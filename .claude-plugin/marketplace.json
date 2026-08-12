@@ -70,6 +70,19 @@
         "url": "https://tsh.io"
       },
       "keywords": ["tsh", "platform", "devops", "ci-cd", "iac", "observability"]
+    },
+    {
+      "name": "tsh-stack-typescript",
+      "source": "./plugins/tsh-stack-typescript",
+      "displayName": "TSH Stack: TypeScript",
+      "description": "TSH conventions for TypeScript: language and version guidelines, and NestJS API implementation and review.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "typescript", "nodejs", "nestjs", "cqrs", "typeorm"]
     }
   ]
 }

@@ -6,7 +6,10 @@ A **Claude Code plugin marketplace** for The Software House. It is not an
 application: there is no build step, no test suite, no dependencies, and no
 runtime. Everything here is Markdown and JSON that Claude Code loads.
 
-The repo publishes five plugins, one per discipline. Each plugin ships custom
+The repo publishes two families of plugins. **Discipline** plugins (`tsh-<discipline>`)
+cover *how we work* — one per discipline, installed by the people who do that job.
+**Stack** plugins (`tsh-stack-<stack-name>`) cover *what we work with* — one per
+technology stack, installed into the projects built on it. Each plugin ships custom
 **agents** and **skills** that TSH teams install into their own projects.
 
 Install instructions for teammates live in [`README.md`](README.md) — that is the
@@ -21,12 +24,14 @@ templates/                        # copy-paste sources; NOT loaded by Claude Cod
 ├── agent.md
 └── SKILL.md
 plugins/
-└── tsh-<discipline>/
-    ├── .claude-plugin/
-    │   └── plugin.json           # manifest — the ONLY file allowed in here
-    ├── agents/                   # <agent-name>.md
-    ├── skills/                   # <skill-name>/SKILL.md
-    └── README.md
+├── tsh-<discipline>/             # how we work — one per discipline
+│   ├── .claude-plugin/
+│   │   └── plugin.json           # manifest — the ONLY file allowed in here
+│   ├── agents/                   # <agent-name>.md
+│   ├── skills/                   # <skill-name>/SKILL.md + references/<topic>.md
+│   └── README.md
+└── tsh-stack-<stack-name>/       # what we work with — one per technology stack
+    └── …                         # identical shape
 ```
 
 ### Manifests
@@ -45,7 +50,9 @@ self-describing if it is ever vendored elsewhere or split into its own repo.
 
 ## Plugin scopes
 
-Route every contribution to the plugin that owns the work:
+Route every contribution to the plugin that owns the work.
+
+### Disciplines — *how we work*
 
 | Plugin | Owns |
 | :-- | :-- |
@@ -59,15 +66,61 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 *outcome*, not the one that owns the tooling. An a11y audit belongs to
 `tsh-product-testing` even though it reads component code.
 
+### Stacks — *what we work with*
+
+| Plugin | Owns |
+| :-- | :-- |
+| `tsh-stack-typescript` | TypeScript as a language, and the frameworks TSH builds on it — currently NestJS |
+
+**Every technology stack gets its own plugin, named `tsh-stack-<stack-name>`.**
+PHP, Java, Go and the rest are expected members of this family; each is created
+when it has real content to ship, not before. An empty plugin in the Discover tab
+teaches teammates the catalogue is hollow.
+
+> **Discipline or stack?** Ask: *would this guidance change if the team switched
+> language or framework?* If yes it's a stack plugin; if it holds regardless of
+> stack it's a discipline plugin. "How we run code review" →
+> `tsh-product-engineering`. "What to look for in a NestJS pull request" →
+> `tsh-stack-typescript`.
+
+The two families are installed differently, and that is the whole reason they are
+separate. A discipline plugin travels with **you** (`user` scope — your job
+doesn't change per repo). A stack plugin travels with the **repo** (`project`
+scope — the repo already knows what it's written in). Collapsing stacks into
+`tsh-product-engineering` would put every stack's skills in front of every
+engineer: Claude Code preloads every installed skill's `name` and `description`
+into context, and when that listing overflows its budget it *truncates
+descriptions*, degrading routing for every skill including the discipline ones.
+
+### Stack plugin granularity
+
+One plugin per stack, where a stack is the unit people actually install. Framework
+skills live inside their ecosystem's plugin — `implementing-nestjs-api` belongs in
+`tsh-stack-typescript`, not in a `tsh-stack-nestjs` of its own. Two reasons:
+
+1. **A plugin is one install decision.** The install unit is the plugin, not the
+   skill; there is no way to install half of one. Nobody wants "NestJS guidance
+   but explicitly not TypeScript guidance."
+2. **Cross-linked knowledge must be co-located.** A skill can only reliably read
+   files inside its own plugin (hard rule 7). The NestJS skill needs the
+   TypeScript decorator and compiler material, so they have to ship together.
+
+**Split trigger.** When a `tsh-stack-*` plugin exceeds roughly 8 skills, or when
+more than half its skills are irrelevant to a typical installer, split it. For
+`tsh-stack-typescript` that means frontend and Node skills moving to
+`tsh-stack-frontend` and `tsh-stack-nodejs`, with the language-level core staying
+put — a Go team writing React should be able to install the frontend guidance
+without the NestJS surface.
+
 ## Where things go
 
 | I want to add… | Path | Start from |
 | :-- | :-- | :-- |
 | An agent | `plugins/<plugin>/agents/<agent-name>.md` | `templates/agent.md` |
 | A skill | `plugins/<plugin>/skills/<skill-name>/SKILL.md` | `templates/SKILL.md` |
-| Supporting detail for a skill | `plugins/<plugin>/skills/<skill-name>/reference.md` | — |
+| Supporting detail for a skill | `plugins/<plugin>/skills/<skill-name>/references/<topic>.md` | — |
 | A script a skill runs | `plugins/<plugin>/skills/<skill-name>/scripts/` | — |
-| A whole new plugin | `plugins/tsh-<discipline>/` + an entry in `marketplace.json` | an existing plugin |
+| A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `marketplace.json` | an existing plugin |
 
 ### Agent or skill?
 
@@ -84,14 +137,27 @@ change the way the current conversation proceeds, make it a skill.
 
 ## Naming
 
-- Plugin directories: `tsh-<discipline>`, kebab-case. The directory name, the
-  `name` in `plugin.json`, and the `name` in the marketplace entry must all match.
+- Plugin directories: `tsh-<discipline>` or `tsh-stack-<stack-name>`, kebab-case.
+  The directory name, the `name` in `plugin.json`, and the `name` in the
+  marketplace entry must all match.
 - Agent and skill names: kebab-case, **without** a `tsh-` prefix. The plugin
   already namespaces them.
   - Correct: `a11y-auditor` → `@tsh-product-testing:a11y-auditor`
   - Wrong: `tsh-a11y-auditor` → `@tsh-product-testing:tsh-a11y-auditor`
 - Agent filename matches its frontmatter `name`. Skill directory name *is* the
   skill name.
+- **Skill names carry no framework version.** `implementing-nestjs-api`, not
+  `implementing-nestjs-11-api`. A skill name is its invocation command, so pinning
+  a dependency's major forces a rename on every upgrade — breaking docs, muscle
+  memory, and any `enabledPlugins` entry, with no deprecation mechanism. Put the
+  version in the `description` and in a **Version Baseline** block at the top of
+  `SKILL.md` that tells Claude to check `package.json` and stop if the project is
+  outside the supported range. The plugin's `version` field is the only version
+  this repo tracks.
+- **Keep skill names tech-qualified.** `implementing-nestjs-api`, not
+  `implementing-api`. Namespacing makes `tsh-stack-java:implementing-api` and
+  `tsh-stack-typescript:implementing-api` both legal, but the model routes on
+  descriptions, and two near-identical ones are a coin flip.
 
 ## Hard rules
 
@@ -116,6 +182,25 @@ change the way the current conversation proceeds, make it a skill.
    Claude Code rejects those fields in plugin-shipped agents for security reasons.
 6. **Keep `templates/` out of the plugins.** It sits at the repo root precisely so
    Claude Code never loads the examples as real components.
+7. **Cross-link only inside your own plugin.** Reference bundled files as
+   `./references/<topic>.md` from `SKILL.md`, or `${CLAUDE_PLUGIN_ROOT}/…` for
+   files shared between skills of the same plugin — Claude Code substitutes
+   `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_SKILL_DIR}` in plugin skill markdown.
+   Never path into another plugin: it may not be installed, and the failure is a
+   silent dead link rather than an error. Knowledge that must cross-link has to be
+   co-located; duplicate the file if two plugins genuinely need it.
+8. **Progressive disclosure above ~150 lines.** `SKILL.md` carries only the
+   frontmatter, applicability and precedence, the non-negotiable rules table, a
+   **Reference Loading** table, and the procedure. Detail goes in `references/`,
+   one concern per file, ≤300 lines each. Two rules make this actually work:
+   - The Reference Loading table needs a **"Load when"** column. A bare list of
+     links gets skimmed; a trigger condition per row gives the model a predicate
+     to evaluate. Pair it with an imperative at the point of use ("read
+     `./references/x.md` before writing any controller") — instruction-following
+     beats table lookup, and the two reinforce each other.
+   - A rule that blocks review belongs in `SKILL.md` even if a reference also
+     explains it. `SKILL.md` is what's in context when the model reads no
+     references at all.
 
 ## Local development loop
 

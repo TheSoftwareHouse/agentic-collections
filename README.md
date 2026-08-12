@@ -1,13 +1,19 @@
 # TSH Agentic Collections
 
 A [Claude Code](https://code.claude.com/docs) plugin marketplace for The Software
-House. It publishes five plugins, one per discipline, each carrying custom agents
-and skills you can install into any project.
+House, carrying custom agents and skills you can install into any project. It
+publishes two families:
 
-> **Heads up:** the plugins are currently **empty scaffolds**. Installing them works
-> and is worth doing now — you'll pick up agents and skills automatically as we land
-> them — but they contribute no components yet. An empty component list after install
-> is expected, not a broken install.
+- **Disciplines** (`tsh-product-engineering` and friends) — *how we work*. One per
+  discipline. Install the one that matches your job.
+- **Stacks** (`tsh-stack-typescript` and friends) — *what we work with*. One per
+  technology stack. Install the ones a given project is built on.
+
+> **Heads up:** the five **discipline** plugins are still **empty scaffolds**.
+> Installing them works and is worth doing now — you'll pick up agents and skills
+> automatically as we land them — but they contribute no components yet. An empty
+> component list after installing one of those is expected, not a broken install.
+> The **stack** plugins ship real skills today.
 
 Requires Claude Code v2.1 or newer:
 
@@ -52,11 +58,15 @@ for plugins in Step 2.
 Copy just the lines you need:
 
 ```shell
+# Disciplines — pick the one that matches your job
 /plugin install tsh-product-engineering@tsh-agentic-collections
 /plugin install tsh-product-testing@tsh-agentic-collections
 /plugin install tsh-product-management@tsh-agentic-collections
 /plugin install tsh-product-design@tsh-agentic-collections
 /plugin install tsh-platform-engineering@tsh-agentic-collections
+
+# Stacks — pick what the project is built on
+/plugin install tsh-stack-typescript@tsh-agentic-collections
 ```
 
 Each install asks you to pick a **scope**:
@@ -70,6 +80,15 @@ Each install asks you to pick a **scope**:
 Pick **User** if you're installing for yourself. Pick **Project** to give a whole
 team the plugin via the repo. Pick **Local** to try one out in a single repo without
 committing anything.
+
+The two plugin families usually want different answers, and it's worth being
+deliberate about it:
+
+- **Discipline plugins travel with you** — **User** scope. Your job doesn't change
+  from repo to repo.
+- **Stack plugins travel with the repo** — **Project** scope. The repo already
+  knows what it's written in, so everyone working on it should get the same
+  guidance, and nobody should carry another stack's skills around.
 
 Prefer the shell (for onboarding scripts, or to skip the interactive prompt):
 
@@ -155,10 +174,14 @@ listed plugins:
   },
   "enabledPlugins": {
     "tsh-product-engineering@tsh-agentic-collections": true,
-    "tsh-product-testing@tsh-agentic-collections": true
+    "tsh-product-testing@tsh-agentic-collections": true,
+    "tsh-stack-typescript@tsh-agentic-collections": true
   }
 }
 ```
+
+The stack plugin is the clearest case for committing this file: a TypeScript repo
+is a TypeScript repo for everyone who clones it.
 
 Teammates still need to complete the install prompt the first time — a plugin from
 an external source doesn't load until it's actually installed. Until then Claude
@@ -188,6 +211,10 @@ auto-update**. Either way, updates only reach you when we bump a plugin's
 
 ## The plugins
 
+### Disciplines — *how we work*
+
+Install the one that matches your job, at **User** scope.
+
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
 | [`tsh-product-engineering`](plugins/tsh-product-engineering) | Feature implementation, code review, refactoring, debugging, TDD workflows | `/plugin install tsh-product-engineering@tsh-agentic-collections` |
@@ -195,6 +222,18 @@ auto-update**. Either way, updates only reach you when we bump a plugin's
 | [`tsh-product-management`](plugins/tsh-product-management) | Business analysis, requirements & user stories, discovery and scoping | `/plugin install tsh-product-management@tsh-agentic-collections` |
 | [`tsh-product-design`](plugins/tsh-product-design) | UI/UX design work, design systems, design review, Figma-driven flows | `/plugin install tsh-product-design@tsh-agentic-collections` |
 | [`tsh-platform-engineering`](plugins/tsh-platform-engineering) | Infrastructure, CI/CD, IaC, containers, observability, deployment | `/plugin install tsh-platform-engineering@tsh-agentic-collections` |
+
+### Stacks — *what we work with*
+
+Install what the project is built on, at **Project** scope.
+
+| Plugin | Covers | Install |
+| :-- | :-- | :-- |
+| [`tsh-stack-typescript`](plugins/tsh-stack-typescript) | TypeScript version policy, `tsconfig` baselines, decorators and class fields, type modelling; NestJS 11 REST APIs | `/plugin install tsh-stack-typescript@tsh-agentic-collections` |
+
+Every stack gets its own plugin, named `tsh-stack-<stack-name>` — PHP, Java, Go
+and the rest are expected members of this family. Each appears here once it has
+real content to ship, rather than as an empty placeholder.
 
 ## Troubleshooting
 
