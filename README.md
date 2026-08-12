@@ -241,12 +241,13 @@ Everyone, at **User** scope.
 
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
-| [`tsh-core`](plugins/tsh-core) | Tool mechanics that hold regardless of role and stack — currently Git worktree lifecycle | `/plugin install tsh-core@tsh-agentic-collections` |
+| [`tsh-core`](plugins/tsh-core) | What holds regardless of role and stack — Git worktree lifecycle, and the house standard for writing technical documents | `/plugin install tsh-core@tsh-agentic-collections` |
 
-One plugin, not a family, and **capped at six skills**. Anything that would change
-if you switched job belongs in a discipline plugin; anything that would change if
-the repo switched language belongs in a stack plugin. The bar is high on purpose —
-everyone installs this one, so every skill in it costs every teammate context.
+One plugin, not a family. Anything that would change if you switched job belongs in
+a discipline plugin; anything that would change if the repo switched language
+belongs in a stack plugin. There is no cap on what lands here, but the bar is the
+highest in the repo and every addition states what it costs — everyone installs
+this one, so every skill in it spends every teammate's context.
 
 ### Disciplines — *how we work*
 

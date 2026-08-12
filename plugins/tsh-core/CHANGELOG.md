@@ -14,6 +14,38 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.0] - 2026-08-12
+
+### Added
+
+- `writing-technical-documents`, the house writing standard for any technical
+  document a TSH project produces — README, CHANGELOG, `/docs` page, runbook, ADR,
+  RFC, PR description, release note, migration guide, ticket, user story, bug
+  report, test plan. It leads with the conclusion, verifies every path, command and
+  version against the source, and cuts what does not change the reader's decision.
+  The craft rules come from *Writing for Busy Readers* by Todd Rogers and Jessica
+  Lasky-Fink, restated as checkable MUST/NEVER rules with a mandatory revision pass,
+  because a model follows a predicate it can evaluate and skims a principle.
+- Five references loaded on demand: the mechanical revision pass, plus one per
+  artifact class — repository documentation, change records, decision records and
+  work items. Each covers only how the craft rules land on that artifact: who reads
+  it, what to front-load, what typically bloats it.
+
+### Changed
+
+- The skill governs prose craft and **never** an artifact's structure. It will not
+  say what sections a user story or an ADR needs; that belongs to the discipline
+  skill owning the artifact. Commit subject lines and PR titles are outside its
+  scope entirely — the repository's commit convention owns those.
+- `tsh-core`'s admission bar drops its six-skill hard cap. A count never measured
+  the actual cost: Claude Code preloads every installed skill's name and
+  description to route on, so three terse skills can cost less than one verbose
+  one. A PR adding a skill here now reports the plugin's routing footprint before
+  and after instead — a disclosure, not a ceiling.
+- The *name-the-tool* admission test gains one named exception, for this skill
+  only. It is named rather than generalised into an "output standards" category:
+  an exception you can point at is auditable, a category is a hole.
+
 ## [0.2.0] - 2026-08-12
 
 ### Added
