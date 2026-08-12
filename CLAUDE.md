@@ -185,6 +185,7 @@ anything used by a single team or a single repo.
 | A script a skill runs | `plugins/<plugin>/skills/<skill-name>/scripts/` | — |
 | A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `marketplace.json` | an existing plugin |
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read [Core plugin admission](#core-plugin-admission) first | `templates/SKILL.md` |
+| A note about what a released version changed | `plugins/<plugin>/CHANGELOG.md`, in the same commit as the `version` bump | `plugins/tsh-core/CHANGELOG.md` |
 
 ### Agent or skill?
 
@@ -252,6 +253,33 @@ change the way the current conversation proceeds, make it a skill.
    an update only when this string changes — push without bumping it and
    `/plugin update` reports "already at the latest version", with no error to
    explain why nothing arrived.
+
+   **How much to bump**, per plugin:
+
+   | Bump | When |
+   | :-- | :-- |
+   | `patch` | Wording, clarifications, a fix — no change to what the plugin can do |
+   | `minor` | A new skill or agent, or an existing one gains a capability |
+   | `major` | A skill or agent is renamed or removed, or a non-negotiable rule reverses in a way an existing workflow could depend on |
+
+   Renames are `major` because there is no deprecation mechanism: the name is the
+   invocation command, so it breaks docs, muscle memory and `enabledPlugins`
+   entries at once (see [Naming](#naming)).
+
+   **Bump in the same commit as the change, and add a `CHANGELOG.md` entry to that
+   plugin in the same commit too.** There is no release step to separate them from
+   — the marketplace serves whatever is on `main`, so merging *is* releasing. Use
+   [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) with **no
+   `[Unreleased]` section**, for the same reason: nothing sits unreleased. Create a
+   plugin's `CHANGELOG.md` at its first version bump; don't scaffold empty ones.
+   [`plugins/tsh-core/CHANGELOG.md`](plugins/tsh-core/CHANGELOG.md) is the worked
+   example.
+
+   Nothing in Claude Code surfaces release notes, so link the changelog from the
+   plugin's `README.md` and attach the link when you announce a bump. Which command
+   teammates need depends on what changed: an **existing** plugin reaches them with
+   `/plugin update`, a **brand-new** plugin needs
+   `/plugin marketplace update tsh-agentic-collections` first — see rule 2.
 4. **A `CLAUDE.md` inside a plugin is not loaded.** Claude Code ignores it. To ship
    instructions that reach Claude's context, write a skill. Per-plugin human docs
    go in that plugin's `README.md`.
