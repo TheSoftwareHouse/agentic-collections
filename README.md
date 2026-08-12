@@ -37,6 +37,16 @@ or `gh auth login` already set up. Alternatives if the `owner/repo` shorthand fa
 /plugin marketplace add ./agentic-collections        # from a local clone
 ```
 
+The catalog is registered for **you, in every project** by default. It takes a scope of
+its own — run this from a repo's root to register it for that repo only:
+
+```shell
+claude plugin marketplace add TheSoftwareHouse/agentic-collections --scope project
+```
+
+`--scope` takes `user`, `project` or `local`, and means the same thing here as it does
+for plugins in Step 2.
+
 ## Step 2 — install the plugins you want
 
 Copy just the lines you need:
@@ -54,18 +64,39 @@ Each install asks you to pick a **scope**:
 | Scope | Who gets it | Where it's written |
 | :-- | :-- | :-- |
 | **User** | You, in every project | your user settings |
-| **Project** | Everyone working on this repo | the repo's `.claude/settings.json` |
-| **Local** | You, in this repo only | `.claude/settings.local.json` |
+| **Project** | Everyone working on this repo | the repo's `.claude/settings.json` — **committed**, so it travels with the repo |
+| **Local** | You, in this repo only | `.claude/settings.local.json` — keep it out of git |
 
 Pick **User** if you're installing for yourself. Pick **Project** to give a whole
-team the plugin via the repo.
+team the plugin via the repo. Pick **Local** to try one out in a single repo without
+committing anything.
 
 Prefer the shell (for onboarding scripts, or to skip the interactive prompt):
 
 ```shell
 claude plugin install tsh-product-testing@tsh-agentic-collections --scope user
 claude plugin install tsh-product-testing@tsh-agentic-collections --scope project
+claude plugin install tsh-product-testing@tsh-agentic-collections --scope local
 ```
+
+Three things the table doesn't say:
+
+- **Scope is resolved against your current directory.** Run `project` and `local`
+  installs from the target repo's root, not from wherever your session started.
+- **To confine a plugin to one project, scope both.** The marketplace has its own
+  scope (Step 1). Scope only the install and you've still registered the catalog
+  everywhere.
+- **Scopes stack.** A committed project set is a starting point, not a cage —
+  anyone can add their own plugins on top at `user` or `local` scope, and both
+  sets load together.
+
+`local` scope is only private if you keep the file out of git; nothing adds it for
+you. Add `.claude/settings.local.json` to your `.gitignore` — [this repo's
+`.gitignore`](.gitignore) does exactly that.
+
+Installing never copies plugin files into your project. Everything lives in
+`~/.claude/plugins/marketplaces/`, whatever the scope — scope decides which projects
+load a plugin, not where it's stored.
 
 You can also browse instead of typing names: run `/plugin`, go to the **Discover**
 tab, and press Enter on a plugin to see its details and install it.
@@ -103,8 +134,14 @@ claude plugin details tsh-product-testing@tsh-agentic-collections
 
 ## Onboarding a whole project team at once
 
-Commit this to your project's `.claude/settings.json`. Everyone who trusts the
-folder gets prompted to install the marketplace and the listed plugins:
+Installing at `--scope project` already does this — it writes your project's
+`.claude/settings.json` for you, in exactly the shape below. Commit that file and your
+team has the set.
+
+Write it by hand instead when you want to declare the set *before* anyone installs
+anything: a repo template, or an onboarding PR that lands the plugin list alongside the
+code. Everyone who trusts the folder gets prompted to install the marketplace and the
+listed plugins:
 
 ```json
 {
@@ -164,12 +201,22 @@ auto-update**. Either way, updates only reach you when we bump a plugin's
 **`/plugin` isn't recognized.** Your Claude Code is too old. Update it, restart your
 terminal, and try again.
 
-**Skills or agents don't appear after installing.** Clear the plugin cache, restart
-Claude Code, and reinstall:
+**A plugin shows as `✘ disabled` in `claude plugin list`.** Check where you ran it.
+`plugin list` reports every plugin you've installed, anywhere, but `Status` reflects
+the **current directory** — a `project` or `local` scoped plugin is correctly disabled
+outside its project. Run it again from that project's root and it should read
+`✔ enabled`.
+
+**Skills or agents don't appear after installing.** Delete the marketplace's cached
+clone, restart Claude Code, then re-add (Step 1) and reinstall (Step 2):
 
 ```shell
-rm -rf ~/.claude/plugins/cache
+rm -rf ~/.claude/plugins/marketplaces/tsh-agentic-collections
 ```
+
+`~/.claude/plugins/known_marketplaces.json` is the index that tracks the clone and
+where it lives. (Older docs point at `~/.claude/plugins/cache` — that path no longer
+exists, so removing it does nothing.)
 
 **Anything else.** Run `/plugin` and open the **Errors** tab — load failures are
 reported there with the reason.
