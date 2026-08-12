@@ -1,8 +1,8 @@
 # Creating a Worktree
 
 Use this flow only for create requests. Work through the steps in order — the
-ordering of fetch, conflict checks, and the two confirmations is what makes the
-operation safe.
+ordering of base resolution, fetch, conflict checks, and the two confirmations is
+what makes the operation safe.
 
 ## 1. Resolve the active root
 
@@ -43,6 +43,9 @@ operation safe.
   `feat-checkout-flow` produce `/Users/you/dev/acme-api-feat-checkout-flow`. Note
   that the sibling is derived from the **canonical** root's basename, never from
   the active linked worktree's.
+- The slug always comes from the **new branch**, never from the base branch. The
+  two are independent values, and a path named after the base tells the user
+  nothing about what the worktree is for.
 - If the user supplies a path, still derive and show the canonical-root-based
   proposal, then validate the supplied path as the candidate before accepting it;
   normalize it to exactly one absolute path and stop on lookup, normalization, or
@@ -53,51 +56,93 @@ operation safe.
   branch name. Reject unsafe, conflicting, or non-unique paths before mutation.
 - Do not silently create inside either repository root.
 
-## 4. Fetch the base
+## 4. Resolve the base branch
 
-- Run `git -C "$canonical_root" fetch origin main`.
+- Determine `base_branch` by precedence and stop at the first that succeeds:
+  1. The base branch the user named, if they named one.
+  2. Origin's own default branch, read from the remote with
+     `git -C "$canonical_root" ls-remote --symref origin HEAD` and taken from the
+     `ref: refs/heads/<name>` line of the output.
+  3. Neither resolved — stop and ask the user which branch to base on.
+- Record whether `base_branch` was **user-supplied** or **detected**; step 7 has to
+  disclose which.
+- Normalize the candidate by stripping a single leading `refs/heads/` or a single
+  leading `origin/`. The result is the bare branch name. Rewrite nothing else.
+- Validate the candidate with
+  `git -C "$canonical_root" ls-remote --exit-code --heads origin "refs/heads/$base_branch"`.
+  Exit status `0` is the only acceptable result. Exit status `2` means no such
+  branch on `origin` and must cause rejection that says so specifically; any other
+  exit status is indeterminate/fatal and must stop the workflow.
+- Any branch that exists on `origin` is a legal base, feature branches included.
+- That same check is what refuses tags, commit SHAs, local-only branches, and
+  branches on other remotes such as `upstream/main` — none of them match
+  `refs/heads/*` on `origin`. Do not add a separate resolution path for any of
+  them; report the rejection and stop.
+- Reject the request if `base_branch` equals the new `branch`.
+- Never infer the base from local state. `refs/remotes/origin/HEAD` can be stale or
+  absent, and `init.defaultBranch` describes this machine rather than this remote.
+- Never substitute a different base when the requested one is missing, and never
+  assume `main` when detection fails. Stop instead.
+
+## 5. Fetch the base
+
+- Run
+  `git -C "$canonical_root" fetch origin -- "+refs/heads/${base_branch}:refs/remotes/origin/${base_branch}"`.
+- The explicit refspec is required, not stylistic. A refspec-less
+  `git fetch origin <branch>` only guarantees `FETCH_HEAD`, so under a non-default
+  fetch refspec or a single-branch clone the remote-tracking ref below can still
+  hold a stale commit while this step appears to have succeeded.
+- Write the refspec with **braced** `${base_branch}`, never bare `$base_branch`. In
+  zsh — the macOS default — `"$base_branch:refs/…"` is parsed as the `:r` history
+  modifier, which swallows the `:r` and yields a corrupt one-sided refspec such as
+  `+refs/heads/my-brancefs/remotes/origin/my-branch`. It fails loudly rather than
+  fetching the wrong thing, but only the braced form works in both shells.
 - Stop immediately on any fetch failure.
-- Verify that `refs/remotes/origin/main` exists.
-- Resolve the fetched commit with
-  `git -C "$canonical_root" rev-parse refs/remotes/origin/main` and call the result
-  `base_commit`.
-- Run `git ls-remote --exit-code --heads origin "refs/heads/$branch"`. Exit status
-  `2` is the only acceptable absence/no-matching-head result. Exit status `0` means
-  the remote branch exists and must cause rejection; any other exit status is
-  indeterminate/fatal and must stop the workflow. Never adopt an existing remote
-  branch, and stop on any failure.
-- Stop if the ref or `base_commit` cannot be resolved.
-- Never fall back to local `main`, `HEAD`, or the current feature branch.
+- Verify that `refs/remotes/origin/$base_branch` exists and call it `base_ref`.
+- Resolve the fetched commit with `git -C "$canonical_root" rev-parse "$base_ref"`
+  and call the result `base_commit`.
+- Stop if `base_ref` or `base_commit` cannot be resolved.
+- Never fall back to a local branch of the same name, `HEAD`, or the current
+  feature branch.
 
-## 5. Check conflicts before mutation
+## 6. Check conflicts before mutation
 
 - Reject the branch if a registered worktree already uses that branch name.
 - Reject the branch if a local branch with that name already exists, even if it is
   not registered to a worktree.
-- Reject the branch if remote `refs/heads/<branch>` exists; never adopt an existing
-  remote branch.
+- Reject the branch if it already exists on the remote. Run
+  `git ls-remote --exit-code --heads origin "refs/heads/$branch"`. Exit status `2`
+  is the only acceptable absence/no-matching-head result. Exit status `0` means the
+  remote branch exists and must cause rejection; any other exit status is
+  indeterminate/fatal and must stop the workflow. Never adopt an existing remote
+  branch, and stop on any failure.
 - Reject the path if a registered worktree already uses that path.
 - Reject any path that already exists or is inside the active worktree.
 - Do not create anything until all checks pass.
 
-## 6. Present the final literal confirmation
+## 7. Present the final literal confirmation
 
-- After fetch and conflict checks, present one final confirmation that contains the
-  exact branch name, the shell-safe absolute path, the resolved `base_commit`, and
-  the intended upstream `origin/<branch>`.
+- After base resolution, fetch, and conflict checks, present one final confirmation
+  that contains the exact branch name, the base as `origin/<base_branch>` together
+  with the resolved `base_commit`, the shell-safe absolute path, and the intended
+  upstream `origin/<branch>`.
 - Example wording:
-  `Create worktree? branch=<branch> path='/abs/path' base=<base_commit> upstream=origin/<branch>`.
+  `Create worktree? branch=<branch> base=origin/<base_branch>@<base_commit> path='/abs/path' upstream=origin/<branch>`.
+- Name the base branch; never present the base as a bare commit. A SHA on its own
+  gives the user no way to notice that the wrong trunk was used.
+- When `base_branch` was detected rather than user-supplied, say so inline, for
+  example `base=origin/develop (origin's default) @<base_commit>`.
 - Only this final confirmation authorizes creation; earlier proposals or partial
   confirmations do not.
 
-## 7. Create the local worktree with no tracking
+## 8. Create the local worktree with no tracking
 
 - Create the worktree with
   `git -C "$canonical_root" worktree add --no-track -b "$branch" "$path" "$base_commit"`.
-- Treat branch, path, and `base_commit` as untrusted values; pass them as separate
-  shell arguments and never concatenate them into a raw command string.
+- Treat branch, base branch, path, and `base_commit` as untrusted values; pass them
+  as separate shell arguments and never concatenate them into a raw command string.
 
-## 8. Verify the created result
+## 9. Verify the created result
 
 - Verify that the created path exists and that
   `git -C "$path" rev-parse --abbrev-ref HEAD` resolves to `$branch`.
@@ -106,29 +151,30 @@ operation safe.
   `git -C "$path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}` fails or
   errors because no upstream is configured. If it unexpectedly resolves to any
   upstream, treat that as verification failure, stop, and do not proceed to publish.
-- On fetch, creation, or verification failure, stop in a controlled unverified
-  state and report the failure; do not report an unverified success.
+- On resolution, fetch, creation, or verification failure, stop in a controlled
+  unverified state and report the failure; do not report an unverified success.
 
-## 9. Return the terminal command
+## 10. Return the terminal command
 
 - Return a copy-paste-ready shell-quoted absolute command such as
   `cd -- '/abs/path'`.
 
-## 10. Confirm the first remote publication separately
+## 11. Confirm the first remote publication separately
 
 - Immediately before the first remote mutation, request a second, separate literal
-  confirmation naming exactly the intended upstream `origin/<branch>` and
-  `base_commit`.
-- Example wording: `Publish upstream? upstream=origin/<branch> base=<base_commit>`.
-- This confirmation and the step 6 local-creation confirmation are distinct;
+  confirmation naming exactly the intended upstream `origin/<branch>`, the base
+  `origin/<base_branch>`, and `base_commit`.
+- Example wording:
+  `Publish upstream? upstream=origin/<branch> base=origin/<base_branch>@<base_commit>`.
+- This confirmation and the step 7 local-creation confirmation are distinct;
   neither substitutes for the other.
 
-## 11. Publish without force
+## 12. Publish without force
 
 - After the separate publish confirmation, run exactly
   `git -C "$path" push --set-upstream origin "$branch"`.
 
-## 12. Verify the published upstream
+## 13. Verify the published upstream
 
 - Verify that `git -C "$path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}`
   resolves exactly to `origin/<branch>`.

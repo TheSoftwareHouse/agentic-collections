@@ -2,7 +2,7 @@
   "name": "tsh-core",
   "displayName": "TSH Core",
   "description": "Tool mechanics every TSH engineer needs regardless of discipline or stack, starting with safe Git worktree lifecycle management.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

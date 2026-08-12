@@ -23,7 +23,14 @@ that is on purpose.
 
 | Skill | Invoke | Covers |
 | :-- | :-- | :-- |
-| `managing-git-worktrees` | `/tsh-core:managing-git-worktrees` | Git worktree lifecycle: create from a freshly fetched `origin/main`, list read-only, remove one precisely identified target — each with explicit confirmation and post-mutation verification |
+| `managing-git-worktrees` | `/tsh-core:managing-git-worktrees` | Git worktree lifecycle: create from a freshly fetched base branch on `origin` — any branch, defaulting to origin's own default — list read-only, remove one precisely identified target, each with explicit confirmation and post-mutation verification |
+
+Name a base branch and it is used; name none and origin's default branch is read
+from the remote, so `main`, `master` and `develop` trunks all work. A base that
+cannot be resolved stops the run — the skill never guesses one.
+
+See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
+with `/plugin update`.
 
 The skill is model-invocable — Claude loads it when the work matches its
 description, so you don't have to remember to type the command.
@@ -93,7 +100,13 @@ Add a skill as `skills/<skill-name>/SKILL.md`, with supporting detail in
 [`templates/SKILL.md`](../../templates/SKILL.md) and read
 [`CLAUDE.md`](../../CLAUDE.md) for the conventions and the local test loop.
 
-Two rules that bite hardest here:
+Shipping a change means bumping `version` in
+[`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) and adding a
+[`CHANGELOG.md`](CHANGELOG.md) entry in the same commit — without the bump,
+`/plugin update` tells teammates they are already up to date and your change never
+reaches them. `CLAUDE.md` hard rule 3 has the patch/minor/major semantics.
+
+Three rules that bite hardest here:
 
 - **Name the tool in the skill name.** `managing-git-worktrees`, not
   `managing-worktrees`. It keeps the *name-the-tool* admission test visible in the
