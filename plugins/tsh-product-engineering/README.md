@@ -13,6 +13,9 @@ Feature implementation, code review, refactoring, debugging and TDD workflows.
 
 Nothing yet — this is a scaffold. `agents/` and `skills/` are empty on purpose.
 
+Git worktree lifecycle lives in `tsh-core`, not here — it doesn't change with your
+discipline. Install that alongside this one.
+
 ## Contributing
 
 Add an agent as `agents/<agent-name>.md`, a skill as `skills/<skill-name>/SKILL.md`.

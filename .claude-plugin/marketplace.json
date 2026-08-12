@@ -1,11 +1,24 @@
 {
   "name": "tsh-agentic-collections",
-  "description": "The Software House agentic collections: Claude Code plugins organized per discipline.",
+  "description": "The Software House agentic collections: Claude Code plugins organized per discipline, per technology stack, and a small shared core.",
   "owner": {
     "name": "The Software House",
     "url": "https://tsh.io"
   },
   "plugins": [
+    {
+      "name": "tsh-core",
+      "source": "./plugins/tsh-core",
+      "displayName": "TSH Core",
+      "description": "Tool mechanics every TSH engineer needs regardless of discipline or stack, starting with safe Git worktree lifecycle management.",
+      "category": "tooling",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling"]
+    },
     {
       "name": "tsh-product-engineering",
       "source": "./plugins/tsh-product-engineering",

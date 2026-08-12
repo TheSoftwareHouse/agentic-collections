@@ -2,8 +2,11 @@
 
 A [Claude Code](https://code.claude.com/docs) plugin marketplace for The Software
 House, carrying custom agents and skills you can install into any project. It
-publishes two families:
+publishes three families:
 
+- **Core** (`tsh-core`) — *the ground under both*. One small plugin of tool
+  mechanics that depend on neither your role nor the repo. Install it; it's for
+  everyone.
 - **Disciplines** (`tsh-product-engineering` and friends) — *how we work*. One per
   discipline. Install the one that matches your job.
 - **Stacks** (`tsh-stack-typescript` and friends) — *what we work with*. One per
@@ -13,7 +16,7 @@ publishes two families:
 > Installing them works and is worth doing now — you'll pick up agents and skills
 > automatically as we land them — but they contribute no components yet. An empty
 > component list after installing one of those is expected, not a broken install.
-> The **stack** plugins ship real skills today.
+> **`tsh-core` and the stack plugins ship real skills today.**
 
 Requires Claude Code v2.1 or newer:
 
@@ -58,6 +61,9 @@ for plugins in Step 2.
 Copy just the lines you need:
 
 ```shell
+# Core — everyone
+/plugin install tsh-core@tsh-agentic-collections
+
 # Disciplines — pick the one that matches your job
 /plugin install tsh-product-engineering@tsh-agentic-collections
 /plugin install tsh-product-testing@tsh-agentic-collections
@@ -81,9 +87,11 @@ Pick **User** if you're installing for yourself. Pick **Project** to give a whol
 team the plugin via the repo. Pick **Local** to try one out in a single repo without
 committing anything.
 
-The two plugin families usually want different answers, and it's worth being
+The three plugin families usually want different answers, and it's worth being
 deliberate about it:
 
+- **Core travels with you** — **User** scope, same as your discipline plugin. It
+  depends on neither your role nor the repo, so it should follow you everywhere.
 - **Discipline plugins travel with you** — **User** scope. Your job doesn't change
   from repo to repo.
 - **Stack plugins travel with the repo** — **Project** scope. The repo already
@@ -183,6 +191,13 @@ listed plugins:
 The stack plugin is the clearest case for committing this file: a TypeScript repo
 is a TypeScript repo for everyone who clones it.
 
+`tsh-core` is deliberately **not** in that list, and that isn't an oversight to
+fix. It's user-scope by design — it follows the person, not the repo — so pinning
+it here would mean every repo in the company re-declaring the same line, and
+anyone who already installed it getting a redundant prompt. The discipline plugins
+are listed only because a repo may want to hand a new team a sensible starting
+set; drop them if your team installs their own.
+
 Teammates still need to complete the install prompt the first time — a plugin from
 an external source doesn't load until it's actually installed. Until then Claude
 Code reports it as not installed and prints the `claude plugin install` command.
@@ -219,6 +234,19 @@ The two commands answer different questions, and the distinction matters:
 ⚠️ Removing the marketplace also uninstalls every plugin you installed from it.
 
 ## The plugins
+
+### Core — *the ground under both*
+
+Everyone, at **User** scope.
+
+| Plugin | Covers | Install |
+| :-- | :-- | :-- |
+| [`tsh-core`](plugins/tsh-core) | Tool mechanics that hold regardless of role and stack — currently Git worktree lifecycle | `/plugin install tsh-core@tsh-agentic-collections` |
+
+One plugin, not a family, and **capped at six skills**. Anything that would change
+if you switched job belongs in a discipline plugin; anything that would change if
+the repo switched language belongs in a stack plugin. The bar is high on purpose —
+everyone installs this one, so every skill in it costs every teammate context.
 
 ### Disciplines — *how we work*
 

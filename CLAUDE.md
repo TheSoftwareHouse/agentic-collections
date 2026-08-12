@@ -6,10 +6,12 @@ A **Claude Code plugin marketplace** for The Software House. It is not an
 application: there is no build step, no test suite, no dependencies, and no
 runtime. Everything here is Markdown and JSON that Claude Code loads.
 
-The repo publishes two families of plugins. **Discipline** plugins (`tsh-<discipline>`)
+The repo publishes three families of plugins. **Discipline** plugins (`tsh-<discipline>`)
 cover *how we work* — one per discipline, installed by the people who do that job.
 **Stack** plugins (`tsh-stack-<stack-name>`) cover *what we work with* — one per
-technology stack, installed into the projects built on it. Each plugin ships custom
+technology stack, installed into the projects built on it. **`tsh-core`** is the
+ground under both: a single, deliberately small plugin for tool mechanics that
+depend on neither your role nor the repo's technology. Each plugin ships custom
 **agents** and **skills** that TSH teams install into their own projects.
 
 Install instructions for teammates live in [`README.md`](README.md) — that is the
@@ -24,6 +26,8 @@ templates/                        # copy-paste sources; NOT loaded by Claude Cod
 ├── agent.md
 └── SKILL.md
 plugins/
+├── tsh-core/                     # neither role nor stack — one plugin, capped at 6 skills
+│   └── …                         # identical shape
 ├── tsh-<discipline>/             # how we work — one per discipline
 │   ├── .claude-plugin/
 │   │   └── plugin.json           # manifest — the ONLY file allowed in here
@@ -77,20 +81,42 @@ PHP, Java, Go and the rest are expected members of this family; each is created
 when it has real content to ship, not before. An empty plugin in the Discover tab
 teaches teammates the catalogue is hollow.
 
-> **Discipline or stack?** Ask: *would this guidance change if the team switched
-> language or framework?* If yes it's a stack plugin; if it holds regardless of
-> stack it's a discipline plugin. "How we run code review" →
-> `tsh-product-engineering`. "What to look for in a NestJS pull request" →
-> `tsh-stack-typescript`.
+### Core — *neither role nor stack*
 
-The two families are installed differently, and that is the whole reason they are
-separate. A discipline plugin travels with **you** (`user` scope — your job
+| Plugin | Owns |
+| :-- | :-- |
+| `tsh-core` | Tool mechanics that hold regardless of discipline and stack — currently Git worktree lifecycle |
+
+**`tsh-core` is one plugin, not a family. There is no `tsh-core-*`.** See
+[Core plugin admission](#core-plugin-admission) before adding anything to it.
+
+> **Which family?** Ask in order and stop at the first yes:
+>
+> 1. *Would this guidance change if the repo switched language or framework?*
+>    → `tsh-stack-<stack-name>`. "What to look for in a NestJS pull request."
+> 2. *Would it change if the reader switched job?* → the `tsh-<discipline>` that
+>    owns the **outcome**. "How we run code review."
+> 3. *Neither, and it clears the admission bar?* → `tsh-core`. "How to create a
+>    Git worktree without losing work."
+>
+> **Ties go to a discipline plugin. `tsh-core` is never the default answer.**
+
+The families are installed differently, and the split exists to make that
+possible. A discipline plugin travels with **you** (`user` scope — your job
 doesn't change per repo). A stack plugin travels with the **repo** (`project`
-scope — the repo already knows what it's written in). Collapsing stacks into
+scope — the repo already knows what it's written in). `tsh-core` travels with
+you too, at `user` scope, because it depends on nothing at all.
+
+The underlying constraint is context budget. Collapsing stacks into
 `tsh-product-engineering` would put every stack's skills in front of every
 engineer: Claude Code preloads every installed skill's `name` and `description`
 into context, and when that listing overflows its budget it *truncates
 descriptions*, degrading routing for every skill including the discipline ones.
+That argument is about **relevance density**, which is why it does not also
+forbid a small universal plugin — a skill relevant to every installer costs
+exactly one description, the floor for shipping it at all. But it does mean
+`tsh-core` carries the highest admission bar in the repo, because everyone pays
+for every entry in it.
 
 ### Stack plugin granularity
 
@@ -112,6 +138,43 @@ more than half its skills are irrelevant to a typical installer, split it. For
 put — a Go team writing React should be able to install the frontend guidance
 without the NestJS surface.
 
+### Core plugin admission
+
+Every other plugin has a claimant and an affirmative question — *is this QA's
+job?*, *is this TypeScript?*. `tsh-core` is the only one defined by a
+**negation**, and negatively-defined containers accrete by default. The cost is
+also externalised: the contributor who couldn't decide gets a home for their
+skill, while every teammate pays listing budget. So admission is by elimination
+**plus evidence**:
+
+1. **It fails both routing questions.** Not stack, not discipline.
+2. **Generic is not core.** Core skills are *tool mechanics* — the procedure is
+   dictated by the tool's own semantics (`git`, `gh`, the shell), not by TSH's
+   opinion about how to work. "Write good commit messages" is generic, applies to
+   everyone, and is still a **discipline** skill, because only TSH's opinion could
+   produce it. **If you cannot name the tool the skill wraps, it is not core.**
+3. **Evidence, not assertion.** The PR names which **three of the five
+   disciplines** would invoke it in a normal month. "It's generic" is not evidence.
+4. **Ties go to a discipline plugin.** When the answer is arguable, it isn't core.
+
+**Hard cap: six skills.** At six, nothing new lands until something is removed or
+re-homed. Hitting the cap means admission got too loose — it is **not** a signal
+that the plugin needs splitting. A prefixed family earns its keep only when there
+is a variable to instantiate (`tsh-stack-<stack-name>`, `tsh-<discipline>`), and
+`tsh-core`'s defining property is depending on no variable. The only thing that
+could follow `tsh-core-` is a topic bucket, and a topic is not an install
+decision.
+
+The name is doing guardrail work, so don't "clarify" it later: `common` and
+`shared` are the industry's canonical junk-drawer names because they claim *mere
+reuse*, which anyone can truthfully assert about anything. `core` claims
+*centrality*, which has to be defended.
+
+Out of scope by construction: language or framework content (→ stack); role
+practice and methodology (→ discipline); company policy, onboarding or handbook
+prose (that's a document, not a skill); "utilities" and one-off automation; and
+anything used by a single team or a single repo.
+
 ## Where things go
 
 | I want to add… | Path | Start from |
@@ -121,6 +184,7 @@ without the NestJS surface.
 | Supporting detail for a skill | `plugins/<plugin>/skills/<skill-name>/references/<topic>.md` | — |
 | A script a skill runs | `plugins/<plugin>/skills/<skill-name>/scripts/` | — |
 | A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `marketplace.json` | an existing plugin |
+| A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read [Core plugin admission](#core-plugin-admission) first | `templates/SKILL.md` |
 
 ### Agent or skill?
 
@@ -137,9 +201,13 @@ change the way the current conversation proceeds, make it a skill.
 
 ## Naming
 
-- Plugin directories: `tsh-<discipline>` or `tsh-stack-<stack-name>`, kebab-case.
-  The directory name, the `name` in `plugin.json`, and the `name` in the
-  marketplace entry must all match.
+- Plugin directories: `tsh-<discipline>`, `tsh-stack-<stack-name>`, or the fixed
+  single name `tsh-core`, kebab-case. The directory name, the `name` in
+  `plugin.json`, and the `name` in the marketplace entry must all match.
+- **`tsh-core` is a single plugin — there is no `tsh-core-*`.** The two
+  neighbouring families are prefixed, so this is the obvious thing to pattern-match
+  and get wrong. Don't rename it to `tsh-common` or `tsh-shared` either; see
+  [Core plugin admission](#core-plugin-admission) for why the name is load-bearing.
 - Agent and skill names: kebab-case, **without** a `tsh-` prefix. The plugin
   already namespaces them.
   - Correct: `a11y-auditor` → `@tsh-product-testing:a11y-auditor`
@@ -157,7 +225,10 @@ change the way the current conversation proceeds, make it a skill.
 - **Keep skill names tech-qualified.** `implementing-nestjs-api`, not
   `implementing-api`. Namespacing makes `tsh-stack-java:implementing-api` and
   `tsh-stack-typescript:implementing-api` both legal, but the model routes on
-  descriptions, and two near-identical ones are a coin flip.
+  descriptions, and two near-identical ones are a coin flip. This applies in
+  `tsh-core` too: `managing-git-worktrees`, not `managing-worktrees` — naming the
+  tool keeps the *name-the-tool* admission test visible in the directory listing,
+  and "worktree" alone collides with monorepo *workspaces*.
 
 ## Hard rules
 
@@ -207,6 +278,14 @@ change the way the current conversation proceeds, make it a skill.
    - A rule that blocks review belongs in `SKILL.md` even if a reference also
      explains it. `SKILL.md` is what's in context when the model reads no
      references at all.
+9. **`tsh-core` admits by elimination and evidence, and is capped at six skills.**
+   A contribution lands there only if it fails both routing questions, wraps a
+   named tool rather than a TSH opinion, and the PR says which three of the five
+   disciplines would invoke it in a normal month. Ties go to a discipline plugin.
+   This is a hard rule and not just prose because it is the one convention whose
+   violation is invisible at review time — a wrongly-placed skill loads fine,
+   validates fine, and simply taxes everyone's context forever. See
+   [Core plugin admission](#core-plugin-admission).
 
 ## Local development loop
 
