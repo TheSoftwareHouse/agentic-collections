@@ -1,0 +1,75 @@
+{
+  "name": "tsh-agentic-collections",
+  "description": "The Software House agentic collections: Claude Code plugins organized per discipline.",
+  "owner": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "plugins": [
+    {
+      "name": "tsh-product-engineering",
+      "source": "./plugins/tsh-product-engineering",
+      "displayName": "TSH Product Engineering",
+      "description": "Feature implementation, code review, refactoring, debugging and TDD workflows.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "engineering", "code-review", "refactoring", "tdd"]
+    },
+    {
+      "name": "tsh-product-testing",
+      "source": "./plugins/tsh-product-testing",
+      "displayName": "TSH Product Testing",
+      "description": "E2E testing, accessibility testing, exploratory and manual QA, test-plan authoring.",
+      "category": "quality",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "testing", "qa", "e2e", "accessibility", "a11y"]
+    },
+    {
+      "name": "tsh-product-management",
+      "source": "./plugins/tsh-product-management",
+      "displayName": "TSH Product Management",
+      "description": "Business analysis, requirements and user stories, product discovery and scoping.",
+      "category": "product",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "product-management", "business-analysis", "requirements", "discovery"]
+    },
+    {
+      "name": "tsh-product-design",
+      "source": "./plugins/tsh-product-design",
+      "displayName": "TSH Product Design",
+      "description": "UI/UX design work, design systems, design review and Figma-driven flows.",
+      "category": "design",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "design", "ux", "ui", "design-system", "figma"]
+    },
+    {
+      "name": "tsh-platform-engineering",
+      "source": "./plugins/tsh-platform-engineering",
+      "displayName": "TSH Platform Engineering",
+      "description": "Infrastructure, CI/CD, infrastructure as code, containers, observability and deployment.",
+      "category": "platform",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "platform", "devops", "ci-cd", "iac", "observability"]
+    }
+  ]
+}

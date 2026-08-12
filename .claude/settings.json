@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "tsh-agentic-collections": {
+      "source": {
+        "source": "github",
+        "repo": "TheSoftwareHouse/agentic-collections"
+      }
+    }
+  }
+}

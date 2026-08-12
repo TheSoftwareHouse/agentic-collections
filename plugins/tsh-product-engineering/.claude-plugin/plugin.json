@@ -1,0 +1,14 @@
+{
+  "name": "tsh-product-engineering",
+  "displayName": "TSH Product Engineering",
+  "description": "Feature implementation, code review, refactoring, debugging and TDD workflows.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-product-engineering",
+  "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
+  "license": "MIT",
+  "keywords": ["tsh", "engineering", "code-review", "refactoring", "tdd"]
+}

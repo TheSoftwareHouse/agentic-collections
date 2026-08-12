@@ -1,0 +1,192 @@
+# TSH Agentic Collections
+
+A [Claude Code](https://code.claude.com/docs) plugin marketplace for The Software
+House. It publishes five plugins, one per discipline, each carrying custom agents
+and skills you can install into any project.
+
+> **Heads up:** the plugins are currently **empty scaffolds**. Installing them works
+> and is worth doing now — you'll pick up agents and skills automatically as we land
+> them — but they contribute no components yet. An empty component list after install
+> is expected, not a broken install.
+
+Requires Claude Code v2.1 or newer:
+
+```shell
+claude --version
+```
+
+If you need to update: `npm install -g @anthropic-ai/claude-code@latest`, or
+`brew upgrade claude-code` if you installed it with Homebrew.
+
+## Step 1 — add the marketplace
+
+Run this inside any Claude Code session. It registers the catalog so you can browse
+it; nothing is installed yet.
+
+```shell
+/plugin marketplace add TheSoftwareHouse/agentic-collections
+```
+
+This repo is private, so your git needs to be able to clone it — a working SSH key
+or `gh auth login` already set up. Alternatives if the `owner/repo` shorthand fails:
+
+```shell
+/plugin marketplace add git@github.com:TheSoftwareHouse/agentic-collections.git
+/plugin marketplace add https://github.com/TheSoftwareHouse/agentic-collections.git
+/plugin marketplace add https://github.com/TheSoftwareHouse/agentic-collections.git#some-branch
+/plugin marketplace add ./agentic-collections        # from a local clone
+```
+
+## Step 2 — install the plugins you want
+
+Copy just the lines you need:
+
+```shell
+/plugin install tsh-product-engineering@tsh-agentic-collections
+/plugin install tsh-product-testing@tsh-agentic-collections
+/plugin install tsh-product-management@tsh-agentic-collections
+/plugin install tsh-product-design@tsh-agentic-collections
+/plugin install tsh-platform-engineering@tsh-agentic-collections
+```
+
+Each install asks you to pick a **scope**:
+
+| Scope | Who gets it | Where it's written |
+| :-- | :-- | :-- |
+| **User** | You, in every project | your user settings |
+| **Project** | Everyone working on this repo | the repo's `.claude/settings.json` |
+| **Local** | You, in this repo only | `.claude/settings.local.json` |
+
+Pick **User** if you're installing for yourself. Pick **Project** to give a whole
+team the plugin via the repo.
+
+Prefer the shell (for onboarding scripts, or to skip the interactive prompt):
+
+```shell
+claude plugin install tsh-product-testing@tsh-agentic-collections --scope user
+claude plugin install tsh-product-testing@tsh-agentic-collections --scope project
+```
+
+You can also browse instead of typing names: run `/plugin`, go to the **Discover**
+tab, and press Enter on a plugin to see its details and install it.
+
+## Step 3 — activate
+
+Read the install summary:
+
+- `Plugin is now active.` → you're done.
+- `Run /reload-plugins to activate.` → run that command:
+
+```shell
+/reload-plugins
+```
+
+If it warns that reloading will re-read the conversation, rerun it as
+`/reload-plugins --force`. The reload summary counts only `commands/` directories,
+so `0 skills` is normal and doesn't mean anything failed.
+
+## Using what you installed
+
+Skills and agents are invoked differently, and both are namespaced by plugin:
+
+```shell
+/tsh-product-testing:<skill-name>     # skills — type / and the plugin name
+@tsh-product-testing:<agent-name>     # agents — @-mention typeahead
+```
+
+To see exactly what a plugin gives you, run `/plugin`, open the **Installed** tab,
+and press Enter on it. Same list from the shell:
+
+```shell
+claude plugin details tsh-product-testing@tsh-agentic-collections
+```
+
+## Onboarding a whole project team at once
+
+Commit this to your project's `.claude/settings.json`. Everyone who trusts the
+folder gets prompted to install the marketplace and the listed plugins:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "tsh-agentic-collections": {
+      "source": {
+        "source": "github",
+        "repo": "TheSoftwareHouse/agentic-collections"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "tsh-product-engineering@tsh-agentic-collections": true,
+    "tsh-product-testing@tsh-agentic-collections": true
+  }
+}
+```
+
+Teammates still need to complete the install prompt the first time — a plugin from
+an external source doesn't load until it's actually installed. Until then Claude
+Code reports it as not installed and prints the `claude plugin install` command.
+
+## Staying current
+
+```shell
+/plugin marketplace update tsh-agentic-collections   # refresh the catalog
+/plugin list                                         # what you have installed
+```
+
+Third-party marketplaces have **auto-update off by default**. To turn it on: run
+`/plugin` → **Marketplaces** → select `tsh-agentic-collections` → **Enable
+auto-update**. Either way, updates only reach you when we bump a plugin's
+`version`, so a refresh that reports no change usually means nothing was released.
+
+## Removing plugins
+
+```shell
+/plugin disable tsh-product-design@tsh-agentic-collections     # keep, stop loading
+/plugin uninstall tsh-product-design@tsh-agentic-collections   # remove one plugin
+/plugin marketplace remove tsh-agentic-collections             # remove everything
+```
+
+⚠️ Removing the marketplace also uninstalls every plugin you installed from it.
+
+## The plugins
+
+| Plugin | Covers | Install |
+| :-- | :-- | :-- |
+| [`tsh-product-engineering`](plugins/tsh-product-engineering) | Feature implementation, code review, refactoring, debugging, TDD workflows | `/plugin install tsh-product-engineering@tsh-agentic-collections` |
+| [`tsh-product-testing`](plugins/tsh-product-testing) | E2E testing, accessibility testing, exploratory/manual QA, test-plan authoring | `/plugin install tsh-product-testing@tsh-agentic-collections` |
+| [`tsh-product-management`](plugins/tsh-product-management) | Business analysis, requirements & user stories, discovery and scoping | `/plugin install tsh-product-management@tsh-agentic-collections` |
+| [`tsh-product-design`](plugins/tsh-product-design) | UI/UX design work, design systems, design review, Figma-driven flows | `/plugin install tsh-product-design@tsh-agentic-collections` |
+| [`tsh-platform-engineering`](plugins/tsh-platform-engineering) | Infrastructure, CI/CD, IaC, containers, observability, deployment | `/plugin install tsh-platform-engineering@tsh-agentic-collections` |
+
+## Troubleshooting
+
+**`/plugin` isn't recognized.** Your Claude Code is too old. Update it, restart your
+terminal, and try again.
+
+**Skills or agents don't appear after installing.** Clear the plugin cache, restart
+Claude Code, and reinstall:
+
+```shell
+rm -rf ~/.claude/plugins/cache
+```
+
+**Anything else.** Run `/plugin` and open the **Errors** tab — load failures are
+reported there with the reason.
+
+## Contributing
+
+Read [`CLAUDE.md`](CLAUDE.md) for conventions, then copy
+[`templates/agent.md`](templates/agent.md) or
+[`templates/SKILL.md`](templates/SKILL.md) into the right plugin.
+
+Test against the working tree without installing anything:
+
+```shell
+claude --plugin-dir ./plugins/tsh-product-testing
+claude plugin validate ./plugins/tsh-product-testing
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE).

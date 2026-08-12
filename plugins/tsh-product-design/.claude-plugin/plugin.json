@@ -1,0 +1,14 @@
+{
+  "name": "tsh-product-design",
+  "displayName": "TSH Product Design",
+  "description": "UI/UX design work, design systems, design review and Figma-driven flows.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-product-design",
+  "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
+  "license": "MIT",
+  "keywords": ["tsh", "design", "ux", "ui", "design-system", "figma"]
+}
