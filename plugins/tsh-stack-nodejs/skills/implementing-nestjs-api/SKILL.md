@@ -29,10 +29,10 @@ is on NestJS ≤10 or TypeORM 0.2, **stop and say so** — the module compositio
 `DataSource`, and repository guidance below does not transfer. When a newer major
 lands, add its deltas as a reference rather than renaming this skill.
 
-For TypeScript language and compiler-level constraints that this guidance depends
-on — decorator metadata, `useDefineForClassFields`, `verbatimModuleSyntax` — see
-the sibling [`typescript-conventions`](../typescript-conventions/SKILL.md) skill
-in this plugin.
+For the TypeScript compiler-level constraints that this guidance depends on —
+decorator metadata, `useDefineForClassFields`, `verbatimModuleSyntax` — see the
+sibling [`configuring-typescript-for-nodejs`](../configuring-typescript-for-nodejs/SKILL.md)
+skill in this plugin.
 
 ## Applicability and Precedence
 
@@ -104,9 +104,10 @@ For review, load [the NestJS review checklist](./references/nestjs-review-checkl
 Optional and may not be installed — treat each as a bonus, never a prerequisite,
 and do not block on a missing one:
 
-- [`typescript-conventions`](../typescript-conventions/SKILL.md) — ships in this
-  same plugin, so it is always available alongside this skill. Covers the
-  compiler and language baseline the guidance above assumes.
+- [`configuring-typescript-for-nodejs`](../configuring-typescript-for-nodejs/SKILL.md)
+  — ships in this same plugin, so it is always available alongside this skill.
+  Covers the compiler baseline the guidance above assumes: the Node `tsconfig`,
+  decorator metadata, and class-field semantics.
 - `tsh-product-engineering` — TSH's discipline-level implementation, review, and
   TDD workflows, independent of framework.
 - `tsh-product-testing` — E2E and exploratory testing practice beyond the unit

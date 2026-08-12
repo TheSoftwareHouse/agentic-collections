@@ -10,14 +10,14 @@
       "name": "tsh-core",
       "source": "./plugins/tsh-core",
       "displayName": "TSH Core",
-      "description": "Tool mechanics every TSH engineer needs regardless of discipline or stack, starting with safe Git worktree lifecycle management.",
+      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, and the house standard for writing technical documents.",
       "category": "tooling",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling"]
+      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation"]
     },
     {
       "name": "tsh-product-engineering",
@@ -85,17 +85,30 @@
       "keywords": ["tsh", "platform", "devops", "ci-cd", "iac", "observability"]
     },
     {
-      "name": "tsh-stack-typescript",
-      "source": "./plugins/tsh-stack-typescript",
-      "displayName": "TSH Stack: TypeScript",
-      "description": "TSH conventions for TypeScript: language and version guidelines, and NestJS API implementation and review.",
+      "name": "tsh-stack-frontend",
+      "source": "./plugins/tsh-stack-frontend",
+      "displayName": "TSH Stack: Frontend",
+      "description": "TSH conventions for browser-targeted frontend code: TypeScript compiler configuration for bundler-resolved applications, starting with React and Vite.",
       "category": "engineering",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "stack", "typescript", "nodejs", "nestjs", "cqrs", "typeorm"]
+      "keywords": ["tsh", "stack", "frontend", "typescript", "react", "vite", "browser"]
+    },
+    {
+      "name": "tsh-stack-nodejs",
+      "source": "./plugins/tsh-stack-nodejs",
+      "displayName": "TSH Stack: Node.js",
+      "description": "TSH conventions for TypeScript on Node.js: compiler configuration for a Node runtime, and NestJS API implementation and review.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "nodejs", "typescript", "nestjs", "cqrs", "typeorm"]
     }
   ]
 }

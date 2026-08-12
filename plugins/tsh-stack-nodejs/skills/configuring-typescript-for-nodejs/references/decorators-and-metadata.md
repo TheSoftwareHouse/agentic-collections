@@ -1,9 +1,9 @@
 # Decorators, Metadata, and Class Fields
 
 Use this reference whenever decorators, dependency injection, or runtime type
-reflection are involved — NestJS, Angular, TypeORM, `class-validator`,
-`class-transformer`, `type-graphql`. The interactions here are the most common
-way a *type-level* configuration change breaks a *running* application.
+reflection are involved — NestJS, TypeORM, `class-validator`,
+`class-transformer`, `type-graphql`. The interactions here are the most common way
+a *type-level* configuration change breaks a *running* service.
 
 ## Contents
 
@@ -25,7 +25,7 @@ TypeScript has shipped decorators twice, and they are not compatible.
 | Based on | a pre-standard proposal | the Stage 3 ECMAScript proposal |
 | Parameter decorators | supported | **not supported** |
 | `emitDecoratorMetadata` | supported | **not supported** |
-| Used by | NestJS, Angular, TypeORM, `class-validator` | newer libraries, and framework majors that have migrated |
+| Used by | NestJS, TypeORM, `class-validator` | newer libraries, and framework majors that have migrated |
 
 | Severity | Rule |
 | --- | --- |
@@ -33,16 +33,17 @@ TypeScript has shipped decorators twice, and they are not compatible.
 | NEVER | Assume "standard is newer, so use standard." For a NestJS or TypeORM codebase, legacy decorators are the correct and required choice, not technical debt. |
 | NEVER | Mix the two in one compilation unit. `experimentalDecorators` is per-project; there is no per-file opt-out. |
 
-The decisive constraint is usually parameter decorators. NestJS's
-`@Inject()`, `@Body()`, `@Param()`, and `@Query()` are all parameter decorators,
-so a NestJS project cannot use standard decorators until Nest itself migrates.
+The decisive constraint is usually parameter decorators. NestJS's `@Inject()`,
+`@Body()`, `@Param()`, and `@Query()` are all parameter decorators, so a NestJS
+project cannot use standard decorators until Nest itself migrates.
 
 ## `emitDecoratorMetadata`
 
 With `experimentalDecorators` and `emitDecoratorMetadata` both on, the compiler
 emits `design:type`, `design:paramtypes`, and `design:returntype` metadata for
-decorated declarations, via `Reflect.metadata`. This requires the `reflect-metadata`
-polyfill to be imported once, before anything decorated is loaded.
+decorated declarations, via `Reflect.metadata`. This requires the
+`reflect-metadata` polyfill to be imported once, before anything decorated is
+loaded.
 
 This metadata is what makes constructor injection work without naming the token:
 
@@ -60,8 +61,8 @@ The emit has hard limits worth knowing before relying on it:
   emits as `Object`, which is why DI on an interface requires an explicit token.
 - **Union and generic type arguments are erased.** `string | number` becomes
   `Object`; `Repository<Order>` becomes `Repository`.
-- **Circular imports break it.** A type used only in metadata position can
-  resolve to `undefined` when the module graph has a cycle.
+- **Circular imports break it.** A type used only in metadata position can resolve
+  to `undefined` when the module graph has a cycle.
 
 | Severity | Rule |
 | --- | --- |
@@ -82,9 +83,10 @@ class Example {
 
 - **`false` (legacy):** the declaration emits nothing. The field exists only once
   something assigns it.
-- **`true` (standard):** the declaration emits `Object.defineProperty(this, "declared", { value: undefined })`
-  in the constructor — **overwriting** whatever a decorator, base constructor, or
-  DI container had already set.
+- **`true` (standard):** the declaration emits
+  `Object.defineProperty(this, "declared", { value: undefined })` in the
+  constructor — **overwriting** whatever a decorator, base constructor, or DI
+  container had already set.
 
 That difference is the cause of a whole family of bugs that appear after a
 `target` bump and no other change:
@@ -92,12 +94,11 @@ That difference is the cause of a whole family of bugs that appear after a
 - Injected properties becoming `undefined`.
 - TypeORM entity columns losing values assigned by the driver.
 - `class-transformer` output missing fields.
-- Angular `@Input()` bindings resetting.
 
 | Severity | Rule |
 | --- | --- |
 | MUST | Set `useDefineForClassFields` **explicitly** in any project using decorators. Do not let it be implied by `target`. |
-| MUST | Set it to `false` for NestJS, Angular, and TypeORM codebases unless the framework documents otherwise. |
+| MUST | Set it to `false` for NestJS and TypeORM codebases unless the framework documents otherwise. |
 | MUST | Run the application, not just `tsc --noEmit`, after changing it or after changing `target`. The type-check cannot see this class of failure. |
 | PREFER | `true` for framework-free code, where it is the standards-correct behavior. |
 
@@ -137,8 +138,8 @@ introduce this bug at scale if configured without an exception for decorated cod
 ## `erasableSyntaxOnly` and Parameter Properties
 
 TypeScript 5.8's `erasableSyntaxOnly` restricts the language to syntax a runtime
-can strip without transforming — the requirement for executing TypeScript
-directly under Node's native type stripping.
+can strip without transforming — the requirement for executing TypeScript directly
+under Node's native type stripping.
 
 It bans:
 
@@ -147,11 +148,11 @@ It bans:
 - constructor **parameter properties** (`constructor(private readonly x: T) {}`)
 
 The third one is a direct conflict: parameter properties are the idiomatic NestJS
-and Angular DI style, and the codebase is built on them.
+DI style, and a Nest codebase is built on them.
 
 | Severity | Rule |
 | --- | --- |
-| NEVER | Enable `erasableSyntaxOnly` in a NestJS or Angular project without first converting every parameter property to an explicit field assignment. |
+| NEVER | Enable `erasableSyntaxOnly` in a NestJS project without first converting every parameter property to an explicit field assignment. |
 | MUST | Treat "run TypeScript directly on Node" and "use decorator-based DI" as mutually exclusive today. Decorators still require a compile step. |
 | PREFER | A `const` object with a derived union over `enum` in new code regardless — it erases cleanly and produces a narrower type. |
 
@@ -165,7 +166,11 @@ this table; it records the shape of the constraint, not a live pin.
 | NestJS 11 | legacy (`experimentalDecorators`) | required | `false` | Parameter decorators throughout; `reflect-metadata` at entry point |
 | TypeORM 0.3 | legacy | required for implicit column types | `false` | Explicit column types reduce metadata reliance |
 | `class-validator` / `class-transformer` | legacy | required | `false` | Property decorators read `design:type` |
-| Angular | legacy | not required (compiler handles it) | `false` | The Angular compiler supplies its own metadata |
+
+```shell
+npm view @nestjs/core peerDependencies
+npm view typeorm peerDependencies
+```
 
 ## Diagnosing
 
@@ -175,8 +180,8 @@ When something decorated is `undefined` at runtime:
    the most common cause and the easiest to miss, because nothing in the source
    changed.
 2. **Check for `import type`** on the class that came back `undefined`.
-3. **Check `reflect-metadata`** is imported once, first, at the real entry point
-   — including in the test setup, which often has a different entry.
+3. **Check `reflect-metadata`** is imported once, first, at the real entry point —
+   including in the test setup, which often has a different entry.
 4. **Check for a circular import** between the two modules. Metadata resolves to
    `undefined` in a cycle even when the runtime import eventually succeeds.
 5. **Inspect the emit**, which settles it definitively:

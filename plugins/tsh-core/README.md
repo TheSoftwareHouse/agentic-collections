@@ -5,7 +5,7 @@ Tool mechanics every TSH engineer needs regardless of discipline or stack.
 This is a **core** plugin — the third family, alongside disciplines and stacks.
 Install it at `user` scope, like a discipline plugin: what's in here depends on
 neither your role nor the language a repo is written in, so it should follow you
-everywhere. Stack plugins (`tsh-stack-typescript` and friends) go at `project`
+everywhere. Stack plugins (`tsh-stack-frontend` and friends) go at `project`
 scope instead, because the repo is what decides those.
 
 `tsh-core` is deliberately small. There is no cap on how many skills it holds, but

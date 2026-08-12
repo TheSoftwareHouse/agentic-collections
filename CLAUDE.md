@@ -74,7 +74,8 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 
 | Plugin | Owns |
 | :-- | :-- |
-| `tsh-stack-typescript` | TypeScript as a language, and the frameworks TSH builds on it — currently NestJS |
+| `tsh-stack-frontend` | Browser-targeted code — TypeScript configuration for bundler-resolved apps, currently React and Vite |
+| `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
 
 **Every technology stack gets its own plugin, named `tsh-stack-<stack-name>`.**
 PHP, Java, Go and the rest are expected members of this family; each is created
@@ -85,7 +86,7 @@ teaches teammates the catalogue is hollow.
 
 | Plugin | Owns |
 | :-- | :-- |
-| `tsh-core` | Tool mechanics that hold regardless of discipline and stack — currently Git worktree lifecycle |
+| `tsh-core` | What holds regardless of discipline and stack — Git worktree lifecycle, and the house standard for writing technical documents |
 
 **`tsh-core` is one plugin, not a family. There is no `tsh-core-*`.** See
 [Core plugin admission](#core-plugin-admission) before adding anything to it.
@@ -120,23 +121,53 @@ for every entry in it.
 
 ### Stack plugin granularity
 
-One plugin per stack, where a stack is the unit people actually install. Framework
-skills live inside their ecosystem's plugin — `implementing-nestjs-api` belongs in
-`tsh-stack-typescript`, not in a `tsh-stack-nestjs` of its own. Two reasons:
+**A stack is a runtime target, not a language.** `tsh-stack-frontend` and
+`tsh-stack-nodejs` both carry TypeScript guidance, and that is the design rather
+than a duplication to clean up. Three reasons:
 
-1. **A plugin is one install decision.** The install unit is the plugin, not the
-   skill; there is no way to install half of one. Nobody wants "NestJS guidance
-   but explicitly not TypeScript guidance."
-2. **Cross-linked knowledge must be co-located.** A skill can only reliably read
-   files inside its own plugin (hard rule 7). The NestJS skill needs the
-   TypeScript decorator and compiler material, so they have to ship together.
+1. **Most projects have a frontend, whatever the backend is.** A Go or PHP team
+   writing React must be able to install the frontend guidance without dragging a
+   NestJS surface into their skill listing. A language-shaped plugin makes that
+   impossible.
+2. **The configuration genuinely diverges.** A bundler-resolved browser app
+   (`moduleResolution: bundler`, `jsx`, `lib: DOM`, emit owned by Vite) and a Node
+   service (`module: nodenext`, `emitDecoratorMetadata`, `outDir`) do not share one
+   baseline `tsconfig.json`. There is no language-level core big enough to be worth
+   a plugin of its own.
+3. **A plugin is one install decision.** The install unit is the plugin, not the
+   skill; there is no way to install half of one. Nobody wants "Node guidance but
+   explicitly not the TypeScript settings it depends on."
+
+Framework skills still live inside their runtime's plugin: `implementing-nestjs-api`
+belongs in `tsh-stack-nodejs`, not in a `tsh-stack-nestjs` of its own. What changed
+is where the boundary falls, not that frameworks get their own plugins.
 
 **Split trigger.** When a `tsh-stack-*` plugin exceeds roughly 8 skills, or when
-more than half its skills are irrelevant to a typical installer, split it. For
-`tsh-stack-typescript` that means frontend and Node skills moving to
-`tsh-stack-frontend` and `tsh-stack-nodejs`, with the language-level core staying
-put — a Go team writing React should be able to install the frontend guidance
-without the NestJS surface.
+more than half its skills are irrelevant to a typical installer, split it — again
+along a target boundary people actually install separately. For `tsh-stack-nodejs`
+that would mean a serverless or CLI plugin peeling off if that guidance grows and
+stops being relevant to service authors; it does **not** mean one plugin per
+framework.
+
+### Deliberate duplication across stack plugins
+
+Two stack plugins needing the same knowledge is expected, and hard rule 7 makes
+linking between them impossible. So the knowledge is **duplicated**, on purpose:
+`configuring-typescript-for-frontend` and `configuring-typescript-for-nodejs` both
+carry version policy, a strictness ladder, and an upgrade procedure.
+
+Three rules keep that from rotting:
+
+1. **Name the copies differently, and write genuinely different descriptions.** The
+   model routes on descriptions; two near-identical ones are a coin flip. Naming the
+   target in the skill name is what makes them distinguishable at all.
+2. **Let the divergent parts diverge.** Copying a file and never adapting it is how
+   the frontend skill ends up recommending `emitDecoratorMetadata`. If a section is
+   identical in both copies *and* would stay identical under any future edit, that is
+   a signal the content belongs to neither target specifically — reconsider whether
+   it needs to ship at all.
+3. **When you change one copy, check the other in the same PR.** Say in the commit
+   message which copies you touched and which you deliberately left alone.
 
 ### Core plugin admission
 
@@ -153,17 +184,34 @@ skill, while every teammate pays listing budget. So admission is by elimination
    opinion about how to work. "Write good commit messages" is generic, applies to
    everyone, and is still a **discipline** skill, because only TSH's opinion could
    produce it. **If you cannot name the tool the skill wraps, it is not core.**
+   *One named exception exists:* `writing-technical-documents` is admitted as the
+   house writing standard despite wrapping no tool, because every discipline's
+   written deliverables are judged by it. It is the **only** exception, and it is
+   named rather than generalised — there is no "output standards" category to file
+   the next thing under. Commit-message and PR-title conventions are outside it and
+   remain discipline skills.
 3. **Evidence, not assertion.** The PR names which **three of the five
    disciplines** would invoke it in a normal month. "It's generic" is not evidence.
 4. **Ties go to a discipline plugin.** When the answer is arguable, it isn't core.
 
-**Hard cap: six skills.** At six, nothing new lands until something is removed or
-re-homed. Hitting the cap means admission got too loose — it is **not** a signal
-that the plugin needs splitting. A prefixed family earns its keep only when there
-is a variable to instantiate (`tsh-stack-<stack-name>`, `tsh-<discipline>`), and
-`tsh-core`'s defining property is depending on no variable. The only thing that
-could follow `tsh-core-` is a topic bucket, and a topic is not an install
-decision.
+**No cap — a disclosure instead.** There is no maximum number of skills here. There
+is an obligation to state the cost at the moment someone chooses to pay it: a PR
+adding a skill to `tsh-core` reports the plugin's **routing footprint** — the
+combined `name`, `description` and `when_to_use` characters across its skills —
+before and after. Claude Code preloads that text for every installed skill in order
+to route on it; `description` and `when_to_use` are truncated together at 1,536
+characters per skill, and when the whole listing overflows, descriptions are cut
+and routing degrades for *every* skill in *every* plugin, not just the new one. A
+count of skills never measured that — three terse skills can cost less than one
+verbose one. Report the number, name the three disciplines, and let the reviewer
+weigh it.
+
+Growth is never a reason to split into `tsh-core-*`. A prefixed family earns its
+keep only when there is a variable to instantiate (`tsh-stack-<stack-name>`,
+`tsh-<discipline>`), and `tsh-core`'s defining property is depending on no
+variable. The only thing that could follow `tsh-core-` is a topic bucket, and a
+topic is not an install decision. When this plugin feels heavy, the fix is
+re-homing what should never have been admitted.
 
 The name is doing guardrail work, so don't "clarify" it later: `common` and
 `shared` are the industry's canonical junk-drawer names because they claim *mere
@@ -225,11 +273,17 @@ change the way the current conversation proceeds, make it a skill.
   this repo tracks.
 - **Keep skill names tech-qualified.** `implementing-nestjs-api`, not
   `implementing-api`. Namespacing makes `tsh-stack-java:implementing-api` and
-  `tsh-stack-typescript:implementing-api` both legal, but the model routes on
-  descriptions, and two near-identical ones are a coin flip. This applies in
+  `tsh-stack-nodejs:implementing-api` both legal, but the model routes on
+  descriptions, and two near-identical ones are a coin flip. It applies with extra
+  force to the two TypeScript configuration skills, which are near-twins by design:
+  `configuring-typescript-for-frontend` and `configuring-typescript-for-nodejs`
+  name their target because nothing else would tell them apart. This applies in
   `tsh-core` too: `managing-git-worktrees`, not `managing-worktrees` — naming the
   tool keeps the *name-the-tool* admission test visible in the directory listing,
   and "worktree" alone collides with monorepo *workspaces*.
+  `writing-technical-documents` names no tool because it is the one admitted
+  exception; it names the artifact class instead, which does the same routing work.
+  Do not treat its presence in the listing as permission to skip the test.
 
 ## Hard rules
 
@@ -306,10 +360,13 @@ change the way the current conversation proceeds, make it a skill.
    - A rule that blocks review belongs in `SKILL.md` even if a reference also
      explains it. `SKILL.md` is what's in context when the model reads no
      references at all.
-9. **`tsh-core` admits by elimination and evidence, and is capped at six skills.**
-   A contribution lands there only if it fails both routing questions, wraps a
-   named tool rather than a TSH opinion, and the PR says which three of the five
-   disciplines would invoke it in a normal month. Ties go to a discipline plugin.
+9. **`tsh-core` admits by elimination and evidence, and every addition discloses
+   its cost.** A contribution lands there only if it fails both routing questions,
+   wraps a named tool rather than a TSH opinion, and the PR says which three of the
+   five disciplines would invoke it in a normal month. `writing-technical-documents`
+   is the single named exception to the name-a-tool test; do not read it as licence
+   to add a second. There is no cap on skill count, but the PR reports the
+   plugin's routing footprint before and after. Ties go to a discipline plugin.
    This is a hard rule and not just prose because it is the one convention whose
    violation is invisible at review time — a wrongly-placed skill loads fine,
    validates fine, and simply taxes everyone's context forever. See

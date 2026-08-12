@@ -9,7 +9,7 @@ publishes three families:
   everyone.
 - **Disciplines** (`tsh-product-engineering` and friends) — *how we work*. One per
   discipline. Install the one that matches your job.
-- **Stacks** (`tsh-stack-typescript` and friends) — *what we work with*. One per
+- **Stacks** (`tsh-stack-frontend` and friends) — *what we work with*. One per
   technology stack. Install the ones a given project is built on.
 
 > **Heads up:** the five **discipline** plugins are still **empty scaffolds**.
@@ -72,7 +72,8 @@ Copy just the lines you need:
 /plugin install tsh-platform-engineering@tsh-agentic-collections
 
 # Stacks — pick what the project is built on
-/plugin install tsh-stack-typescript@tsh-agentic-collections
+/plugin install tsh-stack-frontend@tsh-agentic-collections
+/plugin install tsh-stack-nodejs@tsh-agentic-collections
 ```
 
 Each install asks you to pick a **scope**:
@@ -183,13 +184,15 @@ listed plugins:
   "enabledPlugins": {
     "tsh-product-engineering@tsh-agentic-collections": true,
     "tsh-product-testing@tsh-agentic-collections": true,
-    "tsh-stack-typescript@tsh-agentic-collections": true
+    "tsh-stack-frontend@tsh-agentic-collections": true,
+    "tsh-stack-nodejs@tsh-agentic-collections": true
   }
 }
 ```
 
-The stack plugin is the clearest case for committing this file: a TypeScript repo
-is a TypeScript repo for everyone who clones it.
+The stack plugins are the clearest case for committing this file: a repo's runtime
+targets are the same for everyone who clones it. List only the ones that apply —
+a backend-only service has no use for the frontend plugin.
 
 `tsh-core` is deliberately **not** in that list, and that isn't an oversight to
 fix. It's user-scope by design — it follows the person, not the repo — so pinning
@@ -267,11 +270,33 @@ Install what the project is built on, at **Project** scope.
 
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
-| [`tsh-stack-typescript`](plugins/tsh-stack-typescript) | TypeScript version policy, `tsconfig` baselines, decorators and class fields, type modelling; NestJS 11 REST APIs | `/plugin install tsh-stack-typescript@tsh-agentic-collections` |
+| [`tsh-stack-frontend`](plugins/tsh-stack-frontend) | TypeScript for the browser: version policy, the `tsconfig` baseline for a bundler-resolved app, the React + Vite split-config layout, and getting a real type-check into CI | `/plugin install tsh-stack-frontend@tsh-agentic-collections` |
+| [`tsh-stack-nodejs`](plugins/tsh-stack-nodejs) | TypeScript for Node: version policy, the `tsconfig` baseline for a Node runtime, decorator metadata and class fields; NestJS 11 REST APIs | `/plugin install tsh-stack-nodejs@tsh-agentic-collections` |
+
+A stack here is a **runtime target**, not a language. Both plugins carry TypeScript
+guidance, because a browser app and a Node service genuinely need different
+compiler configuration — and because most projects have a frontend whatever their
+backend is written in. Install one, the other, or both.
 
 Every stack gets its own plugin, named `tsh-stack-<stack-name>` — PHP, Java, Go
 and the rest are expected members of this family. Each appears here once it has
 real content to ship, rather than as an empty placeholder.
+
+> **Coming from `tsh-stack-typescript`?** It has been split into the two plugins
+> above. There is no automatic migration, so run:
+>
+> ```shell
+> /plugin uninstall tsh-stack-typescript@tsh-agentic-collections
+> /plugin marketplace update tsh-agentic-collections
+> /plugin install tsh-stack-frontend@tsh-agentic-collections
+> /plugin install tsh-stack-nodejs@tsh-agentic-collections
+> ```
+>
+> `implementing-nestjs-api` moved to `tsh-stack-nodejs` unchanged. The old
+> `typescript-conventions` skill is gone: its compiler and version material now
+> lives in each plugin's `configuring-typescript-for-<target>` skill, and its type
+> modelling material was dropped rather than duplicated — it will return as its own
+> skill.
 
 ## Troubleshooting
 
