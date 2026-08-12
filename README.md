@@ -196,8 +196,17 @@ Code reports it as not installed and prints the `claude plugin install` command.
 
 Third-party marketplaces have **auto-update off by default**. To turn it on: run
 `/plugin` → **Marketplaces** → select `tsh-agentic-collections` → **Enable
-auto-update**. Either way, updates only reach you when we bump a plugin's
-`version`, so a refresh that reports no change usually means nothing was released.
+auto-update**.
+
+The two commands answer different questions, and the distinction matters:
+
+- **A catalog refresh** (`marketplace update`) re-reads which plugins exist. A
+  newly published plugin shows up in **Discover** as soon as you run it, with no
+  `version` field involved — until then, `/plugin install` will tell you it
+  doesn't exist.
+- **A plugin update** (`/plugin update`) pulls new content for plugins you already
+  installed, and only lands when we bump that plugin's `version`. A refresh that
+  reports no change usually means nothing was released.
 
 ## Removing plugins
 
@@ -245,6 +254,11 @@ terminal, and try again.
 the **current directory** — a `project` or `local` scoped plugin is correctly disabled
 outside its project. Run it again from that project's root and it should read
 `✔ enabled`.
+
+**A plugin listed in this README isn't in the Discover tab.** Your cached copy of the
+catalog predates it. `/plugin` never re-fetches on its own and auto-update is off by
+default, so refresh it — see [Staying current](#staying-current). `/plugin update`
+won't help: that updates plugins you already have, not the list of what exists.
 
 **Skills or agents don't appear after installing.** Delete the marketplace's cached
 clone, restart Claude Code, then re-add (Step 1) and reinstall (Step 2):

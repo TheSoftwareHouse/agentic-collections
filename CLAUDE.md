@@ -166,7 +166,13 @@ change the way the current conversation proceeds, make it a skill.
    `.claude-plugin/` is the single most common plugin bug and fails silently.
 2. **A new plugin must be added to `.claude-plugin/marketplace.json`** or nobody
    can install it. The marketplace file is the catalog; the plugin directory alone
-   is invisible.
+   is invisible. Landing the entry only makes the plugin *installable* — teammates
+   who already added the marketplace keep reading their cached clone of the
+   catalog, so a new plugin stays absent from **Discover** and `/plugin install`
+   reports it doesn't exist until they run `/plugin marketplace update
+   tsh-agentic-collections`. Neither `/plugin update` nor a `version` bump reaches
+   them, since a new plugin has no installed version to compare against; announce
+   a new plugin with the marketplace-update command attached.
 3. **Bump `version` in the plugin's `plugin.json` when shipping a change — that
    file only.** Claude Code resolves a plugin's version from `plugin.json` first,
    then the marketplace entry, then the commit SHA. Because `plugin.json` always
