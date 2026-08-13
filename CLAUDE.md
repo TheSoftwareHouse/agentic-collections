@@ -86,7 +86,7 @@ teaches teammates the catalogue is hollow.
 
 | Plugin | Owns |
 | :-- | :-- |
-| `tsh-core` | What holds regardless of discipline and stack — Git worktree lifecycle, and the house standard for writing technical documents |
+| `tsh-core` | What holds regardless of discipline and stack — Git worktree lifecycle, the house standard for writing technical documents, the project-context files Claude Code loads, and the decision-record format and lifecycle |
 
 **`tsh-core` is one plugin, not a family. There is no `tsh-core-*`.** See
 [Core plugin admission](#core-plugin-admission) before adding anything to it.
@@ -184,12 +184,22 @@ skill, while every teammate pays listing budget. So admission is by elimination
    opinion about how to work. "Write good commit messages" is generic, applies to
    everyone, and is still a **discipline** skill, because only TSH's opinion could
    produce it. **If you cannot name the tool the skill wraps, it is not core.**
-   *One named exception exists:* `writing-technical-documents` is admitted as the
-   house writing standard despite wrapping no tool, because every discipline's
-   written deliverables are judged by it. It is the **only** exception, and it is
-   named rather than generalised — there is no "output standards" category to file
-   the next thing under. Commit-message and PR-title conventions are outside it and
-   remain discipline skills.
+   *Two named exceptions exist, and they are a closed list.*
+   `writing-technical-documents` is admitted as the house writing standard despite
+   wrapping no tool, because every discipline's written deliverables are judged by
+   it. `managing-decision-records` is admitted for the ADR format and lifecycle
+   only, because `managing-claude-context` — which passes the test outright, wrapping
+   Claude Code's memory subsystem — already mandates the decision index and the
+   status vocabulary, and splitting one artifact system across two install units
+   would leave a `tsh-core` installer told to keep an index with no guidance on what
+   a record is.
+
+   Both are **named rather than generalised** — there is no "output standards" or
+   "artifact conventions" category to file the next thing under, and creating one is
+   how the test dies. `managing-decision-records` is the **last** artifact-convention
+   skill core admits; a third exception makes this a category, which is the failure
+   mode the test was written to prevent. Commit-message and PR-title conventions are
+   outside both and remain discipline skills.
 3. **Evidence, not assertion.** The PR names which **three of the five
    disciplines** would invoke it in a normal month. "It's generic" is not evidence.
 4. **Ties go to a discipline plugin.** When the answer is arguable, it isn't core.
@@ -281,8 +291,11 @@ change the way the current conversation proceeds, make it a skill.
   `tsh-core` too: `managing-git-worktrees`, not `managing-worktrees` — naming the
   tool keeps the *name-the-tool* admission test visible in the directory listing,
   and "worktree" alone collides with monorepo *workspaces*.
-  `writing-technical-documents` names no tool because it is the one admitted
-  exception; it names the artifact class instead, which does the same routing work.
+  `writing-technical-documents` and `managing-decision-records` name no tool because
+  they are the two admitted exceptions; each names its artifact class instead, which
+  does the same routing work. Note the verbs are doing real work between them —
+  `managing-` for format and lifecycle, `writing-` for prose — because two skills
+  both claiming ADRs under the same verb would be a routing coin flip.
   Do not treat its presence in the listing as permission to skip the test.
 
 ## Hard rules
@@ -364,8 +377,9 @@ change the way the current conversation proceeds, make it a skill.
    its cost.** A contribution lands there only if it fails both routing questions,
    wraps a named tool rather than a TSH opinion, and the PR says which three of the
    five disciplines would invoke it in a normal month. `writing-technical-documents`
-   is the single named exception to the name-a-tool test; do not read it as licence
-   to add a second. There is no cap on skill count, but the PR reports the
+   and `managing-decision-records` are the **only two** named exceptions to the
+   name-a-tool test, and the list is closed — do not read them as licence to add a
+   third. There is no cap on skill count, but the PR reports the
    plugin's routing footprint before and after. Ties go to a discipline plugin.
    This is a hard rule and not just prose because it is the one convention whose
    violation is invisible at review time — a wrongly-placed skill loads fine,

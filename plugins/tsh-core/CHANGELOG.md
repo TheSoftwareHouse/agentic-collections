@@ -14,6 +14,69 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.5.0] - 2026-08-13
+
+### Added
+
+- `managing-decision-records`, which owns what a decision record *is*: a
+  four-section format, the status vocabulary, numbering, superseding, and keeping
+  the index in step. 0.4.0 mandated the index and the status column, then left the
+  record body undefined — a gap that showed up immediately, because a status column
+  nothing explains is a column every reader interprets differently.
+- Three references: the format section by section with a worked example, the status
+  lifecycle including the full supersede procedure, and the threshold test for
+  whether something is a decision at all. That last one exists because the most
+  common mistake is recording a *convention* — conventions apply on every file you
+  touch and belong where they load automatically, while a decision applies when you
+  are about to contradict it.
+- `Alternatives` is a required section, not an optional one. It is the part that
+  answers the person proposing the rejected option eighteen months later, which is
+  the reason the artifact exists at all. A record without it reads as though no
+  alternatives were considered, which is almost never true.
+
+### Changed
+
+- **Only `Accepted` records bind.** Every other status — `Proposed`, `Rejected`,
+  `Superseded`, `Deprecated` — is history: readable to answer "was this considered
+  before?", never applicable as a current constraint, and a `Superseded` record is
+  never read without its successor. The alternative rule, "read only `Accepted`",
+  was rejected because it would destroy what the rejected and superseded records
+  exist for. The distinction is between reading a record and obeying it.
+- `managing-claude-context` now **writes that rule into the artifacts it
+  generates** — the `CLAUDE.md` pointer sentence and a note above the index table.
+  This is the substance of the change rather than a detail of it: that skill runs at
+  setup and audit, so a rule living only inside it would govern nothing else. The
+  generated sentences are what carry the filter into sessions it never runs in.
+- The index and the record can now disagree, so a precedence rule was needed: **the
+  record is the source of truth for status and tags, and the index mirrors it.** An
+  index row reading `Accepted` above a record reading `Superseded` is the most
+  dangerous state this layer produces, because the filter reads the row and admits a
+  reversed decision as binding. Audits check both directions and correct the row.
+- The *name-the-tool* admission test now has **two** named exceptions rather than
+  one, and the list is explicitly closed. `managing-decision-records` wraps no tool
+  and is TSH opinion about document structure, which the rule otherwise routes to a
+  discipline plugin. It is admitted because `managing-claude-context` — which passes
+  the test outright — already mandates the index and the status vocabulary, and
+  splitting one artifact system across two install units would leave a `tsh-core`
+  installer told to keep an index with no guidance on what a record is. It is named
+  as the **last** artifact-convention skill core admits; a third exception would
+  make this a category, which is the failure the test was written to prevent. The
+  amendment is recorded in `CLAUDE.md` and in this plugin's README rather than left
+  implicit, because it reverses a rule those files previously stated.
+- Decision records are now split three ways, and the verbs carry the routing:
+  `managing-claude-context` owns the index and wiring, `managing-decision-records`
+  owns format and lifecycle, `writing-technical-documents` owns the prose. Two
+  skills under a `writing-` verb both claiming ADRs would have been a routing coin
+  flip, which is why this one is `managing-`.
+- Routing footprint: **2,245 to 2,937 characters** across four skills. The new entry
+  is 692 of that, with `description` and `when_to_use` at 667 against the 1,536
+  per-skill cap. It is the smallest entry in the plugin, because its description
+  leads on format and lifecycle and deliberately avoids the words
+  `writing-technical-documents` already claims.
+- No skill sets or changes a record's status. Marking one `Accepted` asserts what a
+  team agreed; inferring it from the code records an agreement that never happened,
+  and the record then becomes the evidence for it.
+
 ## [0.4.0] - 2026-08-13
 
 ### Added

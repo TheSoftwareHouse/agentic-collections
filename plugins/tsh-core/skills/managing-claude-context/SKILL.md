@@ -67,6 +67,8 @@ the decision instead of writing a plausible rule.
 | MUST | Give every rule in `.claude/rules/` a `paths:` glob unless it genuinely applies to every session — a rule without one costs every session, forever. |
 | MUST | Write the decision index reference in backticks as `` `docs/decisions/README.md` ``. Written bare with a leading `@` it becomes an import and loads the whole index at launch. |
 | MUST | Give the decision index four columns — path, tags, one-line description, status. Tags carry the routing; an index without them is a list nothing can search. |
+| MUST | Write the status filter into the artifacts you generate — the `CLAUDE.md` pointer sentence and the index header must both say that only `Accepted` records bind. This skill runs occasionally; the generated text is what reaches every session. |
+| MUST | Treat `Accepted` as the only binding status when reading decisions yourself. Other statuses are history — read them to avoid re-proposing a rejected option, never as a current constraint, and never read a `Superseded` record without its successor. |
 | NEVER | Use `@path` imports to reduce context. Imports load in full at launch; they organise, they never save. |
 | MUST | Split downward into a nested `CLAUDE.md` once the root file grows per-package or per-subsystem sections. |
 | NEVER | Overwrite an existing `CLAUDE.md` wholesale. Revise in place and report what changed and why. |
@@ -80,7 +82,7 @@ the decision instead of writing a plausible rule.
 | [Writing CLAUDE.md](./references/writing-claude-md.md) | Creating or trimming a root or nested `CLAUDE.md` | The content contract, the 200-line target, what to cut, section order, `AGENTS.md` interop |
 | [Writing path-scoped rules](./references/writing-path-scoped-rules.md) | Recording a convention that applies to some files but not all | `.claude/rules/` mechanics, `paths:` globs, brace-expansion budget, the unescaped-`[` trap, sharing rules by symlink |
 | [Monorepos and scale](./references/monorepos-and-scale.md) | The repo has packages or subsystems with different owners | Nested `CLAUDE.md` vs. path-scoped rules by ownership, the split trigger, start directory, `claudeMdExcludes`, per-directory skills |
-| [Indexing decision records](./references/indexing-decision-records.md) | Wiring ADRs into context, or decisions exist but go unread | `docs/decisions/` layout, the index schema, statuses and superseding, the backtick-not-import wiring |
+| [Indexing decision records](./references/indexing-decision-records.md) | Wiring ADRs into context, or decisions exist but go unread | `docs/decisions/` layout, the index schema, the `Accepted`-only binding rule and how to propagate it, the backtick-not-import wiring |
 | [Bootstrapping a repository](./references/bootstrapping-a-repository.md) | Step 1 found no existing context files | The inspection order, `/init` and `/import`, migrating from Copilot or Cursor |
 | [Auditing for drift](./references/auditing-for-drift.md) | Step 1 found existing context files | Verifying each claim against current code, pruning, `/doctor`, the `InstructionsLoaded` and `Stop` hooks |
 
@@ -119,9 +121,11 @@ between a rule and a nested file** — the deciding question is ownership, not c
 **Step 5 — Wire the decision index.** If decision records exist or are wanted, read
 [`indexing-decision-records.md`](./references/indexing-decision-records.md) and
 create or update `docs/decisions/README.md`, then reference it from root `CLAUDE.md`
-in backticks. Write the index rows only; individual ADRs are drafted with
-[`writing-technical-documents`](../writing-technical-documents/SKILL.md) and their
-status is a human decision.
+in backticks. Both the pointer and the index header must state that only `Accepted`
+records bind — that sentence is how the rule reaches sessions this skill never runs
+in. Write the index rows only; the record format and status lifecycle belong to
+[`managing-decision-records`](../managing-decision-records/SKILL.md), and status is
+a human decision.
 
 **Step 6 — Verify what actually loads.** Start a session and run `/context`. Confirm
 the files you expect appear under **Memory files** and the ones you scoped are

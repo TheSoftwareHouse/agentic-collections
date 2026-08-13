@@ -26,6 +26,7 @@ it costs. Read [Scope](#scope) before adding anything.
 | `managing-git-worktrees` | `/tsh-core:managing-git-worktrees` | Git worktree lifecycle: create from a freshly fetched base branch on `origin` — any branch, defaulting to origin's own default — list read-only, remove one precisely identified target, each with explicit confirmation and post-mutation verification |
 | `writing-technical-documents` | `/tsh-core:writing-technical-documents` | The house writing standard for any technical document — README, CHANGELOG, ADR, PR description, runbook, ticket, bug report, test plan: lead with the conclusion, verify every claim against the source, cut what does not change the reader's decision |
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
+| `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
@@ -34,9 +35,19 @@ whatever shape the artifact already has.
 
 `managing-claude-context` records conventions a team already holds; it does not
 decide what a convention should be, and it asks rather than inventing one when the
-codebase is ambiguous. It writes decision-record *index rows and wiring* only — the
-prose inside a record belongs to `writing-technical-documents`, and a record's
-status is a human call.
+codebase is ambiguous.
+
+Decision records are split three ways, deliberately — the verbs tell you which skill
+you want:
+
+| Concern | Skill |
+| :-- | :-- |
+| Index schema, the binding note, the `CLAUDE.md` pointer | `managing-claude-context` |
+| Record format, sections, numbering, status lifecycle, superseding | `managing-decision-records` |
+| The prose inside a record | `writing-technical-documents` |
+
+None of them sets a record's status. Marking something `Accepted` asserts what a
+team agreed, so it stays a human call — the skills propose one and name who decides.
 
 Name a base branch and it is used; name none and origin's default branch is read
 from the remote, so `main`, `master` and `develop` trunks all work. A base that
@@ -78,14 +89,20 @@ Ask in order and stop at the first yes:
   opinion about how to work. "Write good commit messages" is generic, applies to
   everyone, and is still a **discipline** skill, because only TSH's opinion could
   produce it. **If you cannot name the tool the skill wraps, it is not core.**
-- **One named exception, and only one.** `writing-technical-documents` wraps no
-  tool. It is admitted because every discipline's written deliverables are judged
-  by it, and it is named here rather than generalised into an "output standards"
-  category — an exception you can point at is auditable, a category is a hole.
-  Commit-message and PR-title conventions sit outside it and stay discipline
-  skills. `managing-claude-context` is **not** a second exception — it passes the
-  test, naming Claude Code's own memory subsystem, whose loading mechanics dictate
-  the whole procedure.
+- **Two named exceptions, and the list is closed.** `writing-technical-documents`
+  wraps no tool; it is admitted because every discipline's written deliverables are
+  judged by it. `managing-decision-records` wraps no tool either; it is admitted for
+  ADR format and lifecycle only, because `managing-claude-context` already mandates
+  the decision index and status vocabulary, and splitting one artifact system across
+  two install units would leave a `tsh-core` installer told to keep an index with no
+  guidance on what a record is. Both are named here rather than generalised into an
+  "output standards" or "artifact conventions" category — an exception you can point
+  at is auditable, a category is a hole. `managing-decision-records` is the **last**
+  artifact-convention skill admitted; a third makes it a category. Commit-message
+  and PR-title conventions sit outside both and stay discipline skills.
+  `managing-claude-context` is **not** an exception — it passes the test, naming
+  Claude Code's own memory subsystem, whose loading mechanics dictate the whole
+  procedure.
 - **Evidence, not assertion.** Your PR names which **three of the five
   disciplines** would invoke the skill in a normal month. "It's generic" is not
   evidence.

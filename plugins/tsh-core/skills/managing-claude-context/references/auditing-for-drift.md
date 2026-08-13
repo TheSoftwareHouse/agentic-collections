@@ -90,6 +90,8 @@ something true but misplaced, run it through
 | A long procedure in `CLAUDE.md` | Move to a skill |
 | A rule with no `paths:` | Add a glob, or move it to `CLAUDE.md` where readers look |
 | Decisions written down but never applied | Index them — see [`indexing-decision-records.md`](./indexing-decision-records.md) |
+| An index row's status disagrees with the record | Correct the row; the record is the source of truth. A row reading `Accepted` over a `Superseded` record admits a reversed decision as binding |
+| An index with a status column but no binding note | Add it. Without it each reader guesses, and the common guess is that everything listed applies |
 | An instruction the model ignores | Make it specific and checkable; if it must hold regardless, make it a hook |
 
 ## 6. When the instruction is ignored rather than wrong

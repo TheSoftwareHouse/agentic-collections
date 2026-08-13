@@ -1,8 +1,8 @@
 {
   "name": "tsh-core",
   "displayName": "TSH Core",
-  "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, and setup and maintenance of the project-context files Claude Code loads.",
-  "version": "0.4.0",
+  "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, the project-context files Claude Code loads, and the decision-record format and lifecycle.",
+  "version": "0.5.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"
@@ -10,5 +10,5 @@
   "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-core",
   "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
   "license": "MIT",
-  "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr"]
+  "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr", "decision-records"]
 }
