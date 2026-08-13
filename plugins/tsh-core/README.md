@@ -25,11 +25,18 @@ it costs. Read [Scope](#scope) before adding anything.
 | :-- | :-- | :-- |
 | `managing-git-worktrees` | `/tsh-core:managing-git-worktrees` | Git worktree lifecycle: create from a freshly fetched base branch on `origin` — any branch, defaulting to origin's own default — list read-only, remove one precisely identified target, each with explicit confirmation and post-mutation verification |
 | `writing-technical-documents` | `/tsh-core:writing-technical-documents` | The house writing standard for any technical document — README, CHANGELOG, ADR, PR description, runbook, ticket, bug report, test plan: lead with the conclusion, verify every claim against the source, cut what does not change the reader's decision |
+| `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
 the discipline skill that owns the artifact — only how to write the words inside
 whatever shape the artifact already has.
+
+`managing-claude-context` records conventions a team already holds; it does not
+decide what a convention should be, and it asks rather than inventing one when the
+codebase is ambiguous. It writes decision-record *index rows and wiring* only — the
+prose inside a record belongs to `writing-technical-documents`, and a record's
+status is a human call.
 
 Name a base branch and it is used; name none and origin's default branch is read
 from the remote, so `main`, `master` and `develop` trunks all work. A base that
@@ -38,7 +45,7 @@ cannot be resolved stops the run — the skill never guesses one.
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
 with `/plugin update`.
 
-Both skills are model-invocable — Claude loads them when the work matches their
+Every skill here is model-invocable — Claude loads it when the work matches its
 description, so you don't have to remember to type the command.
 
 They keep a short `SKILL.md` and push detail into `references/`, loaded only when
@@ -76,7 +83,9 @@ Ask in order and stop at the first yes:
   by it, and it is named here rather than generalised into an "output standards"
   category — an exception you can point at is auditable, a category is a hole.
   Commit-message and PR-title conventions sit outside it and stay discipline
-  skills.
+  skills. `managing-claude-context` is **not** a second exception — it passes the
+  test, naming Claude Code's own memory subsystem, whose loading mechanics dictate
+  the whole procedure.
 - **Evidence, not assertion.** Your PR names which **three of the five
   disciplines** would invoke the skill in a normal month. "It's generic" is not
   evidence.

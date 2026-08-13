@@ -14,6 +14,67 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.4.0] - 2026-08-13
+
+### Added
+
+- `managing-claude-context`, which sets up and maintains the project-context files
+  Claude Code loads: root and nested `CLAUDE.md`, path-scoped rules in
+  `.claude/rules/`, and a decision-record index. It exists because the failure it
+  prevents is expensive and invisible — a `CLAUDE.md` stating a build command that
+  no longer works is worse than no file at all, since the model follows it
+  confidently and the reader stops checking.
+- A four-layer model the skill applies to the repositories it touches: orientation
+  in a thin root `CLAUDE.md`, conventions in `.claude/rules/` scoped with `paths:`,
+  locality in nested `CLAUDE.md` files owned by the directory's team, and decisions
+  behind a `docs/decisions/README.md` index. Each layer stays thin and points
+  downward, which is the same progressive-disclosure discipline this repo already
+  applies to its own skills, turned outward.
+- Explicit monorepo guidance, because the choice between a nested `CLAUDE.md` and a
+  path-scoped rule is decided by **ownership** rather than file count: a rule
+  maintained centrally belongs in `.claude/rules/` however many directories it
+  touches, and a convention a package team owns belongs beside their code where
+  their reviewers see it change. The split trigger is named too — a root file
+  growing per-package sections has already outgrown its layer, well before it
+  reaches 200 lines.
+- Seven references loaded on demand: choosing the layer, writing `CLAUDE.md`,
+  writing path-scoped rules, monorepos and scale, indexing decision records,
+  bootstrapping a repository, and auditing for drift. The bootstrap and audit halves
+  are separate references behind one branching first step, because "does context
+  already exist here?" is a question the procedure answers, not a routing decision
+  worth a second skill and a second near-identical description.
+- Migration guidance from GitHub Copilot and Cursor, since the mapping is close to
+  one-to-one — `copilot-instructions.md` to `CLAUDE.md`, and `*.instructions.md`
+  with `applyTo:` to `.claude/rules/*.md` with `paths:`. The one asymmetry is called
+  out: Copilot can apply an instruction file by semantic match on its description,
+  which `paths` does not do, so such an instruction has to become a skill.
+
+### Changed
+
+- The *name-the-tool* admission test is **not** gaining a second exception. This
+  skill wraps Claude Code's own memory subsystem, whose mechanics dictate the
+  procedure rather than TSH preference: the documented precedence order, the
+  200-line adherence target, the 1,536-character routing cap, the 1,000-pattern
+  brace-expansion budget, and path-scoped rules that are not re-injected after
+  `/compact`. `writing-technical-documents` remains the only named exception.
+- One part of the skill is convention rather than mechanics, and is disclosed rather
+  than blurred: `docs/decisions/` as a location, and the four index columns, are a
+  TSH default a repository may override. The wiring is the non-negotiable part —
+  the index must be referenced from `CLAUDE.md` in backticks, because written bare
+  with a leading `@` it becomes an import and loads the whole index at launch, which
+  is the opposite of what the layer is for.
+- Routing footprint, disclosed per the admission bar: **1,492 to 2,245 characters**
+  across three skills, measured as `name` plus `description` plus `when_to_use`. The
+  new entry is 753 of that, with `description` and `when_to_use` at 730 against the
+  1,536 per-skill cap. The three disciplines that would invoke it in a normal month
+  are product engineering, platform engineering, and product testing.
+- `writing-technical-documents` keeps sole ownership of decision-record prose. The
+  new skill writes index rows and wiring only, and hands off the record body — the
+  handoff its own Applicability section already anticipated for artifacts whose
+  structure another skill defines. Record status stays a human call, because
+  inferring `Accepted` from the code eventually records agreement that never
+  happened.
+
 ## [0.3.0] - 2026-08-12
 
 ### Added
