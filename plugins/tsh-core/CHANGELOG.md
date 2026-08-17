@@ -14,6 +14,46 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.6.0] - 2026-08-17
+
+### Added
+
+- `authoring-claude-extensions`, which decides **which** Claude Code extension a need
+  calls for — skill, subagent, hook or plugin — and then writes it. It covers those
+  four and nothing else; MCP, agent teams, code intelligence and artifacts are out of
+  scope.
+- Five references: the primitive-choosing predicate, and one each for skills,
+  subagents, hooks and plugin packaging.
+- The routing table is keyed on **what just happened to you**, not on the artifact you
+  already have in mind. Routing on the artifact is how you end up writing a perfectly
+  correct rule for a job only a skill can do.
+
+### Changed
+
+- **`managing-claude-context` narrowed to the memory layer** — `CLAUDE.md` root and
+  nested, `.claude/rules/`, and the decision index. Building a skill, subagent, hook or
+  plugin now hands off to `authoring-claude-extensions`. Both skills state the boundary
+  in their own `SKILL.md`, because two routers with adjacent descriptions is a coin
+  flip and the loser is silently never invoked.
+- **The layer predicate now asks *when* an instruction is needed, not only what it is
+  about.** It previously asked only whether an instruction applied to files matching a
+  pattern — a question about scope, which authoring guidance passes. So guidance on how
+  to *write* a file routed to a path-scoped rule, and a rule fires when Claude **reads**
+  a matching file. The result was guidance that could never load at the moment it was
+  needed, with a symptom nobody traces back to the rule: the convention is honoured on
+  edits and ignored on creation.
+- The rules-versus-skills comparison gained **Trigger** and **Survives `/compact`**
+  rows. Its old summary — "the dividing line is length and shape, not topic" — was
+  incomplete: timing is the axis that decides, and a rule cannot reach creation time at
+  any length.
+- `choosing-the-layer.md` names the three peer primitives it routes to (skill, hook,
+  subagent) instead of implying memory files are the whole space. Subagents previously
+  appeared nowhere in the skill.
+- `writing-path-scoped-rules.md` now requires expanding every `paths:` glob against the
+  working tree before declaring a rule finished, and reads a zero-match result as a
+  diagnosis rather than a typo: either the pattern is wrong, or the files do not exist
+  yet because the guidance is creation-time and belongs in a skill.
+
 ## [0.5.0] - 2026-08-13
 
 ### Added

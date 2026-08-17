@@ -15,6 +15,12 @@ silently never loads at all — not by preference.
 `CLAUDE.md` that states a build command which no longer works is worse than no
 file: the model follows it confidently and the reader stops checking.
 
+> **Scope boundary.** This skill owns the **memory layer**: `CLAUDE.md` root and
+> nested, `.claude/rules/`, and the decision-record index. **If you are building a
+> skill, subagent, hook or plugin, this is the wrong skill — use
+> [`authoring-claude-extensions`](../authoring-claude-extensions/SKILL.md).** This one
+> routes work to those primitives and hands off; it does not author them.
+
 ## When to Use
 
 - A repository has no `CLAUDE.md` and Claude keeps re-deriving the same conventions
@@ -64,7 +70,9 @@ the decision instead of writing a plausible rule.
 | MUST | Keep every `CLAUDE.md` under 200 lines, root and nested alike. Adherence drops as the file grows. |
 | MUST | Make each layer point downward to the next instead of inlining it. |
 | MUST | Move any multi-step procedure out of `CLAUDE.md` into a skill. `CLAUDE.md` holds facts, not workflows. |
+| MUST | Route creation-time guidance to a skill, never a path-scoped rule. A rule fires only when Claude **reads** a matching file, so guidance for authoring a file that does not exist yet never loads when it is needed. Ask *when* the guidance is needed, not only what it is about. |
 | MUST | Give every rule in `.claude/rules/` a `paths:` glob unless it genuinely applies to every session — a rule without one costs every session, forever. |
+| MUST | Confirm every `paths:` glob matches at least one file that exists today. Zero matches means either a broken pattern or creation-time guidance in the wrong layer; a rule that never fires is indistinguishable from one never written. |
 | MUST | Write the decision index reference in backticks as `` `docs/decisions/README.md` ``. Written bare with a leading `@` it becomes an import and loads the whole index at launch. |
 | MUST | Give the decision index four columns — path, tags, one-line description, status. Tags carry the routing; an index without them is a list nothing can search. |
 | MUST | Write the status filter into the artifacts you generate — the `CLAUDE.md` pointer sentence and the index header must both say that only `Accepted` records bind. This skill runs occasionally; the generated text is what reaches every session. |
@@ -78,9 +86,9 @@ the decision instead of writing a plausible rule.
 
 | Reference | Load when | Covers |
 | --- | --- | --- |
-| [Choosing the layer](./references/choosing-the-layer.md) | Before writing or moving any instruction, every time | The four layers and the predicate for each; `CLAUDE.md` vs. rule vs. nested file vs. skill vs. hook vs. auto memory; the import and `/compact` traps |
+| [Choosing the layer](./references/choosing-the-layer.md) | Before writing or moving any instruction, every time | The four layers and the predicate for each; the timing test that separates a rule from a skill; the import, `/compact` and read-not-write traps; when to hand off to `authoring-claude-extensions` |
 | [Writing CLAUDE.md](./references/writing-claude-md.md) | Creating or trimming a root or nested `CLAUDE.md` | The content contract, the 200-line target, what to cut, section order, `AGENTS.md` interop |
-| [Writing path-scoped rules](./references/writing-path-scoped-rules.md) | Recording a convention that applies to some files but not all | `.claude/rules/` mechanics, `paths:` globs, brace-expansion budget, the unescaped-`[` trap, sharing rules by symlink |
+| [Writing path-scoped rules](./references/writing-path-scoped-rules.md) | Recording a convention that applies to some files but not all | `.claude/rules/` mechanics, `paths:` globs, brace-expansion budget, the unescaped-`[` trap, the zero-match check, sharing rules by symlink |
 | [Monorepos and scale](./references/monorepos-and-scale.md) | The repo has packages or subsystems with different owners | Nested `CLAUDE.md` vs. path-scoped rules by ownership, the split trigger, start directory, `claudeMdExcludes`, per-directory skills |
 | [Indexing decision records](./references/indexing-decision-records.md) | Wiring ADRs into context, or decisions exist but go unread | `docs/decisions/` layout, the index schema, the `Accepted`-only binding rule and how to propagate it, the backtick-not-import wiring |
 | [Bootstrapping a repository](./references/bootstrapping-a-repository.md) | Step 1 found no existing context files | The inspection order, `/init` and `/import`, migrating from Copilot or Cursor |
@@ -142,6 +150,8 @@ Answer each line before reporting the work finished. Any "no" sends you back.
 - [ ] No root or nested CLAUDE.md exceeds 200 lines
 - [ ] Nothing was written that Claude could derive from the codebase
 - [ ] Every rule in .claude/rules/ has paths:, or justifies loading every session
+- [ ] Every paths: glob was expanded against the tree and matches at least one file
+- [ ] No creation-time guidance was left in a rule — it was routed to a skill
 - [ ] The decision index is referenced in backticks, with no bare @ import anywhere
 - [ ] No multi-step procedure was left in a CLAUDE.md
 - [ ] An existing CLAUDE.md was revised in place, and the changes were reported

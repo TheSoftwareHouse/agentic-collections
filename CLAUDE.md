@@ -81,20 +81,13 @@ and `tsh-core` with you, because it depends on nothing at all.
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read `.claude/rules/core-plugin-admission.md` first | `templates/SKILL.md` |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
+**Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
+placement, naming and the `tsh-core` admission test, then hands the authoring
+mechanics to `/tsh-core:authoring-claude-extensions`. The `.claude/rules/` files below
+fire only when Claude *reads* a matching file, so they cannot reach you while you are
+writing a new one.
+
 `spec/` holds implementation specifications and is gitignored.
-
-## Agent or skill?
-
-- **Agent** — delegated work in its own context with its own system prompt and its
-  own tool restrictions. Use it when the work is a self-contained job whose
-  intermediate reasoning should stay out of the main conversation: audits, reviews,
-  focused investigations. Invoked as `@tsh-product-testing:a11y-auditor`.
-- **Skill** — instructions loaded into the *current* context. Use it when the work is
-  a procedure the main agent should follow inline, with full access to what the
-  conversation already knows. Invoked as `/tsh-product-testing:audit-page`.
-
-Rule of thumb: if it needs to hand back a report, make it an agent. If it needs to
-change the way the current conversation proceeds, make it a skill.
 
 ## Naming
 
@@ -187,8 +180,9 @@ them as errors. To test the catalog end to end without pushing, see
 ## Where the rest lives
 
 Authoring rationale is in `.claude/rules/`, one file per concern, loaded only when you
-read a file it governs — the pointers above say which and when. Shipping is a
-procedure, not a fact, so it lives in the `/releasing-a-plugin-change` skill.
+read a file it governs — the pointers above say which and when. Anything needed
+*before* a file exists is a skill instead: `/contributing-a-plugin-component` to place
+and name a component, `/releasing-a-plugin-change` to ship it.
 
 ## Reference
 

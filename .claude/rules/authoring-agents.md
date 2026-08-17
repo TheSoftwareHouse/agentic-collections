@@ -4,40 +4,37 @@ paths:
   - "templates/agent.md"
 ---
 
-# Authoring an agent
+# Agents in this marketplace
 
-An agent is delegated work in its own context, with its own system prompt and its own
-tool restrictions. Use one when the work is a self-contained job whose intermediate
-reasoning should stay out of the main conversation: audits, reviews, focused
-investigations. Start from `templates/agent.md`.
+Repo-specific constraints for an agent that ships from here. **The general mechanics —
+the frontmatter field set, `tools`, what loads at startup, skill-versus-subagent —
+belong to `/tsh-core:authoring-claude-extensions`.** Invoke it rather than working from
+memory; this file is only the local delta.
 
-Rule of thumb against a skill: **if it needs to hand back a report, make it an
-agent. If it needs to change the way the current conversation proceeds, make it a
-skill.**
+Creating an agent from scratch? Start with `/contributing-a-plugin-component`. This
+rule fires when Claude *reads* an agent file, so it cannot reach you while you are
+writing a new one.
 
 ## Forbidden frontmatter fields
 
-**Plugin agents may not declare `hooks`, `mcpServers`, or `permissionMode`.** Claude
-Code rejects those fields in plugin-shipped agents for security reasons. A plugin is
-installed from a marketplace, so an agent that could attach hooks or spawn MCP
-servers would be arbitrary code arriving with a `/plugin install`.
+**Plugin-shipped agents may not declare `hooks`, `mcpServers`, or `permissionMode`.**
+Claude Code ignores those fields there, because a plugin installs from a marketplace
+and those fields would let an install deliver arbitrary configuration.
 
-If an agent needs narrower tool access, use the `tools` field. If a constraint must
-hold regardless of what the model decides, it cannot ship in a plugin agent — that is
-a hook the installing repository configures itself.
+If an agent genuinely needs one of them, it cannot ship in a plugin. Narrow its access
+with `tools` instead, or leave the constraint to the installing repository.
 
 ## Naming
 
-Kebab-case, **without** a `tsh-` prefix — the plugin already namespaces it.
+- Kebab-case, **without** a `tsh-` prefix. The plugin already namespaces it:
+  `a11y-auditor` → `@tsh-product-testing:a11y-auditor`, never
+  `@tsh-product-testing:tsh-a11y-auditor`.
+- **The filename must match the frontmatter `name`.** `agents/a11y-auditor.md`
+  declares `name: a11y-auditor`.
+- Keep the name unique across every plugin here. Only the `name` field identifies an
+  agent, so a collision means one of them silently loses.
 
-- Correct: `a11y-auditor` → `@tsh-product-testing:a11y-auditor`
-- Wrong: `tsh-a11y-auditor` → `@tsh-product-testing:tsh-a11y-auditor`
+## Renaming is a `major` bump
 
-**The filename must match the frontmatter `name`.** `agents/a11y-auditor.md` declares
-`name: a11y-auditor`.
-
-## Renaming an agent is a `major` bump
-
-There is no deprecation mechanism — the name is the invocation handle, so a rename
-breaks docs, muscle memory and `enabledPlugins` entries at once. See
+The name is the invocation handle and there is no deprecation mechanism. See
 `/releasing-a-plugin-change`.

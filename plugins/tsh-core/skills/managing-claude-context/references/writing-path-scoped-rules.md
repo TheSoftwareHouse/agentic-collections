@@ -117,12 +117,29 @@ are versioned and installed explicitly.
 A path-scoped rule that never triggers looks identical to one that was never
 written. After creating one:
 
-1. Start a session and run `/context` — an unscoped rule should appear under
+1. **Confirm the glob matches a file that exists today.** Expand it against the
+   working tree and count the hits. Zero is not a passing result.
+2. Start a session and run `/context` — an unscoped rule should appear under
    **Memory files** immediately; a scoped one should not.
-2. Ask Claude to read a file matching the glob.
-3. Run `/context` again and confirm the rule now appears.
+3. Ask Claude to read a file matching the glob.
+4. Run `/context` again and confirm the rule now appears.
 
 When it does not, the glob is the first suspect: check for brace-budget overflow and
 unescaped brackets before anything else. The `InstructionsLoaded` hook logs exactly
 which instruction files loaded and when, which settles it — see
 [`auditing-for-drift.md`](./auditing-for-drift.md).
+
+### A glob that matches nothing is a diagnosis, not just a typo
+
+Step 1 fails in two different ways, and they need opposite fixes.
+
+- **The pattern is wrong** — a typo, a stale directory name, an unescaped `[`. Fix the
+  pattern.
+- **The files do not exist yet**, because the rule describes how to *create* them.
+  That is the timing test from
+  [`choosing-the-layer.md`](./choosing-the-layer.md) §4 reporting a
+  mis-routed instruction. A rule fires when Claude reads a matching file, so it can
+  never reach the moment a file is being written. **Move that guidance to a skill.**
+
+The second case is the one that survives review, because the rule reads perfectly and
+its glob looks reasonable. Counting the matches is what exposes it.

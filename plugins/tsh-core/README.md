@@ -25,8 +25,15 @@ it costs. Read [Scope](#scope) before adding anything.
 | :-- | :-- | :-- |
 | `managing-git-worktrees` | `/tsh-core:managing-git-worktrees` | Git worktree lifecycle: create from a freshly fetched base branch on `origin` — any branch, defaulting to origin's own default — list read-only, remove one precisely identified target, each with explicit confirmation and post-mutation verification |
 | `writing-technical-documents` | `/tsh-core:writing-technical-documents` | The house writing standard for any technical document — README, CHANGELOG, ADR, PR description, runbook, ticket, bug report, test plan: lead with the conclusion, verify every claim against the source, cut what does not change the reader's decision |
+| `authoring-claude-extensions` | `/tsh-core:authoring-claude-extensions` | Which Claude Code extension a need calls for — skill, subagent, hook or plugin — and how to write it. Routes on *when* the guidance is needed, not just what it is about, because that is the distinction that decides whether an extension ever loads |
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 | `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
+
+`authoring-claude-extensions` and `managing-claude-context` split cleanly:
+**"I want to build something"** goes to the first, **"I want this repo's memory files
+to be right"** to the second. The first owns skills, subagents, hooks and plugins; the
+second owns `CLAUDE.md`, `.claude/rules/` and the decision index. Each hands off to the
+other rather than overlapping.
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
