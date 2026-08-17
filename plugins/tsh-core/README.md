@@ -28,6 +28,7 @@ it costs. Read [Scope](#scope) before adding anything.
 | `authoring-claude-extensions` | `/tsh-core:authoring-claude-extensions` | Which Claude Code extension a need calls for — skill, subagent, hook or plugin — and how to write it. Routes on *when* the guidance is needed, not just what it is about, because that is the distinction that decides whether an extension ever loads |
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 | `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
+| `init` | `/tsh-core:init` | One-shot project setup: audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules and the decision-record index by running the owning skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Safe to re-run — the second pass is a repair |
 
 `authoring-claude-extensions` and `managing-claude-context` split cleanly:
 **"I want to build something"** goes to the first, **"I want this repo's memory files
@@ -43,6 +44,13 @@ whatever shape the artifact already has.
 `managing-claude-context` records conventions a team already holds; it does not
 decide what a convention should be, and it asks rather than inventing one when the
 codebase is ambiguous.
+
+`init` and `managing-claude-context` do not compete: `init` is the **user command**
+you type once per repository, and it works by running `managing-claude-context` and
+its neighbours in order and wiring the result together. It owns only the sequence
+and the maintenance pointers it leaves in `CLAUDE.md`; every rule about the
+artifacts stays with the owning skill. It is deliberately not model-invocable, so
+setup requests phrased in prose route to `managing-claude-context`, never to it.
 
 Decision records are split three ways, deliberately — the verbs tell you which skill
 you want:
@@ -63,8 +71,10 @@ cannot be resolved stops the run — the skill never guesses one.
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
 with `/plugin update`.
 
-Every skill here is model-invocable — Claude loads it when the work matches its
-description, so you don't have to remember to type the command.
+Every skill here except `init` is model-invocable — Claude loads it when the work
+matches its description, so you don't have to remember to type the command. `init`
+is the one deliberate exception (`disable-model-invocation: true`): it is a command
+you type, its description is never preloaded, and it costs no routing budget.
 
 They keep a short `SKILL.md` and push detail into `references/`, loaded only when
 the task needs it. The **"Load when"** column in the Reference Loading table is

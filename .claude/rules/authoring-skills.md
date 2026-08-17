@@ -38,6 +38,13 @@ writing a new one.
 - Verbs carry meaning between related skills. `managing-` claims format and lifecycle,
   `writing-` claims prose. Two skills claiming the same artifact under the same verb
   would be a routing coin flip.
+- **One exception: user-invoked entry points.** A skill with
+  `disable-model-invocation: true` is a command, not a routing surface — its
+  description is never preloaded, so it cannot collide with anything. It may take a
+  short imperative name (`init`), because the name is what a person types.
+  Everything else here still applies: kebab-case, no `tsh-` prefix, no version, and
+  renaming is still a `major` bump. A model-invocable skill never qualifies —
+  dropping the flag to reclaim routing means taking a conforming name first.
 
 ## Cross-linking
 

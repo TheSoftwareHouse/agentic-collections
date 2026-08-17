@@ -14,6 +14,41 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.7.0] - 2026-08-17
+
+### Added
+
+- `init` — the one command that takes a repository from any starting state to a
+  complete, wired set of context primitives. Run `/tsh-core:init` and it audits what
+  already loads, creates or repairs root and nested `CLAUDE.md`, path-scoped rules
+  and the decision-record archive with its index, and leaves a maintenance section
+  in root `CLAUDE.md` telling every future session to invoke
+  `managing-claude-context` when the project changes and to propose
+  `managing-decision-records` when a decision is made. It is safe to re-run: the
+  second pass converges to repair, never a rewrite.
+- It is a **thin orchestrator**, not a third opinion. Every rule about the artifacts
+  stays with the owning skill — `managing-claude-context` for the memory layer,
+  `managing-decision-records` for record format and lifecycle — and init loads those
+  skills rather than restating them, so there is exactly one copy of each rule to
+  keep true. Its only original content is the sequence and one reference: the
+  canonical maintenance block, phrased conditionally ("with the `tsh-core` plugin
+  installed, invoke …; without it, do X by hand") because `tsh-core` installs at
+  user scope and the generated `CLAUDE.md` is read by teammates who never installed
+  it.
+- `init` is the plugin's first **user-invoked-only** skill
+  (`disable-model-invocation: true`). That is what makes the overlap with
+  `managing-claude-context` safe: setup requests phrased in prose still route there,
+  and init's description is never preloaded — the plugin's routing footprint is
+  **unchanged at 3,647 characters** across the five model-invocable skills.
+  Admission evidence: it wraps the same tool `managing-claude-context` does — Claude
+  Code's memory subsystem — and every discipline initializes projects; product
+  engineering, platform engineering and product testing would invoke it in a normal
+  month.
+- The naming rule gains one documented exception for user-invoked entry points: a
+  skill that is a command rather than a routing surface may take a short imperative
+  name (`init`). Kebab-case, no prefix, no version and rename-is-major all still
+  apply, and a model-invocable skill never qualifies.
+
 ## [0.6.1] - 2026-08-17
 
 ### Changed
