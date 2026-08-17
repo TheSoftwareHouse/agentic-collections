@@ -136,3 +136,19 @@ Loading and routing are different failures, and only one of them is visible.
 
 Step 3 is the one people skip, and it is the one that decides whether the skill is ever
 used by anyone but its author.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Extend Claude with skills](https://code.claude.com/docs/en/skills)
+
+The specific figures above ship on Claude Code's release cadence and will drift: the
+**1,536-character truncation** of `description` and `when_to_use` together, the skill
+listing's **~1% of the context window** budget, and the optional frontmatter field
+names in §3. Where the documentation disagrees with this reference, **the documentation
+is right** — treat a mismatch as a signal to update this file, not as a defect in the
+tool.
+
+The **~150-line split threshold** in §4 is not one of these. It is a TSH convention,
+not a Claude Code limit, and it does not change when Claude Code does.

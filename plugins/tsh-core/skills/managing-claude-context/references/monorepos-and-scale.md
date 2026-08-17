@@ -124,3 +124,18 @@ maintains centrally.
 A `SessionStart` hook can close the discovery gap that creates: anything it prints
 to stdout enters context before the first prompt, so a script can map the launch
 directory to the plugin that area's owners maintain and tell Claude to mention it.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Monorepos and large repos](https://code.claude.com/docs/en/large-codebases)
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory) — nested
+  file discovery and `claudeMdExcludes`
+
+Three things above ship on Claude Code's release cadence and will drift: **which files
+load at launch versus on demand** as you move the start directory, the
+**`claudeMdExcludes`** glob semantics and the settings layers it merges across, and the
+`SessionStart` hook behaviour. Where the documentation disagrees with this reference,
+**the documentation is right** — treat a mismatch as a signal to update this file, not
+as a defect in the tool.

@@ -14,6 +14,24 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.6.1] - 2026-08-17
+
+### Changed
+
+- **Every reference in `authoring-claude-extensions` and `managing-claude-context` now
+  cites its upstream Claude Code documentation**, with a verification date and a note
+  naming which of its own claims are version-sensitive. These are the only two skills
+  here describing a tool that ships on its own release cadence — the 1,536-character
+  description limit, the hook event table, the 1,000-pattern brace budget — so they are
+  snapshots, and they now say so. Where the documentation disagrees, it wins.
+- Both skills state in *Applicability and Precedence* that Claude Code's documentation
+  outranks them. Neither `SKILL.md` carries a source list: a `SKILL.md` is paid on every
+  invocation while a reference is paid only when read, and a link belongs next to the
+  claim it supports.
+- Corrected an attribution in `authoring-a-skill.md`, which listed the ~150-line split
+  threshold among the figures sourced from Claude Code. It is a TSH convention and does
+  not change when Claude Code does.
+
 ## [0.6.0] - 2026-08-17
 
 ### Added

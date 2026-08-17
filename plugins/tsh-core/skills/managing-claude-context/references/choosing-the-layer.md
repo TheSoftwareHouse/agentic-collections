@@ -150,3 +150,19 @@ version control, and is not a substitute for any layer above.
 Never hand-author auto memory to stand in for a `CLAUDE.md`. A teammate cloning the
 repository gets none of it, and the resulting behaviour difference between machines
 is very hard to diagnose.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory) — loading
+  order, `.claude/rules/`, imports, auto memory
+- [Explore the context window](https://code.claude.com/docs/en/context-window) — what
+  survives compaction
+
+Four claims above ship on Claude Code's release cadence and will drift: **path-scoped
+rules fire when Claude reads a matching file**, **imports expand at launch to a depth
+of four hops**, **root `CLAUDE.md` is re-injected after `/compact` while nested files
+and scoped rules are not**, and the auto-memory path in §6. Where the documentation
+disagrees with this reference, **the documentation is right** — treat a mismatch as a
+signal to update this file, not as a defect in the tool.

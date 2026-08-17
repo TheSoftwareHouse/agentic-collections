@@ -116,3 +116,20 @@ one and it propagates.
 4. `docs/decisions/README.md` if decision records exist or the team wants them.
 5. Verify with `/context`, then hand the result to a human who knows the project.
    A first pass is a proposal, not a finished artifact.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory) — `/init`
+  and which other agents' rule files it reads
+- [Slash commands](https://code.claude.com/docs/en/commands) — `/init`, `/import`,
+  `/context`
+
+**The command behaviour described here is gated on Claude Code versions and will
+drift.** `/import` requires v2.1.213 or later, and what `/init` reads expands with
+releases — `CLAUDE_CODE_NEW_INIT=1` currently adds `AGENTS.md`, `.devin/rules/`,
+`.windsurf/rules/` and `.clinerules` to the Cursor and Copilot files it reads by
+default. Check before promising a migration path. Where the documentation disagrees
+with this reference, **the documentation is right** — treat a mismatch as a signal to
+update this file, not as a defect in the tool.

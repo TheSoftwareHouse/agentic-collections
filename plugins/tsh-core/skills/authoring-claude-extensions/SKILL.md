@@ -28,6 +28,11 @@ hook is a statement of team intent — extend it in place rather than adding a s
 one beside it. Where the repository has its own conventions for naming, layout or
 packaging, those win over this skill's defaults.
 
+**Claude Code's own documentation outranks this skill.** These mechanics ship on
+Claude Code's release cadence, and every reference here is a snapshot with its sources
+and a verification date at the bottom. Where the two disagree, follow the docs and fix
+the reference.
+
 ## Explicit Exclusions
 
 This skill does not:

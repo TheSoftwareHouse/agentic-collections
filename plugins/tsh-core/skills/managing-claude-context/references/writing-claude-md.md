@@ -130,3 +130,17 @@ Treat these files as code:
 
 When the file is already too large, [`auditing-for-drift.md`](./auditing-for-drift.md)
 covers trimming an existing file rather than writing a new one.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory)
+
+Three things above ship on Claude Code's release cadence and will drift: the **file
+locations and their load order** in §1, the **200-line target**, and the `AGENTS.md`
+interop in §6 — including the Windows symlink caveat and which agents' rule files
+`/init` reads. The stripping of block-level HTML comments in §7 is the kind of detail
+most likely to change quietly. Where the documentation disagrees with this reference,
+**the documentation is right** — treat a mismatch as a signal to update this file, not
+as a defect in the tool.

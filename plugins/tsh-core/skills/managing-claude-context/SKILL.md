@@ -42,6 +42,11 @@ that convention wins over this skill's defaults.
 requirement of Claude Code. A repository that already keeps ADRs elsewhere keeps
 them there; only the index wiring described below is non-negotiable.
 
+**Claude Code's own documentation outranks this skill.** Loading rules, glob budgets
+and command behaviour ship on Claude Code's release cadence, and every reference here
+is a snapshot with its sources and a verification date at the bottom. Where the two
+disagree, follow the docs and fix the reference.
+
 ## Explicit Exclusions
 
 This skill does not:

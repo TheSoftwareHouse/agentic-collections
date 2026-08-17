@@ -134,3 +134,21 @@ Hand back a summary, not just an edited file:
 
 An audit that quietly rewrites a file leaves nobody able to tell a correction from
 an invention.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory) — the
+  troubleshooting section, and what `/doctor` proposes trimming
+- [Hooks reference](https://code.claude.com/docs/en/hooks) — the `InstructionsLoaded`
+  and `Stop` events
+
+Three things above ship on Claude Code's release cadence and will drift: **`/doctor`'s
+trim check** (added in v2.1.206), the **`InstructionsLoaded` hook** used in §1 to settle
+what loaded, and the **`Stop` hook's** transcript payload used in §7. The compaction
+behaviour in §6 — root `CLAUDE.md` re-injected, nested files and scoped rules not — is
+the claim most worth re-checking, because the audit conclusions in this file depend on
+it. Where the documentation disagrees with this reference, **the documentation is
+right** — treat a mismatch as a signal to update this file, not as a defect in the
+tool.

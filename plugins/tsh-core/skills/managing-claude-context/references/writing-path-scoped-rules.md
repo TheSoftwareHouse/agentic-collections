@@ -143,3 +143,20 @@ Step 1 fails in two different ways, and they need opposite fixes.
 
 The second case is the one that survives review, because the rule reads perfectly and
 its glob looks reasonable. Counting the matches is what exposes it.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [How Claude remembers your project](https://code.claude.com/docs/en/memory) — see
+  *Organize rules with `.claude/rules/`* and *Path-specific rules*
+
+**This is the most version-sensitive reference in the skill.** Several claims above are
+tied to specific releases and will drift: the **1,000-expanded-pattern and 4 MiB brace
+budget**, the behaviour of an **unescaped `[`** (changed in v2.1.207), **symlinked-path
+matching** (v2.1.198), the brace-overflow crash fixed in v2.1.217, and whether
+on-demand rules load when `project` is excluded from `--setting-sources` (changed in
+v2.1.211). Check the documentation before trusting any of them against a Claude Code
+version other than the one that was current when this was written. Where the two
+disagree, **the documentation is right** — treat a mismatch as a signal to update this
+file, not as a defect in the tool.

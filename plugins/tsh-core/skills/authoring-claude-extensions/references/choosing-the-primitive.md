@@ -134,3 +134,18 @@ Some things should not be built at all:
 
 Building one of these costs context forever and buys nothing. Saying so is a valid
 outcome of this skill.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Extend Claude Code](https://code.claude.com/docs/en/features-overview) — the
+  primitives and the comparisons between them
+- [Explore the context window](https://code.claude.com/docs/en/context-window) — what
+  survives compaction
+
+Two claims above ship on Claude Code's release cadence and will drift: **rules fire on
+read, not on write**, and **invoked skills are re-attached after `/compact` at 5,000
+tokens each within a 25,000-token shared budget**. Where the documentation disagrees
+with this reference, **the documentation is right** — treat a mismatch as a signal to
+update this file, not as a defect in the tool.

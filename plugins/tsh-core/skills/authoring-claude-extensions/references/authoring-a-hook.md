@@ -137,3 +137,20 @@ A hook runs on every matching event, so its failure modes are everyone's failure
    stdout and stderr.
 3. Test the **negative** case: something the matcher should *not* catch. An overly broad
    matcher is the most common hook defect, and it only shows up as friction later.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Hooks reference](https://code.claude.com/docs/en/hooks) — the full event schemas,
+  JSON input and output formats, and handler types
+- [Automate actions with hooks](https://code.claude.com/docs/en/hooks-guide) — the
+  walkthrough, if you have not written one before
+
+**The event table in §2 is a subset and it will go stale first.** Around thirty events
+exist; the table lists the eleven most hooks use, and both the set and which of them
+can block change with releases — check the reference before relying on an event not
+listed here. The matcher semantics in §3 and the exit-code behaviour in §5 are equally
+version-sensitive. Where the documentation disagrees with this reference, **the
+documentation is right** — treat a mismatch as a signal to update this file, not as a
+defect in the tool.

@@ -113,3 +113,20 @@ the manifest, not whether your skills and agents were discovered.
 
 Validation passing while `/context` shows nothing is the signature of §1's directory
 trap.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Plugins](https://code.claude.com/docs/en/plugins)
+- [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)
+- [Plugins reference](https://code.claude.com/docs/en/plugins-reference) — the complete
+  component schemas, manifest structure and CLI commands
+
+Three things above ship on Claude Code's release cadence and will drift: the
+**`${CLAUDE_*}` path variables** in §3, the **version-resolution order** in §6, and the
+fields a plugin-shipped subagent may not declare in §4. The manifest path in §1 is the
+most stable claim here and also the most costly to get wrong, since both failure modes
+are silent. Where the documentation disagrees with this reference, **the documentation
+is right** — treat a mismatch as a signal to update this file, not as a defect in the
+tool.

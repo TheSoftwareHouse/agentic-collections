@@ -111,3 +111,16 @@ subagent and escalate only when the workers genuinely need to talk to each other
 3. Then describe a task matching its `description` **without naming it**, and confirm
    it gets delegated. If not, the `description` is wrong — it is the only thing routing
    sees.
+
+## Sources
+
+Claude Code documentation, verified 2026-08-17:
+
+- [Subagents](https://code.claude.com/docs/en/sub-agents)
+
+Three things above ship on Claude Code's release cadence and will drift: the
+**frontmatter field set** in §2, the **five-scope precedence order** in §1, and the
+list of **what loads at startup** in §4. The three fields a plugin-shipped agent may
+not declare are the most likely of these to change. Where the documentation disagrees
+with this reference, **the documentation is right** — treat a mismatch as a signal to
+update this file, not as a defect in the tool.
