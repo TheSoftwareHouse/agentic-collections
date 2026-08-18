@@ -12,6 +12,24 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.4.0] - 2026-08-18
+
+### Added
+
+- The plugin now bundles the [Playwright MCP server](https://github.com/microsoft/playwright-mcp)
+  (`.mcp.json`), so `ui-engineer`'s browser verification works out of the box —
+  no per-project MCP setup. The server starts with each session, shows in `/mcp`
+  as plugin-provided, and can be disabled there per project. It needs Node.js on
+  the machine; context stays lean because Claude Code defers MCP tool schemas
+  until a tool is used.
+
+### Changed
+
+- The `ui-engineer` prerequisites in the README no longer claim plugins cannot
+  bundle MCP servers — only agent frontmatter is barred from `mcpServers`. Figma
+  MCP remains a consuming-project prerequisite because it needs per-user
+  authentication, not because bundling is impossible.
+
 ## [0.3.0] - 2026-08-18
 
 ### Changed

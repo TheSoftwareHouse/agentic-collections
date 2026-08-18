@@ -32,8 +32,8 @@ browser to scrape a design**, and never substitute a guess for the reference.
    layout, spacing, typography, design tokens, states, and behavior.
 3. Implement following the project's existing component patterns.
 4. Verify in a real browser: render the change at the pinned dev server URL using the
-   browser tooling available in this session (Playwright MCP, a connected browser, or
-   the project's own tooling) and compare the result against the design. Also run the
+   Playwright MCP bundled with this plugin (or another connected browser tool, or the
+   project's own tooling) and compare the result against the design. Also run the
    task's Definition of Done commands verbatim.
 5. Fix and re-verify. Repeat up to 5 iterations per component. If differences remain
    after 5, stop and report each remaining gap with what you tried — do not silently

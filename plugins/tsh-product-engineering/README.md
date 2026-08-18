@@ -33,10 +33,19 @@ Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
 ### Prerequisites for `ui-engineer`
 
-The agent fetches designs through the **Figma MCP server**, which plugins cannot
-bundle — connect it in the consuming project (and optionally a browser tool such as
-the Playwright MCP for rendered verification). Without it, the agent stops and
-reports what is missing rather than guessing at a design.
+**Browser verification ships with the plugin.** The plugin bundles the
+[Playwright MCP server](https://github.com/microsoft/playwright-mcp) (`.mcp.json`),
+so rendered-result verification works out of the box. It starts automatically with
+each session and appears in `/mcp` as plugin-provided; disable it per project from
+the same `/mcp` panel if a repository never renders UI. It needs Node.js on the
+machine — `npx` fetches the server, and Playwright downloads its browser on first
+use. Context cost stays low: Claude Code defers MCP tool schemas by default (tool
+search), so sessions that never touch a browser pay only for the tool names.
+
+**Design fetching does not.** The agent reads designs through the **Figma MCP
+server**, which needs per-user authentication, so we deliberately leave it to the
+consuming project — connect it there. Without it, the agent stops and reports what
+is missing rather than guessing at a design.
 
 ## Not covered yet
 
