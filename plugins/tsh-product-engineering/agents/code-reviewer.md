@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Reviews a delivered change set against its plan and requirements — executes tests, linters, and build, judges coverage, checks security and high-risk anti-patterns — and returns a structured findings report. Use after implementation tasks complete, before merge.
-model: inherit
+model: opus
 disallowedTools: Write, Edit
 skills:
   - reviewing-code

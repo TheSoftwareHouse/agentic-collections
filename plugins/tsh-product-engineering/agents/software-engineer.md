@@ -1,7 +1,7 @@
 ---
 name: software-engineer
 description: Implements delegated implementation-plan tasks — application code, tests, and configuration — exactly as specified, and verifies each with the plan's own commands. Use to execute one or more tasks from a *.plan.md, including several agents in parallel across independent tasks.
-model: inherit
+model: sonnet
 skills:
   - discovering-technical-context
 ---

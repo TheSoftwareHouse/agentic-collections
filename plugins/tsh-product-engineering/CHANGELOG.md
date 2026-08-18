@@ -12,6 +12,18 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.0] - 2026-08-18
+
+### Changed
+
+- The agents now pin their models instead of inheriting the session's:
+  `software-engineer` and `ui-engineer` run on Sonnet, `code-reviewer` on Opus.
+  Inheriting made delegation cost and quality depend on whatever model the session
+  happened to use; now plan execution stays fast and cheap in parallel, and the
+  pre-merge review always gets the stronger model. To override, set
+  `CLAUDE_CODE_SUBAGENT_MODEL` or pass `model` when invoking an agent — both
+  outrank the pinned value.
+
 ## [0.2.0] - 2026-08-18
 
 ### Added

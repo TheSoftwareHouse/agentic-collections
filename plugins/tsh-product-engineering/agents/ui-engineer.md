@@ -1,7 +1,7 @@
 ---
 name: ui-engineer
 description: Implements UI components and frontend changes from a design reference, fetching the Figma design before writing code and verifying the rendered result in a browser against it. Use for plan tasks that change rendered UI, especially Figma-backed screens and components.
-model: inherit
+model: sonnet
 skills:
   - discovering-technical-context
 ---
