@@ -12,6 +12,17 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.4.1] - 2026-08-18
+
+### Changed
+
+- `ui-engineer` must now verify each component by taking a browser screenshot at
+  the design's breakpoint and examining the image — including design-defined
+  states (hover, focus, error, empty). Previously "verify in a real browser"
+  could be satisfied by accessibility snapshots and click-throughs, which are
+  text-only and let visual defects (spacing, colors, typography) pass unnoticed;
+  those now count as navigation, not verification.
+
 ## [0.4.0] - 2026-08-18
 
 ### Added

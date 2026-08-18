@@ -31,10 +31,16 @@ browser to scrape a design**, and never substitute a guess for the reference.
 2. Fetch the design (gate above). Extract what the implementation must honor:
    layout, spacing, typography, design tokens, states, and behavior.
 3. Implement following the project's existing component patterns.
-4. Verify in a real browser: render the change at the pinned dev server URL using the
-   Playwright MCP bundled with this plugin (or another connected browser tool, or the
-   project's own tooling) and compare the result against the design. Also run the
-   task's Definition of Done commands verbatim.
+4. Verify in a real browser, per component: navigate to the pinned dev server URL
+   using the Playwright MCP bundled with this plugin (or another connected browser
+   tool, or the project's own tooling), set the viewport to the design's breakpoint,
+   take a screenshot, and look at the image — compare spacing, typography, colors,
+   and structure against the design. Give every state the design defines (hover,
+   focus, error, empty) the same screenshot treatment. Accessibility snapshots, DOM
+   assertions, and click-throughs are for navigating and interacting, never a
+   substitute for the screenshot comparison: a component whose screenshot you have
+   not examined is unverified. Also run the task's Definition of Done commands
+   verbatim.
 5. Fix and re-verify. Repeat up to 5 iterations per component. If differences remain
    after 5, stop and report each remaining gap with what you tried — do not silently
    accept a mismatch, and do not loop forever.
@@ -43,7 +49,7 @@ browser to scrape a design**, and never substitute a guess for the reference.
 
 Treat the delegated dev server URL as pinned: never switch ports, start a different
 server, or "correct" it. Type checks, builds, and passing tests are not UI
-verification — only the rendered comparison against the design is.
+verification — only the examined-screenshot comparison against the design is.
 
 ## Authentication safety
 
