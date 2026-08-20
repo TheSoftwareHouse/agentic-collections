@@ -109,6 +109,19 @@
         "url": "https://tsh.io"
       },
       "keywords": ["tsh", "stack", "nodejs", "typescript", "nestjs", "cqrs", "typeorm"]
+    },
+    {
+      "name": "tsh-stack-python",
+      "source": "./plugins/tsh-stack-python",
+      "displayName": "TSH Stack: Python",
+      "description": "TSH conventions for modern Python 3.12+: general implementation and review practices, and Pydantic v2/dataclass/SQLModel/SQLAlchemy 2.0 data modeling.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "python", "pydantic", "sqlmodel", "sqlalchemy", "asyncio"]
     }
   ]
 }
