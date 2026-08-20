@@ -62,6 +62,8 @@ Optional fields worth knowing:
 | `user-invocable: false` | Background knowledge that is not a meaningful command. Claude can load it; it stays out of the `/` menu. |
 | `allowed-tools` | Tools the skill may use without per-use approval, for the turn that invoked it. |
 | `context: fork` | Run the skill in an isolated subagent context instead of inline. |
+| `hooks` | Enforcement that must hold once the workflow is entered. Registered on invocation and kept for the rest of the session; `once: true` limits a handler to one run. See [authoring-a-hook.md](./authoring-a-hook.md). |
+| `paths` | Globs that limit *automatic* activation. Fits a skill triggered by Claude touching a kind of file; never one triggered by the user asking for a workflow. |
 
 Neither visibility flag is a security control. `disable-model-invocation: true` is what
 actually removes a skill from Claude's context; `user-invocable: false` only hides it

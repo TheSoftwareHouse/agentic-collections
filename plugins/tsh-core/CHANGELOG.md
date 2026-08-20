@@ -14,6 +14,30 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.7.1] - 2026-08-20
+
+### Fixed
+
+- **`authoring-claude-extensions` described skill-frontmatter hooks incorrectly.** The
+  registration-scope table said hooks in "Skill or subagent frontmatter" apply "only
+  while that skill or subagent is active." That is true of a subagent and wrong of a
+  skill: Claude Code registers a skill's hooks when the skill is invoked and keeps
+  running them for the rest of the session, later turns included. The two rows are now
+  separate. The wrong line mattered because it removed frontmatter hooks from
+  consideration for the case they fit best — enforcement that should start when a
+  workflow is entered and hold until the session ends, at no cost to sessions that
+  never enter it.
+
+### Added
+
+- `hooks` and `paths` documented in the skill frontmatter table in
+  `references/authoring-a-skill.md`. Neither was listed, which is why nothing in this
+  marketplace uses either. The `hooks` row also records the asymmetry with `CLAUDE.md`'s
+  hard rule on agents: a plugin-shipped **agent** may not declare `hooks`, but a
+  plugin-shipped **skill** may.
+- `once: true` explained in `references/authoring-a-hook.md` — it limits a handler to
+  one run per session and is honoured only in skill frontmatter.
+
 ## [0.7.0] - 2026-08-17
 
 ### Added

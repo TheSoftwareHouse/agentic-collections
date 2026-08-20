@@ -111,6 +111,9 @@ key use case.
 `disable-model-invocation: true` -- human-only; Claude never loads it on its own.
 `user-invocable: false`          -- background knowledge, hidden from the / menu.
 `allowed-tools`    -- tools pre-approved for the turn that invokes the skill.
+`hooks`            -- hooks registered when the skill is invoked, kept for the rest
+                      of the session. `once: true` limits a handler to one run.
+                      Plugin AGENTS may not declare hooks; plugin skills may.
 
 `$ARGUMENTS` interpolates whatever the user typed after the skill name, e.g.
 `/tsh-product-testing:audit-page checkout page` puts "checkout page" there.

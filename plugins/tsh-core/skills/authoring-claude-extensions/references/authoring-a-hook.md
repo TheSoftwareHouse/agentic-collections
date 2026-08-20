@@ -69,7 +69,17 @@ moment it contains a metacharacter. MCP tools are named `mcp__<server>__<tool>`.
 | `.claude/settings.local.json` | You, this checkout — gitignored |
 | `~/.claude/settings.json` | You, everywhere |
 | `<plugin>/hooks/hooks.json` | Wherever the plugin is enabled |
-| Skill or subagent frontmatter | Only while that skill or subagent is active |
+| Subagent frontmatter | Only while that subagent is running — a `Stop` hook becomes `SubagentStop` |
+| Skill frontmatter | Registered when the skill is invoked, then **for the rest of the session** — later turns included |
+
+A skill's frontmatter hooks outliving the skill's own turn is the useful part: gates
+register the moment the workflow is entered and then hold, while costing nothing in
+sessions that never enter it. `once: true` on a handler runs it a single time per
+session instead — and it is honoured **only** in skill frontmatter, ignored in
+settings files and subagent frontmatter.
+
+Note the asymmetry with `CLAUDE.md`'s hard rule on agents: a plugin-shipped **agent**
+may not declare `hooks`, but a plugin-shipped **skill** may.
 
 ```json
 {
