@@ -1,7 +1,7 @@
 ---
 name: discovering-technical-context
-description: "Establishes a project's conventions, patterns, and standards before code is written, in a fixed priority order: context already persisted in the plan, then project instructions, then existing codebase patterns, then external documentation. Use before implementing in an unfamiliar codebase or when deciding which convention a change should follow."
-when_to_use: "Trigger on: onboarding to a new area of a codebase, starting implementation or test-writing in an unfamiliar project, conflicting conventions in the same repository, 'how does this project do X', or populating a plan's Technical Context section."
+description: "Establishes which conventions a change must follow before it is written, in priority order: the plan's persisted technical context, then project instructions (CLAUDE.md, .claude/rules, decision records), then existing codebase patterns, then external documentation. Use to answer 'how does this project do X' or to fill a plan's Technical Context section."
+when_to_use: "Trigger on: 'how does this project do X', 'what are the conventions here', two parts of one repository disagreeing on a convention, choosing the pattern new code or tests should follow, or populating a plan's Technical Context. Conventions only: implementing is orchestrating-feature-implementation, planning is creating-implementation-plans."
 ---
 
 # Discovering Technical Context
@@ -84,7 +84,7 @@ make so they become the project's pattern.
 
 ## Related Skills
 
-Optional and may not be installed — treat each as a bonus, never a prerequisite.
+Ships in this plugin — if this skill loaded, it is installed.
 
 - [`creating-implementation-plans`](../creating-implementation-plans/SKILL.md) —
   persists what this skill discovers into the plan's Technical Context.

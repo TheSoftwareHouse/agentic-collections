@@ -1,6 +1,6 @@
 # TSH Product Engineering
 
-Feature implementation, code review, refactoring, debugging and TDD workflows.
+Spec-driven feature implementation: committed plan files, delegated implementer subagents, and TSH's structured pre-merge code review.
 
 Install at **user scope** — this plugin travels with you, not with a repository. It
 carries TSH's spec-driven implementation workflow: a plan file the team can read and
@@ -26,8 +26,10 @@ conversation, and a delegated review gate at the end.
 | `ui-engineer` (agent) | `@tsh-product-engineering:ui-engineer` | Implements UI from a Figma reference and verifies the rendered result in a browser |
 | `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: runs the checks itself and returns a structured findings report |
 
-All skills are model-invocable: describe the work ("plan this feature", "implement
-the plan", "review this change") and the right one loads without naming it.
+All skills are model-invocable, and their descriptions are written to route on the
+work you describe rather than on the skill's name — "implement this ticket", "plan
+this feature", "is this ready to merge". Each one also names the sibling that owns the
+adjacent job, so the four do not compete for the same request.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 

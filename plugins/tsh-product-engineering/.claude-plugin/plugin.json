@@ -1,8 +1,8 @@
 {
   "name": "tsh-product-engineering",
   "displayName": "TSH Product Engineering",
-  "description": "Feature implementation, code review, refactoring, debugging and TDD workflows.",
-  "version": "0.4.1",
+  "description": "Spec-driven feature implementation: committed plan files, delegated implementer subagents, and TSH's structured pre-merge code review.",
+  "version": "0.5.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"
@@ -10,5 +10,5 @@
   "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-product-engineering",
   "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
   "license": "MIT",
-  "keywords": ["tsh", "engineering", "code-review", "refactoring", "tdd"]
+  "keywords": ["tsh", "engineering", "implementation", "planning", "code-review", "subagents"]
 }

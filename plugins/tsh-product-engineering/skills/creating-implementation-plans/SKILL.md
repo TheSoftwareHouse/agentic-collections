@@ -1,7 +1,7 @@
 ---
 name: creating-implementation-plans
-description: "Turns a task or feature request into a phased, verifiable implementation plan saved as a markdown file the team can read, iterate on, and return to across sessions. Use when planning a feature, breaking work into delegable tasks, or writing or revising an implementation plan."
-when_to_use: "Trigger on: planning a feature or task before coding, 'write an implementation plan', 'break this down into tasks', revising an existing *.plan.md, preparing tasks for parallel implementation, or any spec-driven development request."
+description: "Writes TSH's implementation plan as a committed file at specifications/<task-id>/<task-name>.plan.md: phased tasks that each name their files and a verifiable Definition of Done, technical context persisted for implementers, explicit parallel groups. Use when a plan, spec, or task breakdown is asked for — a plan kept outside the repository cannot be committed, reviewed in a PR, or read by an implementer subagent."
+when_to_use: "Trigger on: 'write an implementation plan', 'plan this feature', 'break this into tasks', revising an existing *.plan.md, preparing tasks for parallel implementation, or any spec-driven development request. Writes the plan only — executing it is orchestrating-feature-implementation."
 ---
 
 # Creating Implementation Plans
@@ -74,9 +74,10 @@ this skill's rules only where the local convention is silent.
 
 ## Related Skills
 
-Optional and may not be installed — treat each as a bonus, never a prerequisite.
+Both ship in this plugin — if this skill loaded, they are installed. Step 2 of the
+procedure depends on the first.
 
 - [`discovering-technical-context`](../discovering-technical-context/SKILL.md) —
-  populates the plan's Technical Context section.
+  populates the plan's Technical Context section. Required by Step 2.
 - [`orchestrating-feature-implementation`](../orchestrating-feature-implementation/SKILL.md) —
   executes the finished plan.

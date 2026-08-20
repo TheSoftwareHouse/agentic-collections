@@ -1,7 +1,7 @@
 ---
 name: orchestrating-feature-implementation
-description: "Drives feature implementation end to end from the main conversation: ensures an implementation plan exists, delegates its tasks to implementer subagents — in parallel where the plan allows — verifies every task, and closes with a delegated code review. Use when implementing a feature or executing an implementation plan."
-when_to_use: "Trigger on: 'implement this feature', executing or resuming a *.plan.md, coordinating implementation across multiple tasks or subagents, or continuing implementation work started in an earlier session."
+description: "Implements a feature, ticket, or plan end to end from the main conversation: confirms a plan file exists, delegates each task to implementer subagents — in parallel where the plan allows — verifies each one, then closes with a delegated code review. Use for any feature request or multi-file change, before the first file is edited."
+when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code."
 ---
 
 # Orchestrating Feature Implementation
@@ -28,7 +28,7 @@ of it.
 
 | Severity | Rule |
 | --- | --- |
-| MUST | Have a plan file the user has read before non-trivial implementation starts. No plan → create one first via `creating-implementation-plans`. Only a genuinely trivial change (single file, no design decision) may proceed planless. |
+| MUST | Have a plan file the user has read before non-trivial implementation starts. No plan → create one first via `creating-implementation-plans`, which ships in this plugin and is always available. Only a genuinely trivial change (single file, no design decision) may proceed planless. |
 | MUST | Make every delegation self-contained: exact plan path, task ID(s), the instruction to read the plan's Technical Context first, and any pinned inputs (dev server URL, design URLs). Subagents have no conversation history. |
 | MUST | Run tasks in parallel only when the plan marks them as one parallel group and their `**Files:**` lists are disjoint. Launch the group's subagents in a single message; run everything else in plan order. |
 | MUST | Verify after every task: confirm the delegate ran the task's Definition of Done commands, and spot-check the result. A failed verification stops the flow — fix before proceeding. |
@@ -82,9 +82,16 @@ of it.
 
 ## Related Skills
 
-Optional and may not be installed — treat each as a bonus, never a prerequisite.
+All three ship in this plugin — if this skill loaded, they are installed. The plan
+rule above depends on the first: it is a prerequisite, not a bonus.
 
 - [`creating-implementation-plans`](../creating-implementation-plans/SKILL.md) —
   authors the plan this workflow executes.
 - [`reviewing-code`](../reviewing-code/SKILL.md) — the standard the final review
-  gate applies.
+  gate applies; the `code-reviewer` agent loads it automatically.
+- [`discovering-technical-context`](../discovering-technical-context/SKILL.md) — what
+  the implementer agents consult before writing code.
+
+Other plugins are a different matter: `tsh-product-testing` (E2E suites) and
+`tsh-platform-engineering` (CI, deployment) may not be installed. Name the gap to the
+user, never path into them, and never block on one.

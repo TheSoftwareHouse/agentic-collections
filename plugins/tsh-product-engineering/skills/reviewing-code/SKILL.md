@@ -1,7 +1,7 @@
 ---
 name: reviewing-code
-description: "Runs TSH's structured code review of a delivered change set: implementation compared against its plan and requirements, test coverage judged and test suites executed, best practices and high-risk anti-patterns checked, then static analysis, security, and scalability. Use when reviewing implemented changes, a pull request, or a finished task against its plan."
-when_to_use: "Trigger on: 'review this code', 'review this PR', verifying an implementation against its plan or acceptance criteria, a pre-merge quality check, or judging whether a change set is adequately tested."
+description: "TSH's pre-merge review of a delivered change set: reads the plan and requirements first, compares the implementation against what was agreed, judges test coverage per layer, actually executes the project's tests, linters and build, then checks high-risk anti-patterns, security, and scalability. Use when a change set, task, or PR must be judged against its plan or acceptance criteria with its suites actually run, not read as a diff."
+when_to_use: "Trigger on: 'review this code', 'review this PR', 'is this ready to merge', verifying an implementation against its *.plan.md or acceptance criteria, judging whether a change is adequately tested, or the review gate closing an implementation workflow. Executes the project's own suites as part of the review; reports findings and never fixes code."
 ---
 
 # Reviewing Code
@@ -97,7 +97,7 @@ results; then what passed. A clean review says so plainly.
 
 ## Related Skills
 
-Optional and may not be installed — treat each as a bonus, never a prerequisite.
+Ships in this plugin — if this skill loaded, it is installed.
 
 - [`discovering-technical-context`](../discovering-technical-context/SKILL.md) —
   establishes the conventions the review judges against.
