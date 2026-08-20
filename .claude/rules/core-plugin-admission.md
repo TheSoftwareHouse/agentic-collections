@@ -64,6 +64,23 @@ and when the whole listing overflows, descriptions are cut and routing degrades 
 measured that — three terse skills can cost less than one verbose one. Report the
 number, name the three disciplines, and let the reviewer weigh it.
 
+## Non-skill components: same bar, different cost
+
+The four tests above apply to **any** component this plugin ships — a bundled MCP
+server, an agent, a hook — not just skills. What changes is test 3's disclosure.
+
+A bundled MCP server spends **no routing footprint**: it puts nothing in the skill
+listing, so the before-and-after number is unchanged and reporting it is a formality.
+Its cost is MCP tool names, and Claude Code defers tool schemas until a tool is used.
+It also passes test 2 by construction — a server *is* a named tool, so "name the tool
+it wraps" can never fail. That leaves test 3 doing all the work: **name the three
+disciplines that drive it in a normal month**, or it is not core.
+
+A server one discipline drives stays in that discipline's plugin.
+`.claude/rules/plugin-manifests-and-marketplace.md` carries the placement table and
+the reason a shared server needs exactly one home — plugin servers deduplicate by
+endpoint, and the surviving definition decides the tool namespace.
+
 ## `tsh-core` is one plugin, not a family
 
 Growth is never a reason to split into `tsh-core-*`. A prefixed family earns its keep

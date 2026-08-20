@@ -80,6 +80,39 @@ They keep a short `SKILL.md` and push detail into `references/`, loaded only whe
 the task needs it. The **"Load when"** column in the Reference Loading table is
 what routes the model to the right file; keep it filled in when adding references.
 
+### The Atlassian connector
+
+**This plugin bundles one MCP server** (`.mcp.json`): Atlassian's official
+[Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/),
+so Claude reads and updates Jira work items and Confluence pages directly instead of
+waiting for someone to paste a ticket into the conversation. It sits here rather than
+in a discipline plugin because Jira is not one job's tool — engineering, product
+management and testing all read from it, and none of that changes with the language a
+repo is written in.
+
+**One step per machine.** Run `/mcp`, pick `atlassian`, finish the browser login. The
+server is remote and OAuth-authenticated, so every call runs as you — it grants
+nothing you could not already open in Jira yourself. Atlassian Cloud only. It appears
+in `/mcp` as plugin-provided; disable it per project from the same panel. The cost is
+not routing budget: an MCP server adds nothing to the skill listing, and Claude Code
+defers tool schemas until a tool is used, so a session that never touches Jira pays
+only for the tool names.
+
+**Bitbucket is possible, but not bundled.** The same server does expose Bitbucket
+Cloud (and Jira Service Management) — but only under API-token authentication, never
+OAuth. That path needs an Atlassian org admin to enable API-token auth under **Admin
+Hub → Rovo → Rovo MCP server**, the Bitbucket workspace linked to the organisation,
+and a scoped token per person, so bundling it would ship a server that fails for most
+installs. If you want it, add your own alongside:
+
+```shell
+claude mcp add --transport http atlassian-bitbucket https://mcp.atlassian.com/v1/mcp \
+  --header "Authorization: Basic $(printf '%s' 'you@tsh.io:YOUR_SCOPED_TOKEN' | base64)"
+```
+
+That one covers Jira as well, so disable the bundled `atlassian` entry in `/mcp` if
+you go this route — otherwise both sets of tools sit in the session.
+
 ## Scope
 
 Every other plugin in this marketplace has a claimant and an affirmative question
@@ -138,6 +171,22 @@ three terse skills can cost less than one verbose one.
 
 Growth is not a reason to split into `tsh-core-*`. There is no `tsh-core-*`. When
 this plugin feels heavy, re-home what should not have been admitted.
+
+### The bar covers every component, not just skills
+
+Everything above is phrased in terms of skills because until now that is all this
+plugin held. It applies unchanged to an MCP server, an agent or a hook — what changes
+is the cost being disclosed. A bundled MCP server adds **no** routing footprint: it
+puts nothing in the skill listing. Its cost is tool names, which Claude Code defers
+until a tool is used, so the deciding test is the third one — **name three of the five
+disciplines that use it in a normal month**. A server one discipline uses stays in
+that discipline's plugin, which is why the Playwright server a UI agent drives is not
+here.
+
+Duplication is not the escape hatch it looks like. Plugin-provided servers are
+deduplicated by **endpoint**, so two plugins declaring the same URL do connect once —
+but the surviving definition decides the `mcp__plugin_<plugin>_<server>__*` namespace,
+and the winner tracks plugin load order, which nobody controls. One home per server.
 
 ### What does not belong here
 

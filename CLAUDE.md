@@ -79,6 +79,8 @@ and `tsh-core` with you, because it depends on nothing at all.
 | A script a skill runs | `plugins/<plugin>/skills/<skill-name>/scripts/` | — |
 | A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `.claude-plugin/marketplace.json` | an existing plugin |
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read `.claude/rules/core-plugin-admission.md` first | `templates/SKILL.md` |
+| An MCP server three or more disciplines drive | `plugins/tsh-core/.mcp.json` — read `.claude/rules/plugin-manifests-and-marketplace.md`, then `core-plugin-admission.md` | the existing entry |
+| An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — Playwright in `tsh-product-engineering` is the worked example | that file |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
 **Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
@@ -147,9 +149,11 @@ Rationale lives in `.claude/rules/authoring-skills.md` and
    cost.** It lands there only if it fails both routing questions, wraps a named tool
    rather than a TSH opinion, and the PR names which three of the five disciplines
    would invoke it in a normal month plus the plugin's routing footprint before and
-   after. Ties go to a discipline plugin. This is a hard rule because a wrongly-placed
-   skill loads fine, validates fine, and simply taxes everyone's context forever. See
-   `.claude/rules/core-plugin-admission.md`.
+   after. Ties go to a discipline plugin. The bar covers every component it ships, not
+   only skills — a bundled MCP server spends no routing footprint, so the deciding
+   test is naming the three disciplines. This is a hard rule because a wrongly-placed
+   component loads fine, validates fine, and simply taxes everyone's context forever.
+   See `.claude/rules/core-plugin-admission.md`.
 
 ## Local development loop
 

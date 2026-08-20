@@ -56,7 +56,9 @@ and discovery/BA work (`tsh-product-management`) are other plugins' ground. Deep
 analysis skills (codebase analysis, gap analysis) are candidates for a later wave.
 
 Git worktree lifecycle lives in `tsh-core`, not here — it doesn't change with your
-discipline. Install that alongside this one.
+discipline. **Jira and Confluence access is there too:** `tsh-core` bundles the
+Atlassian MCP server, because every discipline reads from Jira, not just this one.
+Install it alongside this one and authenticate once with `/mcp`.
 
 ## Contributing
 

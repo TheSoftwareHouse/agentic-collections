@@ -2,12 +2,14 @@
 paths:
   - ".claude-plugin/**"
   - "plugins/**/.claude-plugin/**"
+  - "plugins/**/.mcp.json"
 ---
 
 # Plugin manifests and the marketplace catalog
 
-Rationale for hard rules 1 and 2 in the root `CLAUDE.md`. Both failures are silent:
-nothing errors, nothing validates red, the component simply never reaches anyone.
+Rationale for hard rules 1 and 2 in the root `CLAUDE.md`, plus where a bundled MCP
+server belongs. Every failure here is silent: nothing errors, nothing validates red,
+the component simply never reaches anyone.
 
 ## Only `plugin.json` goes inside `.claude-plugin/`
 
@@ -53,6 +55,52 @@ marketplace-update command attached.**
 
 The directory name, the `name` in `plugin.json`, and the `name` in the marketplace
 entry must all match.
+
+## Where an MCP server goes
+
+A plugin bundles MCP servers from an `.mcp.json` at its **plugin root** — never under
+`.claude-plugin/`, which holds `plugin.json` and nothing else. The same silent failure
+applies: the plugin loads, the server simply isn't there.
+
+Placement follows the routing predicate, with one substitution — count **disciplines**
+instead of asking whose job it is:
+
+| The server is driven by | It goes in |
+| :-- | :-- |
+| Three or more disciplines | `plugins/tsh-core/.mcp.json` — read `core-plugin-admission.md` first |
+| One agent, one skill, one discipline | that plugin's own `.mcp.json` |
+
+Atlassian is the first case: engineering, product management and testing all read
+Jira. Playwright is the second: it exists to let `ui-engineer` look at a rendered
+page, and it stays in `tsh-product-engineering`.
+
+**Two facts that decide the boundary, both undocumented in the plugin docs:**
+
+- **Plugin-provided servers deduplicate by *endpoint*, not by name.** Claude Code's
+  precedence is Local → Project → User → plugin-provided → claude.ai connectors, and
+  the three scopes match by name while plugins and connectors match by URL or command.
+  So two plugins declaring the same Atlassian URL connect **once** — duplication does
+  not double anyone's tool budget. It costs N files to keep in sync and N version
+  bumps per change.
+- **The surviving definition decides the tool namespace.** A plugin server's tools are
+  called `mcp__plugin_<plugin-name>_<server-name>__<tool>`, and the winner tracks
+  plugin **load order** — verified by swapping two `--plugin-dir` flags, which flips
+  which plugin name survives. Nobody controls install order, so treat it as
+  arbitrary. So **never name a shared
+  server's tools in a `tools:` field, an `allowed-tools:` list, or a hook matcher** —
+  the reference breaks silently depending on which plugins the teammate installed.
+  One home per server is what makes those names safe to write down.
+
+**Bundle a server that needs per-user OAuth; don't bundle one that needs a secret.**
+A remote server the teammate authenticates once through `/mcp` is fine — that is the
+Atlassian case, and the credential never touches the repo. A server needing a token in
+`headers` is not: a static `headers.Authorization` also disables Claude Code's OAuth
+fallback, so it fails outright for anyone who hasn't set the value. Leave those to the
+consuming project, which is why Figma MCP is a `ui-engineer` prerequisite rather than
+a bundled server.
+
+An `.mcp.json` change is a `plugins/` change, so hard rule 3 applies in full: version
+bump and `CHANGELOG.md` entry in the same commit.
 
 ## Testing the catalog end to end without pushing
 

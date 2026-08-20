@@ -14,6 +14,42 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.0] - 2026-08-20
+
+### Added
+
+- **The plugin now bundles one MCP server: Atlassian's official
+  [Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)**
+  (`.mcp.json`), so Jira work items and Confluence pages are readable and writable
+  from any session — no per-project MCP setup, and no pasting a ticket into the
+  conversation to plan against it. **One step per machine:** run `/mcp`, pick
+  `atlassian`, finish the browser OAuth login; every call then runs under that
+  person's own Atlassian account and grants nothing they could not already open in
+  Jira. Atlassian Cloud only. It shows in `/mcp` as plugin-provided and can be
+  disabled there per project.
+- **Why here and not in a discipline plugin.** It fails both routing questions —
+  Jira does not change with the language a repo is written in, nor with the reader's
+  job — and it wraps a named tool rather than a TSH opinion, which is the test this
+  plugin's bar is built around. The three disciplines that invoke it in a normal
+  month: **product engineering, product management, product testing**. Placing it in
+  one discipline plugin would mean re-declaring the same endpoint in each of the
+  others; plugin servers are deduplicated by endpoint, so that connects once but
+  leaves the `mcp__plugin_<plugin>_atlassian__*` namespace decided by whichever
+  definition wins — and that tracks plugin load order, which nobody controls.
+- **Routing footprint: 4,076 characters, unchanged by this release** — 3,686 of them
+  actually preloaded, since `init` sets `disable-model-invocation: true`. An MCP
+  server puts nothing in the skill listing, so it spends no routing budget at all.
+  Its cost is MCP tool names, and Claude Code defers tool schemas until a tool is
+  used. The `Scope` section of the README now states that the admission bar covers
+  every component class, not only skills.
+- **Bitbucket is deliberately not included, and that is not a bug.** The same server
+  exposes Bitbucket Cloud and Jira Service Management only under API-token
+  authentication — never OAuth — which additionally requires an org admin to enable
+  API-token auth in Admin Hub → Rovo → Rovo MCP server, the workspace linked to the
+  organisation, and a scoped token per person. Bundling that would ship a server that
+  fails for most installs, so the README carries the `claude mcp add` command for
+  anyone who wants to opt in themselves.
+
 ## [0.7.1] - 2026-08-20
 
 ### Fixed

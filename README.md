@@ -144,6 +144,25 @@ If it warns that reloading will re-read the conversation, rerun it as
 `/reload-plugins --force`. The reload summary counts only `commands/` directories,
 so `0 skills` is normal and doesn't mean anything failed.
 
+## Step 4 — sign in to Jira, once per machine
+
+`tsh-core` bundles the Atlassian MCP server, so Claude can read and update Jira work
+items and Confluence pages directly. It needs one interactive login:
+
+```shell
+/mcp
+```
+
+Pick `atlassian`, finish the browser sign-in, and you're done — on this machine, for
+every project. Every call then runs under your own Atlassian account and grants
+nothing you could not already open in Jira yourself. Skip this and the server simply
+shows as needing authentication; nothing else breaks.
+
+Bitbucket is not included. The same server does cover Bitbucket Cloud, but only under
+API-token authentication, which needs an Atlassian org admin to enable it first — see
+[`plugins/tsh-core/README.md`](plugins/tsh-core/README.md) if you want to set that up
+for yourself.
+
 ## Using what you installed
 
 Skills and agents are invoked differently, and both are namespaced by plugin:
