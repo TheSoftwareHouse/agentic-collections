@@ -32,7 +32,8 @@ this skill's rules only where the local convention is silent.
 | MUST | Choose sections deliberately from the building blocks — match plan depth to task risk. A config tweak gets a goal and two tasks; a schema migration gets the full treatment. |
 | NEVER | Put implementation code in the plan. Type definitions, function signatures, DTOs, and API shapes are allowed to pin a contract; pseudo-code only for genuinely complicated algorithms. |
 | MUST | Name every file each task touches in a `**Files:**` field, each labeled `create`, `modify`, or `reuse`. |
-| MUST | Give every task a Definition of Done with at least one objectively verifiable check. Commands come verbatim from the plan's Technical Context — never assumed from Node/npm. |
+| MUST | Give every task a Definition of Done with at least one objectively verifiable check. Commands come verbatim from the plan's Technical Context — never assumed from Node/npm — and scoped to the task's own files: targeted unit tests, lint or typecheck on the changed area, plus any test file the task itself creates. Never directory- or project-wide suites — integration interactions belong to phase verification, full passes to the final verification phase. |
+| MUST | End every non-trivial plan with a final verification phase: a code-review task and a functional-verification task, executable in parallel. Draft the verification document at `specifications/<task-id>/<task-name>.verification.md` at planning time, and ask the user which functional checks it should include — before implementation starts. |
 | MUST | Mark independent tasks as an explicit parallel group. Tasks qualify only when neither depends on the other's output AND their `**Files:**` lists are disjoint. |
 | MUST | Consult the Current Implementation Analysis before planning new components — reuse or extend existing code first. |
 | MUST | Plan only the current task. Record prerequisite or follow-up work under Improvements (Out of Scope), not as extra phases. |
@@ -44,6 +45,7 @@ this skill's rules only where the local convention is silent.
 | --- | --- | --- |
 | [Plan building blocks](./references/plan-building-blocks.md) | Assembling or revising a plan's structure — every time, before drafting | Every candidate section: why it exists, when to include it, when to drop it, and the Definition of Done rules in full |
 | [Worked example](./references/plan-example.md) | Unsure how a finished plan reads, or calibrating depth for a mid-size task | One complete plan for a small feature — illustrative, not a template to fill |
+| [Verification document](./references/verification-doc.md) | Drafting the final verification phase's document — every non-trivial plan | The document's building blocks, scenario tags, evidence rules, and a compact worked example |
 
 ## Procedure
 
@@ -62,15 +64,22 @@ this skill's rules only where the local convention is silent.
    must change, and what is genuinely new — with file paths.
 5. **Break the work into phases and tasks.** Each task gets a near-imperative
    description naming the files and the behavior to change, a `**Files:**` field, a
-   Definition of Done, and optionally a Stop Rule and Clues.
+   Definition of Done scoped to the task's own files, and optionally a Stop Rule and
+   Clues.
 6. **Mark parallel groups.** Group tasks that can run concurrently and say so
    explicitly (for example `Parallel group A: Tasks 2.1–2.3`). The orchestrator will
    launch one subagent per task in the group, so the disjoint-files rule is what
    prevents them from overwriting each other.
 7. **Persist the Technical Context** into the plan: stack and versions, conventions,
    and the verbatim verification commands the Definitions of Done use.
-8. **Hand the plan to the user.** Ask them to read it and iterate together until it
-   says what they mean. The plan file is the agreement; there is nothing to sign.
+8. **Draft the verification document.** Read
+   [`./references/verification-doc.md`](./references/verification-doc.md), propose
+   the candidate checks — browser walkthrough, API calls, database state, log checks,
+   data seeding — and ask the user which to include. Save the document next to the
+   plan.
+9. **Hand the plan and the verification document to the user.** Ask them to read
+   both and iterate together until they say what they mean. The plan file is the
+   agreement; there is nothing to sign.
 
 ## Related Skills
 

@@ -32,6 +32,10 @@ Two boundaries specific to your role:
   checkboxes are out of scope.
 - Run every check yourself. An implementation report claiming tests pass is a claim,
   not evidence.
+- Suite scope comes from the delegation. When it states that a parallel verifier
+  covers functional and E2E verification, run static checks, unit and integration
+  suites, and the build only, and name the exclusion under Checks executed. With no
+  stated scope, run everything.
 
 If the intent behind a deviation from the plan is unclear, report it as a question in
 your findings rather than assuming it is a defect.

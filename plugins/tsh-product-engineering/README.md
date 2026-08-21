@@ -18,13 +18,14 @@ conversation, and a delegated review gate at the end.
 
 | Component | Invoke | Covers |
 | :-- | :-- | :-- |
-| `orchestrating-feature-implementation` | `/tsh-product-engineering:orchestrating-feature-implementation` | Drives implementation end to end: plan readiness, delegation to the agents below (parallel where the plan allows), per-task verification, final review |
+| `orchestrating-feature-implementation` | `/tsh-product-engineering:orchestrating-feature-implementation` | Drives implementation end to end: plan readiness, delegation to the agents below (parallel where the plan allows), and a verification pyramid — scoped task checks, one checkpoint per phase, one final full pass |
 | `creating-implementation-plans` | `/tsh-product-engineering:creating-implementation-plans` | Authors `*.plan.md` files from a menu of building blocks — verifiable tasks, persisted technical context, parallel groups |
 | `reviewing-code` | `/tsh-product-engineering:reviewing-code` | TSH's structured review: plan comparison, executed test suites, anti-patterns, security, scalability |
 | `discovering-technical-context` | `/tsh-product-engineering:discovering-technical-context` | Project conventions in priority order: plan context → instructions → codebase patterns → external docs |
 | `software-engineer` (agent) | `@tsh-product-engineering:software-engineer` | Implements delegated plan tasks — code, tests, config — and verifies with the plan's commands |
 | `ui-engineer` (agent) | `@tsh-product-engineering:ui-engineer` | Implements UI from a Figma reference and verifies the rendered result in a browser |
 | `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: runs the checks itself and returns a structured findings report |
+| `feature-verifier` (agent) | `@tsh-product-engineering:feature-verifier` | Executes a plan's verification document against the running app — E2E suites, browser walkthroughs with examined screenshots, API/DB/log checks — with per-scenario evidence |
 
 All skills are model-invocable, and their descriptions are written to route on the
 work you describe rather than on the skill's name — "implement this ticket", "plan
@@ -33,11 +34,12 @@ adjacent job, so the four do not compete for the same request.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
-### Prerequisites for `ui-engineer`
+### Prerequisites for `ui-engineer` and `feature-verifier`
 
 **Browser verification ships with the plugin.** The plugin bundles the
 [Playwright MCP server](https://github.com/microsoft/playwright-mcp) (`.mcp.json`),
-so rendered-result verification works out of the box. It starts automatically with
+so rendered-result verification and functional browser walkthroughs work out of the
+box. It starts automatically with
 each session and appears in `/mcp` as plugin-provided; disable it per project from
 the same `/mcp` panel if a repository never renders UI. It needs Node.js on the
 machine — `npx` fetches the server, and Playwright downloads its browser on first
