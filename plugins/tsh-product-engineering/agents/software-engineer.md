@@ -26,7 +26,10 @@ improvise a scope.
    occurs — or an expected seam simply is not there — stop and report instead of
    improvising.
 3. Verify with the task's Definition of Done: run its commands verbatim and make them
-   pass. Loop on fix-and-rerun until they do or you are genuinely blocked.
+   pass. Loop on fix-and-rerun until they do or you are genuinely blocked. Run them
+   exactly as scoped — never widen to directory- or project-wide suites "to be safe";
+   broader verification belongs to the phase checkpoints and the plan's final
+   verification phase.
 4. Update the plan's checkboxes for **your delegated scope only**: the task checkbox
    and each satisfied Definition of Done item. Never touch other tasks' boxes and
    never edit the text of Definition of Done or acceptance-criteria sections.

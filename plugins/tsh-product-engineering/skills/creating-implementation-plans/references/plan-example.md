@@ -4,6 +4,8 @@ Use this reference when unsure how a finished plan reads or how deep a mid-size 
 should go. This is an illustration of the building blocks in use, **not a template to
 fill** — this plan chose its sections for its task, and dropped Proposed Solution
 diagrams, Security beyond one line, and Changelog because they added nothing here.
+Its verification document lives beside it; the compact worked example in
+[the verification-document reference](./verification-doc.md) is that file.
 
 ---
 
@@ -16,6 +18,7 @@ diagrams, Security beyond one line, and Changelog because they added nothing her
 | Ticket | PROJ-482 |
 | Title | Users can export the filtered reports list as CSV |
 | Related research | `specifications/PROJ-482/csv-export.research.md` |
+| Verification doc | `specifications/PROJ-482/csv-export.verification.md` |
 
 ## Goal
 
@@ -71,7 +74,7 @@ infrastructure — the list is capped at 10k rows and streams synchronously.
 
 **Goal**: The API serves filtered reports as CSV.
 
-**Verification:** `pnpm vitest run src/reports && pnpm tsc --noEmit`
+**Verification:** `pnpm test:int -- src/reports && pnpm tsc --noEmit`
 
 Parallel group A: Tasks 1.1 and 1.2 — independent, disjoint files.
 
@@ -102,7 +105,7 @@ row from the column list in the research file.
 **Definition of Done**:
 
 - [ ] Button builds the export URL from the active filters, not from component state copies
-- [ ] Run `pnpm --filter web vitest run src/pages/reports`
+- [ ] Run `pnpm --filter web vitest run src/pages/reports/ReportsToolbar.test.tsx`
 
 **Stop Rule:** if the toolbar no longer owns the filter state, stop and report —
 do not lift state to make the task fit.
@@ -120,7 +123,34 @@ with the existing `report-filters.ts`, stream `findFiltered()` rows through the 
 **Definition of Done**:
 
 - [ ] Integration test covers filtered export and the empty-result case
-- [ ] Run `pnpm test:int -- src/reports`
+- [ ] Run `pnpm test:int -- src/reports/reports.controller.int-spec.ts`
+
+### Phase 2: Final verification
+
+**Goal**: The whole change set is reviewed and the feature is verified working, once.
+
+Parallel group B: Tasks 2.1 and 2.2 — reviewer is read-only, verifier exercises the
+running app.
+
+#### Task 2.1 - [REVIEW] Code review
+
+**Description**: Delegate to `code-reviewer` with this plan and the full changed-file
+list. The delegation states that functional and E2E verification runs in the parallel
+verifier, so the reviewer runs static checks, unit and integration suites, and the
+build — and excludes E2E.
+
+**Definition of Done**:
+
+- [ ] Review verdict returned; every blocker and major finding resolved and re-checked
+
+#### Task 2.2 - [VERIFY] Functional verification
+
+**Description**: Delegate to `feature-verifier` with
+`specifications/PROJ-482/csv-export.verification.md` and the pinned dev server URL.
+
+**Definition of Done**:
+
+- [ ] Every scenario in the verification document passes, with evidence in the report
 
 ## Security Considerations
 

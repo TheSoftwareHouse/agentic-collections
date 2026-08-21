@@ -40,7 +40,10 @@ browser to scrape a design**, and never substitute a guess for the reference.
    assertions, and click-throughs are for navigating and interacting, never a
    substitute for the screenshot comparison: a component whose screenshot you have
    not examined is unverified. Also run the task's Definition of Done commands
-   verbatim.
+   verbatim, exactly as scoped — never widen to directory- or project-wide suites;
+   broader verification belongs to the plan's final verification phase. Your
+   screenshot-vs-design comparison verifies design fidelity of what you just built;
+   it neither replaces nor is replaced by that phase's functional verification.
 5. Fix and re-verify. Repeat up to 5 iterations per component. If differences remain
    after 5, stop and report each remaining gap with what you tried — do not silently
    accept a mismatch, and do not loop forever.

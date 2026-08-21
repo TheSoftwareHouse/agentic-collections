@@ -77,7 +77,10 @@ table.
 **Step 4 — Run tests, linters, and build.** Unit, integration, and e2e suites as they
 exist in the project, then static analysis, formatting, and the build. Use the
 project's own commands (the plan's Technical Context lists them). Record failures
-verbatim.
+verbatim. Run the suites within the scope the caller set: a standalone review with no
+stated scope runs everything, e2e included; when the delegation assigns functional
+and e2e verification to a parallel verifier, exclude those suites and record the
+exclusion in the report.
 
 **Step 5 — Best practices and anti-patterns.** Check against project standards first,
 then general practice (SOLID, DRY, KISS, low cognitive complexity — and no

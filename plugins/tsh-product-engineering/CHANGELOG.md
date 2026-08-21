@@ -12,7 +12,36 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
-## [0.5.1] - 2026-08-20
+## [0.6.0] - 2026-08-21
+
+### Added
+
+- **A `feature-verifier` agent.** It executes a plan's verification document against
+  the running application — committed E2E suites, browser walkthroughs with examined
+  screenshots, real API calls, database and log checks — and reports per-scenario
+  evidence. It uses the Playwright MCP server the plugin already bundles.
+- **A verification-document reference** in `creating-implementation-plans`. Every
+  non-trivial plan now ships a `specifications/<task-id>/<task-name>.verification.md`
+  drafted at planning time, with the user choosing which functional checks it
+  includes before implementation starts.
+
+### Changed
+
+- **Verification now follows a pyramid, so nothing runs twice.** Previously the same
+  suites could execute a dozen times per feature: per task by the implementer, again
+  by the orchestrator's spot-check, again per phase, again in the plan's own review
+  phase, and once more in the closing code review. Now each task runs only checks
+  scoped to its own files and is trusted from its report; each phase closes with one
+  integration checkpoint; and the plan's final verification phase is the single full
+  pass — `code-reviewer` (static checks, unit, integration, build) in parallel with
+  `feature-verifier` (E2E suite plus the functional scenarios). After that phase
+  passes, nothing re-reviews: findings route back as scoped fixes with scoped
+  re-checks.
+- **`code-reviewer` and `reviewing-code` honor caller-set suite scope.** When a
+  delegation assigns functional and E2E verification to a parallel verifier, the
+  review excludes those suites and says so; a standalone "review this PR" still runs
+  everything. Plans from before 0.6.0 still work — a plan without a final
+  verification phase gets the old single full-scope review.
 
 ### Changed
 
