@@ -1,6 +1,11 @@
 # TSH Product Management
 
-Business analysis, requirements and user stories, product discovery and scoping.
+Workshop-to-backlog business analysis: Jira-ready epics and user stories, systematic quality review, and an outcome-based delivery roadmap, behind five human review gates.
+
+Install at **user scope** — this plugin travels with you, not with a repository. It
+carries TSH's business-analysis workflow: discovery material in, a reviewed backlog
+and a client-facing roadmap out, with every irreversible step behind an approval the
+workflow records in a file.
 
 ## Install
 
@@ -9,9 +14,100 @@ Business analysis, requirements and user stories, product discovery and scoping.
 /plugin install tsh-product-management@tsh-agentic-collections
 ```
 
+## Start here
+
+```shell
+/tsh-product-management:analyze-materials specifications/inputs/billing-workshop.md
+```
+
+```shell
+/tsh-product-management:explore-materials specifications/inputs/rfp-bundle/
+```
+
+Both take a transcript path, a Figma or FigJam link, a PDF, a folder of documents —
+or, for `analyze-materials`, Jira issue keys or a project key to import an existing
+backlog instead.
+
 ## What's in it
 
-Nothing yet — this is a scaffold. `agents/` and `skills/` are empty on purpose.
+| Component | Invoke | Covers |
+| :-- | :-- | :-- |
+| `analyze-materials` | `/tsh-product-management:analyze-materials` | Entry point for the full workflow: materials or an existing Jira backlog in, reviewed epics and stories out |
+| `explore-materials` | `/tsh-product-management:explore-materials` | Entry point for Explore Mode: a business-context summary, deliberately stopping short of any backlog item |
+| `orchestrating-business-analysis` | `/tsh-product-management:orchestrating-business-analysis` | Runs the workflow: the five gates, the delegation, the persistent writes, the Jira push |
+| `processing-workshop-transcripts` | `/tsh-product-management:processing-workshop-transcripts` | Raw transcript to a structured document — topics, decisions, action items, preserved quotes |
+| `analyzing-discovery-context` | `/tsh-product-management:analyzing-discovery-context` | What is known, where it came from, and what is still missing — before committing to scope |
+| `extracting-epics-and-stories` | `/tsh-product-management:extracting-epics-and-stories` | Intent brief, epics as demonstrable vertical slices with a delivery contract, stories with source traceability |
+| `reviewing-backlog-quality` | `/tsh-product-management:reviewing-backlog-quality` | Eleven analysis passes over a domain model built from the tasks, as individually accept-or-reject suggestions |
+| `planning-delivery-roadmaps` | `/tsh-product-management:planning-delivery-roadmaps` | Markdown-only roadmap: client-facing outcome waves and internal coordination, linked by stable epic IDs |
+| `formatting-jira-issues` | `/tsh-product-management:formatting-jira-issues` | The benchmark template, the Gate 2 push, post-push verification, and Jira-to-local import |
+| `transcript-cleaner` (agent) | `@tsh-product-management:transcript-cleaner` | Cleans a transcript and returns it — haiku |
+| `discovery-analyst` (agent) | `@tsh-product-management:discovery-analyst` | Synthesizes materials and designs into a business summary — sonnet |
+| `backlog-extractor` (agent) | `@tsh-product-management:backlog-extractor` | Extracts one epic's stories, so a large backlog fans out — sonnet |
+| `backlog-quality-reviewer` (agent) | `@tsh-product-management:backlog-quality-reviewer` | Runs assigned review passes and returns structured findings — opus |
+| `roadmap-planner` (agent) | `@tsh-product-management:roadmap-planner` | Reconciles stable epic identity and proposes the waves — opus, never fanned out |
+| `jira-formatter` (agent) | `@tsh-product-management:jira-formatter` | Applies the benchmark template and prepares verification diffs — haiku |
+
+The two entry points are `disable-model-invocation: true` — commands, not routing
+surfaces, so they cost nothing until you type them. Everything else is
+model-invocable and routes on how people describe the work.
+
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
+
+## The five gates, and the hook behind the last one
+
+| Gate | After | You decide |
+| :-- | :-- | :-- |
+| 0 | The intent brief | Is this the right scope? |
+| 1 | Extraction | Is this the right breakdown? |
+| 1.5 | Quality review | Which suggestions land? |
+| 1.75 | The roadmap proposal | Are these the right waves? |
+| 2 | Jira formatting | Push, to this project, now? |
+
+Approvals are written to `specifications/<workshop-name>/.gates.md` **before** the
+action they unlock, because a long session gets summarized and a remembered
+approval does not survive that.
+
+**Gate 2 is enforced, not merely stated.** The workflow registers a `PreToolUse`
+hook that denies Atlassian write calls while the Gate 2 row is unapproved, and
+refuses to update an issue whose status is Done, Cancelled or PO APPROVE. Two
+things keep it out of everyone else's way: it registers when the workflow is
+entered rather than at install, and it stands down entirely in a repository with no
+BA artifacts. Confirm it is live with `/hooks` after the first
+`/tsh-product-management:analyze-materials` in a session.
+
+## Prerequisites
+
+**Jira needs the Atlassian MCP server, and `tsh-core` bundles it.** Install
+`tsh-core` alongside this plugin and run `/mcp` once to authenticate; every call
+then runs under your own Atlassian account. This plugin deliberately does not ship
+a second copy — plugin MCP servers deduplicate by endpoint, and one home per server
+is what keeps its tool names predictable.
+
+Tool names still vary by Atlassian server version, so the workflow discovers what
+is available before the first push rather than assuming. For the same reason
+nothing here pins an `mcp__atlassian__*` name in a tool allowlist: Jira writes go
+through the normal permission prompt, with the hook behind it.
+
+**Figma is a prerequisite, not a bundled server.** It needs per-user
+authentication, so we leave it to the consuming project — connect it there. Without
+it, design analysis is reported as blocked rather than silently skipped.
+
+**PDFs need nothing.** They are read with the standard `Read` tool.
+
+## Where the output goes
+
+Session artifacts live in `specifications/<workshop-name>/` — the gate ledger, the
+cleaned transcript, the intent brief, the extracted tasks, the quality review, the
+roadmap draft and the Jira-ready tasks. Two artifacts outlive the session in
+`specifications/projects/<project-name>/`: the approved `roadmap.md` and the
+`task-baseline.md` that gives the next workshop its continuity context.
+
+## Not covered here
+
+Implementation and code review are `tsh-product-engineering`; E2E and manual QA are
+`tsh-product-testing`; design work is `tsh-product-design`. Those plugins may not be
+installed, so this one names the gap rather than linking into them.
 
 ## Contributing
 
