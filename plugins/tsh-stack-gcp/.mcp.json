@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "gcp-gcloud": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/gcloud-mcp"]
+    },
+    "gcp-observability": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/observability-mcp"]
+    },
+    "gcp-storage": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/storage-mcp"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "tsh-stack-azure",
+  "displayName": "TSH Stack: Azure",
+  "description": "Azure-specific infrastructure guidance: Terraform module patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity and private-endpoint defaults, and a full evidence-based Azure cost and tagging audit driven by Resource Graph and Cost Management.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-stack-azure",
+  "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
+  "license": "MIT",
+  "keywords": ["tsh", "stack", "azure", "terraform", "aks", "key-vault", "blob-storage", "finops", "cost", "well-architected"]
+}

@@ -1,8 +1,8 @@
 {
   "name": "tsh-product-testing",
   "displayName": "TSH Product Testing",
-  "description": "E2E testing, accessibility testing, exploratory and manual QA, test-plan authoring.",
-  "version": "0.1.0",
+  "description": "Quality assurance: Playwright end-to-end tests that do not flake, and WCAG 2.1 AA accessibility audits that report the success criterion behind every finding.",
+  "version": "0.2.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"
@@ -10,5 +10,16 @@
   "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-product-testing",
   "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
   "license": "MIT",
-  "keywords": ["tsh", "testing", "qa", "e2e", "accessibility", "a11y"]
+  "keywords": [
+    "tsh",
+    "testing",
+    "qa",
+    "e2e",
+    "playwright",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "axe",
+    "flaky-tests"
+  ]
 }

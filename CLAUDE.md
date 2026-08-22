@@ -37,10 +37,18 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | :-- | :-- |
 | `tsh-stack-frontend` | Browser-targeted code — TypeScript configuration for bundler-resolved apps, currently React and Vite |
 | `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
+| `tsh-stack-python` | Modern Python — implementation and review practices, and data modelling |
+| `tsh-stack-aws` | AWS — Terraform resource patterns, Well-Architected defaults, account cost and tagging audits |
+| `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |
+| `tsh-stack-azure` | Azure — Terraform resource patterns, Well-Architected defaults, subscription cost and tagging audits |
 
 Every technology stack gets its own plugin, created when it has real content to ship,
-not before. Read `.claude/rules/stack-plugin-conventions.md` before adding a stack
-plugin or moving guidance between two of them.
+not before. The family has two shapes: **runtime targets for application code**, and
+**cloud providers** — a repository has exactly one of each, which is why both belong
+here rather than in a discipline plugin. Read
+`.claude/rules/stack-plugin-conventions.md` before adding a stack plugin or moving
+guidance between two of them; it carries the discipline/cloud seam, the parallel-naming
+contract, and the ban on delegation instructions between plugins.
 
 ### Core — *neither role nor stack*
 
@@ -56,8 +64,9 @@ installs it pays listing budget for every entry.
 
 Ask in order and stop at the first yes:
 
-1. *Would this guidance change if the repo switched language or framework?*
-   → `tsh-stack-<stack-name>`. "What to look for in a NestJS pull request."
+1. *Would this guidance change if the repo switched language, framework or cloud?*
+   → `tsh-stack-<stack-name>`. "What to look for in a NestJS pull request." "Which
+   EKS settings we always set."
 2. *Would it change if the reader switched job?* → the `tsh-<discipline>` that owns
    the **outcome**. "How we run code review."
 3. *Neither, and it clears the admission bar?* → `tsh-core`. "How to create a Git
@@ -136,10 +145,16 @@ Rationale lives in `.claude/rules/authoring-skills.md` and
    See `.claude/rules/authoring-agents.md`.
 6. **Keep `templates/` out of the plugins.** It sits at the repo root precisely so
    Claude Code never loads the examples as real components.
-7. **Cross-link only inside your own plugin** — `./references/<topic>.md`, or
-   `${CLAUDE_PLUGIN_ROOT}/…` between skills of the same plugin. Never path into
-   another plugin: it may not be installed, and the failure is a silent dead link
-   rather than an error. See `.claude/rules/authoring-skills.md`.
+7. **Never path into another plugin; reference it by name instead.** File links stay
+   inside your own plugin — `./references/<topic>.md`, or `${CLAUDE_PLUGIN_ROOT}/…`
+   between skills of the same plugin. There is no path variable for another plugin's
+   root, and the install layout differs between a marketplace install (siblings under
+   one cache directory) and local `--plugin-dir` development (an isolated directory),
+   so a relative path across plugins resolves in one mode and silently dead-links in
+   the other. **Name-based references are fine and `tsh-core` may be assumed
+   installed** — `/tsh-core:<skill>`, `@tsh-core:<agent>` and its MCP tools resolve
+   through the plugin registry, not the filesystem. Assume nothing about the other
+   discipline and stack plugins. See `.claude/rules/authoring-skills.md`.
 8. **Progressive disclosure above ~150 lines.** `SKILL.md` keeps the frontmatter,
    applicability, the non-negotiable rules table, a **Reference Loading** table with a
    "Load when" column, and the procedure; detail goes to `references/`, ≤300 lines
