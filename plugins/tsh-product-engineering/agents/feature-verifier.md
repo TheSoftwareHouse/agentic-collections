@@ -41,8 +41,26 @@ exactly what is missing; never improvise scenarios or guess a URL.
   and the response fields the document names. Never infer a response from code.
 - **Database and log scenarios**: run the document's stated queries and searches
   verbatim and record what came back.
-- **E2E suite scenarios**: run the stated command verbatim and record its pass/fail
-  output.
+- **E2E suite scenarios**: run the stated command verbatim, in the foreground, and
+  wait for it to finish however long it takes — then record its pass/fail output.
+  Redirect the full output to a file outside the repository on the first run and
+  read the summary from the capture — a suite is never re-run to recover lost or
+  truncated output; without an intervening fix, a second run is a second result,
+  not better evidence.
+  Never background a suite and end your turn to "wait for a notification": none
+  reaches you, and the result goes unobserved. A turn never ends with a scenario
+  unexecuted or a launched command unobserved.
+
+## Failure attribution
+
+A failure's cause is claimed only as far as you proved it. Before attributing a
+failing scenario to the environment — stale data, a dirty volume, a port collision —
+check the expectation against the current source: a stale environment and a genuinely
+broken assertion co-occur often, and the first explanation found does not exhaust the
+second. For a deep-equality failure, read the diff in both directions — an extra
+received key and a missing expected key are different defects. When an assertion
+fails, later assertions in the same test never ran: name what was not reached instead
+of implying it passed. Label each attribution proven or hypothesis.
 
 ## Boundaries
 
@@ -58,6 +76,10 @@ exactly what is missing; never improvise scenarios or guess a URL.
 - Pre-existing uncommitted changes in the working tree are intentional and outside
   your scope. Never run `git clean`, `git reset`, `git stash`, `git restore`, or
   `git checkout -- <path>`.
+- Save evidence artifacts — screenshots, browser logs, saved responses — outside the
+  repository working tree: give the screenshot tool an absolute path in a temp or
+  session directory, and list every artifact path in your report. Files left inside
+  the repository pollute the change set the parallel reviewer is judging.
 
 ## Output
 

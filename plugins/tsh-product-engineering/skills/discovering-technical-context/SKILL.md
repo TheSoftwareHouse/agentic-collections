@@ -29,6 +29,8 @@ instruction from the user.
 | Severity | Rule |
 | --- | --- |
 | MUST | Check the plan's Technical Context first. If it is populated, use it as-is and re-discover only what it does not cover. |
+| MUST | Match the reading vehicle to the conversation. From a planning or orchestrating conversation, run the searches and exemplar reads of Steps 1–2 through `context-scout` subagents and keep interpretation with the caller. Inside an implementer delegate, read directly — a delegate's context is disposable and exists to absorb those reads. |
+| MUST | Scope discovery to the change: open only the categories the task's files touch, one nearest exemplar per open question. Discovery ends when every open question has an answer — never when the repository is fully understood. |
 | MUST | Treat project instructions (`CLAUDE.md`, path-scoped rules, decision records) as the primary source of truth when they exist. |
 | MUST | Mirror existing codebase patterns when instructions are silent — consistency with the code beats theoretical best practice. |
 | MUST | Check the exact dependency versions in the project's manifest before consulting external documentation. |
@@ -52,13 +54,18 @@ Technical Context section is populated, use it and skip to Step 4. Run Steps 1�
 for aspects it does not cover.
 
 **Step 1 — Project instructions.** Read, where present: the root `CLAUDE.md` and any
-nested ones near the touched files; path-scoped rules under `.claude/rules/`;
-decision records (`docs/decisions/` or similar); `CONTRIBUTING.md` or equivalent.
-These are the primary source for coding standards, architecture and layering,
-stack versions, testing strategy, and naming.
+nested ones near the touched files; the path-scoped rules under `.claude/rules/`
+that govern the touched paths; the decision-record index (`docs/decisions/` or
+similar), opening only the records whose titles bear on the change. These are the
+primary source for coding standards, architecture and layering, stack versions,
+testing strategy, and naming.
 
 **Step 2 — Existing codebase patterns.** For whatever the instructions leave
-unstated, find the nearest similar implementation and replicate its approach:
+unstated, find the nearest similar implementation and replicate its approach. The
+categories below are a menu keyed to what the task touches, never a checklist — a
+backend endpoint change opens error handling, testing, and API surface and ignores
+the rest. One nearest exemplar answers a category; read a second only when the
+first visibly disagrees with its neighbors:
 
 - **Architecture** — folder structure, layering, module organization.
 - **Style and idiom** — naming, formatting, import conventions.

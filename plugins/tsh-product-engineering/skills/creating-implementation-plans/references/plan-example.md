@@ -7,6 +7,14 @@ diagrams, Security beyond one line, and Changelog because they added nothing her
 Its verification document lives beside it; the compact worked example in
 [the verification-document reference](./verification-doc.md) is that file.
 
+Note the sizing: the serializer and the route it feeds are **one** task, because
+neither typechecks into a working endpoint without the other. The toolbar button is a
+second task only because it is genuinely independent — different app, disjoint files
+— which is also what makes the parallel group legitimate. And no task carries
+`pnpm tsc --noEmit`: that is the phase's job, run once. Every phase states its
+parallelism — both phases here mark groups; a chained phase would justify each edge
+instead: `Sequential: the endpoint task consumes the DTO the contract task creates.`
+
 ---
 
 # Add CSV export to the reports list — Implementation Plan
@@ -78,19 +86,26 @@ infrastructure — the list is capped at 10k rows and streams synchronously.
 
 Parallel group A: Tasks 1.1 and 1.2 — independent, disjoint files.
 
-#### Task 1.1 - [CREATE] CSV serializer
+#### Task 1.1 - [CREATE] CSV export endpoint
 
 **Description**: Create `csv-serializer.ts` exposing
-`serializeReports(rows: AsyncIterable<Report>): Readable`. RFC 4180 quoting; header
-row from the column list in the research file.
+`serializeReports(rows: AsyncIterable<Report>): Readable` — RFC 4180 quoting, header
+row from the column list in the research file — and add `GET /reports/export` to
+`reports.controller.ts`, parsing filters with the existing `report-filters.ts` and
+streaming `findFiltered()` rows through the serializer as a `StreamableFile` with
+`text/csv` and a dated filename.
 
 **Files:** `src/reports/csv-serializer.ts` (create),
-`src/reports/csv-serializer.spec.ts` (create)
+`src/reports/csv-serializer.spec.ts` (create),
+`src/reports/reports.controller.ts` (modify),
+`src/reports/reports.controller.int-spec.ts` (modify)
 
 **Definition of Done**:
 
 - [ ] Fields containing `,`, `"` or newlines are quoted and escaped per RFC 4180
+- [ ] Integration test covers filtered export and the empty-result case
 - [ ] Run `pnpm vitest run src/reports/csv-serializer.spec.ts`
+- [ ] Run `pnpm test:int -- src/reports/reports.controller.int-spec.ts`
 
 **Clues**: mirror the streaming shape of `src/invoices/pdf-serializer.ts`.
 
@@ -110,21 +125,6 @@ row from the column list in the research file.
 **Stop Rule:** if the toolbar no longer owns the filter state, stop and report —
 do not lift state to make the task fit.
 
-#### Task 1.3 - [MODIFY] Export route
-
-**Description**: Add `GET /reports/export` to `reports.controller.ts`: parse filters
-with the existing `report-filters.ts`, stream `findFiltered()` rows through the Task
-1.1 serializer as a `StreamableFile` with `text/csv` and a dated filename.
-
-**Files:** `src/reports/reports.controller.ts` (modify),
-`src/reports/reports.controller.int-spec.ts` (modify),
-`src/reports/csv-serializer.ts` (reuse — created in Task 1.1)
-
-**Definition of Done**:
-
-- [ ] Integration test covers filtered export and the empty-result case
-- [ ] Run `pnpm test:int -- src/reports/reports.controller.int-spec.ts`
-
 ### Phase 2: Final verification
 
 **Goal**: The whole change set is reviewed and the feature is verified working, once.
@@ -134,10 +134,10 @@ running app.
 
 #### Task 2.1 - [REVIEW] Code review
 
-**Description**: Delegate to `code-reviewer` with this plan and the full changed-file
-list. The delegation states that functional and E2E verification runs in the parallel
-verifier, so the reviewer runs static checks, unit and integration suites, and the
-build — and excludes E2E.
+**Description**: Delegate to `code-reviewer` with this plan, the full changed-file
+list, and the gate results `gate-runner` executed first (static checks, unit and
+integration suites, the build). The delegation states that functional and E2E
+verification runs in the parallel verifier, so E2E is excluded.
 
 **Definition of Done**:
 

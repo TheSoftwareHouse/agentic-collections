@@ -3,31 +3,22 @@
 Use this reference when assembling or revising a plan's structure. Each block below
 explains why it exists and when it earns its place. Pick deliberately: a section that
 adds no decision-relevant information for *this* task is noise the reader pays for on
-every read. When in doubt for a risky task, include the block; when in doubt for a
-trivial one, drop it.
+every read. When in doubt: include for a risky task, drop for a trivial one.
 
 ## Table of Contents
 
-- [Task Details](#task-details)
-- [Goal](#goal)
-- [Proposed Solution](#proposed-solution)
-- [Current Implementation Analysis](#current-implementation-analysis)
-- [Open Questions](#open-questions)
-- [Technical Context](#technical-context)
-- [Phases and Tasks](#phases-and-tasks)
-- [Definition of Done rules](#definition-of-done-rules)
-- [Parallel groups](#parallel-groups)
-- [Final Verification Phase](#final-verification-phase)
-- [Security Considerations](#security-considerations)
-- [Acceptance Criteria](#acceptance-criteria)
-- [Improvements (Out of Scope)](#improvements-out-of-scope)
-- [Changelog](#changelog)
+[Task Details](#task-details) · [Goal](#goal) · [Proposed Solution](#proposed-solution) ·
+[Current Implementation Analysis](#current-implementation-analysis) ·
+[Open Questions](#open-questions) · [Technical Context](#technical-context) ·
+[Phases and Tasks](#phases-and-tasks) · [Definition of Done rules](#definition-of-done-rules) ·
+[Parallel groups](#parallel-groups) · [Final Verification Phase](#final-verification-phase) ·
+[Security Considerations](#security-considerations) · [Acceptance Criteria](#acceptance-criteria) ·
+[Improvements (Out of Scope)](#improvements-out-of-scope) · [Changelog](#changelog)
 
 ## Task Details
 
 **Why:** Links the plan to its source of truth — the ticket, the research notes, the
-conversation that produced it. Anyone opening the file cold can trace where the
-requirements came from.
+conversation that produced it — so anyone opening the file cold can trace them.
 
 **Include when:** A ticket ID, research document, or external reference exists.
 **Drop when:** The plan's Goal section already carries all the context there is.
@@ -101,17 +92,22 @@ that names its files and its done-condition can be handed to a subagent as-is.
 **Include when:** Always — though a small change may be a single phase, or tasks only.
 
 Each **phase** carries a Goal (how it advances the plan's Goal), a short Description,
-and a `**Verification:**` line: one integration-level check of the interaction this
-phase's tasks created, plus one typecheck or build — sourced verbatim from Technical
-Context, never assumed. It is a checkpoint, not a repeat: never the task Definitions
-of Done again, never a full suite. The check may legitimately subsume test files
-individual tasks created — a checkpoint covers the phase, a DoD covers one task — so
-do not "fix" that overlap by widening task DoDs or dropping the phase line.
+a parallelism statement — its groups, or the dependency forcing each sequential edge,
+plus `Independent of Phase N` when the phase shares no files and no contracts with a
+predecessor; see [Parallel groups](#parallel-groups) — and a `**Verification:**` line — the phase
+tier of [Verification tiers](./task-sizing-and-tiers.md#verification-tiers): one integration-level check of
+what this phase's tasks assembled, plus the package- or project-wide typecheck or
+build, sourced verbatim from Technical Context and never assumed. It is a checkpoint,
+not a repeat: never the task Definitions of Done again, never a full suite.
+
+A phase holds two to five tasks. More than that and the tasks are file-sized — see
+[Task sizing](./task-sizing-and-tiers.md#task-sizing).
 
 The last phase of every non-trivial plan is the
 [Final Verification Phase](#final-verification-phase).
 
-Each **task** carries:
+Each **task** is one delegation to one subagent, sized per
+[Task sizing](./task-sizing-and-tiers.md#task-sizing), and carries:
 
 - **Description** — near-imperative, naming the files and the behavior to change.
 - **Files:** — every file touched, each labeled `create` / `modify` / `reuse`. If a
@@ -125,31 +121,33 @@ Each **task** carries:
 
 ## Definition of Done rules
 
-These are what make a plan verifiable rather than aspirational:
+Scope comes from [Verification tiers](./task-sizing-and-tiers.md#verification-tiers). These rules cover the
+rest of what makes a plan verifiable rather than aspirational:
 
 - At least one check per task must be objectively verifiable by a reviewer.
+- **Every item must be satisfiable by the task alone.** An item that depends on a
+  later task landing is a sizing error, not a caveat to write down.
 - A task that changes code includes at least one runnable command taken **verbatim**
   from Technical Context, matched to the app the task's files belong to — for example
-  `pnpm vitest run src/reports/csv-serializer.spec.ts` or
-  `uv run pytest tests/reports/test_export.py`. Never assume the stack.
-- Commands are scoped to the task's own files. A file-scoped run of a test file the
-  task itself creates or modifies is fine at any layer — a task that delivers an
-  integration test runs that file. Directory- and project-wide runs are not: the
-  final verification phase provides the full-pass evidence, so task checks stay
-  cheap.
+  `pnpm vitest run src/reports/csv-serializer.spec.ts`. Never assume the stack.
+- Commands are file-scoped: the test files this task creates or modifies, at whatever
+  layer they sit — a task that delivers an integration test runs that file.
+  Directory-, package- and project-wide runs belong to a later tier.
 - A docs, config, content, or asset task with no runnable command uses a
   deterministic content assertion instead — for example
   `docs/reports.md contains an "## Export" section`.
+- Three to six items is the usual shape. A Definition of Done that restates the
+  description line by line is bookkeeping, not verification.
 - No deployment steps, no manual QA steps, and nothing a code reviewer could not
   confirm during review.
 
 ## Parallel groups
 
-**Why:** The orchestrator can launch several implementer subagents in one message and
-they run concurrently. The plan is where independence is decided, because only the
-planner sees the whole dependency picture.
+**Why:** The orchestrator launches a group's subagents in one message; they run
+concurrently. Independence is decided here — only the planner sees the whole
+dependency picture — and the plan must show it was examined: designed, not noticed.
 
-**Include when:** Two or more tasks are genuinely independent.
+**Include when:** Always — every phase marks its groups or justifies its edges.
 
 Rules:
 
@@ -158,16 +156,37 @@ Rules:
   allowed.
 - Mark groups explicitly where the tasks are defined, for example:
   `Parallel group A: Tasks 2.1, 2.2, 2.3 — independent, disjoint files.`
-- When unsure whether two tasks are independent, they are not. Sequencing is cheap;
-  untangling interleaved edits is not.
+- A chained phase justifies each edge instead, for example:
+  `Sequential: 2.2 consumes the DTO 2.1 creates.` An edge with no data or contract
+  dependency behind it — only layering habit — is a mis-slicing: re-cut by behavior.
+- Unsure whether two tasks are independent? Check, don't sequence: diff their
+  `**Files:**` lists and grep each task's outputs against the other's inputs. An
+  edge is earned by a dependency the check finds or cannot rule out — never by an
+  unexamined "probably related", which costs a delegation slot on every execution
+  of the plan.
+
+Most accidental chains come from slicing by layer, or from every task appending one
+line to the same registration files — barrels, module registration, route tables.
+The fix is fork–join: a short **foundation task** pins the contracts and touches each
+shared hotspot file once, pre-registering stubs; a **wide parallel group** fills in
+the behaviors, files disjoint by construction; a tiny **stitch task** follows only
+where pre-registration is impossible. Width bought this way is free — width bought
+by splitting one coherent change is a sizing error.
+
+Independence holds between phases too. A phase that consumes nothing from a
+predecessor — no shared files, no contract crossing the boundary, typically a
+different package — is marked `Independent of Phase N` in its parallelism statement,
+and the orchestrator runs the two concurrently, each closing with its own
+checkpoint. Multi-package features are the usual win: the API phase and the frontend
+phase that both build only on Phase 1's contracts run side by side instead of
+queueing. The final verification phase is never independent — it gates on everything.
 
 ## Final Verification Phase
 
-**Why:** This is the single full pass. Every earlier check is deliberately scoped —
-task Definitions of Done to their own files, phase checkpoints to their phase — so
-this one can afford to be complete, exactly once. After it passes, nothing
-re-reviews and nothing re-verifies: findings route back as scoped fixes with scoped
-re-checks.
+**Why:** This is the single full pass — the last row of
+[Verification tiers](./task-sizing-and-tiers.md#verification-tiers). Every earlier check is deliberately narrow
+so this one can afford to be complete, exactly once. After it passes nothing
+re-reviews or re-verifies: findings route back as scoped fixes with scoped re-checks.
 
 **Include when:** Always, as the last phase of every non-trivial plan. A plan trivial
 enough to skip it is trivial enough not to need a plan.
@@ -175,11 +194,11 @@ enough to skip it is trivial enough not to need a plan.
 It contains exactly two tasks, a canonical parallel pair — the reviewer is read-only
 while the verifier exercises the running app, so they are disjoint by construction:
 
-- **Code review** — delegated to `code-reviewer` with the plan path and the full
-  changed-file list. It runs static checks, unit and integration suites, and the
-  build itself — implementation reports are claims, and this task is the one place
-  evidence is re-established. The delegation states that functional and E2E
-  verification runs in the parallel verifier, so the reviewer excludes those suites.
+- **Code review** — delegated to `code-reviewer` with the plan path, the changed-file
+  list, and the `gate-runner` report the orchestrator fronts it with: the gates run
+  once, and the reviewer judges from their verbatim results — implementation reports
+  are claims. The delegation states that functional and E2E verification runs in the
+  parallel verifier, so the reviewer excludes those suites.
 - **Functional verification** — delegated to `feature-verifier` with the path to the
   plan's verification document (`specifications/<task-id>/<task-name>.verification.md`,
   drafted at planning time with the user — see

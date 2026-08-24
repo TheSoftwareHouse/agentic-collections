@@ -17,6 +17,10 @@ must be in the file.
   from outside the code belongs to the code review, not here.
 - **Commands verbatim from the plan's Technical Context.** Never assume the stack,
   the ports, or the package manager.
+- **Every endpoint, table, and fixture a scenario names is traceable to source.**
+  The verifier stops on a failed precondition, so one invented artifact deadlocks
+  the whole phase — trace routes to the controllers and tables to the migrations
+  before the document ships.
 - **A committed E2E suite is scenario zero.** The code-review delegation excludes
   E2E, so this document is the one place the suite runs.
 - **No credential values, ever.** Name where credentials come from; never write them
@@ -36,6 +40,17 @@ verbatim start or attach commands, required containers and services, and where
 credentials come from (a named env file, a secrets manager entry — never values).
 The verifier treats the URL as pinned: it never switches ports or starts a
 different server.
+
+When a scenario runs a committed suite against a persistent local store — a Docker
+volume, a dev database — state the clean-baseline expectation and the sanctioned way
+to establish it: the reset command the user approved at planning time, or an
+instruction to report the baseline's state and stop. The verifier never invents a
+reset, so a document silent here turns stale local state into a blocked run.
+Prefer a scratch database or schema on the same instance over a destructive
+reset — create it, verify against it, drop it — and reserve volume resets for
+what the user explicitly authorized. State which database writes scenarios *may*
+make, not only which are forbidden: a verifier that needs a seeding `UPDATE` and
+finds only prohibitions has to stop.
 
 ### Seeding *(optional)*
 
@@ -68,8 +83,10 @@ plainly.
 ### Boundaries
 
 Standing rules for the verifier, restated so the document is self-contained: never
-fix code, never bypass or fake authentication, never switch servers or ports, stop
-and report on a missing precondition instead of improvising one.
+fix code, never bypass or fake authentication, never switch servers or ports,
+capture each command's full output on its first run — a scenario is never re-run
+to recover lost or truncated output — and stop and report on a missing
+precondition instead of improvising one.
 
 ## Worked example
 

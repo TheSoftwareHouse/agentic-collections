@@ -24,7 +24,9 @@ conversation, and a delegated review gate at the end.
 | `discovering-technical-context` | `/tsh-product-engineering:discovering-technical-context` | Project conventions in priority order: plan context → instructions → codebase patterns → external docs |
 | `software-engineer` (agent) | `@tsh-product-engineering:software-engineer` | Implements delegated plan tasks — code, tests, config — and verifies with the plan's commands |
 | `ui-engineer` (agent) | `@tsh-product-engineering:ui-engineer` | Implements UI from a Figma reference and verifies the rendered result in a browser |
-| `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: runs the checks itself and returns a structured findings report |
+| `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: judges the change set from executed gate evidence and returns a structured findings report |
+| `gate-runner` (agent) | `@tsh-product-engineering:gate-runner` | Executes phase checkpoints and the final phase's gates — typecheck, lint, build, unit and integration — once each, and hands the code reviewer verbatim pass/fail evidence |
+| `context-scout` (agent) | `@tsh-product-engineering:context-scout` | Read-only planning scout: sweeps the repo for conventions, call sites and inventories, returning file:line locations and verbatim excerpts — never conclusions |
 | `feature-verifier` (agent) | `@tsh-product-engineering:feature-verifier` | Executes a plan's verification document against the running app — E2E suites, browser walkthroughs with examined screenshots, API/DB/log checks — with per-scenario evidence |
 
 All skills are model-invocable, and their descriptions are written to route on the

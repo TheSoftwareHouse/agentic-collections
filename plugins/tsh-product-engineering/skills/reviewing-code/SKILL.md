@@ -28,10 +28,12 @@ first and use this process to fill what they leave unstated.
 | Severity | Rule |
 | --- | --- |
 | MUST | Read the task context and plan (`*.plan.md`, ticket, research notes) before reading the diff. A review without the intent is a style check. |
-| MUST | Actually execute the relevant test suites, linters, and build — never accept "tests pass" from the implementation report. |
+| MUST | Ground every result in executed evidence: verbatim output from commands run in this review, or a `gate-runner` report embedded in the delegation. Never accept "tests pass" from the party that wrote the code. |
 | MUST | Treat missing integration coverage as a substantive finding when correctness depends on a real database, transaction boundaries, SQL semantics, migrations, queues, or external services. Unit tests alone do not cover those. |
 | MUST | Check every change for the high-risk anti-patterns listed below and report each hit unless the context documents a justified tradeoff. |
 | MUST | Give every finding a severity, evidence (file and line), the consequence, and the minimum correction. No redesigns. |
+| MUST | Run each suite, gate and build once. A failure is a finding, not a retry loop — record it verbatim and move on. |
+| NEVER | Write to the working tree. Run formatters and autofixers in check mode only; a reviewer reports drift, it never fixes it. |
 | NEVER | Report cosmetic or wording-only notes as findings, pad a clean review with invented issues, or escalate severity because an issue repeats — consolidate instead. |
 
 ## High-risk anti-patterns
@@ -55,7 +57,7 @@ Review progress:
 - [ ] 1. Understand the task and the plan
 - [ ] 2. Compare implementation to both
 - [ ] 3. Judge test coverage
-- [ ] 4. Run tests, linters, and build
+- [ ] 4. Establish gate evidence
 - [ ] 5. Best practices and anti-patterns
 - [ ] 6. Security
 - [ ] 7. Scalability
@@ -66,21 +68,32 @@ Review progress:
 the project's instructions (`CLAUDE.md`, rules, decision records) for the touched
 area. Establish what was supposed to change and by what standard.
 
-**Step 2 — Compare implementation to both.** Walk the change set against the plan's
-tasks and the task description. Look beyond the diff: verify that things the plan
-marked as `reuse` or "already implemented" actually exist and behave as claimed.
+**Step 2 — Compare implementation to both.** Walk the diff of the delegated change
+set against the plan's tasks and the task description, opening surrounding files only
+where a finding needs their context — never re-read whole packages. Look beyond the
+diff where the plan makes claims: verify that things it marked as `reuse` or "already
+implemented" actually exist and behave as claimed.
 
 **Step 3 — Judge test coverage.** Every critical path needs coverage from the right
 layer — unit, integration, or e2e. Apply the integration-coverage rule from the
 table.
 
-**Step 4 — Run tests, linters, and build.** Unit, integration, and e2e suites as they
-exist in the project, then static analysis, formatting, and the build. Use the
-project's own commands (the plan's Technical Context lists them). Record failures
-verbatim. Run the suites within the scope the caller set: a standalone review with no
-stated scope runs everything, e2e included; when the delegation assigns functional
-and e2e verification to a parallel verifier, exclude those suites and record the
-exclusion in the report.
+**Step 4 — Establish gate evidence.** When the delegation embeds a `gate-runner`
+report, that is the execution evidence: confirm its command list covers the scope —
+static gates, the formatter in check mode, unit and integration suites, the build —
+and run only what it missed. Otherwise run the gates yourself with the project's own
+commands (the plan's Technical Context lists them), static gates first: a failed
+build skips the suites, which can only fail for the same reason. Keep suite output
+out of your context — prefer the quiet or CI reporter, or redirect to a file and read
+back only the summary and failure blocks. Each command runs once: record failures
+verbatim as findings rather than fixing and re-running. Scope comes from the caller:
+a standalone review with no stated scope runs everything, e2e included; when the
+delegation assigns functional and e2e verification to a parallel verifier, exclude
+those suites and record the exclusion in the report.
+
+This is the plan's one full pass. Earlier tiers ran deliberately narrow — tasks over
+their own files, phases over their own package — so a gate you are running for the
+first time here is the design working, not a coverage gap to report.
 
 **Step 5 — Best practices and anti-patterns.** Check against project standards first,
 then general practice (SOLID, DRY, KISS, low cognitive complexity — and no

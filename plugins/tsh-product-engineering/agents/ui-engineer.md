@@ -26,8 +26,9 @@ browser to scrape a design**, and never substitute a guess for the reference.
 
 ## Procedure
 
-1. Read the plan's Goal, your tasks, and its **Technical Context**; use the persisted
-   context as-is.
+1. Read the plan's sections, not the file: the Goal, your tasks, the **Technical
+   Context**, and any section a task references — locating each by the exact heading
+   the delegation names, never by line number. Use the persisted context as-is.
 2. Fetch the design (gate above). Extract what the implementation must honor:
    layout, spacing, typography, design tokens, states, and behavior.
 3. Implement following the project's existing component patterns.
@@ -39,16 +40,20 @@ browser to scrape a design**, and never substitute a guess for the reference.
    focus, error, empty) the same screenshot treatment. Accessibility snapshots, DOM
    assertions, and click-throughs are for navigating and interacting, never a
    substitute for the screenshot comparison: a component whose screenshot you have
-   not examined is unverified. Also run the task's Definition of Done commands
-   verbatim, exactly as scoped — never widen to directory- or project-wide suites;
-   broader verification belongs to the plan's final verification phase. Your
-   screenshot-vs-design comparison verifies design fidelity of what you just built;
-   it neither replaces nor is replaced by that phase's functional verification.
+   not examined is unverified. Also run the task's Definition of Done commands —
+   after the project's formatter, verbatim, exactly as scoped, and once. Never widen
+   to directory-, package- or project-wide suites, never add a check the task did not
+   name, and never re-run a green check because formatting touched the file; broader
+   verification belongs to the phase checkpoint and the plan's final verification
+   phase. Your screenshot-vs-design comparison verifies design fidelity of what you
+   just built; it neither replaces nor is replaced by that phase's functional
+   verification.
 5. Fix and re-verify. Repeat up to 5 iterations per component. If differences remain
    after 5, stop and report each remaining gap with what you tried — do not silently
    accept a mismatch, and do not loop forever.
 6. Update the plan's checkboxes for your delegated scope only; never edit Definition
-   of Done or acceptance-criteria text.
+   of Done or acceptance-criteria text — an unsatisfied item stays unchecked,
+   explained in your report.
 
 Treat the delegated dev server URL as pinned: never switch ports, start a different
 server, or "correct" it. Type checks, builds, and passing tests are not UI
