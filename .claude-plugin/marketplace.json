@@ -36,14 +36,14 @@
       "name": "tsh-product-testing",
       "source": "./plugins/tsh-product-testing",
       "displayName": "TSH Product Testing",
-      "description": "E2E testing, accessibility testing, exploratory and manual QA, test-plan authoring.",
+      "description": "Quality assurance: Playwright end-to-end tests that do not flake, and WCAG 2.1 AA accessibility audits that report the success criterion behind every finding.",
       "category": "quality",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "testing", "qa", "e2e", "accessibility", "a11y"]
+      "keywords": ["tsh", "testing", "qa", "e2e", "playwright", "accessibility", "a11y", "wcag", "axe", "flaky-tests"]
     },
     {
       "name": "tsh-product-management",
@@ -75,14 +75,14 @@
       "name": "tsh-platform-engineering",
       "source": "./plugins/tsh-platform-engineering",
       "displayName": "TSH Platform Engineering",
-      "description": "Infrastructure, CI/CD, infrastructure as code, containers, observability and deployment.",
+      "description": "Infrastructure, CI/CD and deployment the TSH way: Terraform modules, pipelines with OIDC and plan gates, production-shaped Kubernetes workloads, observability with SLOs, secrets management, and evidence-based cloud cost audits.",
       "category": "platform",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "platform", "devops", "ci-cd", "iac", "observability"]
+      "keywords": ["tsh", "platform", "devops", "ci-cd", "iac", "terraform", "kubernetes", "helm", "observability", "secrets", "finops", "aws", "gcp", "azure"]
     },
     {
       "name": "tsh-stack-frontend",
@@ -109,6 +109,45 @@
         "url": "https://tsh.io"
       },
       "keywords": ["tsh", "stack", "nodejs", "typescript", "nestjs", "cqrs", "typeorm"]
+    },
+    {
+      "name": "tsh-stack-aws",
+      "source": "./plugins/tsh-stack-aws",
+      "displayName": "TSH Stack: AWS",
+      "description": "AWS-specific infrastructure guidance: Terraform module patterns for VPC, EKS, RDS and S3, Well-Architected defaults, and a full evidence-based AWS cost and tagging audit of a live account.",
+      "category": "platform",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "aws", "terraform", "eks", "rds", "s3", "finops", "cost", "well-architected"]
+    },
+    {
+      "name": "tsh-stack-azure",
+      "source": "./plugins/tsh-stack-azure",
+      "displayName": "TSH Stack: Azure",
+      "description": "Azure-specific infrastructure guidance: Terraform module patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity and private-endpoint defaults, and a full evidence-based Azure cost and tagging audit driven by Resource Graph and Cost Management.",
+      "category": "platform",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "azure", "terraform", "aks", "key-vault", "blob-storage", "finops", "cost", "well-architected"]
+    },
+    {
+      "name": "tsh-stack-gcp",
+      "source": "./plugins/tsh-stack-gcp",
+      "displayName": "TSH Stack: GCP",
+      "description": "GCP-specific infrastructure guidance: Terraform module patterns for VPC, GKE, Cloud SQL, Cloud Storage and Cloud Run, Workload Identity and CMEK defaults, and a full evidence-based GCP cost and labelling audit of a live project.",
+      "category": "platform",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "gcp", "google-cloud", "terraform", "gke", "cloud-run", "cloud-sql", "finops", "cost"]
     },
     {
       "name": "tsh-stack-python",

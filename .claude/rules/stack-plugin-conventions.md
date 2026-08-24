@@ -6,9 +6,10 @@ paths:
 # Stack plugin conventions
 
 **Every technology stack gets its own plugin, named `tsh-stack-<stack-name>`.** PHP,
-Java, Go and the rest are expected members of this family; each is created when it
-has real content to ship, not before. An empty plugin in the Discover tab teaches
-teammates the catalogue is hollow.
+Java, Go and further cloud providers are expected members of this family; each is created
+when it has real content to ship, not before. An empty plugin in the Discover tab teaches
+teammates the catalogue is hollow — and so does a plugin holding a single reference file,
+so seed a new member with at least one complete skill.
 
 ## A stack is a runtime target, not a language
 
