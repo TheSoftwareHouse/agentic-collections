@@ -50,6 +50,8 @@ what makes the operation safe.
   proposal, then validate the supplied path as the candidate before accepting it;
   normalize it to exactly one absolute path and stop on lookup, normalization, or
   ambiguity failure.
+- Hold the accepted absolute path in a shell variable named `worktree_path` — never
+  `path`, which destroys `PATH` in zsh. See step 5.
 - Reject either the derived or user-supplied candidate if it equals or is nested
   beneath `active_root` or `canonical_root`, already exists, conflicts with an
   existing registered worktree path, or conflicts with an existing registered
@@ -97,6 +99,13 @@ what makes the operation safe.
   modifier, which swallows the `:r` and yields a corrupt one-sided refspec such as
   `+refs/heads/my-brancefs/remotes/origin/my-branch`. It fails loudly rather than
   fetching the wrong thing, but only the braced form works in both shells.
+- The same shell dictates scratch variable **names**. In zsh, `path`, `cdpath`,
+  `fpath` and `manpath` are arrays tied to `PATH`, `CDPATH`, `FPATH` and `MANPATH`,
+  so `path='/some/dir'` silently replaces `PATH` with that single entry and every
+  later command in the shell dies with `command not found: git`. Never use those
+  names, or their uppercase counterparts, to hold a working value — this flow uses
+  `worktree_path`. The symptom reads as a broken environment or a denied sandbox
+  rather than a naming bug, so it costs a diagnostic detour every time.
 - Stop immediately on any fetch failure.
 - Verify that `refs/remotes/origin/$base_branch` exists and call it `base_ref`.
 - Resolve the fetched commit with `git -C "$canonical_root" rev-parse "$base_ref"`
@@ -138,19 +147,20 @@ what makes the operation safe.
 ## 8. Create the local worktree with no tracking
 
 - Create the worktree with
-  `git -C "$canonical_root" worktree add --no-track -b "$branch" "$path" "$base_commit"`.
+  `git -C "$canonical_root" worktree add --no-track -b "$branch" "$worktree_path" "$base_commit"`.
 - Treat branch, base branch, path, and `base_commit` as untrusted values; pass them
   as separate shell arguments and never concatenate them into a raw command string.
 
 ## 9. Verify the created result
 
 - Verify that the created path exists and that
-  `git -C "$path" rev-parse --abbrev-ref HEAD` resolves to `$branch`.
-- Verify that `git -C "$path" rev-parse HEAD` equals `base_commit`.
+  `git -C "$worktree_path" rev-parse --abbrev-ref HEAD` resolves to `$branch`.
+- Verify that `git -C "$worktree_path" rev-parse HEAD` equals `base_commit`.
 - Verify that resolving
-  `git -C "$path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}` fails or
-  errors because no upstream is configured. If it unexpectedly resolves to any
-  upstream, treat that as verification failure, stop, and do not proceed to publish.
+  `git -C "$worktree_path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}`
+  fails or errors because no upstream is configured. If it unexpectedly resolves to
+  any upstream, treat that as verification failure, stop, and do not proceed to
+  publish.
 - On resolution, fetch, creation, or verification failure, stop in a controlled
   unverified state and report the failure; do not report an unverified success.
 
@@ -172,14 +182,14 @@ what makes the operation safe.
 ## 12. Publish without force
 
 - After the separate publish confirmation, run exactly
-  `git -C "$path" push --set-upstream origin "$branch"`.
+  `git -C "$worktree_path" push --set-upstream origin "$branch"`.
 
 ## 13. Verify the published upstream
 
-- Verify that `git -C "$path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}`
+- Verify that `git -C "$worktree_path" rev-parse --abbrev-ref --symbolic-full-name @{upstream}`
   resolves exactly to `origin/<branch>`.
-- Verify that `git -C "$path" rev-parse HEAD` equals `base_commit`.
-- Verify that `git -C "$path" rev-parse "refs/remotes/origin/$branch"` equals
+- Verify that `git -C "$worktree_path" rev-parse HEAD` equals `base_commit`.
+- Verify that `git -C "$worktree_path" rev-parse "refs/remotes/origin/$branch"` equals
   `base_commit`.
 - On any publish or verification failure, report that no verified upstream exists
   yet; preserve the local worktree and branch unchanged. Never automatically
