@@ -14,6 +14,22 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.1] - 2026-08-24
+
+### Fixed
+
+- **`managing-git-worktrees` told Claude to hold the new worktree's path in a shell
+  variable named `path`, which breaks every command that follows it on macOS.** In
+  zsh — the default shell there — `path` is an array tied to the `PATH` environment
+  variable, so `path='/some/dir'` replaces `PATH` with that single entry and the next
+  step fails with `command not found: git`. The create flow now uses
+  `worktree_path` throughout, and step 5's existing zsh warning gained a second
+  bullet naming `path`, `cdpath`, `fpath` and `manpath` as reserved. This was hit for
+  real: the failure presents as a broken environment or a denied sandbox rather than
+  a variable-naming bug, so it cost a diagnostic detour before anyone suspected the
+  reference. `references/removing-a-worktree.md` was checked and never held a path in
+  a variable.
+
 ## [0.8.0] - 2026-08-20
 
 ### Added
