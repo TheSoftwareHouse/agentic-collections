@@ -36,7 +36,9 @@ alone reaches nobody.
   including a direct `formatting-jira-issues` invocation that never reaches the
   orchestrator. It costs nothing in sessions that never do BA work because the
   script stands down when no BA artifact is on disk, leaving ordinary Jira use
-  elsewhere untouched.
+  elsewhere untouched. Reads are never gated — classification is an anchored read
+  allowlist, so listing transitions or reading comments runs unprompted — and a
+  tool it cannot classify is held with `ask` rather than waved through.
 - **Nine skills**: `analyze-materials` and `explore-materials` as user-invoked entry
   points, `orchestrating-business-analysis` running the workflow, and
   `processing-workshop-transcripts`, `analyzing-discovery-context`,

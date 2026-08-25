@@ -10,6 +10,14 @@ matching.
 Workers hold no Atlassian access at all. When a worker phase needs board context,
 issue payloads or read-back data, fetch it yourself and pass it into the prompt.
 
+**Reads are never gated.** The Gate 2 hook classifies by the tool's leading verb,
+so fetching an issue, searching by JQL, listing transitions or reading comments
+runs without a prompt at any point in the workflow — including the status check
+that must precede an update. Only recognized writes are denied before Gate 2. A
+tool the hook cannot classify is held with `ask` rather than denied, so an
+unfamiliar server version stops for a human instead of failing open or hard-
+blocking the session.
+
 ## Use Atlassian tools for
 
 - Creating epics and stories after Gate 2 approval.

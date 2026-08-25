@@ -31,8 +31,57 @@ import { join } from "node:path";
  * matching on a hardcoded `mcp__atlassian__` prefix would silently never fire.
  */
 const ATLASSIAN_TOOL_PATTERN = /^mcp__.*(atlassian|jira|rovo|confluence)/i;
-const READ_VERB_PATTERN = /(get|search|list|read|fetch|lookup|view|find|query|info|me)/i;
-const WRITE_VERB_PATTERN = /(create|edit|update|transition|delete|remove|add|move|rank|assign|comment|link|set)/i;
+
+/**
+ * Classification is an explicit read allowlist with a gated default, and every
+ * pattern is ANCHORED to the start of the bare tool name.
+ *
+ * Unanchored substring matching was wrong in both directions. It denied reads:
+ * `getTransitionsForJiraIssue`, `getIssueLinkTypes` and the Confluence comment
+ * readers all contain a write noun (`transition`, `link`, `comment`), so they
+ * failed the read test and hit the gate — and the first of those is required by
+ * the workflow's own "check the status before updating" rule, which made the
+ * gate block the read that exists to protect the write. And it allowed writes:
+ * a bare `me` matched `merge` and `rename`, so `mergeJiraIssues` would have
+ * classified as a read and skipped the gate entirely.
+ *
+ * Anything unrecognized is treated as a potential write rather than waved
+ * through, so a future server version cannot re-open the hole by adding a verb
+ * nobody listed here.
+ */
+const READ_PREFIXES =
+  /^(get|search|list|read|fetch|lookup|view|find|query|describe|count|export|download)/i;
+const WRITE_PREFIXES =
+  /^(create|edit|update|transition|delete|remove|add|move|rank|assign|comment|link|unlink|set|merge|rename|archive|restore|publish|upload|attach|clone|convert|import|post|put|patch)/i;
+
+/**
+ * Reads whose names do not start with a verb. `atlassianUserInfo` is the reason
+ * `info` used to be in the read pattern; an exact entry buys the same allowance
+ * without letting `info` match anywhere inside a name.
+ */
+const READ_EXACT = new Set(["atlassianuserinfo", "userinfo", "whoami", "me"]);
+
+/** @returns {"read"|"write"|"unknown"} */
+function classify(bareName) {
+  if (READ_EXACT.has(bareName.toLowerCase())) return "read";
+  if (READ_PREFIXES.test(bareName)) return "read";
+  if (WRITE_PREFIXES.test(bareName)) return "write";
+  return "unknown";
+}
+
+/**
+ * The bare tool name is everything after the LAST `__`.
+ *
+ * A plugin-provided server is named `mcp__plugin_<plugin>_<server>__<tool>`, and
+ * that is the default case here because tsh-core bundles Atlassian. Stripping
+ * only `^mcp__[^_]*(__)?` left `_tsh-core_atlassian__editJiraIssue` as the "bare"
+ * name — harmless today only because no server key happens to contain a listed
+ * verb, and silently wrong the moment one does.
+ */
+function bareToolName(toolName) {
+  const lastSeparator = toolName.lastIndexOf("__");
+  return lastSeparator === -1 ? toolName : toolName.slice(lastSeparator + 2);
+}
 
 const KEY_FIELD_PATTERN = /(^|_)(issueIdOrKey|issueKey|issueid|key|issues|issueKeys)($|_)/i;
 const ISSUE_KEY_PATTERN = /\b([A-Z][A-Z0-9_]{1,19}-\d+)\b/g;
@@ -178,8 +227,8 @@ function main() {
 
   // 2. Read-only Atlassian call. Checked before any filesystem work so that
   //    fetching issues and searching boards stays fast and never prompts.
-  const bareName = toolName.replace(/^mcp__[^_]*(__)?/, "");
-  if (READ_VERB_PATTERN.test(bareName) && !WRITE_VERB_PATTERN.test(bareName)) allow();
+  const kind = classify(bareToolName(toolName));
+  if (kind === "read") allow();
 
   const cwd = payload.cwd || process.cwd();
   if (!existsSync(cwd) || !statSync(cwd).isDirectory()) {
@@ -194,15 +243,27 @@ function main() {
 
   const toolInput = payload.tool_input || payload.toolInput || {};
 
+  // A recognized write that fails a policy is denied. An unrecognized tool is
+  // held for the user with `ask` instead: the guard is reporting that it could
+  // not classify the call, which is a question, not a policy violation. Either
+  // way the model cannot proceed on its own.
+  const verdict = kind === "write" ? "deny" : "ask";
+  const unclassified =
+    kind === "write"
+      ? ""
+      : `BA guard could not classify "${bareToolName(toolName)}" as a read or a write, ` +
+        "so it is being treated as a potential write. ";
+
   // Policy 2 first: a protected issue is never writable, gate or no gate.
   const blocked = protectedKeys(cwd, targetIssueKeys(toolInput));
   if (blocked.length > 0) {
     decide(
-      "deny",
-      `Protected Status Policy: ${blocked.join(", ")} ${
-        blocked.length === 1 ? "is" : "are"
-      } marked 🔒 in jira-tasks.md (status Done, Cancelled, or PO APPROVE) and cannot be modified. ` +
-        "Tell the user the status must be changed in Jira and the backlog re-imported first. Do not retry."
+      verdict,
+      unclassified +
+        `Protected Status Policy: ${blocked.join(", ")} ${
+          blocked.length === 1 ? "is" : "are"
+        } marked 🔒 in jira-tasks.md (status Done, Cancelled, or PO APPROVE) and cannot be modified. ` +
+        "Tell the user the status must be changed in Jira and the backlog re-imported first."
     );
   }
 
@@ -210,8 +271,9 @@ function main() {
   const ledgers = findFiles(cwd, ".gates.md");
   if (ledgers.length === 0) {
     decide(
-      "deny",
-      "Gate 2 not approved: no gate ledger found (expected specifications/<workshop>/.gates.md). " +
+      verdict,
+      unclassified +
+        "Gate 2 not approved: no gate ledger found (expected specifications/<workshop>/.gates.md). " +
         "Create the ledger, complete Gates 0/1/1.5, and record explicit Gate 2 approval before pushing to Jira."
     );
   }
@@ -219,8 +281,9 @@ function main() {
   const approved = ledgers.filter((path) => gate2Approved(readText(path)));
   if (approved.length === 0) {
     decide(
-      "deny",
-      `Gate 2 not approved: found ${ledgers.length} gate ledger(s) but none records Gate 2 as approved. ` +
+      verdict,
+      unclassified +
+        `Gate 2 not approved: found ${ledgers.length} gate ledger(s) but none records Gate 2 as approved. ` +
         "Present the formatted tasks, get explicit user approval for the target Jira project, " +
         "record it in the ledger's Gate 2 row, then retry."
     );
