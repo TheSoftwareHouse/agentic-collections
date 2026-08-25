@@ -17,9 +17,10 @@ You may override a tier per call when the material justifies it — analysis on
 `opus` for a five-document RFP bundle, extraction on `haiku` for one short
 transcript. State the override and why.
 
-Workers never write files, never speak to the user, and hold no Atlassian access.
-You keep every user-facing interaction, every gate, every persistent write and
-every Jira mutation.
+Workers never write files, never speak to the user, and hold no Atlassian or design
+tool access. You keep every user-facing interaction, every gate, every persistent
+write, every Jira mutation, and every call to an external system — including
+fetching designs.
 
 ## When to suggest parallelization
 
@@ -41,8 +42,10 @@ mistake in this workflow.
 
 ## Scenario 1 — material processing (phase level)
 
-*Case A, multi-source*: one worker per activity type — transcript, design
-analysis, codebase reading.
+*Case A, multi-source*: one worker per activity type — transcript, document
+bundles, codebase reading. **Designs are the exception**: fetch them yourself with
+whatever Figma tools the session exposes, then hand the extract to a worker to
+interpret alongside the other material. A worker cannot reach a design tool.
 
 *Case B, multi-document*: one worker per document. Group a subfolder into one
 assignment when it holds 5 or fewer processable files; split larger ones into
@@ -50,9 +53,10 @@ batches of ~5, grouped by affinity. Each worker reads its own documents with `Re
 — PDFs included — and returns key requirements, decisions, constraints, business
 rules and open questions.
 
-The cases combine: 5 RFP documents + a codebase + a Figma link is up to 7 workers.
-Respect the concurrency cap and batch, putting the long-running work — codebase,
-large PDFs, Figma — in the first batch.
+The cases combine: 5 RFP documents + a codebase is up to 6 workers, with the Figma
+link fetched by you and its extract folded into one of their prompts. Respect the
+concurrency cap and batch, putting the long-running work — codebase, large PDFs —
+in the first batch.
 
 Then run a merge pass:
 
@@ -110,8 +114,8 @@ inline instead and say that you did and why. Delegation is the default, not a ru
 5. **Protected status.** Paste the policy into any prompt whose work touches
    existing tasks, even though the skills enforce it internally.
 6. **Concurrency cap: 5 workers at once.** Batch beyond that.
-7. **Jira stays with you.** Workers cannot query Jira; fetch what they need and
-   pass it inline.
+7. **External systems stay with you.** Workers can query neither Jira nor a design
+   tool; fetch what they need and pass it inline.
 
 ## The delegation prompt contract
 
@@ -122,7 +126,8 @@ Every delegation prompt carries:
    pasting a 3000-word transcript into five prompts wastes context five times over.
 2. **Scope** — the exact epic, document or passes assigned, and what is explicitly
    not theirs.
-3. **Jira context** — any payload you fetched, inline.
+3. **External context** — any Jira payload and any design extract you fetched,
+   inline. Workers reach neither system.
 4. **Protected Status Policy** — verbatim, whenever existing tasks are in play.
 5. **Output contract** — the exact section headings you expect back.
 6. **Boundaries** — "Do not write files. Do not ask questions. Return the result as

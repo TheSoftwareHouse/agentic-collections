@@ -15,21 +15,25 @@ ambiguous to commit to epics and stories yet.
 
 ## What this runs
 
-Follow [`orchestrating-business-analysis`](../orchestrating-business-analysis/SKILL.md)
-in **Explore Mode**, which stops at a context summary. The reading itself is
+**Invoke `/tsh-product-management:orchestrating-business-analysis`** in **Explore
+Mode**, which stops at a context summary. Invoke it rather than reading its
+`SKILL.md` — reading the file gets you the text, invoking it is what puts the
+skill's own configuration into effect. The reading itself is
 [`analyzing-discovery-context`](../analyzing-discovery-context/SKILL.md), plus
 [`processing-workshop-transcripts`](../processing-workshop-transcripts/SKILL.md) when
 raw discussion notes are present.
 
 Exploration may be delegated to the `discovery-analyst` worker, but the results
 always come back through this conversation before anything moves toward
-extraction.
+extraction. That worker has no design-tool access: fetch the design context here
+and pass it into its prompt.
 
 ## Steps
 
 1. Review the supplied materials and any existing project baseline. PDFs are read
-   with `Read`; Figma and FigJam links through the Figma MCP tools the session
-   provides.
+   with `Read`; Figma and FigJam links through whatever Figma MCP tools this
+   session provides — check that they are connected before promising design
+   analysis, and say so plainly when they are not.
 2. Clean the transcript first when raw discussion notes are present.
 3. Summarize the workshop context in business language.
 4. Identify the main actors, business entities, and likely epic candidates.

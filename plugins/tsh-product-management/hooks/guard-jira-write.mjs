@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * PreToolUse guard for Jira write operations in the TSH BA collection.
+ * PreToolUse guard for Jira write operations in tsh-product-management.
  *
- * Enforces two policies that copilot-collections could only state in prose:
+ * Enforces two policies that prose alone cannot:
  *
  *   1. Gate 2 — no Jira create/update/transition before the user has approved
  *      the formatted backlog. Approval is recorded in
- *      `specifications/<workshop>/.gates.md` by the tsh-business-analyst skill.
+ *      `specifications/<workshop>/.gates.md` by the
+ *      `orchestrating-business-analysis` skill.
  *
  *   2. Protected Status Policy — issues marked `🔒` in `jira-tasks.md` (status
  *      Done, Cancelled, or PO APPROVE) are immutable and must never be updated.

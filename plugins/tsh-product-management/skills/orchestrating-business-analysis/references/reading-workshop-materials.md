@@ -30,7 +30,16 @@ conversation.
 ## Figma and FigJam
 
 Figma MCP is **not bundled with this plugin** — it is a prerequisite the session
-supplies. Check whether Figma tools are connected before promising design analysis.
+supplies, under whatever tool names that session happens to expose. Check what is
+actually connected before promising design analysis; never assume a particular
+tool name.
+
+**Design reading belongs to you, not to a worker.** Workers carry no design tools,
+for the same reason they carry no Atlassian tools: a tool allowlist naming a
+shared server's tools breaks silently the moment the session exposes that server
+under a different name, and the worker degrades to "no design access" without
+saying why. Fetch the design context here, then pass the relevant extract into the
+delegation prompt.
 
 - Use them when the materials include Figma or FigJam links: user flows,
   wireframes, process diagrams, and the functional requirements a design implies —

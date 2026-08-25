@@ -14,10 +14,13 @@ keys, or a Jira project key.
 
 ## What this runs
 
-Follow [`orchestrating-business-analysis`](../orchestrating-business-analysis/SKILL.md)
-end to end. It owns the procedure, the five review gates, the delegation to worker
-subagents, and the Jira push. Do not restate its steps — load it and work through
-them.
+**Invoke `/tsh-product-management:orchestrating-business-analysis`** and follow it end
+to end. It owns the procedure, the five review gates, the delegation to worker
+subagents, and the Jira push.
+
+Invoke the skill — do not simply `Read` its `SKILL.md`. Reading the file gets you the
+text; invoking it is what puts the skill's own configuration into effect for the
+session.
 
 ## Which entry point applies
 

@@ -68,13 +68,17 @@ Approvals are written to `specifications/<workshop-name>/.gates.md` **before** t
 action they unlock, because a long session gets summarized and a remembered
 approval does not survive that.
 
-**Gate 2 is enforced, not merely stated.** The workflow registers a `PreToolUse`
-hook that denies Atlassian write calls while the Gate 2 row is unapproved, and
-refuses to update an issue whose status is Done, Cancelled or PO APPROVE. Two
-things keep it out of everyone else's way: it registers when the workflow is
-entered rather than at install, and it stands down entirely in a repository with no
-BA artifacts. Confirm it is live with `/hooks` after the first
-`/tsh-product-management:analyze-materials` in a session.
+**Gate 2 is enforced, not merely stated.** The plugin ships a `PreToolUse` hook
+(`hooks/hooks.json`) that denies Atlassian write calls while the Gate 2 row is
+unapproved, and refuses to update an issue whose status is Done, Cancelled or PO
+APPROVE. It is active for anyone who installs the plugin, whichever way the
+workflow is entered — including a direct
+`/tsh-product-management:formatting-jira-issues` that never touches the
+orchestrator.
+
+What keeps it out of everyone else's way is the script, not the registration: it
+stands down entirely in a repository with no BA artifacts on disk, so ordinary
+Jira work elsewhere is unaffected. Confirm it is live with `/hooks`.
 
 ## Prerequisites
 

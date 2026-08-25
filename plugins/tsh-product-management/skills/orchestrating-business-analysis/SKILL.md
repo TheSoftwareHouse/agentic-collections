@@ -3,13 +3,6 @@ name: orchestrating-business-analysis
 description: "Runs the business-analysis workflow end to end from the main conversation: turns discovery workshop material — transcripts, Figma, PDFs, codebase context — into Jira-ready epics and user stories and a delivery roadmap, behind five human review gates, delegating the heavy reading to read-only worker subagents. Also imports an existing Jira backlog for local iteration and controlled push-back."
 when_to_use: "Trigger on: 'turn this workshop into tickets', workshop-to-backlog work, discovery material that needs epics and stories, pushing or updating a backlog in Jira, importing a Jira project or epic keys to iterate on, or planning delivery waves for a project."
 allowed-tools: Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion, Agent
-hooks:
-  PreToolUse:
-    - matcher: "mcp__.*(atlassian|jira|rovo|confluence).*"
-      hooks:
-        - type: command
-          command: node
-          args: ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-jira-write.mjs"]
 ---
 
 # Orchestrating Business Analysis

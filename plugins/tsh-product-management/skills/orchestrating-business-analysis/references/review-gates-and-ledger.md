@@ -43,7 +43,7 @@ Rules:
 
 ## Never renumber the Jira gate
 
-The `2` row is read by the `PreToolUse` hook this skill registers, which denies
+The `2` row is read by the `PreToolUse` hook this plugin ships, which denies
 Atlassian write calls while it is unapproved. **The hook matches that row by
 number.** A gate inserted at `2` would point the hook at the wrong row, and
 approving something unrelated would silently unlock Jira writes. Roadmap Review is

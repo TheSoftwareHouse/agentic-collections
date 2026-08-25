@@ -32,9 +32,11 @@ alone reaches nobody.
   approval does not.
 - **A `PreToolUse` hook that denies Jira writes until Gate 2 is approved**, and
   refuses to update an issue whose status is Done, Cancelled or PO APPROVE. It
-  registers when the workflow is entered rather than at install, so it costs
-  nothing in sessions that never do BA work, and it stands down entirely in a
-  repository with no BA artifacts — ordinary Jira use elsewhere is unaffected.
+  ships as `hooks/hooks.json`, so it is active however the workflow is entered —
+  including a direct `formatting-jira-issues` invocation that never reaches the
+  orchestrator. It costs nothing in sessions that never do BA work because the
+  script stands down when no BA artifact is on disk, leaving ordinary Jira use
+  elsewhere untouched.
 - **Nine skills**: `analyze-materials` and `explore-materials` as user-invoked entry
   points, `orchestrating-business-analysis` running the workflow, and
   `processing-workshop-transcripts`, `analyzing-discovery-context`,
