@@ -144,10 +144,21 @@ function readStdin() {
 }
 
 /**
- * Find files named `target` under `dir`, skipping noisy directories and the
- * `sessions` archive tree — archived ledgers and task files are not live state.
+ * ONE traversal collects every file this guard reads, keyed by filename.
+ *
+ * The matcher fires on every Atlassian call, so each recursive walk here is a
+ * per-call cost paid in a fresh node process. The previous shape ran five
+ * independent walks over the same tree (three for the BA-artifact probe, one
+ * for jira-tasks.md, one for the ledgers); this runs exactly one.
+ *
+ * Skips noisy directories and the `sessions` archive tree — archived ledgers
+ * and task files are not live state.
  */
-function findFiles(dir, target, depth = 0, found = []) {
+function scanForArtifacts(dir, targets, depth = 0, found = null) {
+  if (found === null) {
+    found = new Map();
+    for (const name of targets) found.set(name, []);
+  }
   if (depth > MAX_SCAN_DEPTH) return found;
   let entries;
   try {
@@ -164,13 +175,15 @@ function findFiles(dir, target, depth = 0, found = []) {
         entry.name === "dist" ||
         entry.name === "build" ||
         entry.name === ARCHIVE_DIR ||
+        // `.claude` is the one dotdirectory a team plausibly keeps project
+        // files in, so it stays scanned while other dotdirectories are noise.
         (entry.name.startsWith(".") && entry.name !== ".claude")
       ) {
         continue;
       }
-      findFiles(full, target, depth + 1, found);
-    } else if (entry.name === target) {
-      found.push(full);
+      scanForArtifacts(full, targets, depth + 1, found);
+    } else if (found.has(entry.name)) {
+      found.get(entry.name).push(full);
     }
   }
   return found;
@@ -355,8 +368,9 @@ function main() {
   //    to enforce, so stand down and let normal permission rules apply. This
   //    keeps a user-level install from blocking ordinary Jira work in other
   //    projects — and archived-only repositories count as no BA session.
-  const baArtifacts = BA_ARTIFACTS.flatMap((name) => findFiles(cwd, name));
-  if (baArtifacts.length === 0) allow();
+  //    The same single scan also feeds the protected-task and ledger checks.
+  const artifacts = scanForArtifacts(cwd, BA_ARTIFACTS);
+  if (BA_ARTIFACTS.every((name) => artifacts.get(name).length === 0)) allow();
 
   const toolInput = payload.tool_input || payload.toolInput || {};
 
@@ -374,7 +388,7 @@ function main() {
   // Policy 2 first: a protected issue is never writable, gate or no gate.
   // Only live jira-tasks.md files count — an archived copy marking a key 🔒
   // must not block an issue whose status was legitimately reopened since.
-  const blocked = protectedKeys(findFiles(cwd, "jira-tasks.md"), targetIssueKeys(toolInput));
+  const blocked = protectedKeys(artifacts.get("jira-tasks.md"), targetIssueKeys(toolInput));
   if (blocked.length > 0) {
     decide(
       verdict,
@@ -389,7 +403,7 @@ function main() {
 
   // Policy 1: Gate 2 must be approved in a LIVE ledger, for the project this
   // write targets. An approval names its project; it unlocks nothing else.
-  const ledgers = findFiles(cwd, ".gates.md");
+  const ledgers = artifacts.get(".gates.md");
   if (ledgers.length === 0) {
     decide(
       verdict,
