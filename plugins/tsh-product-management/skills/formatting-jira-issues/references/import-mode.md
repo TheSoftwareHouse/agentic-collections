@@ -45,9 +45,12 @@ and collect the flags — never one popup per flagged task. They are presented i
 batches of up to 4 at step I-5.
 
 **Protected status on import.** After mapping, check each task's status. Done,
-Cancelled or PO APPROVE → mark the task read-only with a `🔒` next to its title and
-preserve its content exactly as fetched. Protected tasks are imported for
-visibility and must never be modified locally or pushed back.
+Cancelled or PO APPROVE → mark the task read-only with a `🔒` **in its `###`
+heading**, directly after the title, and preserve its content exactly as fetched.
+The placement matters: the write guard parses task blocks and reads the marker
+from the heading (the protected `Status` value alone also protects the block).
+Protected tasks are imported for visibility and must never be modified locally or
+pushed back.
 
 ## Step I-4 — Generate `jira-tasks.md`
 

@@ -26,7 +26,7 @@ No roadmap content reaches Jira.
 
 | Severity | Rule |
 | --- | --- |
-| MUST | Preserve a protected task (Done, Cancelled, PO APPROVE) exactly as imported, mark it `🔒`, and skip every formatting, validation and update step for it. |
+| MUST | Preserve a protected task (Done, Cancelled, PO APPROVE) exactly as imported, mark it `🔒` in its `###` heading, and skip every formatting, validation and update step for it. |
 | MUST | Give every epic and story a `Jira Key` field — the real key, or `—` when it has never been pushed. |
 | MUST | Record Gate 2 approval in `.gates.md` **before** the first Jira write call. A `PreToolUse` hook enforces this. |
 | MUST | Present the sync summary — create / update / skipped, with counts — and get approval before pushing. |

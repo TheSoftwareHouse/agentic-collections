@@ -39,6 +39,14 @@ alone reaches nobody.
   elsewhere untouched. Reads are never gated — classification is an anchored read
   allowlist, so listing transitions or reading comments runs unprompted — and a
   tool it cannot classify is held with `ask` rather than waved through.
+  The approval is **scoped and expires with the session**: the Gate 2 row names
+  its target project key and unlocks writes to that project only, and anything
+  archived under `sessions/` is invisible to the guard — a previous workshop's
+  approved ledger or stale `🔒` marker cannot hold the gate open, or an issue
+  hostage, for the next one. Protected tasks are recognized by parsing
+  `jira-tasks.md` task blocks — a `🔒` in the task's `###` heading, or a
+  protected `Status` value — rather than requiring the key and the marker to
+  share a line, and the worked example now demonstrates the format.
 - **Nine skills**: `analyze-materials` and `explore-materials` as user-invoked entry
   points, `orchestrating-business-analysis` running the workflow, and
   `processing-workshop-transcripts`, `analyzing-discovery-context`,

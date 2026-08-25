@@ -167,3 +167,37 @@ Discussed during workshop: Reset link should expire after 24 hours. Team to conf
 ```
 
 **Labels**: `auth`, `workshop-2026-02-19`
+
+---
+
+### Story 1.4: User can log in with SSO 🔒
+
+**Parent**: User Authentication: Secure Login and Account Access
+**Jira Key**: PROJ-127
+**Status**: Done
+
+**Description**:
+```
+h2. Context
+
+This story is part of the [User Authentication: Secure Login and Account Access] epic. Imported from Jira; completed in a previous cycle.
+
+h2. User Story
+
+As a returning corporate user, I want to log in with my company SSO so that I do not manage a separate password.
+```
+
+**Acceptance Criteria**:
+```
+(/) SSO button is visible on the login page
+(/) Successful SSO authentication lands the user on the dashboard
+```
+
+**Labels**: `auth`
+
+> This is what a **protected** task looks like: the `🔒` sits in the `###`
+> heading and the `Status` is one of Done / Cancelled / PO APPROVE. Its content
+> is preserved exactly as imported — no reformatting, no benchmark validation,
+> no field flags — and the write guard refuses any Jira update targeting
+> PROJ-127. Priority and sizing are absent because nothing may be added to a
+> protected task, not even suggestions.

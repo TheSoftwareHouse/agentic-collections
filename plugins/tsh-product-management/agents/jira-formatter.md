@@ -32,7 +32,8 @@ them.
 Two boundaries specific to your role:
 
 - **Protected tasks are preserved verbatim.** Respect the Protected Status Policy
-  supplied in your prompt: mark them `🔒`, skip all formatting, and list them.
+  supplied in your prompt: mark them `🔒` in the task's `###` heading, skip all
+  formatting, and list them.
 - **Jira markdown conventions** (`h2.`, `*bold*`, `_italic_`, `* item`,
   `(/) criterion`) apply only to content destined for Jira itself. The local
   markdown file stays standard markdown.

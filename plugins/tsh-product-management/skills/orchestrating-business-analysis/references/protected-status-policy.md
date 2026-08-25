@@ -25,7 +25,8 @@ A task — epic or story — whose Jira status matches any of these is **immutab
 4. **Formatting and push skip them.** List every skipped task and its status in the
    summary so the user can see what was left alone.
 5. **Import includes them, read-only.** Protected tasks are imported so the user
-   sees the whole backlog, marked with `🔒`, and are never modified or pushed back.
+   sees the whole backlog, marked with `🔒` in their `###` heading, and are never
+   modified or pushed back.
 6. **Refuse an override request**, with this wording:
 
    > This task has a protected status ([status]). Tasks with status Done,

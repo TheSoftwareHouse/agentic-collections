@@ -27,9 +27,13 @@ in `specifications/<workshop-name>/.gates.md`:
 | 2 | jira-tasks.md | approved | 2026-08-19 14:32 — project ACME, batch push |
 ```
 
-A `PreToolUse` hook reads that row and denies Atlassian write calls while it is
-unapproved. If a write is blocked, do not work around it: check the ledger, and if
-the gate genuinely has not been approved, go back and get approval.
+**The row must name the project key** (`project ACME`) — the approval is scoped to
+it. A `PreToolUse` hook reads that row and denies Atlassian write calls while it
+is unapproved **or while the write targets a project the row does not name**.
+Ledgers archived under `sessions/` are invisible to the hook, so a previous
+workshop's approval never carries over. If a write is blocked, do not work around
+it: check the ledger, and if the gate genuinely has not been approved for this
+project, go back and get approval.
 
 ## Step 9 — Create or update issues
 
@@ -76,6 +80,11 @@ Once verification succeeds:
 - Archive the session artifacts under
   `specifications/projects/<project-name>/sessions/<YYYY-MM-DD>-<workshop-name>/`.
   Use the workshop name as the project key when no explicit project name exists.
+  Archiving also **closes the gate**: the guard ignores everything under
+  `sessions/`, so the ledger's approval and the task file's `🔒` markers stop
+  affecting future workshops the moment they are archived. Do not postpone this
+  step — a live approved ledger left behind holds Gate 2 open for the next
+  session that pushes to the same project.
 - Refresh `specifications/projects/<project-name>/task-baseline.md`, treating
   `Jira Key` as the primary identity: replace same-key entries with the latest
   synced content and status, add entries for newly pushed tasks, and leave Jira as
@@ -96,7 +105,8 @@ to Story 2.3", "change the priority of Epic 1"):
 1. **Update `jira-tasks.md` first.**
 2. **Ask once** (`header: "Push now?"`), options `Push now` / `Keep local`.
 3. **On "push now"** — update that issue by its key. A single-task push still
-   requires Gate 2 in `.gates.md`; if it is not there, record the user's explicit
-   approval for this task before the call. If the task has no key yet (`—`), say so
-   and offer to create it.
+   requires Gate 2 in `.gates.md`, naming the task's project key; if it is not
+   there, record the user's explicit approval for this task (with the project key)
+   before the call. If the task has no key yet (`—`), say so and offer to create
+   it.
 4. **On "keep local"** — the change waits in `jira-tasks.md` for the next batch push.

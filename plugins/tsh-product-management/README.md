@@ -74,7 +74,9 @@ unapproved, and refuses to update an issue whose status is Done, Cancelled or PO
 APPROVE. It is active for anyone who installs the plugin, whichever way the
 workflow is entered — including a direct
 `/tsh-product-management:formatting-jira-issues` that never touches the
-orchestrator.
+orchestrator. An approval is scoped: the Gate 2 row names its target project key
+and unlocks that project only, and archived sessions are invisible to the guard,
+so one workshop's approval never carries into the next.
 
 What keeps it out of everyone else's way is the script, not the registration: it
 stands down entirely in a repository with no BA artifacts on disk, so ordinary

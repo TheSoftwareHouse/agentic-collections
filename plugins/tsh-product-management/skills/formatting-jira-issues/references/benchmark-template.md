@@ -150,4 +150,13 @@ The `Status` field reflects the current Jira workflow status of the task (e.g., 
 - After a successful push (create or update), the agent records the current status returned by Jira
 - Tasks whose status is **Done**, **Cancelled**, or **PO APPROVE** are considered **protected** and are treated as read-only. The agent will not modify their content locally or push updates to Jira for them. See the Protected Status Policy in the orchestrating-business-analysis skill for full details.
 
+### Marking a protected task
+
+A protected task carries the `🔒` marker **in its `###` heading**, directly after
+the title — see Story 1.4 in the worked example. This placement is load-bearing,
+not cosmetic: the Jira write guard parses `jira-tasks.md` task blocks, and it
+treats the `Jira Key` of a block as immutable when the block's heading carries
+`🔒` **or** its `Status` line names a protected status. Either signal alone
+protects the task; the marker exists so a human scanning the file sees it too.
+
 ---

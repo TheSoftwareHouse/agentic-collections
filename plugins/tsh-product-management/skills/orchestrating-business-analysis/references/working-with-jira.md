@@ -42,8 +42,10 @@ blocking the session.
 2. Check every task's `Jira Key` field, and present the sync summary — **created**
    (no key), **updated** (key, unprotected), **skipped** (key, protected status),
    with counts. Get approval.
-3. Record Gate 2 in `.gates.md` **before** the first write call. A `PreToolUse` hook
-   enforces this and denies the call otherwise.
+3. Record Gate 2 in `.gates.md` **before** the first write call, naming the target
+   project key in the row (`project ACME`). A `PreToolUse` hook enforces this and
+   denies the call otherwise — including a write aimed at a project the approved
+   row does not name.
 4. Create epics first to obtain their IDs, then stories linked to them, writing each
    returned key back into `jira-tasks.md` immediately.
 5. Check an issue's current status before updating it; skip and report anything

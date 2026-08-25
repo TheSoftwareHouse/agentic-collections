@@ -7,10 +7,24 @@
  *   1. Gate 2 — no Jira create/update/transition before the user has approved
  *      the formatted backlog. Approval is recorded in
  *      `specifications/<workshop>/.gates.md` by the
- *      `orchestrating-business-analysis` skill.
+ *      `orchestrating-business-analysis` skill, and it is SCOPED: the Gate 2 row
+ *      names the target project key, and a write is allowed only when every
+ *      project it targets is named by an approved row in a live ledger.
  *
- *   2. Protected Status Policy — issues marked `🔒` in `jira-tasks.md` (status
- *      Done, Cancelled, or PO APPROVE) are immutable and must never be updated.
+ *   2. Protected Status Policy — a task whose block in `jira-tasks.md` carries a
+ *      🔒 in its heading, or a Status of Done, Cancelled, or PO APPROVE, is
+ *      immutable and must never be updated.
+ *
+ * Archived artifacts do not exist for this guard: any path under a `sessions`
+ * directory is skipped. Otherwise workshop one's approved ledger would hold the
+ * gate open for workshop two forever, and a stale archived 🔒 would block a
+ * legitimately reopened issue with no recovery path.
+ *
+ * One residual this guard cannot close: two live (unarchived) workshops pushing
+ * to the SAME project share gate state, because a tool call carries no signal of
+ * which workshop it serves. Project scoping narrows the blast radius to that one
+ * project; prompt archiving after verification (which the workflow already
+ * mandates) removes it.
  *
  * Contract: reads the PreToolUse payload as JSON on stdin. Emits a deny decision
  * as JSON on stdout when a policy is violated; stays silent (exit 0) when the
@@ -84,7 +98,9 @@ function bareToolName(toolName) {
 }
 
 const KEY_FIELD_PATTERN = /(^|_)(issueIdOrKey|issueKey|issueid|key|issues|issueKeys)($|_)/i;
+const PROJECT_FIELD_PATTERN = /(^|_)(projectKey|projectKeyOrId|projectIdOrKey|project)($|_)/i;
 const ISSUE_KEY_PATTERN = /\b([A-Z][A-Z0-9_]{1,19}-\d+)\b/g;
+const PROJECT_KEY_VALUE_PATTERN = /^[A-Z][A-Z0-9_]{1,19}$/;
 const MAX_SCAN_DEPTH = 6;
 
 /**
@@ -93,6 +109,13 @@ const MAX_SCAN_DEPTH = 6;
  * install of this hook would block ordinary Jira use in unrelated projects.
  */
 const BA_ARTIFACTS = [".gates.md", "jira-tasks.md", "extracted-tasks.md"];
+
+/**
+ * `pushing-to-jira.md` step 11 archives a workshop's artifacts under
+ * `specifications/projects/<p>/sessions/<date>-<workshop>/`. Everything below a
+ * directory with this name is history, not live gate state.
+ */
+const ARCHIVE_DIR = "sessions";
 
 function decide(decision, reason) {
   process.stdout.write(
@@ -120,7 +143,10 @@ function readStdin() {
   }
 }
 
-/** Find files named `target` under `dir`, skipping noisy directories. */
+/**
+ * Find files named `target` under `dir`, skipping noisy directories and the
+ * `sessions` archive tree — archived ledgers and task files are not live state.
+ */
 function findFiles(dir, target, depth = 0, found = []) {
   if (depth > MAX_SCAN_DEPTH) return found;
   let entries;
@@ -137,6 +163,7 @@ function findFiles(dir, target, depth = 0, found = []) {
         entry.name === ".git" ||
         entry.name === "dist" ||
         entry.name === "build" ||
+        entry.name === ARCHIVE_DIR ||
         (entry.name.startsWith(".") && entry.name !== ".claude")
       ) {
         continue;
@@ -158,14 +185,26 @@ function readText(path) {
 }
 
 /**
- * A ledger approves Gate 2 when its Gate 2 row is marked approved.
- * Row shape: | 2 | jira-tasks.md | approved | 2026-08-19 14:32 — project ACME |
+ * Approved Gate 2 rows of a ledger, verbatim. Row shape:
+ *   | 2 | jira-tasks.md | approved | 2026-08-19 14:32 — project ACME, batch push |
+ * The trailing cell must name the target project key — approval is per project,
+ * and `approvedForProject` below matches against the row text.
  */
-function gate2Approved(ledgerText) {
+function approvedGate2Rows(ledgerText) {
   return ledgerText
     .split("\n")
     .filter((line) => /^\s*\|\s*2(\.0)?\s*\|/.test(line))
-    .some((line) => /\bapproved\b/i.test(line) && !/\bnot\s+approved\b/i.test(line));
+    .filter((line) => /\bapproved\b/i.test(line) && !/\bnot\s+approved\b/i.test(line));
+}
+
+/**
+ * Case-sensitive word match: Jira project keys are uppercase by convention
+ * (`PROJECT_KEY_VALUE_PATTERN` enforces it), so `ACME` cannot collide with prose
+ * like "batch push". Keys are [A-Z0-9_]+ — no regex metacharacters to escape.
+ */
+function approvedForProject(approvedRows, projectKey) {
+  const asWord = new RegExp(`\\b${projectKey}\\b`);
+  return approvedRows.some((row) => asWord.test(row));
 }
 
 /** Collect issue keys from fields that plausibly identify a target issue. */
@@ -193,20 +232,97 @@ function targetIssueKeys(toolInput) {
   return [...keys];
 }
 
-/** An issue is protected when its line in jira-tasks.md carries the 🔒 marker. */
-function protectedKeys(cwd, candidateKeys) {
-  if (candidateKeys.length === 0) return [];
-  const hits = [];
-  for (const path of findFiles(cwd, "jira-tasks.md")) {
-    const lines = readText(path).split("\n");
-    for (const key of candidateKeys) {
-      const marked = lines.some(
-        (line) => line.includes(key) && (line.includes("\u{1F512}") || /\bPROTECTED\b/i.test(line))
-      );
-      if (marked && !hits.includes(key)) hits.push(key);
-    }
+/**
+ * The project keys a call targets: prefixes of any issue keys in the payload,
+ * plus bare project-key fields (creates carry `projectKey`, not an issue key).
+ */
+function targetProjectKeys(toolInput) {
+  const projects = new Set();
+  for (const issueKey of targetIssueKeys(toolInput)) {
+    projects.add(issueKey.slice(0, issueKey.lastIndexOf("-")));
   }
-  return hits;
+  const visit = (node, fieldName, depth) => {
+    if (depth > 5 || node == null) return;
+    if (typeof node === "string") {
+      if (
+        fieldName &&
+        PROJECT_FIELD_PATTERN.test(fieldName) &&
+        PROJECT_KEY_VALUE_PATTERN.test(node.trim())
+      ) {
+        projects.add(node.trim());
+      }
+      return;
+    }
+    if (Array.isArray(node)) {
+      for (const item of node) visit(item, fieldName, depth + 1);
+      return;
+    }
+    if (typeof node === "object") {
+      for (const [childName, value] of Object.entries(node)) {
+        visit(value, childName, depth + 1);
+      }
+    }
+  };
+  visit(toolInput, null, 0);
+  return [...projects];
+}
+
+const BLOCK_HEADING_PATTERN = /^#{2,4}\s/;
+const PROTECTED_MARK = "\u{1F512}"; // 🔒
+const JIRA_KEY_LINE_PATTERN = /^\s*\*{0,2}jira\s*key\*{0,2}\s*:/i;
+const STATUS_LINE_PATTERN = /^\s*\*{0,2}status\*{0,2}\s*:/i;
+const PROTECTED_STATUS_PATTERN = /\b(done|cancelled|canceled|po\s+approve)\b/i;
+
+/**
+ * Which of `candidateKeys` are protected in the live `jira-tasks.md` files.
+ *
+ * The benchmark template puts `**Jira Key**:` and `**Status**:` on their own
+ * lines under a `###` task heading, and the 🔒 marker in the heading itself —
+ * so a task is parsed as a BLOCK, never as one line. A block is protected when
+ * its heading carries 🔒 (or the word PROTECTED), or its Status line names a
+ * protected status. Keys are read from the Jira Key line only: a block whose
+ * prose merely mentions "blocked by ACME-441" must not protect ACME-441.
+ *
+ * A single line carrying both a candidate key and the 🔒 marker also counts, so
+ * inline notations ("ACME-441 — status: Done 🔒") stay recognized.
+ */
+function protectedKeys(jiraTaskFiles, candidateKeys) {
+  if (candidateKeys.length === 0) return [];
+  const wanted = new Set(candidateKeys);
+  const hits = new Set();
+  for (const path of jiraTaskFiles) {
+    const lines = readText(path).split("\n");
+    let blockKeys = [];
+    let blockProtected = false;
+    const closeBlock = () => {
+      if (blockProtected) {
+        for (const key of blockKeys) if (wanted.has(key)) hits.add(key);
+      }
+      blockKeys = [];
+      blockProtected = false;
+    };
+    for (const line of lines) {
+      if (BLOCK_HEADING_PATTERN.test(line)) {
+        closeBlock();
+        if (line.includes(PROTECTED_MARK) || /\bPROTECTED\b/.test(line)) {
+          blockProtected = true;
+        }
+        continue;
+      }
+      if (JIRA_KEY_LINE_PATTERN.test(line)) {
+        for (const match of line.matchAll(ISSUE_KEY_PATTERN)) blockKeys.push(match[1]);
+      } else if (STATUS_LINE_PATTERN.test(line) && PROTECTED_STATUS_PATTERN.test(line)) {
+        blockProtected = true;
+      }
+      if (line.includes(PROTECTED_MARK)) {
+        for (const match of line.matchAll(ISSUE_KEY_PATTERN)) {
+          if (wanted.has(match[1])) hits.add(match[1]);
+        }
+      }
+    }
+    closeBlock();
+  }
+  return [...hits];
 }
 
 function main() {
@@ -235,9 +351,10 @@ function main() {
     decide("ask", "BA guard could not resolve the working directory. Confirm this Jira write manually.");
   }
 
-  // 3. Is this a BA session? Without BA artifacts on disk there is no gate to
-  //    enforce, so stand down and let normal permission rules apply. This keeps
-  //    a user-level install from blocking ordinary Jira work in other projects.
+  // 3. Is this a BA session? Without live BA artifacts on disk there is no gate
+  //    to enforce, so stand down and let normal permission rules apply. This
+  //    keeps a user-level install from blocking ordinary Jira work in other
+  //    projects — and archived-only repositories count as no BA session.
   const baArtifacts = BA_ARTIFACTS.flatMap((name) => findFiles(cwd, name));
   if (baArtifacts.length === 0) allow();
 
@@ -255,40 +372,59 @@ function main() {
         "so it is being treated as a potential write. ";
 
   // Policy 2 first: a protected issue is never writable, gate or no gate.
-  const blocked = protectedKeys(cwd, targetIssueKeys(toolInput));
+  // Only live jira-tasks.md files count — an archived copy marking a key 🔒
+  // must not block an issue whose status was legitimately reopened since.
+  const blocked = protectedKeys(findFiles(cwd, "jira-tasks.md"), targetIssueKeys(toolInput));
   if (blocked.length > 0) {
     decide(
       verdict,
       unclassified +
         `Protected Status Policy: ${blocked.join(", ")} ${
           blocked.length === 1 ? "is" : "are"
-        } marked 🔒 in jira-tasks.md (status Done, Cancelled, or PO APPROVE) and cannot be modified. ` +
-        "Tell the user the status must be changed in Jira and the backlog re-imported first."
+        } recorded in jira-tasks.md with a protected status (Done, Cancelled, or PO APPROVE) or a 🔒 marker, ` +
+        "and cannot be modified. Tell the user the status must be changed in Jira and the backlog " +
+        "re-imported first — re-importing refreshes jira-tasks.md and clears a stale marker."
     );
   }
 
-  // Policy 1: Gate 2 must be recorded as approved in a gate ledger.
+  // Policy 1: Gate 2 must be approved in a LIVE ledger, for the project this
+  // write targets. An approval names its project; it unlocks nothing else.
   const ledgers = findFiles(cwd, ".gates.md");
   if (ledgers.length === 0) {
     decide(
       verdict,
       unclassified +
-        "Gate 2 not approved: no gate ledger found (expected specifications/<workshop>/.gates.md). " +
+        "Gate 2 not approved: no live gate ledger found (expected specifications/<workshop>/.gates.md; " +
+        "archived ledgers under sessions/ do not count). " +
         "Create the ledger, complete Gates 0/1/1.5, and record explicit Gate 2 approval before pushing to Jira."
     );
   }
 
-  const approved = ledgers.filter((path) => gate2Approved(readText(path)));
-  if (approved.length === 0) {
+  const approvedRows = ledgers.flatMap((path) => approvedGate2Rows(readText(path)));
+  if (approvedRows.length === 0) {
     decide(
       verdict,
       unclassified +
-        `Gate 2 not approved: found ${ledgers.length} gate ledger(s) but none records Gate 2 as approved. ` +
+        `Gate 2 not approved: found ${ledgers.length} live gate ledger(s) but none records Gate 2 as approved. ` +
         "Present the formatted tasks, get explicit user approval for the target Jira project, " +
-        "record it in the ledger's Gate 2 row, then retry."
+        "record it in the ledger's Gate 2 row (naming the project key), then retry."
     );
   }
 
+  const projects = targetProjectKeys(toolInput);
+  const uncovered = projects.filter((key) => !approvedForProject(approvedRows, key));
+  if (uncovered.length > 0) {
+    decide(
+      verdict,
+      unclassified +
+        `Gate 2 approval does not cover project ${uncovered.join(", ")}: an approved Gate 2 row exists, ` +
+        "but its scope names a different project. Approval is per project — get explicit user approval " +
+        `for ${uncovered.join(", ")} and record it in the Gate 2 row (e.g. "project ${uncovered[0]}") before retrying.`
+    );
+  }
+
+  // A write whose payload names no project at all (rare) falls back to the
+  // ledger-level check above: some live ledger has an approved Gate 2 row.
   allow();
 }
 

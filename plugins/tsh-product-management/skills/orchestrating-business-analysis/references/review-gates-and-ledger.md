@@ -34,8 +34,10 @@ Rules:
 - **Read the ledger. Never treat a gate as approved because it felt approved
   earlier in the conversation.**
 - Write the approval **before** taking the action it unlocks.
-- Record the target project key for Gate 2, and whether the approval covered a
-  batch push or a single task.
+- **The Gate 2 row must name the target project key** — `project ACME` — plus
+  whether the approval covered a batch push or a single task. The key is
+  machine-read: the hook matches every write's target project against the
+  approved row, so a row without the key does not unlock that project's writes.
 - Record Roadmap Review in the `1.75` row **before** writing
   `specifications/projects/<project-name>/roadmap.md`. The draft at
   `.roadmap-proposal.md` may be written and revised freely; the project roadmap may
@@ -51,6 +53,18 @@ numbered `1.75` for exactly this reason.
 
 If a Jira write is blocked, do not look for a workaround. Check the ledger, and if
 the gate genuinely has not been approved, go back and get approval.
+
+## An approval is scoped, and archiving closes it
+
+The hook reads only **live** ledgers — anything under a `sessions/` archive
+directory is history and unlocks nothing. And an approval unlocks writes only for
+the project key its row names: workshop one's `project ACME` approval does not
+open pushes to `BETA`, however many approved rows the repository accumulates.
+
+One residual the hook cannot close: two live workshops pushing to the **same**
+project share gate state, because a tool call carries no signal of which workshop
+it serves. The mitigation is the workflow's own final step — archive the session
+right after post-push verification, which takes its ledger out of play.
 
 ## After Gate 1.5: confirm the tasks, then propose the roadmap
 
