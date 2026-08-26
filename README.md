@@ -12,11 +12,13 @@ publishes three families:
 - **Stacks** (`tsh-stack-frontend` and friends) — *what we work with*. One per
   technology stack. Install the ones a given project is built on.
 
-> **Heads up:** the five **discipline** plugins are still **empty scaffolds**.
-> Installing them works and is worth doing now — you'll pick up agents and skills
-> automatically as we land them — but they contribute no components yet. An empty
-> component list after installing one of those is expected, not a broken install.
-> **`tsh-core` and the stack plugins ship real skills today.**
+> **Heads up:** three of the five **discipline** plugins are still **empty
+> scaffolds** — `tsh-product-testing`, `tsh-product-design` and
+> `tsh-platform-engineering`. Installing them works and is worth doing now — you'll
+> pick up agents and skills automatically as we land them — but they contribute no
+> components yet. An empty component list after installing one of those is
+> expected, not a broken install. **`tsh-core`, `tsh-product-engineering`,
+> `tsh-product-management` and the stack plugins ship real skills today.**
 
 Requires Claude Code v2.1 or newer:
 
@@ -279,7 +281,7 @@ Install the one that matches your job, at **User** scope.
 | :-- | :-- | :-- |
 | [`tsh-product-engineering`](plugins/tsh-product-engineering) | Feature implementation, code review, refactoring, debugging, TDD workflows | `/plugin install tsh-product-engineering@tsh-agentic-collections` |
 | [`tsh-product-testing`](plugins/tsh-product-testing) | E2E testing, accessibility testing, exploratory/manual QA, test-plan authoring | `/plugin install tsh-product-testing@tsh-agentic-collections` |
-| [`tsh-product-management`](plugins/tsh-product-management) | Business analysis, requirements & user stories, discovery and scoping | `/plugin install tsh-product-management@tsh-agentic-collections` |
+| [`tsh-product-management`](plugins/tsh-product-management) | Workshop materials to a Jira-ready backlog: intent brief, epics and user stories, an eleven-pass quality review, and an outcome-based delivery roadmap — five review gates, with the Jira push enforced by a hook | `/plugin install tsh-product-management@tsh-agentic-collections` |
 | [`tsh-product-design`](plugins/tsh-product-design) | UI/UX design work, design systems, design review, Figma-driven flows | `/plugin install tsh-product-design@tsh-agentic-collections` |
 | [`tsh-platform-engineering`](plugins/tsh-platform-engineering) | Infrastructure, CI/CD, IaC, containers, observability, deployment | `/plugin install tsh-platform-engineering@tsh-agentic-collections` |
 
