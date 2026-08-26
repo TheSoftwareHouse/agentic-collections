@@ -134,15 +134,14 @@ alone reaches nobody.
   review excludes those suites and says so; a standalone "review this PR" still runs
   everything. Plans from before 0.6.0 still work — a plan without a final
   verification phase gets the old single full-scope review.
-
-### Changed
-
 - **The README now says where Jira access comes from.** `tsh-core` bundles the
   Atlassian MCP server, so a teammate reading only this plugin's README had no way to
   know Jira and Confluence were available at all. It sits in `tsh-core` rather than
   here for the same reason Git worktrees do: every discipline reads from Jira, so
   declaring the server in each discipline plugin would mean maintaining the same
   endpoint in five files. Playwright stays here — it exists for `ui-engineer` alone.
+  (No longer true as of 0.7.0: the bundled Playwright MCP server was removed when
+  the agents moved to the Playwright CLI.)
 
 ## [0.5.0] - 2026-08-20
 
