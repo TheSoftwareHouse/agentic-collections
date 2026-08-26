@@ -71,8 +71,9 @@ instead of asking whose job it is:
 | One agent, one skill, one discipline | that plugin's own `.mcp.json` |
 
 Atlassian is the first case: engineering, product management and testing all read
-Jira. Playwright is the second: it exists to let `ui-engineer` look at a rendered
-page, and it stays in `tsh-product-engineering`.
+Jira. Playwright is the second: it exists for `tsh-product-testing`'s E2E work and
+stays there. (`tsh-product-engineering` used to bundle it too, until its agents
+moved to the Playwright CLI in 0.7.0.)
 
 **Two facts that decide the boundary, both undocumented in the plugin docs:**
 

@@ -12,6 +12,99 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.7.0] - 2026-08-26
+
+### Added
+
+- **The frontend flow, migrated from `copilot-collections`: a UI verification gate
+  with evidence-based Figma comparison.** Previously `ui-engineer` verified its own
+  work by looking at screenshots inside its own context — implementer and judge were
+  the same agent. Now every Figma-backed UI task closes through a per-item
+  verify-fix loop owned by the orchestrator: a `ui-capture-worker` agent (Haiku,
+  read-only) collects ACTUAL evidence with the **Playwright CLI** — `actual.png`,
+  `computed-styles.json`, `a11y-snapshot.yml` under
+  `specifications/<task-id>/ui-verification/iteration-<N>/` — and a `ui-reviewer`
+  agent (Sonnet, read-only) judges it against EXPECTED taken **only from the Figma
+  MCP** (a shared `figma-expected.png`, exported once per item and reused across
+  iterations), returning PASS, FAIL, or VERIFICATION NOT RUN with a complete
+  difference table. FAIL routes the full report back to `ui-engineer`, then fresh
+  capture and fresh review — up to 5 iterations, then a structured user gate
+  (continue with N more / accept as ESCALATED / custom instruction). Blockers
+  (auth, wrong URL, missing artifacts) are VERIFICATION NOT RUN: they consume no
+  iteration budget and never count as a pass. Code review starts only after every
+  UI item is PASSED or user-acknowledged ESCALATED, and the UI Verification Summary
+  is reported separately from code review.
+- **Three skills behind the gate**: `reviewing-ui` (user-invocable — one
+  capture-plus-comparison pass, the `/tsh-review-ui` equivalent), `verifying-ui`
+  (the judging standard: categories, strict tolerances, PASS gate, report format;
+  preloaded by `ui-reviewer`), and `capturing-ui-evidence` (the Playwright-CLI
+  capture contract and the `TSH_UI_LOGIN_*` repo-root `.env` authentication
+  contract; preloaded by `ui-capture-worker`).
+- **Not migrated, on purpose**: the Copilot Human-Approval record machinery
+  (approval tables, revision predicates, discussion boundaries) — this plugin's
+  existing plan contract ("a plan file the user has read", material deviations stop
+  the flow) already gates execution; and the engineering-manager agent — the main
+  conversation orchestrates in Claude Code.
+
+### Changed
+
+- **`ui-engineer` under the gate implements only** — it skips its own in-browser
+  comparison entirely (the gate owns all rendered-result verification, on the
+  Playwright CLI and Figma MCP exclusively) and gains an explicit fix-application
+  mode: fix ALL differences from a verification report in one pass, then hand back
+  for fresh capture and review. Standalone delegations (no gate announced) keep the
+  existing self-verifying behavior — examined screenshots per component and state —
+  now driven by the Playwright CLI instead of the MCP server.
+- **`feature-verifier` walks browser scenarios with the Playwright CLI** — named
+  session, `snapshot` for element refs, `click`/`fill`/`press` for steps, per-step
+  screenshots saved to explicit files and examined via Read, `console` and
+  `requests` for log and network checks. The evidence rules themselves (examined
+  screenshot per step, real API calls, verbatim queries and suite commands) are
+  unchanged.
+- **`orchestrating-feature-implementation`** routes UI verification capture to
+  `ui-capture-worker` and verdicts to `ui-reviewer`, requires the exact full dev
+  server URL to be user-confirmed (never inferred from config or port scans), and
+  gains a Reference Loading table pointing at the new
+  `references/ui-verification-gate.md`.
+- **New machine prerequisite: the [Playwright CLI](https://www.npmjs.com/package/@playwright/cli)**
+  (`playwright-cli`, or `npx playwright-cli`). Every browser-driving component in
+  this plugin now runs on it — the gate's capture, `ui-engineer`'s standalone
+  checks, and `feature-verifier`'s walkthroughs. Two reasons: capture artifacts are
+  files on disk, which MCP screenshots don't provide, and the CLI is materially
+  cheaper — only paths and measured values enter model context, instead of full
+  screenshots and tool schemas streaming through as MCP traffic. The Figma MCP
+  remains a consuming-project prerequisite.
+
+- **Hardening after the first live benchmark run (OSH-410).** Four gaps the run
+  exposed, closed: (1) the reviewer can no longer invent waiver states
+  ("adjudicated", "accepted deviation") — a difference is excluded from a verdict
+  only under an explicit user ruling forwarded in the delegation and cited verbatim;
+  everything else beyond tolerance stays FAIL until the user closes it through the
+  escalation gate. (2) Capture must measure the visible rendered box — for
+  component-library wrappers (MUI, AntD) both the wrapper and the inner control,
+  labeled — and the reviewer returns VERIFICATION NOT RUN requesting re-capture
+  instead of arithmetically reconstructing dimensions from a wrongly-captured
+  element. (3) A PASS verdict must be backed by the current iteration's
+  measurements only — an unmeasured critical item cannot be discounted against a
+  prior pass. (4) DX: the orchestrator and `reviewing-ui` run a Playwright-CLI
+  preflight (`playwright-cli --version`, `npx` fallback) before the first capture
+  and, when missing, ask the user whether to install it or wait — the blocker never
+  surfaces first inside a subagent, which cannot ask. Also: `feature-verifier`
+  saves its evidence screenshots under
+  `specifications/<task-id>/verification-evidence/`, and the final verification
+  phase may launch its two delegates as immediately consecutive background
+  delegations (still concurrent), not only in a single message.
+
+### Removed
+
+- **The bundled Playwright MCP server (`.mcp.json`).** With `ui-engineer` and
+  `feature-verifier` switched to the Playwright CLI, the server had no consumer
+  left. No invocation handle breaks: plugin-MCP tool names were never safe to
+  reference in `tools:` lists or hook matchers (the surviving namespace depends on
+  plugin load order), so nothing configured can depend on them. A repository that
+  used the bundled server for its own purposes should declare `@playwright/mcp` in
+  its own project `.mcp.json`.
+
 ## [0.6.0] - 2026-08-21
 
 ### Added

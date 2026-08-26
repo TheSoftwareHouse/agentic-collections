@@ -32,11 +32,18 @@ exactly what is missing; never improvise scenarios or guess a URL.
 
 ## Evidence rules
 
-- **Browser scenarios**: navigate with the Playwright tooling available in this
-  session, take a screenshot at each stated step, and **examine the image** — judge
-  the expected result from what the screenshot shows. Accessibility snapshots, DOM
-  assertions, and click-throughs are navigation, never verification: a step whose
-  screenshot you have not examined is unverified.
+- **Browser scenarios**: drive the app with the Playwright CLI (`playwright-cli`,
+  or `npx playwright-cli`; neither available → stop and report that the machine
+  needs `npm install -g @playwright/cli@latest`). Use a named session: `open`,
+  `goto` the pinned URL, `snapshot` to get element refs, then `click`/`fill`/`press`
+  to walk the scenario's steps. At each stated step save a screenshot into
+  `specifications/<task-id>/verification-evidence/`
+  (`playwright-cli screenshot --filename=specifications/<task-id>/verification-evidence/<scenario>-<step>.png -s <session>`),
+  then **Read and examine the image** — judge the expected result from what the screenshot shows.
+  Use `playwright-cli console` and `playwright-cli requests` when a step checks
+  console output or network traffic, and close the session when done. Accessibility
+  snapshots, DOM assertions, and click-throughs are navigation, never verification:
+  a step whose screenshot you have not examined is unverified.
 - **API scenarios**: send the real request as specified and record the actual status
   and the response fields the document names. Never infer a response from code.
 - **Database and log scenarios**: run the document's stated queries and searches
