@@ -74,7 +74,6 @@ alone reaches nobody.
   cheaper — only paths and measured values enter model context, instead of full
   screenshots and tool schemas streaming through as MCP traffic. The Figma MCP
   remains a consuming-project prerequisite.
-
 - **Hardening after the first live benchmark run (OSH-410).** Four gaps the run
   exposed, closed: (1) the reviewer can no longer invent waiver states
   ("adjudicated", "accepted deviation") — a difference is excluded from a verdict

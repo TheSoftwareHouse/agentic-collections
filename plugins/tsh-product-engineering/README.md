@@ -34,8 +34,10 @@ conversation, and a delegated review gate at the end.
 
 All skills are model-invocable, and their descriptions are written to route on the
 work you describe rather than on the skill's name — "implement this ticket", "plan
-this feature", "is this ready to merge". Each one also names the sibling that owns the
-adjacent job, so the four do not compete for the same request.
+this feature", "is this ready to merge", "does this page match the design". Each one
+also names the sibling that owns the adjacent job, so they do not compete for the
+same request. `verifying-ui` and `capturing-ui-evidence` stay out of the `/` menu:
+they are contracts the two UI agents preload, not commands worth typing.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -51,7 +53,9 @@ scenarios — and only paths and measured values enter model context, which is w
 replaced the Playwright MCP server this plugin bundled through 0.6.0. Have
 `playwright-cli` on the machine: `npm install -g @playwright/cli@latest`, or a
 project-local install reached via `npx playwright-cli` (Node.js required either
-way). Agents stop and report when the CLI is missing rather than improvising.
+way). You do not have to remember this: before the first capture, the workflow runs
+`playwright-cli --version` (with an `npx` fallback) and, when neither answers, asks
+whether to install it for you or wait while you do it yourself.
 
 **Design fetching needs the Figma MCP server**, which needs per-user
 authentication, so we deliberately leave it to the consuming project — connect it
