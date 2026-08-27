@@ -29,12 +29,22 @@ it costs. Read [Scope](#scope) before adding anything.
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 | `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
 | `init` | `/tsh-core:init` | One-shot project setup: audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules and the decision-record index by running the owning skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Safe to re-run — the second pass is a repair |
+| `retro` | `/tsh-core:retro` | A retrospective over the session you are in: finds the friction that should have been tooling — a procedure reconstructed twice, a convention Claude was corrected on repeatedly, a side task that flooded the context — and writes the candidates to a proposal file with their quoted evidence, trigger, primitive and target. Proposes only; builds nothing |
 
 `authoring-claude-extensions` and `managing-claude-context` split cleanly:
 **"I want to build something"** goes to the first, **"I want this repo's memory files
 to be right"** to the second. The first owns skills, subagents, hooks and plugins; the
 second owns `CLAUDE.md`, `.claude/rules/` and the decision index. Each hands off to the
 other rather than overlapping.
+
+`retro` and `authoring-claude-extensions` are two halves of one job, split by which
+question you are asking. **"What should we build?"** goes to `retro`, which analyses a
+session and produces a proposal document. **"How do I build it?"** goes to
+`authoring-claude-extensions`, which decides the primitive and writes the file. `retro`
+loads that skill's routing table rather than restating it, and it never creates an
+artifact — a retro's entire output is one Markdown file for a human to review. Like
+`init`, it is deliberately not model-invocable, so "should this be a skill or a hook?"
+still routes to `authoring-claude-extensions` and never to it.
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
@@ -71,14 +81,78 @@ cannot be resolved stops the run — the skill never guesses one.
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
 with `/plugin update`.
 
-Every skill here except `init` is model-invocable — Claude loads it when the work
-matches its description, so you don't have to remember to type the command. `init`
-is the one deliberate exception (`disable-model-invocation: true`): it is a command
-you type, its description is never preloaded, and it costs no routing budget.
+Every skill here except `init` and `retro` is model-invocable — Claude loads it when
+the work matches its description, so you don't have to remember to type the command.
+Those two are the deliberate exceptions (`disable-model-invocation: true`): they are
+commands you type, their descriptions are never preloaded, and they cost no routing
+budget. Between them they add seven skills' worth of capability for five skills'
+worth of listing.
 
 They keep a short `SKILL.md` and push detail into `references/`, loaded only when
 the task needs it. The **"Load when"** column in the Reference Loading table is
 what routes the model to the right file; keep it filled in when adding references.
+
+### Using retro
+
+`/tsh-core:retro` reads a session back and writes **one file** —
+`docs/extension-proposals/<date>-<slug>.md` — listing the friction that should have been
+tooling. Nothing else on disk changes. It never builds what it proposes.
+
+Run it at the **end** of a session that felt repetitive, or one where Claude had to be
+corrected more than once. Running it mid-task gives it half a session to work from.
+Running it in a fresh one gets you a question, not a retro: there is nothing to analyse
+yet, and it will ask which session you meant rather than guess.
+
+```
+/tsh-core:retro
+/tsh-core:retro the worktree cleanup thread
+/tsh-core:retro yesterday's work in the main checkout
+```
+
+The first analyses the whole conversation. The second narrows detection to one thread
+and records that the retro was partial by instruction. The third reaches for a
+**transcript** — a bundled script lists the sessions attached to this repository,
+including every Git worktree, and digests the one you pick down to its user turns,
+corrections and repeated steps. That path also covers a session long enough to have been
+compacted, where the original wording is gone from context but survives on disk.
+
+Each surviving candidate arrives with the evidence behind it:
+
+```markdown
+## P1 — Enforce the marketplace version bump before a plugin commit
+
+- **Primitive:** hook · **Confidence:** strong
+- **Target:** `.claude/settings.json` — repo-local
+- **Handoff:** `/tsh-core:authoring-claude-extensions`
+
+**Evidence** — 3 occurrences
+1. "you forgot the version bump again", after the second plugin commit
+...
+**Trigger** — any commit touching `plugins/` without a `plugin.json` change
+**Rejected alternative** — a `CLAUDE.md` line, because it already says this and was
+still missed twice
+```
+
+**Getting the most out of it**
+
+- Name a focus when the session did several unrelated things. One retro over three
+  subjects finds less than three prompts would.
+- Expect **"no candidates"** on a short, clean session, and read it as the skill
+  working. A retro that always finds something is one nobody trusts twice.
+- The output is a proposal for a person to weigh, not a decision. Once you agree with
+  one, `/tsh-core:authoring-claude-extensions` builds it.
+- Rejected candidates are listed with their reasons, so you can disagree with the
+  judgement rather than just the conclusion.
+
+**What it will not do:** create or enable any skill, agent, hook or MCP server; edit
+`CLAUDE.md` or a `.claude/rules/` file; commit; or open a pull request.
+
+Reading a transcript runs `node` through Bash, so the first time you use the third form
+Claude will ask you to approve it. If you decline — or there is no `node` on `PATH` — the
+retro falls back to the conversation in context and says so under **Not analysed** in the
+file. That line is expected behaviour, not a broken install. It will not go looking for
+another way in; a retro that spends its run on transcript access produces no proposal at
+all.
 
 ### The Atlassian connector
 

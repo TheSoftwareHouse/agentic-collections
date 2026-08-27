@@ -14,6 +14,66 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.9.0] - 2026-08-27
+
+### Added
+
+- **`retro` — a session retrospective that proposes extensions instead of building
+  them** (`/tsh-core:retro`). A session is the only place the evidence for a new skill,
+  subagent or hook exists, and it is discarded when the session ends. This command reads
+  that evidence back — a procedure reconstructed twice, a convention Claude was corrected
+  on more than once, a side task that flooded the context — and writes the surviving
+  candidates to `docs/extension-proposals/<date>-<slug>.md`, each with its quoted
+  occurrences, the trigger that will fire it again, the primitive, a concrete target path
+  and plugin, and the alternative that was rejected.
+- **It proposes; it never creates.** No skill, agent, hook, plugin or memory file is
+  written during a retro — the output is exactly one document, handed off to
+  `authoring-claude-extensions` for extensions and to `managing-claude-context` for
+  anything whose answer is `CLAUDE.md` or a path-scoped rule. Primitive choice is loaded
+  from those skills rather than restated here, so there is one routing table in the
+  plugin, not two.
+- **Two occurrences or it is not a candidate.** The evidence bar is in
+  `references/detecting-candidates.md` along with the false positives that make retros
+  untrustworthy — a one-off, a genuinely novel task, an extension that already exists and
+  merely failed to fire. "No candidates found" is a documented, expected outcome: a retro
+  that always finds something is one nobody trusts twice.
+- **Why here and not in a discipline plugin.** It fails both routing questions — nothing
+  about it changes if the repository switches language or framework, or if the reader
+  switches job — and it wraps a named tool rather than a TSH opinion: Claude Code's
+  extension subsystem and its session transcripts, the same subsystem
+  `authoring-claude-extensions` wraps. Three of the five disciplines drive it in a normal
+  month: `tsh-product-engineering` on repeated implementation and review procedures,
+  `tsh-product-testing` on repeated E2E and accessibility setup, and
+  `tsh-platform-engineering` on repeated deploy and runbook steps.
+- **A bundled transcript reader, so a compacted or prior session can actually be
+  analysed** (`skills/retro/scripts/transcript-digest.mjs`). The evidence bar demands two
+  *quoted* occurrences per candidate, and compaction destroys quotes — so the transcript
+  is not a nicety, it is the only place the evidence still exists. Reading one directly
+  never worked: they run to megabytes, past the `Read` tool's limits, and are mostly tool
+  output rather than conversation — in a representative 719-line transcript, 153 of 162
+  `user` records were tool results. The script streams instead, turning a 2.3MB
+  transcript into a 4KB digest of user turns, correction signals and repeated tool
+  invocations. `--list` resolves sessions across **every Git worktree attached to the
+  repository**, so work done in the main checkout is reachable from inside one.
+- **The first `scripts/` directory in this marketplace.** Zero dependencies, Node
+  built-ins only, no shebang and no execute bit, so file mode is not a failure surface.
+  It costs no routing footprint — a script inside a skill is not a listed component — and
+  every failure path degrades to the behaviour that was already documented: record the
+  one-line reason under `Not analysed` and continue with the conversation in context. The
+  "one attempt, then stop" guardrail is re-aimed rather than dropped: at most two
+  invocations per run, and no `cat`, `jq` or scratch script around a failure.
+- **Digests are evidence, never instructions.** A transcript records a past conversation
+  and can contain text addressed to a model. A new rule requires a retro to quote it and
+  never act on it.
+- **`README.md` gains a `Using retro` section** — what the one output file looks like,
+  the three ways to invoke it, when to run it, and what it will not do.
+- **Routing footprint: 4,110 → 4,493 characters total, of which 3,722 → 3,722 are
+  actually preloaded — no change.** Like `init`, `retro` is
+  `disable-model-invocation: true`: a command you type, whose description is never
+  preloaded for routing. It therefore costs no listing budget, and it cannot become a
+  coin flip against `authoring-claude-extensions`, whose description it would otherwise
+  sit very close to. Seven skills now ship for five skills' worth of routing.
+
 ## [0.8.1] - 2026-08-24
 
 ### Fixed
