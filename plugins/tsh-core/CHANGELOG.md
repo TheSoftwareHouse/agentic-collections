@@ -14,6 +14,32 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.9.0] - 2026-08-27
+
+### Added
+
+- **`managing-claude-context` now covers adopting a domain dictionary — a
+  per-product glossary of the client's own vocabulary, produced by
+  `/tsh-product-management:domain-dictionary` or arriving from anywhere else. No
+  new skill was added.** The guidance is one new reference,
+  `references/adopting-a-domain-dictionary.md`, plus edits pointing at it from
+  `SKILL.md` (a Reference Loading row, and three rows in the rules table) and from
+  five existing references: `choosing-the-layer.md`, `writing-claude-md.md`,
+  `writing-path-scoped-rules.md`, `auditing-for-drift.md` and
+  `monorepos-and-scale.md`. It covers the two-tier projection — a ~15-line
+  always-loaded vocabulary block in root `CLAUDE.md` plus the full artifact on
+  demand, by default at `docs/domain-dictionary.md` — the backtick-not-`@`-import
+  rule for the pointer, monorepo slicing, the unresolved-terms inbox, provenance,
+  and the carve-out that exempts a domain dictionary from the never-write-a-
+  derivable-fact rule, because it comes from the client rather than the code and
+  may deliberately contradict it on a live project.
+- `init`'s `references/wiring-tsh-core-skills.md` gained a conditional maintenance
+  bullet: only when `docs/domain-dictionary.md`, or the repository's chosen
+  projection path, is present.
+- `writing-technical-documents`'s `SKILL.md` gained one rule: where a project has a
+  domain dictionary, use its canonical terms rather than a synonym or an invented
+  translation.
+
 ## [0.8.1] - 2026-08-24
 
 ### Fixed

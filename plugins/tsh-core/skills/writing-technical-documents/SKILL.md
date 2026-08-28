@@ -62,6 +62,7 @@ report the dependency instead of editing code.
 | NEVER | Link to a page that does not exist. A broken internal link is a failure, not a cosmetic issue. |
 | MUST | Cut every word, sentence, and section that does not change what the reader thinks or does. |
 | MUST | Keep one idea per paragraph, and prefer the shorter, plainer word. |
+| MUST | Where the project has a domain dictionary, use its canonical terms — never a synonym or a translation you invent. |
 | NEVER | Ship filler — "comprehensive", "robust", "seamless", "leverage", "in order to", "it should be noted", "simply", "just". |
 | MUST | Use a table or list when the content is enumerable, prose when it is not. Never format for decoration. |
 | MUST | Write headings that summarise what follows, so a reader skimming headings alone can navigate. |

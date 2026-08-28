@@ -34,9 +34,8 @@ file: the model follows it confidently and the reader stops checking.
 ## Applicability and Precedence
 
 Read what already loads before writing anything. An existing `CLAUDE.md` is a
-statement of team intent, not a draft to overwrite — revise it in place and report
-what changed. Where a repository already has a documentation or ADR convention,
-that convention wins over this skill's defaults.
+statement of team intent, not a draft to overwrite. Where a repository already has a
+documentation or ADR convention, that convention wins over this skill's defaults.
 
 `docs/decisions/` is this skill's **default** location for decision records, not a
 requirement of Claude Code. A repository that already keeps ADRs elsewhere keeps
@@ -72,6 +71,9 @@ the decision instead of writing a plausible rule.
 | MUST | Inventory what already loads before writing — run `/context` and read every file it lists under **Memory files**. |
 | MUST | Verify every command, path, version and convention against the source before writing it into a memory file. |
 | NEVER | Write a fact Claude can derive from the codebase — directory listings, dependency inventories, generated architecture overviews. |
+| MUST | Exempt a domain dictionary from the rule above — it comes from the client, not the code, and may deliberately contradict it on a live project. |
+| MUST | Write a domain dictionary's pointer in backticks as `` `docs/domain-dictionary.md` ``, never a bare `@` import. |
+| NEVER | Inline the full domain dictionary into any `CLAUDE.md` — the root vocabulary block stays ~15 lines; the artifact lives once, on demand. |
 | MUST | Keep every `CLAUDE.md` under 200 lines, root and nested alike. Adherence drops as the file grows. |
 | MUST | Make each layer point downward to the next instead of inlining it. |
 | MUST | Move any multi-step procedure out of `CLAUDE.md` into a skill. `CLAUDE.md` holds facts, not workflows. |
@@ -96,6 +98,7 @@ the decision instead of writing a plausible rule.
 | [Writing path-scoped rules](./references/writing-path-scoped-rules.md) | Recording a convention that applies to some files but not all | `.claude/rules/` mechanics, `paths:` globs, brace-expansion budget, the unescaped-`[` trap, the zero-match check, sharing rules by symlink |
 | [Monorepos and scale](./references/monorepos-and-scale.md) | The repo has packages or subsystems with different owners | Nested `CLAUDE.md` vs. path-scoped rules by ownership, the split trigger, start directory, `claudeMdExcludes`, per-directory skills |
 | [Indexing decision records](./references/indexing-decision-records.md) | Wiring ADRs into context, or decisions exist but go unread | `docs/decisions/` layout, the index schema, the `Accepted`-only binding rule and how to propagate it, the backtick-not-import wiring |
+| [Adopting a domain dictionary](./references/adopting-a-domain-dictionary.md) | A domain dictionary or glossary is being adopted, or the repository already has one | The two-tier projection, the backtick rule, monorepo slicing, the inbox, provenance, the derivable-fact carve-out |
 | [Bootstrapping a repository](./references/bootstrapping-a-repository.md) | Step 1 found no existing context files | The inspection order, `/init` and `/import`, migrating from Copilot or Cursor |
 | [Auditing for drift](./references/auditing-for-drift.md) | Step 1 found existing context files | Verifying each claim against current code, pruning, `/doctor`, the `InstructionsLoaded` and `Stop` hooks |
 
@@ -130,6 +133,9 @@ to a nested `CLAUDE.md` in the directory that owns them. If the repository has
 packages or subsystems, read
 [`monorepos-and-scale.md`](./references/monorepos-and-scale.md) **before deciding
 between a rule and a nested file** — the deciding question is ownership, not count.
+Adopting or maintaining a domain dictionary follows this same shape; read
+[`adopting-a-domain-dictionary.md`](./references/adopting-a-domain-dictionary.md)
+first.
 
 **Step 5 — Wire the decision index.** If decision records exist or are wanted, read
 [`indexing-decision-records.md`](./references/indexing-decision-records.md) and
@@ -142,8 +148,7 @@ a human decision.
 
 **Step 6 — Verify what actually loads.** Start a session and run `/context`. Confirm
 the files you expect appear under **Memory files** and the ones you scoped are
-absent until a matching file is read. A path-scoped rule that never triggers is
-indistinguishable from one you never wrote.
+absent until a matching file is read.
 
 ## Self-check Before Handoff
 

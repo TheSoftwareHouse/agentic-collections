@@ -2,7 +2,7 @@
   "name": "tsh-core",
   "displayName": "TSH Core",
   "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and a bundled Atlassian MCP server for Jira and Confluence.",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

@@ -25,6 +25,13 @@ After the split, the root file orients and the leaves specify:
 In a monorepo that is one file per package. In a large single tree it is one per
 subsystem — `src/db/`, `src/api/` — and everything on this page applies unchanged.
 
+**Bounded contexts are a split trigger too.** When a term means something different
+per package — `packages/billing` calls it an `Invoice`, `packages/support` calls the
+same concept a `Case` — a domain dictionary's per-context slice belongs in that
+package's nested `CLAUDE.md`, not a second root-level dictionary. Whether it lives
+there or stays centrally maintained is the ownership question §2 already answers; it
+is not a new predicate.
+
 ## 2. Nested CLAUDE.md or a path-scoped rule?
 
 Both target instructions at part of the tree. They differ in where the file lives

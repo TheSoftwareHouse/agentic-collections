@@ -40,6 +40,20 @@ Every path stays in backticks. Written bare with a leading `@`, a path becomes
 an import and loads the file at launch — the rule and its rationale are owned by
 `managing-claude-context`; this template exists to comply with it.
 
+A third bullet joins the block only where the repository has adopted a domain
+dictionary — appended to a repository with none, it is a dead instruction, the same
+failure the conditional phrasing below prevents for an uninstalled plugin. Append it
+only where `docs/domain-dictionary.md` (or the repository's chosen projection path)
+exists:
+
+```markdown
+- When code surfaces a term the dictionary doesn't cover, or an existing entry
+  looks wrong, record it in the dictionary's inbox in the same change — never
+  invent the resolution yourself. With the `tsh-core` plugin installed, invoke
+  `/tsh-core:managing-claude-context`; without it, add the entry by hand,
+  matching the projection's existing format.
+```
+
 ## 3. Why the phrasing is conditional
 
 `tsh-core` installs at **user scope** — each teammate individually, not the

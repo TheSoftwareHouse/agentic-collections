@@ -52,7 +52,8 @@ The claims that drift fastest, in order:
 Independently of truth, remove:
 
 - Facts derivable by reading the code — trees, dependency inventories, architecture
-  overviews
+  overviews. A domain dictionary's vocabulary block is the deliberate exception —
+  see §9
 - Anything the linter, formatter or type-checker enforces
 - Procedures longer than about three steps — relocate to a skill
 - Workarounds for older model limitations. A rule forcing single-file refactors, or
@@ -134,6 +135,23 @@ Hand back a summary, not just an edited file:
 
 An audit that quietly rewrites a file leaves nobody able to tell a correction from
 an invention.
+
+## 9. Domain dictionary drift
+
+A domain dictionary carries two drift signatures the checks above do not cover.
+
+- **The dictionary claims a term the code contradicts.** On a live project this can
+  be intentional — a `Deprecated → <successor>` entry exists precisely because the
+  code identifier is the wrong word and the dictionary is what says so. Check the
+  entry's `Status` and the reconciliation record before treating the disagreement as
+  staleness; do not auto-prune the vocabulary block to match the code.
+- **Provenance older than the source it travelled from.** A projected copy's header
+  states what it was last reconciled against; if the source has moved on since, the
+  header is stale even though the term table itself may still be correct.
+
+See [`adopting-a-domain-dictionary.md`](./adopting-a-domain-dictionary.md) §7 for why
+a dictionary is exempt from §3's derivable-fact pruning: it comes from the client,
+not the code, and no amount of reading `src/` recovers it.
 
 ## Sources
 
