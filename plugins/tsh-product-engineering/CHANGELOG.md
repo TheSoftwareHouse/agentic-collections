@@ -79,9 +79,10 @@ alone reaches nobody.
   ("adjudicated", "accepted deviation") — a difference is excluded from a verdict
   only under an explicit user ruling forwarded in the delegation and cited verbatim;
   everything else beyond tolerance stays FAIL until the user closes it through the
-  escalation gate. (2) Capture must measure the visible rendered box — for
-  component-library wrappers (MUI, AntD) both the wrapper and the inner control,
-  labeled — and the reviewer returns VERIFICATION NOT RUN requesting re-capture
+  escalation gate. (2) Capture must measure the visible rendered box — found by asking
+  which ancestor paints a border or background, not by naming any library's classes,
+  and captured alongside the inner control — and the reviewer returns VERIFICATION
+  NOT RUN requesting re-capture
   instead of arithmetically reconstructing dimensions from a wrongly-captured
   element. (3) A PASS verdict must be backed by the current iteration's
   measurements only — an unmeasured critical item cannot be discounted against a
@@ -93,6 +94,103 @@ alone reaches nobody.
   `specifications/<task-id>/verification-evidence/`, and the final verification
   phase may launch its two delegates as immediately consecutive background
   delegations (still concurrent), not only in a single message.
+- **Second benchmark round (OSH-410, hardened build).** The hardening above held —
+  zero invented waivers, zero arithmetic reconstruction, the CLI preflight ran, no
+  Playwright MCP — and exposed five more gaps, all of them places where this
+  plugin's own contract was silent: (1) the reviewer's report was never persisted,
+  because the save rule lived in `reviewing-ui` while a full-flow orchestrator reads
+  the gate reference — the rule is now stated there, so verdicts leave a reviewable
+  trace instead of living only in a transcript. (2) Locale, language and text
+  direction are now pinned inputs alongside the dev server URL: a bilingual app
+  captured in the wrong language against an English design cost two extra capture
+  rounds, and other locales or an RTL variant now get labeled sibling directories
+  (`ui-verification/<label>/`) judged as their own items. (3) The orchestrator gates
+  on what capture actually measured — the capture summary names its measured
+  elements — because three present-but-thin artifacts still burn a reviewer round.
+  (4) `ui-capture-worker` reports the locale it captured and the elements it
+  measured. (5) A regression introduced by the previous round: telling `ui-engineer`
+  to "skip steps 4–5 and hand back" under the gate also dropped step 6, so plan
+  checkboxes stopped being ticked; the checkbox update is now explicit in both gate
+  modes.
+
+- **Third benchmark round (OSH-410).** Report persistence and plan checkboxes both
+  held. Five further gaps closed, two of them in this plugin's own examples: (1) a
+  verdict is now self-consistent by rule — FAIL with an empty `Recommended Fixes`,
+  or a FAIL that blames the evidence, is `VERIFICATION NOT RUN`, so a capture defect
+  can no longer be booked as an implementation failure (it cost a full iteration in
+  this run). (2) A measurement whose label disagrees with the element it describes is
+  a capture defect: capture must scope selectors to the component's own root and
+  sanity-check it against text the component renders, and every entry now carries a
+  `label` and a `textSample` so a mis-scoped measurement is visible on sight — the
+  previous generic example selector (`[class*="card"]`) matched the page banner
+  instead of the card under verification, which is what produced the defect. The
+  example stays framework-agnostic: a discipline plugin must not encode one UI
+  library's class names. (3) Capture runs from the
+  repository root, so the CLI's scratch `.playwright-cli/` cannot land under
+  `specifications/**`. (4) Exactly one design file per item: no second Figma export
+  beside `figma-expected.png`, and `ui-engineer` no longer saves its own copy.
+  (5) The orchestrator rejects a report missing the literal
+  `## Verification Result:` heading or the `Blocker Resolution` section — one
+  stricter rerun, then `VERIFICATION NOT RUN` — and may attach its own findings only
+  as a marked `> **Orchestrator note.**` block above the verbatim report. Blocker
+  passes keep their own iteration directory while not consuming budget; the reports
+  state the divergence so the numbering stays auditable.
+
+- **Fourth benchmark round (OSH-410).** Every fix from the previous rounds held:
+  three reports saved in contract format, no stray `.playwright-cli/`, one design
+  file, no empty-FAIL verdicts, locale recorded in the artifacts, and the loop ran
+  FAIL → FAIL → PASS into a concurrent final phase. Three defects remained, all in
+  measurement: (1) a PASS was issued while `computed-styles.json` carried
+  `"error": "Element not found"` and a `null` entry for the card under
+  verification — the reviewer now treats a `null` or `error` entry as an unmeasured
+  element that blocks PASS, and the orchestrator reads the file rather than trusting
+  its existence. (2) The measurement contract lived only in the on-demand reference,
+  so the capture worker — which preloads the skill, not its references — improvised
+  its own payload: generic `[class*="…"]` matching and a jQuery `:contains()`
+  selector that `querySelector` silently never matches. The contract (object shape,
+  `label`/`selector`/`textSample` per entry, prove the root before measuring, CSS
+  selectors only, find-by-text in JavaScript) now sits in the skill's own rules
+  table, with the worked example still in the reference. (3) Coverage gaps are fixed
+  by re-measuring, never by a companion measurements file beside
+  `computed-styles.json`, and the file is a JSON object rather than a string
+  containing JSON.
+
+- **Fifth benchmark round (OSH-410).** The measurement contract landed: `textSample`
+  present in every iteration, no `error` entries, files as JSON objects, no companion
+  measurements file — and, most importantly, a capture defect came back as
+  `VERIFICATION NOT RUN` instead of a FAIL against the implementation, with the
+  orchestrator reading `computed-styles.json` and sending capture back before the
+  reviewer saw it. Four smaller gaps closed: (1) a plan can be authored with no task
+  checkboxes at all, which silently disables the progress tracking three agents are
+  required to perform — every task and Definition-of-Done item is now a `- [ ]`
+  checkbox by rule. (2) When the pinned Figma node covers more than the component
+  under verification, a cropped reference is now explicitly allowed as
+  `figma-expected-<region>.png` at the verification root, exported once and reused —
+  the run improvised one inside `iteration-4/`, which the contract forbade without
+  offering the legitimate alternative. (3) A `null` optional field inside an
+  otherwise measured entry (a control with no label) is not an unmeasured element;
+  only a `null` or `error` *entry* blocks a verdict. (4) A capture round superseded
+  before any reviewer saw it now leaves a one-line `report.md` explaining why, so an
+  unjudged iteration directory is not indistinguishable from a skipped review.
+
+- **Sixth benchmark round (OSH-410): wall-clock work, same quality.** The run was
+  correct end to end (FAIL → FAIL → PASS, contract reports everywhere, superseded
+  captures left their one-line trace, plan checkboxes present and ticked), so this
+  round's changes target the 135-minute wall clock instead. Where the time went:
+  six capture rounds (~33 min) because every round opened a fresh browser and
+  logged in again, one capture existed only to discover the login screen, and the
+  same two design-vs-ticket questions that stalled the two previous benchmarks
+  stalled this one mid-loop (~13 min of user wait). Four rules added, none touching
+  the judging standard: (1) auth is prepared before the first capture — check
+  `.env` for `TSH_UI_LOGIN_*` upfront or ask alongside the URL — never discovered
+  by burning a capture round; (2) URL, locale, auth and visible design-vs-ticket
+  conflicts go to the user as one question round, not four round-trips; (3) the
+  named browser session (and its login) survives iterations of an item and closes
+  at PASS/ESCALATED, and the capture worker is resumed for iteration N+1 rather
+  than respawned — the reviewer stays fresh per pass, always, so verdict
+  independence is untouched; (4) design-vs-ticket conflicts visible at planning
+  time are asked then, not mid-loop, where they stall the gate and can cost a FAIL
+  iteration implementing the losing interpretation.
 
 ### Removed
 

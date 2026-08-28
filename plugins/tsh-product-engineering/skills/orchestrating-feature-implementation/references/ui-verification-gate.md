@@ -27,6 +27,28 @@ skip verification and never guess the design.
   running processes, or port scans; no delegate may switch it, swap ports, or start
   another server.
 - **The Figma URL or node** for each item, from the plan (or the user when missing).
+- **The locale, language and text direction the design represents**, when the app
+  can render the screen in more than one. Ask the user once, pin it, and pass it in
+  every capture delegation together with how to select it (URL parameter, app
+  language switch, or a storage value the app itself sets). Capturing the wrong
+  language against an English design wastes a full capture round. When another
+  locale or direction also matters (an RTL variant, for example), capture it as an
+  extra labeled sibling of the iteration directories — `ui-verification/<label>/` —
+  never inside `iteration-<N>/`, and judge it as its own item.
+- **Authentication, prepared before the first capture, not discovered by it.**
+  When the pinned page sits behind a login, resolve the auth path now: check
+  repo-root `.env` for existing `TSH_UI_LOGIN_*` vars, or ask the user for them in
+  the same question round as the URL and locale. A first capture that exists only to
+  discover the login screen burns four to five minutes and a delegation round that
+  one upfront check replaces.
+- **One question round, not four.** URL, locale, auth, and any design-vs-ticket
+  conflict already visible go to the user together (AskUserQuestion takes up to four
+  questions). Every separate round costs a full user round-trip — in practice the
+  slowest step of the whole gate.
+- **Read the design against the ticket before iteration 1.** A conflict visible by
+  comparing the Figma node with the ticket text (a fixed-width card vs "full width",
+  a styled-differently field) is a user question NOW — asked mid-loop it stalls the
+  gate and can cost a whole FAIL iteration implementing the losing interpretation.
 - **The shared verification root**, defined once per item before iteration 1:
   `specifications/<task-id>/ui-verification/`, with the reusable
   `figma-expected.png` inside it. Every iteration reuses that same shared root and
@@ -55,6 +77,20 @@ Each pass follows [`reviewing-ui`](../../reviewing-ui/SKILL.md) exactly: capture
 first, hard ordering gate on the three ACTUAL artifacts, then the reviewer — both as
 subagent delegations, never self-executed in this conversation.
 
+Two reuse rules keep later iterations fast without touching quality:
+
+- **The browser session survives the loop.** The named playwright-cli session (and
+  the login it holds) stays open across iterations of the same item and closes when
+  the item ends PASS or ESCALATED — tell the capture delegation which session name
+  to reuse. Re-opening a browser and re-authenticating every round costs minutes and
+  adds nothing: freshness lives in the artifacts, which are regenerated every pass
+  regardless.
+- **Resume the capture worker; keep the reviewer fresh.** For iteration N+1, prefer
+  resuming the previous capture worker (SendMessage) with "same recipe, write to
+  iteration-<N+1>/" — it already knows the session, the root proof, and the
+  measurement payload. The reviewer is the opposite case: fresh per pass, always,
+  so no memory of a previous verdict leaks into the next one.
+
 The gate runs exclusively on the **Playwright CLI** (capture) and the **Figma MCP**
 (EXPECTED) — no delegate substitutes another browser tool for either side. State in
 every `ui-engineer` delegation under this gate that the gate runs after the task, so
@@ -69,6 +105,30 @@ invents waivers, and neither does this orchestrator.
 
 Hard rules:
 
+- **Gate on what capture measured, not only on file existence.** The capture
+  summary must name the elements it measured; when `computed-styles.json` does not
+  cover the containers and controls under verification, send capture back before
+  invoking the reviewer. Three present-but-thin files still produce a wasted
+  reviewer round. Read the file before delegating: an entry that is `null` or
+  carries an `error`, or a companion measurements file bolted on beside it, means
+  the capture is incomplete — re-capture, never review around the gap.
+- **Save every reviewer report to disk yourself.** The reviewer is read-only, so
+  after each verdict write its report verbatim to
+  `iteration-<N>/report.md` before acting on it. A verdict that lives only in this
+  conversation leaves no reviewable trace in the repository. You may add your own
+  observations as a clearly marked `> **Orchestrator note.**` block above the
+  report — never edited into its body.
+- **Reject a report that breaks the contract before you act on it.** It must carry
+  the literal `## Verification Result: <verdict>` heading plus the `Component`,
+  `Artifact Directory`, `Artifact Status`, `Blocker Resolution` and
+  `Recommended Fixes` sections. Missing any of them: rerun the reviewer once on the
+  same artifacts with a stricter handoff naming the missing sections, then treat a
+  second failure as `VERIFICATION NOT RUN`. Do not paraphrase a non-conforming
+  report into shape yourself.
+- **A FAIL with nothing to fix is not a FAIL.** When a report says FAIL but
+  recommends no code change — or blames the evidence rather than the
+  implementation — treat it as `VERIFICATION NOT RUN`: no iteration is consumed, and
+  the next step is re-capture, not a fix delegation.
 - A single FAIL is never terminal and never "good enough" — keep iterating.
 - Never report an item complete while its latest result is FAIL.
 - Every iteration regenerates fresh ACTUAL artifacts; the shared
@@ -113,6 +173,17 @@ user, rerun capture with the same pinned URL, and re-verify:
   item at `VERIFICATION NOT RUN` and resolve with the user.
 - An item may become `ESCALATED` from a blocker only when the user explicitly
   acknowledges it as unresolved.
+- **Every iteration directory ends with a report, or an explanation.** When a
+  capture round is superseded before any reviewer saw it, write a one-line
+  `iteration-<N>/report.md` saying so and why. A directory holding artifacts nobody
+  judged, with nothing recording that, is indistinguishable later from a review that
+  was skipped.
+- **Directory numbers may outrun the iteration count, and that is fine.** A blocker
+  pass still gets its own `iteration-<N>/` for its fresh artifacts, while the
+  5-iteration budget counts only passes that actually judged the implementation.
+  When they diverge, say so in the next report — "counted as the second real
+  iteration; iteration 2 was an artifact blocker" — so the numbering stays
+  auditable.
 
 ## The structured escalation gate (after 5 FAIL iterations)
 

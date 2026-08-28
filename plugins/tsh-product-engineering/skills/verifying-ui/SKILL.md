@@ -35,6 +35,9 @@ main conversation, ask the user. Never fabricate values or proceed on partial ev
 | NEVER | Report PASS while any structure, layout, or >2px dimension difference remains. Structure and layout mismatches are CRITICAL and cannot be waived as "close enough". |
 | NEVER | Invent waiver states ("adjudicated", "accepted deviation", "out of scope for this task"). The only verdicts are PASS, FAIL, and VERIFICATION NOT RUN. A difference may be excluded from the verdict only when an explicit user ruling covering it was forwarded in the delegation — cite that ruling verbatim in the report. Everything else beyond tolerance keeps the item FAIL until the user closes it through the escalation gate. |
 | MUST | Judge dimensions from values as recorded in `computed-styles.json`. If the captured element does not represent the visible rendered box (an inner input instead of its bordered wrapper), that is a capture defect: return `VERIFICATION NOT RUN` requesting re-capture of the right element — never reconstruct values arithmetically. |
+| NEVER | Return FAIL when you recommend no code changes. FAIL means the engineer has something concrete to fix; a pass where nothing is actionable is PASS, and evidence you cannot trust is `VERIFICATION NOT RUN`. Check this before writing the verdict: an empty `Recommended Fixes` and a FAIL verdict together are a contradiction. |
+| MUST | Read `computed-styles.json` as evidence about coverage as well as values: an entry that is `null`, carries an `error`, or is missing for an element under verification means that element was never measured. No PASS may rest on it — return `VERIFICATION NOT RUN` naming the unmeasured elements and asking for re-capture. |
+| MUST | Treat a present-but-wrong measurement as untrustworthy evidence, not as a difference. When a measured entry describes a different element than its label claims — a page banner recorded as the card under verification, an inner input recorded as its bordered wrapper — the artifact is defective: return `VERIFICATION NOT RUN` naming the entry and the element it actually measured. Never convert a capture defect into a FAIL against the implementation. |
 | NEVER | Treat `VERIFICATION NOT RUN` as a pass, a fail, or a consumed iteration. It is a pre-verification blocker state: resolve the blocker, recapture, rerun. |
 | MUST | Re-verify after every fix on fresh artifacts from a new capture pass. Never reuse pre-fix evidence or assume a fix worked. |
 | NEVER | Repeat a failing tool call more than once. After a second failure, stop and return a `VERIFICATION NOT RUN` blocker report describing the failure. |
@@ -79,6 +82,17 @@ specifications/<task-id>/ui-verification/
 
 `figma-expected.png` is never duplicated into `iteration-<N>/` and never re-exported
 per iteration. When no task id exists, use `specifications/<page-slug>/ui-verification/`.
+
+When the pinned Figma node covers more than the component under verification, a
+cropped reference is allowed — but as a second shared file at the verification root,
+named for the region (`figma-expected-<region>.png`), exported once and reused across
+iterations. Never write a design image into `iteration-<N>/`: an iteration directory
+holds this pass's ACTUAL evidence and its report, nothing else.
+
+Evidence for another locale, language or text direction goes in a labeled sibling —
+`ui-verification/<label>/` holding the same three artifacts, for example
+`ui-verification/rtl-arabic/` — and is judged as its own item. Never mix a second
+variant into `iteration-<N>/`, whose artifacts belong to one pass of one variant.
 
 ## PASS Gate (strict)
 

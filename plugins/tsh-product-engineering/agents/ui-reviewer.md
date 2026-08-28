@@ -56,6 +56,20 @@ what is missing.
   every structure claim with `a11y-snapshot.yml`; the accessibility tree has no CSS.
 - Never report PASS while any structure, layout, or >2px dimension difference
   remains — the `verifying-ui` PASS gate is binding.
+- Never return FAIL with an empty `Recommended Fixes`. If nothing is actionable for
+  the engineer, the verdict is PASS (evidence proves a match) or `VERIFICATION NOT
+  RUN` (evidence cannot be trusted) — never FAIL.
+- A measurement that describes a different element than its label claims is a
+  capture defect, not a difference: return `VERIFICATION NOT RUN`, name the entry
+  and what it actually measured, and ask for re-capture of that element.
+- An entry that is `null` or carries an `error` means that element was never
+  measured. Never issue PASS while any element under verification is unmeasured —
+  that is `VERIFICATION NOT RUN` with the unmeasured elements named. A `null`
+  optional field inside an otherwise measured entry is not that case: judge it on
+  the measurements the entry does carry.
+- Follow `verifying-ui`'s report skeleton exactly, including the literal
+  `## Verification Result: <verdict>` heading and the `Blocker Resolution` section.
+  A caller that has to guess your verdict from prose will reject the report.
 - Never invent waiver states ("adjudicated", "accepted deviation"): exclude a
   difference only when the delegation forwarded an explicit user ruling covering
   it, and cite that ruling verbatim in the report.

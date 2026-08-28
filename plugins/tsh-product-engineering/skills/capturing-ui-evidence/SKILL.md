@@ -25,7 +25,16 @@ capture method.
 | MUST | Use only the caller-provided, user-confirmed full URL for the current pass, unchanged. A delegation without that URL is an immediate blocker. |
 | NEVER | Discover, infer, normalize, or replace the URL: no port swaps, no config inspection to pick another URL, no launching or switching to another local app or server. |
 | MUST | Write every artifact into the caller-provided iteration directory with an explicit path. `playwright-cli` defaults to `.playwright-cli/` — that location is WRONG for these artifacts; never rely on default output locations. |
+| MUST | Run every command from the repository root, so the CLI's own `.playwright-cli/` scratch directory stays at the repo root where it is git-ignored. A `.playwright-cli/` directory appearing under `specifications/**` means the working directory was wrong: move the real artifacts to their explicit paths and delete the stray directory. |
+| NEVER | Write a Figma export anywhere other than the verification root. The shared `figma-expected.png` is the reference; when the pinned node covers more than the component under verification, a cropped `figma-expected-<region>.png` may sit beside it, exported once and reused. Never place a design image inside `iteration-<N>/`, which holds this pass's ACTUAL evidence only. |
 | MUST | Collect all three ACTUAL artifacts — `actual.png`, `computed-styles.json`, `a11y-snapshot.yml` — and confirm they exist in the iteration directory. Even one missing artifact makes the verification invalid. |
+| MUST | Shape `computed-styles.json` as a JSON **object**, never a JSON string containing JSON, and never split across companion files. Every entry carries a `label`, the `selector` used, a `textSample` of the element's text, its `rect`, and the computed values. Missing coverage is fixed by re-measuring, not by writing a second measurements file beside it. |
+| MUST | Resolve the component root first and prove it before measuring anything: try whatever stable hooks this project actually offers — test attributes, ids, ARIA landmarks, whatever the page and the plan's Technical Context show it uses — then assert the element contains text the component is known to render. Never assume a hook convention such as `data-testid`; when none exists, the smallest element containing that text is a valid root. No proof, no measurement. |
+| NEVER | Ship an **entry** that is `null` or carries an `error` such as "Element not found". A failed lookup means the selector is wrong, not that the element is absent from the design: fix the selector and re-measure, or return the capture as incomplete with that element named. A file full of nulls passes the file-exists check and then wastes a reviewer round. An optional **field** inside an otherwise measured entry may legitimately be `null` — a control that genuinely has no label, for instance — as long as the entry itself carries real measurements. |
+| NEVER | Use a selector engine the browser does not have. `document.querySelector` takes CSS only — `:contains()` and other jQuery-isms silently match nothing. Match on text in JavaScript instead: filter elements by `textContent`. |
+| MUST | Confirm each measured element IS the element its label claims, before writing the file. Scope every selector to the component under verification — derive it from the component's own root, heading text, or test id — never take the first match of a generic pattern like `[class*="card"]`, which on a real page is as likely to be the page banner as the target card. When a label and the measured element disagree, fix the selector and re-measure rather than shipping the mismatch. |
+| MUST | Make `computed-styles.json` actually cover every container and control under verification, and list the measured elements in the capture summary. A file that exists but measures none of the verified elements is an incomplete capture — report it as such rather than returning success. |
+| MUST | Capture the locale, language and text direction the caller pinned, selecting it the way the caller specified. Record what was actually captured in the summary; when the page renders in a different language than requested, that is a blocker, not a detail to mention in passing. |
 | MUST | When the caller provides a Figma URL and shared verification root, export or ensure the shared `figma-expected.png` via the Figma MCP BEFORE browser capture begins, so auth or page blockers cannot prevent EXPECTED preparation. |
 | NEVER | Fetch a design through the browser: no figma.com navigation, no saving a browser, login, or error screenshot as `figma-expected.png`. Figma MCP unavailable → escalate the blocker. |
 | NEVER | Bypass, fake, seed, or inject authentication state (cookies, tokens, localStorage, sessionStorage) or assume an identity to get past a login or access gate — even when the gate looks trivially circumventable. A genuine login through the app's real sign-in UI, with user-provided inputs, is allowed; bypass never is. Read `./references/authenticated-capture.md` the moment a login redirect appears. |
@@ -67,15 +76,20 @@ capture method.
    boxes, computed width/height, max-width, min-height, padding, margin, gap,
    alignment-relevant properties, and targeted style values needed to explain
    differences. Measure the VISIBLE rendered box — the element that paints the
-   border and background — never only an inner input or text node. For
-   component-library wrappers (MUI, Ant Design, …) capture both the wrapper and the
-   inner control, labeled so the reviewer knows which is which; the design is
-   compared against the wrapper.
+   border and background — never only an inner input or text node. A component
+   library commonly wraps the real control, so find the box by asking which ancestor
+   paints a border or background rather than by hard-coding any library's class
+   names, and capture both that box and the inner control, labeled so the reviewer
+   knows which is which; the design is compared against the box.
 9. **Confirm artifacts landed** — `ls -la "$ARTIFACT_DIR"`: all three files present
    there, and `$FIGMA_EXPECTED` present at the shared root. Anything in
    `.playwright-cli/` or the working directory → move it or re-run with the explicit
    path. Missing `figma-expected.png` → go back to step 1 and export it.
 10. **Clean up** — `playwright-cli close -s <session-name>`, also after aborts.
+    Exception: when the caller says the verification loop continues, leave the named
+    session open and report its name — the next iteration reuses the browser and its
+    login instead of paying for both again. The caller owns closing it when the item
+    ends.
 
 ## Exit codes and escalation
 

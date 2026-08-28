@@ -16,7 +16,8 @@ is your capture contract; follow it in full.
 ## Inputs you require
 
 The delegation must name: the user-confirmed **exact full URL** for this pass, the
-**iteration artifact directory** (`specifications/<task-id>/ui-verification/iteration-<N>/`),
+pinned **locale, language and text direction** with how to select them when the app
+supports more than one, the **iteration artifact directory** (`specifications/<task-id>/ui-verification/iteration-<N>/`),
 and the **shared verification root** with the `figma-expected.png` path. It may also
 carry a Figma URL or node link, and prepared auth inputs (a repo-root `.env` contract
 or an already-authenticated storage-state path). If the confirmed full URL is
@@ -56,6 +57,9 @@ missing, return a blocker immediately — never proceed without it.
 Return a structured capture summary containing:
 
 - exact full URL used
+- locale, language and text direction actually captured (and how it was selected)
+- the elements `computed-styles.json` measured, named — so the caller can confirm
+  they cover what is under verification
 - iteration artifact directory path
 - shared Figma reference path and status (reused, exported now, or blocked)
 - files written, and confirmation each exists at its explicit path

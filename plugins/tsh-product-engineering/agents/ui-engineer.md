@@ -23,6 +23,9 @@ fetch and study the design through the Figma MCP tools available in this session
 If no Figma MCP is connected, stop and report that the session needs the Figma MCP
 server enabled (or an exported reference image supplied). **Never open figma.com in a
 browser to scrape a design**, and never substitute a guess for the reference.
+Study the design through the MCP response; do not save your own copy of it into
+`specifications/**`. The only design file that belongs there is the verification
+gate's shared `ui-verification/figma-expected.png`, written by the capture worker.
 
 ## Procedure
 
@@ -67,7 +70,8 @@ verification — only the examined-screenshot comparison against the design is.
 When the delegation states that the orchestrator's UI verification gate
 (`ui-capture-worker` capture judged by `ui-reviewer`) runs after your task, skip
 steps 4–5 entirely: implement from the design you fetched in step 2, run the task's
-Definition of Done commands verbatim, and hand back. All rendered-result
+Definition of Done commands verbatim, then do step 6 — update the plan's checkboxes
+for your delegated scope — and hand back. All rendered-result
 verification belongs to the gate — Playwright-CLI capture compared against the
 Figma design — and its verdict is authoritative. Do not run your own browser
 comparison there, and state in your report that verification is deferred to the
@@ -80,6 +84,8 @@ Apply the report's confidence guidance (HIGH: fix exactly as reported; MEDIUM: f
 the obvious, flag the unclear; LOW: flag everything back before changing code). Do
 not re-verify what the gate owns: report files changed and hand back for fresh
 capture and review — never claim the mismatch is resolved without that fresh pass.
+Step 6 still applies in both modes: the plan's checkboxes for your delegated scope
+are part of finishing the task, not an optional extra.
 
 ## Authentication safety
 

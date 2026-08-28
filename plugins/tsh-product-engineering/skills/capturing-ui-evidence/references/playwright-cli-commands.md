@@ -77,15 +77,77 @@ playwright-cli --raw eval -s ui-verify "JSON.stringify(...)" > "$ARTIFACT_DIR/co
 `--raw` strips page status and snapshot sections, returning only the result value —
 required when piping to a file. Example measurement payload shape:
 
+The payload contract — object shape, required fields, no nulls, CSS-only selectors —
+is in `capturing-ui-evidence`'s rules table. This is the worked example of it.
+
+Scope the query to the component under verification — never a page-wide generic
+pattern, whose first match is as likely to be the page banner as the target. The
+pattern has three parts, and none of it depends on a UI library: resolve a root the
+caller named, **prove** it is the right element, then measure inside it. `:contains()`
+is jQuery, not CSS — `querySelector` silently matches nothing with it, so find by
+text in JavaScript as the fallback below does.
+
 ```js
+// 1. Resolve the root, then PROVE it. ROOT_TEXT is the proof and is always required;
+//    ROOT_HOOKS is whatever this project actually offers — check the page source and
+//    the plan's Technical Context, and delete the lines that do not apply. Some
+//    repos use test attributes (named data-testid, data-test, data-qa, …), some
+//    expose ids or ARIA landmarks, some offer nothing but rendered text. The text
+//    proof is what makes every one of these safe, so the ladder degrades cleanly.
+const ROOT_TEXT = 'REPLACE-ME: text this component always renders';
+const ROOT_HOOKS = [
+  // '[data-testid="company-details"]',   // a test attribute, if this project has one
+  // '#company-details',                  // a stable id
+  // 'main section[aria-labelledby="…"]', // a landmark or labelled region
+];
+
+const root =
+  ROOT_HOOKS.map((sel) => document.querySelector(sel)).find(Boolean) ??
+  // Last resort, and fine on its own: the smallest element containing the text.
+  // CSS has no :contains(), so filter in JS.
+  [...document.querySelectorAll('section, article, div')]
+    .filter((el) => el.textContent?.includes(ROOT_TEXT))
+    .sort((a, b) => a.getElementsByTagName('*').length - b.getElementsByTagName('*').length)[0];
+
+if (!root) throw new Error(`no element contains "${ROOT_TEXT}" — wrong page or wrong text`);
+if (!root.textContent?.includes(ROOT_TEXT)) {
+  throw new Error(`root does not contain "${ROOT_TEXT}" — wrong element, fix the hook`);
+}
+
+// 2. The visible box of a control is often an ancestor of the focusable element:
+//    walk up until something actually paints a border or a background. This finds
+//    the wrapper in any component library without naming one.
+const visibleBox = (el) => {
+  let node = el;
+  for (let hops = 0; hops < 4 && node && node !== root; hops += 1) {
+    const cs = getComputedStyle(node);
+    const paints =
+      parseFloat(cs.borderTopWidth) > 0 ||
+      (cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent');
+    if (paints) return node;
+    node = node.parentElement;
+  }
+  return el;
+};
+
+// 3. Measure the root and every control, labeling each entry so a mis-scoped
+//    measurement is visible on sight.
+const controls = [...root.querySelectorAll('input, textarea, select, button, [role="textbox"]')];
+
 JSON.stringify(
-  [...document.querySelectorAll('main, header, [class*="card"], [class*="container"], button, nav')]
-    .slice(0, 60)
-    .map((el) => {
+  [
+    { label: 'root', el: root },
+    ...controls.flatMap((el, i) => [
+      { label: `control-${i}-box`, el: visibleBox(el) },
+      { label: `control-${i}-inner`, el },
+    ]),
+  ].map(({ label, el }) => {
       const cs = getComputedStyle(el);
       const r = el.getBoundingClientRect();
       return {
+        label,
         selector: el.tagName + (el.className ? '.' + String(el.className).split(' ').join('.') : ''),
+        textSample: (el.textContent ?? '').trim().slice(0, 40),
         rect: { x: r.x, y: r.y, width: r.width, height: r.height },
         display: cs.display, flexDirection: cs.flexDirection,
         justifyContent: cs.justifyContent, alignItems: cs.alignItems,
@@ -101,13 +163,23 @@ JSON.stringify(
 )
 ```
 
-Adjust the selector list to the containers and controls actually under
-verification, and target the VISIBLE box of each control — the element that paints
-the border and background. Component libraries wrap the real input (in MUI,
-`.MuiInputBase-root` paints the text-field box; the inner `.MuiInputBase-input` is
-smaller by the horizontal padding), so measuring only inner elements makes every
-width comparison wrong. When in doubt, capture the wrapper and the inner control
-both, with a label distinguishing them.
+Set `ROOT_TEXT` to something the component always renders, fill `ROOT_HOOKS` with
+whatever stable hooks this project actually has (none is fine — the text path stands
+on its own), and adjust the control selector list to the elements this project
+renders; keep the three-part shape. Never assume a hook convention: read the page or
+the plan's Technical Context to see what exists here, and if a hook you expected is
+absent, that is a fact about the project, not a reason to stop. Two things make the output
+reviewable: `label` and `textSample` expose a mis-scoped measurement immediately — an
+entry labeled `root` whose `textSample` reads like the page header is a capture
+defect, not a design difference — and capturing both `-box` and `-inner` per control
+means the design is compared against the box that paints the border, while the inner
+value stays available to explain a difference.
+
+The failure this prevents: a component library commonly wraps the real control, so
+the focusable element is smaller than the bordered box a design specifies. Measuring
+only the inner element makes every width comparison wrong by the horizontal padding.
+Finding the wrapper by asking which ancestor paints, rather than by hard-coding a
+library's class names, keeps this working on any stack.
 
 ## Render stabilization
 
