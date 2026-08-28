@@ -22,7 +22,9 @@ does not get written down.
 > [`authoring-claude-extensions`](../authoring-claude-extensions/SKILL.md); anything
 > whose answer is a memory file belongs to
 > [`managing-claude-context`](../managing-claude-context/SKILL.md). This skill loads
-> their rules; it never restates them.
+> their rules; it never restates them. Packaging a session to hand to *someone else* —
+> the maintainer of a plugin that misbehaved — is
+> [`session-dump`](../session-dump/SKILL.md) instead.
 
 ## When to Use
 

@@ -29,6 +29,7 @@ it costs. Read [Scope](#scope) before adding anything.
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 | `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
 | `init` | `/tsh-core:init` | One-shot project setup: audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules and the decision-record index by running the owning skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Safe to re-run — the second pass is a repair |
+| `session-dump` | `/tsh-core:session-dump` | Packages one session into a portable, redacted Markdown file a teammate can hand to whoever maintains the plugin that misbehaved — the conversation, the plugin versions in play, the tool failures, and nothing that matched a secret shape. It writes the file and stops; sending it is the sender's decision |
 | `retro` | `/tsh-core:retro` | A retrospective over the session you are in: finds the friction that should have been tooling — a procedure reconstructed twice, a convention Claude was corrected on repeatedly, a side task that flooded the context — and writes the candidates to a proposal file with their quoted evidence, trigger, primitive and target. Proposes only; builds nothing |
 
 `authoring-claude-extensions` and `managing-claude-context` split cleanly:
@@ -45,6 +46,13 @@ loads that skill's routing table rather than restating it, and it never creates 
 artifact — a retro's entire output is one Markdown file for a human to review. Like
 `init`, it is deliberately not model-invocable, so "should this be a skill or a hook?"
 still routes to `authoring-claude-extensions` and never to it.
+
+`retro` and `session-dump` both read a session and neither changes anything but the one
+file they write. They split on **whose problem it is**. `retro` asks *what should we
+build?* over your own session, and produces a proposal for your own repository.
+`session-dump` asks *how do I show someone else what broke?* and produces an artifact
+that leaves the machine — which is why it, alone in this plugin, redacts, discloses what
+it removed, and stops before sending.
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
@@ -81,12 +89,12 @@ cannot be resolved stops the run — the skill never guesses one.
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
 with `/plugin update`.
 
-Every skill here except `init` and `retro` is model-invocable — Claude loads it when
-the work matches its description, so you don't have to remember to type the command.
-Those two are the deliberate exceptions (`disable-model-invocation: true`): they are
-commands you type, their descriptions are never preloaded, and they cost no routing
-budget. Between them they add seven skills' worth of capability for five skills'
-worth of listing.
+Every skill here except `init`, `retro` and `session-dump` is model-invocable — Claude
+loads it when the work matches its description, so you don't have to remember to type
+the command. Those three are the deliberate exceptions
+(`disable-model-invocation: true`): they are commands you type, their descriptions are
+never preloaded, and they cost no routing budget. Between them they add eight skills'
+worth of capability for five skills' worth of listing.
 
 They keep a short `SKILL.md` and push detail into `references/`, loaded only when
 the task needs it. The **"Load when"** column in the Reference Loading table is
@@ -153,6 +161,66 @@ retro falls back to the conversation in context and says so under **Not analysed
 file. That line is expected behaviour, not a broken install. It will not go looking for
 another way in; a retro that spends its run on transcript access produces no proposal at
 all.
+
+### Using session-dump
+
+`/tsh-core:session-dump` is for the other direction: a plugin **you did not write**
+misbehaved, and the maintainer needs to see it. It writes **one file** —
+`session-dumps/<date>-<slug>.dump.md` — and then stops. It does not send it, post it,
+commit it, attach it, or tell you what went wrong.
+
+```
+/tsh-core:session-dump
+/tsh-core:session-dump the code review that skipped the tests
+```
+
+You will be asked two questions before anything runs — *what were you trying to do*, and
+*what did Claude do instead*. Your own words go into the file verbatim and are the first
+thing the maintainer reads; they cannot be recovered from a transcript at any price. Then
+you pick the session from a list that spans **every Git worktree attached to the
+repository**, so a session from the main checkout is reachable from inside one.
+
+What lands in the file:
+
+| Section | Why the maintainer needs it |
+| :-- | :-- |
+| Sender report | Your account of the problem — the only part no tool can reconstruct |
+| Provenance | Repository, branch, Claude Code version, model, permission mode, whether the session was compacted |
+| TSH plugins | Every installed `tsh-*` plugin with version, scope and commit — plus the versions the transcript shows were *actually loaded*, which wins when the two disagree |
+| Extension activity | Skills invoked, slash commands typed, subagents spawned, MCP tools used |
+| Friction signals | Repeated tool calls, tool failures with their error text, permission denials, likely corrections |
+| Conversation | Numbered user turns with Claude's reply and the tools it reached for |
+
+**Never in it:** successful tool output, file contents, diffs or attachments. A dump is
+bounded on purpose, and the file declares everything it left out, including any turns cut
+to fit.
+
+**Read it before you send it.** Values matching known secret shapes — API keys, tokens,
+JWTs, private-key blocks, `user:password@host` URLs, `SOMETHING_SECRET=` assignments — are
+replaced before anything reaches disk, and the file counts what it replaced. That is a
+floor, not a guarantee: pattern matching cannot catch a password typed as prose, an
+internal hostname, or a client's name. Placeholders like `API_KEY=${MY_VAR}` are left
+alone deliberately, because an unset variable is very often the actual bug.
+
+**Two things to do afterwards.** Add `session-dumps/` to your `.gitignore` — a dump is a
+transcript sitting in a working tree, one `git add -A` from a commit — and delete the file
+once it has been sent.
+
+**Check the version first.** The dump names the plugin versions you have installed. If
+yours is behind, `/plugin update` is a cheaper first move than a dump, and an
+already-fixed bug costs a maintainer a day to rediscover.
+
+**Some sessions should not be packaged at all**, and the skill will say so rather than
+produce a smaller dump as a compromise: a client agreement that covers repository
+contents, a session whose substance *is* the confidential material, or a sender who does
+not want to read the file. The fallback is usually enough — describe the problem, name the
+plugin and version, paste the one error message.
+
+Like `retro`, it reads the transcript by running `node` through Bash, so the first use
+prompts for approval. It makes at most two invocations — one to list, one to write — and
+on failure reports the one-line reason and stops. It will not improvise another route to
+your `.jsonl`; every alternative produces an unredacted file, which is the outcome the
+whole command exists to prevent.
 
 ### The Atlassian connector
 
