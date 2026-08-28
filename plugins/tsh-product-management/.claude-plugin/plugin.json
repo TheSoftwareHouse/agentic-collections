@@ -2,7 +2,7 @@
   "name": "tsh-product-management",
   "displayName": "TSH Product Management",
   "description": "Workshop-to-backlog business analysis: Jira-ready epics and user stories, systematic quality review, and an outcome-based delivery roadmap, behind five human review gates.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

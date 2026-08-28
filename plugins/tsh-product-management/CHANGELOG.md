@@ -12,6 +12,39 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.0] - 2026-08-27
+
+### Added
+
+- **A per-product domain dictionary**, produced and maintained end to end by the new
+  `managing-domain-dictionaries` skill and its entry point,
+  `/tsh-product-management:domain-dictionary`. This is not domain-driven design —
+  the dictionary records the client's own vocabulary: canonical terms, their
+  source-language surface forms, and where a UI label differs from the identifier —
+  through Harvest, Reconcile and Interview modes, checked by eleven review passes
+  and reconciled against a live codebase without ever editing it. The skill ships
+  as a 103-line `SKILL.md` plus five references: `dictionary-format.md`,
+  `elicitation-protocol.md`, `review-passes.md`, `reconciling-with-code.md` and
+  `handoff-and-portability.md`.
+- **A new read-only agent, `terminology-extractor`** (`Read`, `Grep`, `Glob`). It
+  runs the harvest reading pass over supplied material and the identifier sweep
+  Reconcile mode diffs against the term table. It writes nothing and asks nobody —
+  every dictionary write and every question to the client stays with the skill.
+- **A new quality-review pass, Pass K — Terminology Consistency**, added to
+  `reviewing-backlog-quality` and its `analysis-passes.md`. It flags a story using a
+  banned term, a synonym where a canonical term exists, a term used with two
+  meanings and no disambiguating context, or a status value outside the entity's
+  state set. It runs in both Lite and Full mode, but only when a dictionary exists
+  for the project — with no dictionary, it is skipped and the skip is recorded.
+- **The rest of the workflow now knows the dictionary exists.**
+  `orchestrating-business-analysis` suggests or consumes a project's dictionary and
+  tracks it as a project artifact — no new gate; the five BA gates are unchanged.
+  `extracting-epics-and-stories` uses canonical terms and keeps an
+  unresolved-terms inbox. `formatting-jira-issues` uses canonical terms in issue
+  titles and descriptions. `processing-workshop-transcripts`,
+  `analyzing-discovery-context` and the `transcript-cleaner` and
+  `discovery-analyst` agents harvest term candidates as they read.
+
 ## [0.2.0] - 2026-08-21
 
 ### Added

@@ -62,3 +62,9 @@
 > "<exact quote>"
 > — <speaker-name>, regarding <topic>
 
+## Terminology
+
+| Canonical Term | Source Term(s) | Inflected Forms |
+|---|---|---|
+| <canonical-term> | <term(s) as said by the client> | <other-surface-forms-encountered> |
+

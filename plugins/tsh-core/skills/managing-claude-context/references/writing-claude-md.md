@@ -131,6 +131,20 @@ Treat these files as code:
 When the file is already too large, [`auditing-for-drift.md`](./auditing-for-drift.md)
 covers trimming an existing file rather than writing a new one.
 
+## 8. The vocabulary block
+
+A repository with a domain dictionary carries a dedicated block in the root file
+instead of the artifact itself. Budget it at **~15 lines**:
+
+- the canonical-language rule — read the dictionary before naming anything new
+- the handful of banned substitutions that matter most, not the full term table
+- a backticked pointer to the full dictionary, `docs/domain-dictionary.md` by
+  default — never a bare `@` import, which would load the whole artifact at launch
+
+The full dictionary is never inlined here, at any size. See
+[`adopting-a-domain-dictionary.md`](./adopting-a-domain-dictionary.md) for the
+two-tier shape this block is half of.
+
 ## Sources
 
 Claude Code documentation, verified 2026-08-17:

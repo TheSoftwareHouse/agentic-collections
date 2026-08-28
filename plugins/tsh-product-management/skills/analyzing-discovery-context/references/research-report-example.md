@@ -53,3 +53,7 @@ All missing information and gaps in task description, together with provided ans
 ### Question 2
 #### <question>
 <answer>
+
+## Term Candidates
+
+- <canonical-term> - <source-language term(s) found in the material> - <inflected or surface form, if any>

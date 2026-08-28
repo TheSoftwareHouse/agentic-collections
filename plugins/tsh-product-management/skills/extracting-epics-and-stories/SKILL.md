@@ -35,6 +35,7 @@ invent one.
 | MUST | Present a 15-story breakdown as a file plus one disposition question — never one popup per story. |
 | NEVER | Use implementation jargon. A stakeholder must understand what will be delivered without technical knowledge. |
 | NEVER | Treat a story as the primary delivery unit. Stories are implementation detail beneath a contracted epic. |
+| NEVER | Mint a canonical term here. A term the project's domain dictionary does not contain goes to its unresolved-terms inbox, not into the backlog as a new canonical form. |
 
 ## Reference Loading
 
@@ -56,8 +57,11 @@ would have asked under `## Open Questions`.
 1. **Review every input**: `workshop-context-summary.md` if Explore Mode ran, the
    cleaned transcript as primary source, Figma/FigJam flows and annotations, PDFs
    (via `Read`, with an explicit `pages` range beyond 10 pages), any other supplied
-   documents, and the project baseline if one exists. Build the full picture before
-   extracting anything.
+   documents, and the project baseline if one exists. If
+   `specifications/projects/<project-name>/domain-dictionary.md` exists, consume it
+   as canonical terms; otherwise point the user at
+   `/tsh-product-management:domain-dictionary` later rather than inventing terms now.
+   Build the full picture before extracting anything.
 2. **Draft the intent brief** — goal, in scope, out of scope, key stakeholders and
    actors, likely epic candidates, baseline overlap, open questions. Scope
    decisions only, no backlog detail.

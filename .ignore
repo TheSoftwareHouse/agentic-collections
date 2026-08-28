@@ -1,0 +1,6 @@
+# .ignore — read by ripgrep and by Claude Code's file search, not by git.
+# Overrides .gitignore (see `man rg`, "precedence of ignore rules").
+# Specs are deliberately untracked, but Claude must still index them so they can be
+# @-mentioned. Git never reads this file, so they stay uncommitted either way.
+!spec/
+!specifications/

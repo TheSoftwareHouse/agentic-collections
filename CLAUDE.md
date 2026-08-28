@@ -98,7 +98,9 @@ mechanics to `/tsh-core:authoring-claude-extensions`. The `.claude/rules/` files
 fire only when Claude *reads* a matching file, so they cannot reach you while you are
 writing a new one.
 
-`spec/` holds implementation specifications and is gitignored.
+`specifications/` holds implementation specifications and plans, and is gitignored
+along with `spec/`. Both are re-included in `.ignore` so Claude Code still indexes
+them for `@`-mentions — they are readable but never committed.
 
 ## Naming
 

@@ -50,6 +50,14 @@ Leave `paths` off only when the rule genuinely applies to every session regardle
 of which files are open — and prefer putting that in `CLAUDE.md` instead, where a
 reader will look for it.
 
+An edit-time domain dictionary rule is a worked instance of this scoping: `paths:`
+over the source globs a canonical term would appear in, then **pointing at** the
+dictionary rather than restating it — the file path in backticks plus the naming
+constraint, not the term table copied into the rule body. See
+[`adopting-a-domain-dictionary.md`](./adopting-a-domain-dictionary.md) §3 for the
+exact form; restating the table here creates a second copy that drifts from the
+first the next time only one of them is edited.
+
 ## 3. Glob patterns
 
 | Pattern | Matches |

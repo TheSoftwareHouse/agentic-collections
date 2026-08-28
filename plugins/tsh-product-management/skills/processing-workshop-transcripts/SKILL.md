@@ -30,6 +30,7 @@ contradictions between sources. It produces one cleaned transcript and stops.
 | MUST | Keep the exact wording of requirements, constraints and conflicting viewpoints in a Preserved Context section, with attribution. |
 | NEVER | Invent metadata, roles or decisions the source does not state. Record "not stated in source" instead. |
 | NEVER | Infer the contents of a scanned PDF that returns no text. Report it and ask for a text-based version. |
+| NEVER | Normalise or paraphrase the client's own terminology while cleaning — preserve the term as said, including inflected surface forms, in the transcript's Terminology section. |
 
 ## Reference Loading
 
@@ -72,7 +73,8 @@ message and collect anything you would have asked under `## Open Questions`.
    [`cleaned-transcript-example.md`](./references/cleaned-transcript-example.md) and
    save to `specifications/<workshop-name>/cleaned-transcript.md`. Check before
    finishing: nothing business-relevant was dropped, topics are logically grouped,
-   and decisions, action items and open questions are complete.
+   decisions, action items and open questions are complete, and the Terminology
+   section captures every client term encountered, in the client's own words.
 
 ## Related Skills
 

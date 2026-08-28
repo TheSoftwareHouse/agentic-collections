@@ -23,8 +23,9 @@ layer returns empty content — report that rather than inferring what it said.
 
 Follow the `processing-workshop-transcripts` skill preloaded into your context, in
 full: identify the format and metadata, tag participants, remove non-business
-content, group by topic, extract decisions, action items and open questions, and
-preserve the quotes whose exact wording matters.
+content, group by topic, extract decisions, action items and open questions,
+preserve the quotes whose exact wording matters, and collect the client's own terms
+and their inflected surface forms as terminology candidates.
 
 Two boundaries specific to your role:
 
@@ -54,5 +55,6 @@ Emit only the structured result, no preamble:
 ## Action Items
 ## Open Questions
 ## Preserved Context     (exact quotes where wording matters, with attribution)
+## Terminology           (client terms and their inflected surface forms, one entry per lemma)
 ## Ambiguities for BA Analysis
 ```

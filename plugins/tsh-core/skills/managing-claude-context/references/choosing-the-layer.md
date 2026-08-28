@@ -141,6 +141,16 @@ there is only one copy of the content:
 Writing the same guidance into both guarantees they diverge, and a contradiction
 between layers surfaces as inconsistency rather than as an error.
 
+A domain dictionary is a worked instance of this pairing, stretched across three
+layers instead of two: a ~15-line vocabulary block in root `CLAUDE.md` states the
+canonical-language rule and points at the full artifact; the full dictionary lives
+on demand at `docs/domain-dictionary.md`, read only when Claude follows that
+pointer; and an edit-time rule in `.claude/rules/` carries the same constraint over
+source globs, pointing at the same file rather than restating its term table. One
+copy of the content, three arrival times — see
+[`adopting-a-domain-dictionary.md`](./adopting-a-domain-dictionary.md) for the full
+shape.
+
 ## 6. Auto memory is not yours to write
 
 Claude Code maintains its own memory at `~/.claude/projects/<project>/memory/`,

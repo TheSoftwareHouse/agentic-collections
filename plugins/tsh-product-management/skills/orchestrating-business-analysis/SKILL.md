@@ -65,7 +65,9 @@ In `specifications/<workshop-name>/`: `.gates.md` (ledger), `cleaned-transcript.
 `workshop-context-summary.md` (Explore Mode only), `intent-brief.md`,
 `extracted-tasks.md`, `quality-review.md`, `.roadmap-proposal.md` (draft),
 `jira-tasks.md`. Outliving the session, in
-`specifications/projects/<project-name>/`: `roadmap.md` and `task-baseline.md`.
+`specifications/projects/<project-name>/`: `roadmap.md`, `task-baseline.md` and
+`domain-dictionary.md` — the dictionary keeps its own gate ledger,
+`.dictionary-gates.md`, at that same project scope, not `.gates.md`.
 
 ## Procedure
 
@@ -84,7 +86,9 @@ epics or stories unless the user asks to continue.
    designs, PDFs and other documents, plus
    `specifications/projects/<project-name>/task-baseline.md` if it exists. This is
    the phase that most often justifies parallel workers; suggest it and get
-   confirmation.
+   confirmation. Check `specifications/projects/<project-name>/domain-dictionary.md`
+   the same way: consume it as canonical terms if present, otherwise suggest
+   `/tsh-product-management:domain-dictionary`.
 4. **Draft the intent brief** with
    [`extracting-epics-and-stories`](../extracting-epics-and-stories/SKILL.md), then run
    **Gate 0** and record it.
@@ -139,5 +143,6 @@ linked from the procedure step that uses it:
 [`analyzing-discovery-context`](../analyzing-discovery-context/SKILL.md),
 [`extracting-epics-and-stories`](../extracting-epics-and-stories/SKILL.md),
 [`reviewing-backlog-quality`](../reviewing-backlog-quality/SKILL.md),
-[`planning-delivery-roadmaps`](../planning-delivery-roadmaps/SKILL.md) and
-[`formatting-jira-issues`](../formatting-jira-issues/SKILL.md).
+[`planning-delivery-roadmaps`](../planning-delivery-roadmaps/SKILL.md),
+[`formatting-jira-issues`](../formatting-jira-issues/SKILL.md) and
+[`domain-dictionary`](../domain-dictionary/SKILL.md).

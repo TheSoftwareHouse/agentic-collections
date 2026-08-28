@@ -32,6 +32,7 @@ No roadmap content reaches Jira.
 | MUST | Present the sync summary — create / update / skipped, with counts — and get approval before pushing. |
 | MUST | Write each returned Jira key back into `jira-tasks.md` immediately after that issue is created, not in a batch at the end. |
 | MUST | Review formatted output from the file with one disposition question, never a popup per task. |
+| MUST | Use the project's canonical terms in issue titles and descriptions when a domain dictionary exists — the `UI label` column is not the identifier and must never replace it in a title. |
 | NEVER | Reformat, reword or update a protected task, locally or in Jira. |
 | NEVER | Recreate a task that already has a Jira key — update it. |
 
@@ -56,7 +57,8 @@ are orchestrator-only.
 ## Procedure
 
 1. **Load the inputs** — [`benchmark-template.md`](./references/benchmark-template.md)
-   for the expected structure, and `extracted-tasks.md` for the content.
+   for the expected structure, `extracted-tasks.md` for the content, and the
+   project's domain dictionary, if one exists, for canonical terms.
 2. **Format each epic**: summary per the template's naming convention; a description
    carrying business overview, business value and success criteria; acceptance
    criteria transferred from the extraction; suggested labels drawn from the epic's
