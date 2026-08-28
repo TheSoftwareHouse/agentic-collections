@@ -34,11 +34,13 @@ backlog instead.
 | :-- | :-- | :-- |
 | `analyze-materials` | `/tsh-product-management:analyze-materials` | Entry point for the full workflow: materials or an existing Jira backlog in, reviewed epics and stories out |
 | `explore-materials` | `/tsh-product-management:explore-materials` | Entry point for Explore Mode: a business-context summary, deliberately stopping short of any backlog item |
+| `domain-dictionary` | `/tsh-product-management:domain-dictionary` | Entry point for the per-product domain dictionary: canonical business terms, not domain-driven design |
 | `orchestrating-business-analysis` | `/tsh-product-management:orchestrating-business-analysis` | Runs the workflow: the five gates, the delegation, the persistent writes, the Jira push |
+| `managing-domain-dictionaries` | `/tsh-product-management:managing-domain-dictionaries` | Harvest, Reconcile and Interview modes for the dictionary, checked by eleven review passes and reconciled against a live codebase without editing it |
 | `processing-workshop-transcripts` | `/tsh-product-management:processing-workshop-transcripts` | Raw transcript to a structured document — topics, decisions, action items, preserved quotes |
 | `analyzing-discovery-context` | `/tsh-product-management:analyzing-discovery-context` | What is known, where it came from, and what is still missing — before committing to scope |
 | `extracting-epics-and-stories` | `/tsh-product-management:extracting-epics-and-stories` | Intent brief, epics as demonstrable vertical slices with a delivery contract, stories with source traceability |
-| `reviewing-backlog-quality` | `/tsh-product-management:reviewing-backlog-quality` | Eleven analysis passes over a domain model built from the tasks, as individually accept-or-reject suggestions |
+| `reviewing-backlog-quality` | `/tsh-product-management:reviewing-backlog-quality` | Twelve analysis passes over a domain model built from the tasks, as individually accept-or-reject suggestions |
 | `planning-delivery-roadmaps` | `/tsh-product-management:planning-delivery-roadmaps` | Markdown-only roadmap: client-facing outcome waves and internal coordination, linked by stable epic IDs |
 | `formatting-jira-issues` | `/tsh-product-management:formatting-jira-issues` | The benchmark template, the Gate 2 push, post-push verification, and Jira-to-local import |
 | `transcript-cleaner` (agent) | `@tsh-product-management:transcript-cleaner` | Cleans a transcript and returns it — haiku |
@@ -47,8 +49,10 @@ backlog instead.
 | `backlog-quality-reviewer` (agent) | `@tsh-product-management:backlog-quality-reviewer` | Runs assigned review passes and returns structured findings — opus |
 | `roadmap-planner` (agent) | `@tsh-product-management:roadmap-planner` | Reconciles stable epic identity and proposes the waves — opus, never fanned out |
 | `jira-formatter` (agent) | `@tsh-product-management:jira-formatter` | Applies the benchmark template and prepares verification diffs — haiku |
+| `terminology-extractor` (agent) | `@tsh-product-management:terminology-extractor` | Extracts term candidates from material and sweeps codebase identifiers for Reconcile mode — sonnet |
 
-The two entry points are `disable-model-invocation: true` — commands, not routing
+The three entry points — `analyze-materials`, `explore-materials` and
+`domain-dictionary` — are `disable-model-invocation: true` — commands, not routing
 surfaces, so they cost nothing until you type them. Everything else is
 model-invocable and routes on how people describe the work.
 
@@ -105,9 +109,11 @@ it, design analysis is reported as blocked rather than silently skipped.
 
 Session artifacts live in `specifications/<workshop-name>/` — the gate ledger, the
 cleaned transcript, the intent brief, the extracted tasks, the quality review, the
-roadmap draft and the Jira-ready tasks. Two artifacts outlive the session in
-`specifications/projects/<project-name>/`: the approved `roadmap.md` and the
-`task-baseline.md` that gives the next workshop its continuity context.
+roadmap draft and the Jira-ready tasks. Four artifacts outlive the session in
+`specifications/projects/<project-name>/`: the approved `roadmap.md`, the
+`task-baseline.md` that gives the next workshop its continuity context, and
+`domain-dictionary.md`, which keeps its own gate ledger, `.dictionary-gates.md`, at
+that same project scope.
 
 ## Not covered here
 

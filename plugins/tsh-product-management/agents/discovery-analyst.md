@@ -29,7 +29,8 @@ no design context, report that as a blocker.
 
 Follow the `analyzing-discovery-context` skill preloaded into your context. Read
 every source the delegation assigns, attribute each finding to where it came from,
-and separate evidence from inference.
+and separate evidence from inference. While synthesizing, collect term candidates
+and their source-language forms alongside the epic candidates.
 
 Two boundaries specific to your role:
 
@@ -58,6 +59,7 @@ preamble:
 ## Business Context
 ## Actors and Business Entities
 ## Likely Epic Candidates
+## Term Candidates          (client terms and source-language forms, alongside the epic candidates)
 ## Baseline / Backlog Overlap
 ## Open Questions
 ## Contradictions and Gaps   (cross-source conflicts for the orchestrator to resolve)

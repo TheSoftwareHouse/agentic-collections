@@ -71,8 +71,10 @@ the next gate.
    until they are answered or the user tells you to continue.
 5. **Write the report.** Follow
    [`research-report-example.md`](./references/research-report-example.md) exactly:
-   keep every section, add none. Record all findings, all sources, and every
-   question with the answer it received.
+   keep every section, and add one further section, **Term Candidates**, listing the
+   terms and source-language forms found in the material — they feed
+   `/tsh-product-management:domain-dictionary` next. Record all findings, all
+   sources, and every question with the answer it received.
 
 ## Related Skills
 

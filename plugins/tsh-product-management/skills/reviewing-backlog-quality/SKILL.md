@@ -55,8 +55,11 @@ structured suggestions as your final message.
 
 | Mode | Use when | Active passes |
 | --- | --- | --- |
-| Lite | Default for small, low-risk workshops — roughly ≤3 epics and ≤12 stories, unless the user asks for Full | A, B, E, H, I, then R |
-| Full | Larger workshops, regulated domains, high-risk scope, or on request | A–J, then R |
+| Lite | Default for small, low-risk workshops — roughly ≤3 epics and ≤12 stories, unless the user asks for Full | A, B, E, H, I, K, then R |
+| Full | Larger workshops, regulated domains, high-risk scope, or on request | A–J, K, then R |
+
+Pass K runs in both modes only when a project dictionary exists; with none, skip it
+and record the skip in the review output.
 
 ## Procedure
 
@@ -74,7 +77,9 @@ structured suggestions as your final message.
    involved, key capabilities), **entities** (where each is created, read, updated,
    deactivated), and the **relationships** between them. This is a business map of
    what the system manages, not a technical data model, and it is what makes the
-   gap detection systematic.
+   gap detection systematic. Where a project dictionary exists, seed the model from
+   it; where one does not, offer the model built here to
+   `/tsh-product-management:domain-dictionary` as a starting point.
 4. **Run the active passes**, following
    [`analysis-passes.md`](./references/analysis-passes.md). Apply the protected-status
    filter first.

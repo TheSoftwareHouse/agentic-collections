@@ -3,8 +3,9 @@
 Each pass is independent and produces zero or more findings. A finding is a
 potential gap or improvement that becomes a suggestion in step 6 of the skill.
 
-Lite mode runs **A, B, E, H, I**. Full mode runs **A through J**. Both modes then
-run the mandatory **Pass R**.
+Lite mode runs **A, B, E, H, I**. Full mode runs **A through J**. Pass K runs in
+both modes when a project dictionary exists; with none, skip it and record the skip
+in the review output. Both modes then run the mandatory **Pass R**.
 
 Before running any pass, filter out every task whose status is Done, Cancelled or
 PO APPROVE. Those tasks may still be referenced as dependencies, but they generate
@@ -105,12 +106,27 @@ the project with `WebSearch` and `WebFetch`, and check them against the task lis
 
 Findings from this pass are **Medium** or **Low** confidence — never High — and
 must cite what was found so the user can judge the source. If neither research
-tool is available, run the other nine passes and state that Pass J was skipped
+tool is available, run the other ten passes and state that Pass J was skipped
 rather than speculating.
 
 *Example patterns*: a financial application with no audit logging; a healthcare
 application with no data-retention policy; e-commerce with no cancellation or
 refund flow.
+
+## Pass K — Terminology Consistency
+
+Check the task list against the project dictionary at
+`specifications/projects/<project-name>/domain-dictionary.md`, produced by
+`/tsh-product-management:domain-dictionary`. A finding is generated for a story
+using a banned term, a story using a synonym where a canonical term exists, a term
+used with two meanings and no context to separate them, or a status value not in
+the entity's state set. This pass runs in both Lite and Full mode, but only when a
+dictionary exists for the project — with no dictionary, skip it and record the skip
+in the review output.
+
+*Example patterns*: a story says "customer" where the dictionary canonicalizes
+"account holder"; a booking story sets status to "archived" when the entity's
+dictionary state set is Draft/Active/Closed.
 
 ## Pass R — Pre-Roadmap Delivery-Readiness (mandatory in both modes)
 
@@ -157,4 +173,5 @@ ordinary finding per epic — not six findings per legacy epic.
 | H | Error State and Edge Case Coverage | High | ADD_ACCEPTANCE_CRITERION |
 | I | Notification and Communication Gaps | High | NEW_STORY or ADD_ACCEPTANCE_CRITERION |
 | J | Domain-Specific Research | Low–Medium | Varies |
+| K | Terminology Consistency | High | MODIFY_STORY |
 | R | Pre-Roadmap Delivery-Readiness | High | MODIFY_EPIC |
