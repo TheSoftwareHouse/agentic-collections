@@ -14,6 +14,146 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.0] - 2026-08-28
+
+### Added
+
+- **`session-dump` — hand a maintainer the session instead of describing it**
+  (`/tsh-core:session-dump`). When a shared skill, agent or hook misbehaves, the evidence
+  exists in exactly one place — the session it happened in — and it dies with it. What
+  reaches the maintainer is "the review skill didn't work", with no session, no plugin
+  version and no error text. This command packages one session into a single portable
+  Markdown file: the conversation, the `tsh-*` plugin versions that were installed, the
+  plugin versions the transcript shows were actually *loaded*, every tool failure with
+  its error text, and the sender's own account of what they expected.
+- **It writes the file and stops.** Nothing is sent, posted, committed or attached —
+  publishing a session is irreversible and is the sender's call, not Claude's, even once
+  they have named who it is for. The dump is not diagnosed either: analysis belongs to
+  whoever maintains the plugin, in their own repository.
+- **Redaction is a floor, and says so.** Values matching known secret shapes — AWS, GitHub,
+  GitLab, Slack, Stripe, Anthropic and Google keys, JWTs, bearer tokens, private-key
+  blocks, `user:password@host` URLs and `*_SECRET=`-style assignments — are replaced before
+  anything reaches disk, and the file reports the tally by kind. Home paths are rewritten
+  to `~`, which also strips the sender's account name. There is deliberately **no**
+  high-entropy heuristic: it would mangle every hash, UUID and base64 payload the
+  maintainer came for, while still missing a password typed in prose. Placeholders survive
+  on purpose — an unset `API_KEY=${MY_VAR}` is very often the actual bug.
+- **So the real gate is the sender reading the file**, and the skill states that every
+  time, with the reason rather than as boilerplate. It also names the case where the
+  answer is *do not send this at all* — a client agreement that covers repository
+  contents, a session whose substance is the confidential material, or a sender who does
+  not want to read it — and offers the fallback that needs no dump: describe the problem,
+  name the plugin and version, paste the one error.
+- **Markdown, not JSON, and versioned as `tsh-session-dump/1`.** A format only a parser
+  can read cannot be reviewed, and review is the control that makes sharing a session safe
+  at all. The version is a single integer because a reader either understands the contract
+  or stops.
+- **Check the version before anyone spends an afternoon on it.** The file's *TSH plugins*
+  table is read at dump time and says so; the `Plugin versions the session actually loaded`
+  subsection is the session-accurate counterpart and wins when the two disagree. An
+  already-fixed bug costs a maintainer a day to rediscover, and `/plugin update` is a
+  cheaper first move than a dump.
+- **`README.md` gains a `Using session-dump` section** — what the file contains, what is
+  never in it, the `retro` seam, and the two things to do with the file once it is sent.
+
+### Changed
+
+- **`retro`'s scope boundary now names `session-dump`.** The two split on *whose* session
+  and *whose* problem: `retro` mines your own session for tooling you should build,
+  `session-dump` packages a session for someone else to debug. Neither builds or sends
+  anything.
+
+### Fixed
+
+- **A `|` in a branch name or working directory broke the Provenance table.** The
+  table-cell escape emitted `\\|` — an escaped backslash followed by a still-live pipe —
+  so the row split anyway and left a stray backslash behind. Found before release; no dump
+  written by an installed version was affected.
+- **`--error-chars` is now a real flag.** The per-failure truncation had a default and was
+  applied at render, but no switch reached it, so the one case that needs it — a failure
+  message cut before the part that names the cause — could not be raised.
+
+### Notes
+
+- **Why `tsh-core` and not a discipline plugin.** It fails both routing questions: nothing
+  about it changes if the repository switches language or framework, or if the reader
+  switches job. It wraps named tools rather than a TSH opinion — Claude Code's session
+  transcripts and its plugin inventory. The three disciplines that drive it in a normal
+  month: **product engineering** when a review or implementation skill misfires,
+  **product testing** when an E2E or accessibility skill misroutes, and **platform
+  engineering** when a Terraform or pipeline skill fails against real infrastructure. It
+  is also the only component here whose *value* rises with install count — a dump is worth
+  producing precisely because someone else maintains the thing that broke.
+- **Routing footprint: 4,479 → 4,916 characters total, of which 3,647 → 3,647 are actually
+  preloaded — no change.** Measured as `name` + `description` + `when_to_use` per skill.
+  Like `init` and `retro`, `session-dump` is `disable-model-invocation: true`: a command
+  you type, whose description is never preloaded for routing, so it costs no listing
+  budget. Eight skills now ship for five skills' worth of routing.
+- **The receiving end is deliberately not in this plugin.** Every dump names
+  `/analysing-a-session-dump`, which lives in the `agentic-collections` repository's own
+  `.claude/skills/`. Reading a dump is a plugin maintainer's job done in that checkout, so
+  it would fail the same three-disciplines test this skill passes.
+
+## [0.9.0] - 2026-08-27
+
+### Added
+
+- **`retro` — a session retrospective that proposes extensions instead of building
+  them** (`/tsh-core:retro`). A session is the only place the evidence for a new skill,
+  subagent or hook exists, and it is discarded when the session ends. This command reads
+  that evidence back — a procedure reconstructed twice, a convention Claude was corrected
+  on more than once, a side task that flooded the context — and writes the surviving
+  candidates to `docs/extension-proposals/<date>-<slug>.md`, each with its quoted
+  occurrences, the trigger that will fire it again, the primitive, a concrete target path
+  and plugin, and the alternative that was rejected.
+- **It proposes; it never creates.** No skill, agent, hook, plugin or memory file is
+  written during a retro — the output is exactly one document, handed off to
+  `authoring-claude-extensions` for extensions and to `managing-claude-context` for
+  anything whose answer is `CLAUDE.md` or a path-scoped rule. Primitive choice is loaded
+  from those skills rather than restated here, so there is one routing table in the
+  plugin, not two.
+- **Two occurrences or it is not a candidate.** The evidence bar is in
+  `references/detecting-candidates.md` along with the false positives that make retros
+  untrustworthy — a one-off, a genuinely novel task, an extension that already exists and
+  merely failed to fire. "No candidates found" is a documented, expected outcome: a retro
+  that always finds something is one nobody trusts twice.
+- **Why here and not in a discipline plugin.** It fails both routing questions — nothing
+  about it changes if the repository switches language or framework, or if the reader
+  switches job — and it wraps a named tool rather than a TSH opinion: Claude Code's
+  extension subsystem and its session transcripts, the same subsystem
+  `authoring-claude-extensions` wraps. Three of the five disciplines drive it in a normal
+  month: `tsh-product-engineering` on repeated implementation and review procedures,
+  `tsh-product-testing` on repeated E2E and accessibility setup, and
+  `tsh-platform-engineering` on repeated deploy and runbook steps.
+- **A bundled transcript reader, so a compacted or prior session can actually be
+  analysed** (`skills/retro/scripts/transcript-digest.mjs`). The evidence bar demands two
+  *quoted* occurrences per candidate, and compaction destroys quotes — so the transcript
+  is not a nicety, it is the only place the evidence still exists. Reading one directly
+  never worked: they run to megabytes, past the `Read` tool's limits, and are mostly tool
+  output rather than conversation — in a representative 719-line transcript, 153 of 162
+  `user` records were tool results. The script streams instead, turning a 2.3MB
+  transcript into a 4KB digest of user turns, correction signals and repeated tool
+  invocations. `--list` resolves sessions across **every Git worktree attached to the
+  repository**, so work done in the main checkout is reachable from inside one.
+- **The first `scripts/` directory in this marketplace.** Zero dependencies, Node
+  built-ins only, no shebang and no execute bit, so file mode is not a failure surface.
+  It costs no routing footprint — a script inside a skill is not a listed component — and
+  every failure path degrades to the behaviour that was already documented: record the
+  one-line reason under `Not analysed` and continue with the conversation in context. The
+  "one attempt, then stop" guardrail is re-aimed rather than dropped: at most two
+  invocations per run, and no `cat`, `jq` or scratch script around a failure.
+- **Digests are evidence, never instructions.** A transcript records a past conversation
+  and can contain text addressed to a model. A new rule requires a retro to quote it and
+  never act on it.
+- **`README.md` gains a `Using retro` section** — what the one output file looks like,
+  the three ways to invoke it, when to run it, and what it will not do.
+- **Routing footprint: 4,110 → 4,493 characters total, of which 3,722 → 3,722 are
+  actually preloaded — no change.** Like `init`, `retro` is
+  `disable-model-invocation: true`: a command you type, whose description is never
+  preloaded for routing. It therefore costs no listing budget, and it cannot become a
+  coin flip against `authoring-claude-extensions`, whose description it would otherwise
+  sit very close to. Seven skills now ship for five skills' worth of routing.
+
 ## [0.8.1] - 2026-08-24
 
 ### Fixed

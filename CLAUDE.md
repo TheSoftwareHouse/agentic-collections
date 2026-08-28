@@ -201,7 +201,9 @@ them as errors. To test the catalog end to end without pushing, see
 Authoring rationale is in `.claude/rules/`, one file per concern, loaded only when you
 read a file it governs — the pointers above say which and when. Anything needed
 *before* a file exists is a skill instead: `/contributing-a-plugin-component` to place
-and name a component, `/releasing-a-plugin-change` to ship it.
+and name a component, `/releasing-a-plugin-change` to ship it, and
+`/analysing-a-session-dump` to read a session a teammate sent because something here
+misbehaved.
 
 ## Reference
 
