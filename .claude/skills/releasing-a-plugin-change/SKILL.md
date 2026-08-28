@@ -16,8 +16,9 @@ to explain why nothing arrived.
 ## When it does not apply
 
 Changes outside `plugins/` — this file, `README.md`, `.claude/rules/`,
-`.claude-plugin/marketplace.json` on its own, `templates/`, `spec/` — ship nothing to
-anyone and need no bump and no changelog entry.
+`.claude-plugin/marketplace.json` on its own, `templates/`, `spec/` and
+`specifications/` — ship nothing to anyone and need no bump and no
+changelog entry.
 
 ## Procedure
 
