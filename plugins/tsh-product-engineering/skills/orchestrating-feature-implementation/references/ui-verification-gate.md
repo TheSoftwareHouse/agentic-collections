@@ -46,16 +46,34 @@ skip verification and never guess the design.
   questions). Every separate round costs a full user round-trip — in practice the
   slowest step of the whole gate.
 - **Read the design against the ticket before iteration 1.** A conflict visible by
-  comparing the Figma node with the ticket text (a fixed-width card vs "full width",
-  a styled-differently field) is a user question NOW — asked mid-loop it stalls the
-  gate and can cost a whole FAIL iteration implementing the losing interpretation.
+  comparing the Figma node with the ticket text (a fixed-width card vs "full width")
+  is a user question NOW — asked mid-loop it stalls the gate and can cost a whole
+  FAIL iteration implementing the losing interpretation. Two patterns are candidate
+  conflicts every time they appear: one control styled differently from its siblings
+  (enabled-looking among disabled — intentional state or a design artifact?), and
+  any dimension the ticket describes in words that the design contradicts in pixels.
+  Scan for both while reading the node, and put what you find in the same upfront
+  question round.
 - **The shared verification root**, defined once per item before iteration 1:
   `specifications/<task-id>/ui-verification/`, with the reusable
   `figma-expected.png` inside it. Every iteration reuses that same shared root and
   reference while the Figma URL/node is unchanged — no per-iteration copies, and the
   root is never redefined mid-loop.
+- **Prefetch the Figma reference while implementation is still running.** EXPECTED
+  depends on the design, not on the code, so delegate the `figma-expected.png`
+  export (a `ui-capture-worker` run with only the Figma URL and the shared root — no
+  app URL, no browser) as a background task the moment the gate's inputs are pinned,
+  in parallel with the `ui-engineer` delegations. This takes the export off the
+  first capture's critical path and surfaces a Figma-side blocker minutes earlier,
+  while the fix costs nothing instead of stalling the loop.
 
 ## The loop, per item — never batch items
+
+Per-item means per-verdict, not single-file: with several UI items, stages of
+different items may overlap — item B's capture can run while item A's review is in
+flight — as long as every verdict is issued per item, on that item's own artifacts,
+by its own fresh reviewer pass. What stays forbidden is batching two items into one
+review or one report.
 
 ```text
 iteration = 0

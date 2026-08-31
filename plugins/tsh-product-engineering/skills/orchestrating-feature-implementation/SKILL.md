@@ -70,7 +70,10 @@ of it.
    and iterate with the user until they are happy with it.
 2. **Confirm the go-ahead.** For a plan created or changed in this session, ask the
    user to read it before execution. Their word is the gate — there are no approval
-   fields to fill.
+   fields to fill. Ask through the AskUserQuestion tool (options like "Execute the
+   plan" / "Wait — I want changes"), never as a prose question at the end of a turn:
+   plain text blocks nothing and is easy to scroll past, so the flow silently stalls
+   while both sides think they are waiting for the other.
 3. **Create todos.** One per plan task, including the final verification phase's
    tasks, in plan order, parallel groups noted.
 4. **Collect pinned inputs up front.** If any task is UI work, or the verification

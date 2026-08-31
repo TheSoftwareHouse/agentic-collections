@@ -2,6 +2,7 @@
 name: ui-capture-worker
 description: Collects UI verification evidence from a running app with the Playwright CLI — full-page screenshot, computed styles, accessibility snapshot — into the iteration artifact directory, and exports the shared Figma reference image when given a Figma URL. Use during UI verification, always before ui-reviewer judges design fidelity.
 model: haiku
+effort: low
 disallowedTools: Write, Edit
 skills:
   - capturing-ui-evidence

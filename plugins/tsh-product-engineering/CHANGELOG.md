@@ -192,6 +192,36 @@ alone reaches nobody.
   time are asked then, not mid-loop, where they stall the gate and can cost a FAIL
   iteration implementing the losing interpretation.
 
+- **Three more wall-clock levers, quality untouched:** the shared
+  `figma-expected.png` is prefetched in the background the moment the gate's inputs
+  are pinned — EXPECTED depends on the design, not the code, so it runs in parallel
+  with implementation and takes the export off the first capture's critical path;
+  with several UI items, stages may pipeline (item B's capture during item A's
+  review) while every verdict stays per-item on its own artifacts; and
+  `ui-capture-worker` pins `effort: low` — it drives a CLI to a written recipe, and
+  paying reasoning depth for mechanical work buys nothing.
+
+- **The plan-approval gate must be an AskUserQuestion, never prose.** A benchmark
+  run stalled invisibly: the orchestrator wrote "please read the plan before I
+  start delegating" as plain text at the end of a turn, the user scrolled past it,
+  and both sides waited for the other. The gate itself held — nothing was
+  implemented without approval — but a gate nobody sees is a stall, not a gate.
+
+- **Seventh benchmark round (OSH-410): the speed levers landed.** Planning with all
+  upfront questions took 10 minutes, the Figma reference was prefetched during
+  planning, the capture worker was resumed with "same recipe" between iterations,
+  a defective capture was rejected before any reviewer saw it, and the item passed
+  in four iteration directories with the final phase concurrent. Two fixes from the
+  run: (1) `actual.png` is now captured with `fullPage: true` as the mandatory
+  primary command and verified against the page's `scrollHeight` — the contract's
+  `resize <width> 1080` height was honoured as an evidence boundary and every early
+  screenshot came back clipped at 1080px, costing a `VERIFICATION NOT RUN` round;
+  the height sizes the window, never the evidence. (2) The upfront design-vs-ticket
+  scan now names two recurring conflict patterns to look for — a control styled
+  differently from its siblings, and a dimension the ticket words contradict in
+  pixels — because the Tax-number question, asked and answered in three previous
+  benchmarks, still surfaced mid-loop instead of in the upfront round.
+
 ### Removed
 
 - **The bundled Playwright MCP server (`.mcp.json`).** With `ui-engineer` and

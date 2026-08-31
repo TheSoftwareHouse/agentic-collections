@@ -28,6 +28,7 @@ capture method.
 | MUST | Run every command from the repository root, so the CLI's own `.playwright-cli/` scratch directory stays at the repo root where it is git-ignored. A `.playwright-cli/` directory appearing under `specifications/**` means the working directory was wrong: move the real artifacts to their explicit paths and delete the stray directory. |
 | NEVER | Write a Figma export anywhere other than the verification root. The shared `figma-expected.png` is the reference; when the pinned node covers more than the component under verification, a cropped `figma-expected-<region>.png` may sit beside it, exported once and reused. Never place a design image inside `iteration-<N>/`, which holds this pass's ACTUAL evidence only. |
 | MUST | Collect all three ACTUAL artifacts — `actual.png`, `computed-styles.json`, `a11y-snapshot.yml` — and confirm they exist in the iteration directory. Even one missing artifact makes the verification invalid. |
+| MUST | Capture `actual.png` as the FULL page (`fullPage: true`), never the viewport. The resize height only sizes the window; a screenshot clipped at the viewport hides everything below the fold and invalidates the pass. Verify the image height against the page's `scrollHeight` before reporting success. |
 | MUST | Shape `computed-styles.json` as a JSON **object**, never a JSON string containing JSON, and never split across companion files. Every entry carries a `label`, the `selector` used, a `textSample` of the element's text, its `rect`, and the computed values. Missing coverage is fixed by re-measuring, not by writing a second measurements file beside it. |
 | MUST | Resolve the component root first and prove it before measuring anything: try whatever stable hooks this project actually offers — test attributes, ids, ARIA landmarks, whatever the page and the plan's Technical Context show it uses — then assert the element contains text the component is known to render. Never assume a hook convention such as `data-testid`; when none exists, the smallest element containing that text is a valid root. No proof, no measurement. |
 | NEVER | Ship an **entry** that is `null` or carries an `error` such as "Element not found". A failed lookup means the selector is wrong, not that the element is absent from the design: fix the selector and re-measure, or return the capture as incomplete with that element named. A file full of nulls passes the file-exists check and then wastes a reviewer round. An optional **field** inside an otherwise measured entry may legitimately be `null` — a control that genuinely has no label, for instance — as long as the entry itself carries real measurements. |
@@ -61,15 +62,23 @@ capture method.
    escalate before opening the app page.
 2. **Open a named session** — `playwright-cli open -s <session-name>`.
 3. **Resize to the Figma frame width** — `playwright-cli resize <figma-width> 1080 -s <session-name>`.
+   The height here sizes the browser window, nothing more — it is NOT the boundary
+   of the evidence. When the page scrolls past it, the screenshot must still show
+   everything (step 6).
 4. **Navigate to the full pinned URL** including query params —
    `playwright-cli goto <full-url> -s <session-name>`.
 5. **Stabilize the render** —
    `playwright-cli run-code -s <session-name> "async page => { await page.emulateMedia({ reducedMotion: 'reduce' }); await page.waitForLoadState('networkidle'); }"`.
    Add route mocks only when the task explicitly requires deterministic data; mask
    known dynamic regions (timestamps, avatars, ads) when unavoidable.
-6. **Screenshot** — `playwright-cli screenshot --filename="$ARTIFACT_DIR/actual.png" -s <session-name>`
-   (full page when supported); fallback:
-   `playwright-cli run-code -s <session-name> "async page => { await page.screenshot({ path: '$ARTIFACT_DIR/actual.png', fullPage: true }); }"`.
+6. **Screenshot — full page, mandatory, verified.** Use
+   `playwright-cli run-code -s <session-name> "async page => { await page.screenshot({ path: '$ARTIFACT_DIR/actual.png', fullPage: true }); }"`
+   as the primary command — the plain `screenshot` subcommand captures the viewport,
+   and a viewport shot of a scrolling page is clipped evidence that fails review.
+   Then PROVE it is full-page: compare the PNG's pixel height against the page's
+   `document.documentElement.scrollHeight`; when the page scrolls beyond the
+   viewport and the image is not taller than the window, the capture is invalid —
+   retake it, never ship it.
 7. **Accessibility snapshot** — `playwright-cli --raw snapshot -s <session-name> > "$ARTIFACT_DIR/a11y-snapshot.yml"`.
 8. **Computed styles** — `playwright-cli --raw eval -s <session-name> "JSON.stringify(...)" > "$ARTIFACT_DIR/computed-styles.json"`.
    The payload covers every major container and control under verification: bounding
