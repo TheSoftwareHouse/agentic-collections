@@ -1,6 +1,6 @@
 ---
 name: capturing-ui-evidence
-description: "The mechanical capture contract for UI verification: drives the playwright-cli against the pinned dev server URL to collect actual.png, computed-styles.json and a11y-snapshot.yml into the iteration artifact directory, and exports the shared figma-expected.png via the Figma MCP. Evidence collection only — judging the result is verifying-ui."
+description: "The mechanical capture contract for UI verification: drives the playwright-cli against the pinned dev server URL to collect actual.png, computed-styles.json and a11y-snapshot.yml into the iteration artifact directory. Works with no design reference at all; when — and only when — the caller supplies a Figma URL, it also exports the shared reference image. Evidence collection only — judging the result is verifying-ui."
 when_to_use: "Trigger on: collecting ACTUAL evidence from a running app for UI verification, running playwright-cli capture commands, exporting the shared Figma reference image, or resolving a capture blocker such as a login redirect. Judging the artifacts is verifying-ui; running a full pass is reviewing-ui."
 user-invocable: false
 ---
@@ -8,8 +8,11 @@ user-invocable: false
 # Capturing UI Evidence
 
 The capture side of UI verification: mechanical evidence collection with the
-Playwright CLI, plus preparing the shared Figma reference. Capture never judges
-whether the UI matches the design — that is [`verifying-ui`](../verifying-ui/SKILL.md).
+Playwright CLI, plus preparing the shared design reference when the caller supplies
+one. The three ACTUAL artifacts come purely from the running application, so capture
+runs with or without a design reference — the Figma export is a conditional extra
+step, not a prerequisite. Capture never judges whether the UI matches the design —
+that is [`verifying-ui`](../verifying-ui/SKILL.md).
 
 ## Applicability and Precedence
 
@@ -38,6 +41,7 @@ capture method.
 | MUST | Capture the locale, language and text direction the caller pinned, selecting it the way the caller specified. Record what was actually captured in the summary; when the page renders in a different language than requested, that is a blocker, not a detail to mention in passing. |
 | MUST | When the caller provides a Figma URL and shared verification root, export or ensure the shared `figma-expected.png` via the Figma MCP BEFORE browser capture begins, so auth or page blockers cannot prevent EXPECTED preparation. |
 | NEVER | Fetch a design through the browser: no figma.com navigation, no saving a browser, login, or error screenshot as `figma-expected.png`. Figma MCP unavailable → escalate the blocker. |
+| MUST | Reuse the project's own authentication path before proposing one: a documented auth recipe, an existing E2E auth setup (`global.setup`, storage state, auth fixture), existing `.env` vars that match the login form, or a seeded development account — in that order. Deriving `TSH_UI_LOGIN_*` names and asking the user to add them is the last rung, not the first: a project that already stores test credentials should never be asked to duplicate them under our prefix. Report which mechanism was used. |
 | NEVER | Bypass, fake, seed, or inject authentication state (cookies, tokens, localStorage, sessionStorage) or assume an identity to get past a login or access gate — even when the gate looks trivially circumventable. A genuine login through the app's real sign-in UI, with user-provided inputs, is allowed; bypass never is. Read `./references/authenticated-capture.md` the moment a login redirect appears. |
 | MUST | Escalate every blocker (missing URL, unreachable page, login redirect, unexpected content, missing target component, failed command) back to the caller immediately with exact details. Never stop silently, and never ask the user directly from a subagent. |
 | MUST | Report a trivially bypassable access gate as a potential security vulnerability in the escalation notes — flag it, never exploit it. |

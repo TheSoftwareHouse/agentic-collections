@@ -59,6 +59,9 @@ Return a structured capture summary containing:
 
 - exact full URL used
 - locale, language and text direction actually captured (and how it was selected)
+- which authentication mechanism was used, when the page required one (documented
+  recipe, existing E2E setup, existing `.env` vars, seeded account, or the derived
+  `TSH_UI_LOGIN_*` fallback)
 - the elements `computed-styles.json` measured, named — so the caller can confirm
   they cover what is under verification
 - iteration artifact directory path

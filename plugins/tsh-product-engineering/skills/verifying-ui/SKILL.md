@@ -16,6 +16,14 @@ design wins.
 Local repository rules outrank this skill. If the project defines its own visual
 tolerances or design-QA process, apply those numbers inside this process.
 
+**Scope of EXPECTED, stated deliberately:** today the Figma MCP is the only accepted
+source of EXPECTED, and the rules below enforce that. Everything else this standard
+defines — the five categories, the tolerances, the PASS gate, the report format — is
+independent of where EXPECTED came from. The reference source is a parameter of the
+standard, not its identity, which is why this skill is named for the job (verifying
+UI) rather than for today's single source. Adding a source means adding a rung here
+and stating the rigor it supports, never a second copy of this standard.
+
 **Default to raising, not guessing.** Every named blocker here is an example of one
 rule: when you cannot run a real, complete verification on the full artifact base —
 something missing, broken, ambiguous, or unexpected, listed here or not — stop.

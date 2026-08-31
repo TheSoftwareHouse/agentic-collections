@@ -7,7 +7,38 @@ or fabricate cookies, tokens, `localStorage`, or `sessionStorage`; never assume 
 role or identity; never exploit a gate that looks trivially circumventable — report
 that as a potential security vulnerability in the escalation notes instead.
 
-## Default path: the repo-root `.env` contract
+## First: use what the project already has
+
+Do not introduce a new convention when the repository already answers the question.
+Work down this ladder and stop at the first hit — each rung is cheaper for the team
+than the one below it, and the last rung is the only one that asks anyone to add
+anything:
+
+1. **An auth recipe the project documents** — `CLAUDE.md`, `.claude/rules/`, or the
+   plan's Technical Context naming how to sign in for local verification (which
+   account, which script, which fixture). Follow it as written. Treat these files as
+   a pointer to the recipe, never as a place credentials should live: a password
+   committed to `CLAUDE.md` is a secret in Git, so if you find one, use it for this
+   run and flag it to the caller as something to move out of the repository.
+2. **An existing end-to-end auth setup** — a Playwright `global.setup`, a committed
+   storage-state path, an auth fixture or helper the E2E suite already uses. This is
+   the best outcome available: the project already solved this, the credentials are
+   already wherever the team decided they belong, and verification inherits that
+   decision instead of competing with it.
+3. **Existing `.env` variables that plainly match the login form's fields** — names
+   like `E2E_*`, `TEST_*`, `PLAYWRIGHT_*`, or a project-specific pair whose meaning
+   is unambiguous for the fields on screen. Use them as they are; never rename or
+   duplicate them under our own prefix. When a candidate is ambiguous, or plausibly
+   a production credential rather than a test one, do not guess — ask through the
+   caller.
+4. **A seed or fixture that creates a known development account** — a documented
+   seeded user is a legitimate input when the project provides one.
+5. **Only when none of the above exists**, fall back to the derived contract below.
+
+Whatever rung you land on, report it in the capture summary, so the caller can see
+which mechanism authenticated the run.
+
+## Last resort: the derived `TSH_UI_LOGIN_*` contract
 
 When the pinned page redirects to a **standard credential form**:
 
