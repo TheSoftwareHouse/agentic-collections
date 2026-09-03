@@ -14,6 +14,28 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.2.0] - 2026-08-26
+
+### Added
+
+- **`implementing-frontend`** — component implementation patterns migrated from
+  `copilot-collections` (`tsh-implementing-frontend`): composition over prop sprawl,
+  design tokens over hardcoded values, typed props and named exports, the three UI
+  states for data-dependent components, barrel-file rules, and the Figma-to-code
+  workflow whose first step — reading the design through the Figma MCP before the
+  first line of markup — is a hard gate. Framework-agnostic core with a React
+  reference. This closes the "component patterns" gap the README listed since 0.1.0.
+- **`ensuring-accessibility`** — WCAG 2.1 AA implementation patterns migrated from
+  `copilot-collections` (`tsh-ensuring-accessibility`): semantic HTML first,
+  per-widget keyboard maps, focus management, ARIA only where HTML falls short,
+  contrast minimums, zoom/reflow criteria, RTL rules, and an axe-core CLI
+  verification step. Implementation-time patterns only — auditing an existing page
+  stays with `tsh-product-testing`'s `auditing-accessibility`, and both skills name
+  each other so they don't compete for the same request.
+- Both skills support the frontend flow in `tsh-product-engineering` 0.7.0 (the
+  `ui-engineer` + UI verification gate), but stand alone: they reference that plugin
+  by name only, never by path, and work without it.
+
 ## [0.1.0] - 2026-08-12
 
 Initial release. This plugin is one half of the split of `tsh-stack-typescript`,
