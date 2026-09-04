@@ -71,9 +71,10 @@ instead of asking whose job it is:
 | One agent, one skill, one discipline | that plugin's own `.mcp.json` |
 
 Atlassian is the first case: engineering, product management and testing all read
-Jira. Playwright is the second: it exists for `tsh-product-testing`'s E2E work and
-stays there. (`tsh-product-engineering` used to bundle it too, until its agents
-moved to the Playwright CLI in 0.7.0.)
+Jira. `context7` in `tsh-product-testing` is the second: it exists for that plugin's
+Playwright API lookups and stays there. (Playwright MCP used to be this example —
+bundled by `tsh-product-engineering` until 0.7.0 and by `tsh-product-testing` until
+0.3.0, when their agents moved to the Playwright CLI. No plugin bundles it now.)
 
 **Two facts that decide the boundary, both undocumented in the plugin docs:**
 

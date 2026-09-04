@@ -2,7 +2,7 @@
   "name": "tsh-product-testing",
   "displayName": "TSH Product Testing",
   "description": "Quality assurance: Playwright end-to-end tests that do not flake, and WCAG 2.1 AA accessibility audits that report the success criterion behind every finding.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

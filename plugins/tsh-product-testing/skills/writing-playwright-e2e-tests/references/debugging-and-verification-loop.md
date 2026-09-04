@@ -9,8 +9,9 @@ limits below are what make it terminate.
 RUN → fails? → INSPECT the real page state → FIX one thing → REPEAT
 ```
 
-Inspect before changing anything. The Playwright MCP's page snapshot shows the
-accessibility tree as it actually is — which is where "the locator is wrong" and "the
+Inspect before changing anything. A `playwright-cli snapshot` of the live page — see
+[playwright-cli-exploration.md](./playwright-cli-exploration.md) — shows the
+accessibility tree as it actually is, which is where "the locator is wrong" and "the
 element genuinely is not there" become distinguishable. Guessing at a new locator
 without looking is how a two-minute fix becomes fifteen iterations.
 

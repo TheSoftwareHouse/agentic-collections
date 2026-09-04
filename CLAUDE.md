@@ -89,7 +89,7 @@ and `tsh-core` with you, because it depends on nothing at all.
 | A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `.claude-plugin/marketplace.json` | an existing plugin |
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read `.claude/rules/core-plugin-admission.md` first | `templates/SKILL.md` |
 | An MCP server three or more disciplines drive | `plugins/tsh-core/.mcp.json` — read `.claude/rules/plugin-manifests-and-marketplace.md`, then `core-plugin-admission.md` | the existing entry |
-| An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — Playwright in `tsh-product-testing` is the worked example | that file |
+| An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — `context7` in `tsh-product-testing` is the worked example | that file |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
 **Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
