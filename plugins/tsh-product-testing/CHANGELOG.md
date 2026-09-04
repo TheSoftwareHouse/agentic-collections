@@ -4,6 +4,59 @@ All notable changes to `tsh-product-testing` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-03
+
+### Changed
+
+- **Live-page exploration moved from the bundled Playwright MCP server to the
+  [Playwright CLI](https://www.npmjs.com/package/@playwright/cli)** — locator
+  confirmation before a test is written, and page-state inspection inside the debug
+  loop. The view is the same accessibility tree `getByRole` resolves against, so
+  nothing about the standard changes; what improves is that the CLI executes a
+  candidate locator string (`playwright-cli click "getByRole(…)"`) against the live
+  page before it enters a test, its output stays out of MCP tool context, and both
+  TSH plugins now drive the one browser tool — `tsh-product-engineering` made the
+  same move in its 0.7.0. The mechanics live in a new `writing-playwright-e2e-tests`
+  reference, `playwright-cli-exploration.md`, and the README now names the CLI as a
+  prerequisite with the install command. The workflow checks availability
+  (`playwright-cli --version`, `npx` fallback) before its first exploration — the
+  same preflight `tsh-product-engineering` runs — and, when the CLI is missing,
+  asks the user whether to install it for them or wait; a subagent, which cannot
+  ask, reports the missing prerequisite. Neither guesses locators blind, and
+  nothing installs without the user choosing it.
+- **The language version under test is a pinned input.** A multilingual app renders
+  different accessible names per locale, so `getByRole` locators written against the
+  wrong language test nothing users get. The skill now requires pinning the language
+  before any locator is read off a snapshot — from the plan, the Playwright config
+  or existing tests, and by asking the user when nothing settles it — and
+  exploration confirms the rendered language matches before any locator is
+  confirmed. Imported from the wrong-language capture lesson in
+  `tsh-product-engineering`'s benchmark rounds.
+- **Locator confirmation is a MUST, not a procedure step, and the report proves
+  it.** A pilot run showed the failure mode: with good sources at hand (translation
+  files, component code) the model rationalized skipping live exploration entirely
+  and derived locators from source — which happened to work, and would not have next
+  time. Confirming locators against the running app now sits in the non-negotiable
+  rules table (self-scoped: a test that drives no browser has no locators, so pure
+  API scenarios are exempt), and the output contract carries two audit fields —
+  `Locators confirmed against the running app` and `Language pinned by` — so a
+  skipped confirmation is visible in the report instead of buried in a transcript.
+  A second pilot closed three letter-of-the-rule dodges the first hardening left
+  open: confirmation must use the CLI's own commands after loading the exploration
+  reference (an improvised browser script skips the preflight and leaves scratch
+  files in the repository), a silent language choice disclosed in the report does
+  not count as asking, and the two audit fields are verbatim contract lines that
+  prose cannot replace.
+
+### Removed
+
+- **The Playwright MCP server from `.mcp.json`** — with exploration on the CLI it has
+  no consumer left; `context7` stays. No invocation handle breaks: plugin-MCP tool
+  names were never safe to reference in `tools:` lists or hook matchers (the
+  surviving namespace depends on plugin load order), so nothing configured can depend
+  on them. A repository that used the bundled server for its own purposes should
+  declare `@playwright/mcp` in its own project `.mcp.json`.
+
 ## [0.2.0] - 2026-08-22
 
 First content release. Ports the QA collection from `copilot-collections`,

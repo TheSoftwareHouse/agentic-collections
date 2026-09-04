@@ -14,6 +14,16 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.9.1] - 2026-09-03
+
+### Fixed
+
+- **The README's admission example named a Playwright MCP server that no longer
+  exists.** Both discipline plugins that drove one have moved to the Playwright CLI
+  (`tsh-product-engineering` in its 0.7.0, `tsh-product-testing` in its 0.3.0), so
+  the sentence now cites the example in the past tense. The admission rule it
+  illustrates is unchanged.
+
 ## [0.9.0] - 2026-08-27
 
 ### Added

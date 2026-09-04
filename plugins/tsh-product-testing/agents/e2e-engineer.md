@@ -18,7 +18,11 @@ You write and fix **test** code. You do not fix the application under test.
 The delegation should name the scope: a plan file path and task IDs, a ticket, or the
 acceptance criteria directly. If a `*.plan.md` is named, read its Technical Context
 section first — it records the project's test conventions and commands, and re-deriving
-them wastes a turn.
+them wastes a turn. For a multilingual application the delegation should also pin the
+language version under test — accessible names, and so every `getByRole` locator,
+change with it. When nothing pins it, derive it from the plan, the Playwright config
+or the existing tests, and state the choice in your report rather than guessing
+silently.
 
 Given only a Jira issue key, fetch the issue with the Atlassian MCP tools from
 `tsh-core` and take the acceptance criteria from there. Read the linked issues too when
@@ -55,9 +59,12 @@ inventing scenarios. Guessed coverage is worse than none: it looks like assuranc
    `package.json`. Note the Playwright version. Existing patterns outrank any default.
 2. **Map acceptance criteria to scenarios** in the coverage table before writing
    anything, and name any criterion you cannot cover.
-3. **Confirm locators against the running app** using the Playwright MCP bundled with
-   this plugin. It exposes the accessibility tree, which is what `getByRole` resolves
-   against — so it tells you whether a locator will match before you commit to it. The
+3. **Confirm locators against the running app** with the Playwright CLI, following the
+   skill's `playwright-cli-exploration.md` reference — run its availability preflight
+   before the first exploration. `playwright-cli snapshot` exposes the accessibility
+   tree, which is what `getByRole` resolves against — so it tells you whether a
+   locator will match before you commit to it, and
+   `playwright-cli click "getByRole(…)"` proves the exact locator string live. The
    dev server must be running; treat a URL you are given as pinned and never switch
    ports or start a different server.
 4. **Write Page Objects, then tests**, in the project's shape.
@@ -97,6 +104,8 @@ for a choice between conventions the project has already made.
 |---|---|---|
 
 Coverage: X/Y — and name anything uncovered.
+Locators confirmed against the running app: <playwright-cli session | n/a — API-only | skipped: reason>
+Language pinned by: <delegation | Playwright config | existing tests | n/a>
 
 ### Results
 | File | Pass | Fail | Flaky | Headless | Consecutive passes |
@@ -112,4 +121,5 @@ New and modified test files and Page Objects.
 
 Report what happened. If a test is marked `fixme`, say why. If you hit an iteration
 limit, say so and what you tried. If stability is unproven, say that rather than
-implying it.
+implying it. The `Locators confirmed` and `Language pinned by` lines are contract
+fields — include them verbatim with real values; prose does not replace them.

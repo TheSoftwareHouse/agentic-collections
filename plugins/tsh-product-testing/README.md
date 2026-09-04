@@ -29,16 +29,27 @@ Invoked as `/tsh-product-testing:<skill>`.
 
 Invoked as `@tsh-product-testing:e2e-engineer`.
 
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
+
 ### Bundled MCP servers
 
-`.mcp.json` ships the Playwright MCP — the accessibility tree it exposes is what
-`getByRole` resolves against, so it is how a locator gets confirmed before it is
-committed to a test — and `context7` for Playwright API documentation. For Playwright,
-query the library ID `/microsoft/playwright.dev` directly rather than resolving it.
+`.mcp.json` ships `context7` for Playwright API documentation. For Playwright, query
+the library ID `/microsoft/playwright.dev` directly rather than resolving it.
 
-This mirrors the Playwright server in `tsh-product-engineering`. Installing both gives
-you two independently namespaced servers; that is expected, and each plugin stays
-usable on its own.
+### Prerequisite: Playwright CLI
+
+**Live-page exploration runs on the
+[Playwright CLI](https://www.npmjs.com/package/@playwright/cli)** — its `snapshot` is
+the accessibility tree `getByRole` resolves against, so it is how a locator gets
+confirmed before it is committed to a test, and it executes a candidate locator
+string against the live page. Have `playwright-cli` on the machine:
+`npm install -g @playwright/cli@latest`, or a project-local install reached via
+`npx playwright-cli` (Node.js required either way). The workflow checks availability
+before its first exploration and, when the CLI is missing, asks whether to install it
+for you or wait while you do it yourself — a subagent, which cannot ask, reports the
+missing prerequisite instead. Neither ever guesses locators blind. This matches `tsh-product-engineering`, whose UI evidence
+runs on the same CLI — one browser tool across both plugins, and none of its output
+spends MCP tool context.
 
 ## Assumes tsh-core
 
