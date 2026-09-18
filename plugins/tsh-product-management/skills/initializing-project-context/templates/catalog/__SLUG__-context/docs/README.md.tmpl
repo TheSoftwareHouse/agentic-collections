@@ -1,0 +1,41 @@
+# Documentation
+
+Entry point to the **{{PROJECT_NAME}}** knowledge base. Every workspace has one owner,
+who keeps it current and reviews changes to it
+([conventions/ownership.md](../conventions/ownership.md)).
+
+## Project workspaces
+
+The areas every project has, whatever it is built with.
+
+| Workspace | Holds | Owner |
+| --- | --- | --- |
+| [Baseline](baseline/README.md) | What the project is held to: scope, assumptions, risks, non-functional requirements. | {{OWNER_NAME}} |
+| [Architecture](architecture/README.md) | Current and target system shape, platform baseline, cross-repository concerns. | {{OWNER_NAME}} |
+| [Product](product/README.md) | What is being built and why: requirements, epics and stories as source content. | {{OWNER_NAME}} |
+| [Delivery](delivery/README.md) | How the project is run: timeline, process, Definition of Ready and Done, sign-off. | {{OWNER_NAME}} |
+| [Quality](quality/README.md) | How quality is assured: test strategy, checklists, environments, acceptance. | {{OWNER_NAME}} |
+
+## Layer workspaces
+
+One per delivery layer. Each owns its own conventions and contributes decisions under
+its `Scope`.
+
+| Workspace | Holds | Owner |
+| --- | --- | --- |
+| [Backend](backend/README.md) | Server-side services: module layout, API contracts, data model, background work. | {{OWNER_NAME}} |
+| [Frontend](frontend/README.md) | Browser applications: component and state conventions, routing, design-system usage. | {{OWNER_NAME}} |
+| [Design](design/README.md) | Design ownership and handoff: who designs, who approves, what a package contains. | {{OWNER_NAME}} |
+{{OPTIONAL_LAYER_ROWS}}
+
+## Supporting
+
+| File | Holds |
+| --- | --- |
+| [decisions/](decisions/README.md) | Every decision record, one folder, with a `Scope` column. Only `Accepted` binds. |
+| [glossary.md](glossary.md) | Canonical project vocabulary. |
+
+A layer this project does not have yet — or an area none of the rows above covers —
+becomes a workspace when it has content: folder, `README.md`, `CLAUDE.md` with an
+owner, and a row above. With the shared plugin installed,
+`/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-space` does all four in one change.

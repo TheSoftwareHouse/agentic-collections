@@ -1,0 +1,44 @@
+# Spaces and owners
+
+A document is only as trustworthy as the person known to keep it true.
+
+| Kind | What it is | Must have | Owner |
+| --- | --- | --- | --- |
+| **Workspace** | An area a role keeps current, under `docs/`. Either a **project workspace** (baseline, architecture, product, delivery, quality) or a **layer workspace** (backend, frontend, design, and any layer this project adds). | `README.md` (index) and `CLAUDE.md` (owner, scope, rules). No `decisions/` folder — records live in `docs/decisions/`. | Exactly one named person. |
+| **Supporting folder** | Everything else: glossary, conventions, plugins. | Nothing extra. No `CLAUDE.md`. | The repository owner. |
+
+- **One space, one owner.** Two names means nobody is accountable when they disagree.
+  One person may own several spaces. Unassigned means the repository owner, never
+  nobody.
+- The owner keeps the space at the state of today, is the **default reviewer** of every
+  change under it, and keeps its `README.md` and `CLAUDE.md` true.
+- Owners are named as `Full Name (e-mail)`. The area map in
+  [docs/README.md](../docs/README.md) is authoritative; a workspace `CLAUDE.md` repeats
+  only its own owner. Change both in the same change.
+- **Repository owner:** {{OWNER}}.
+
+## Workspace `CLAUDE.md` shape
+
+```markdown
+# <Space> workspace
+
+**Owner:** <Full name> (<e-mail>) — default reviewer for changes here.
+
+## Scope
+- What belongs here; what does not, and where it lives instead.
+
+## Rules for this space
+- Only rules a newcomer would get wrong.
+
+## Start here
+- The README and the one document a task here begins with.
+```
+
+## Adding a workspace
+
+Create the folder under `docs/` with `README.md` and `CLAUDE.md`, and add its row to the
+area map in the same change. With the shared plugin installed,
+`/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-space` does both and cannot forget the row.
+
+A layer this project does not have yet — `mobile`, `platform`, anything else — becomes
+a workspace the moment it has content, never before.

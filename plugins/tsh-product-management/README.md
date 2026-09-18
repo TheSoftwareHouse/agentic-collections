@@ -35,6 +35,7 @@ backlog instead.
 | `analyze-materials` | `/tsh-product-management:analyze-materials` | Entry point for the full workflow: materials or an existing Jira backlog in, reviewed epics and stories out |
 | `explore-materials` | `/tsh-product-management:explore-materials` | Entry point for Explore Mode: a business-context summary, deliberately stopping short of any backlog item |
 | `domain-dictionary` | `/tsh-product-management:domain-dictionary` | Entry point for the per-product domain dictionary: canonical business terms, not domain-driven design |
+| `initializing-project-context` | `/tsh-product-management:initializing-project-context` | Entry point that scaffolds a project catalog with its context repository: a knowledge base with one owner per area, all decisions in one folder, a link-and-table gate, and a marketplace shipping four project-prefixed skills over it — then enables that plugin in the sibling code repositories |
 | `orchestrating-business-analysis` | `/tsh-product-management:orchestrating-business-analysis` | Runs the workflow: the five gates, the delegation, the persistent writes, the Jira push |
 | `managing-domain-dictionaries` | `/tsh-product-management:managing-domain-dictionaries` | Harvest, Reconcile and Interview modes for the dictionary, checked by eleven review passes and reconciled against a live codebase without editing it |
 | `processing-workshop-transcripts` | `/tsh-product-management:processing-workshop-transcripts` | Raw transcript to a structured document — topics, decisions, action items, preserved quotes |
@@ -51,8 +52,8 @@ backlog instead.
 | `jira-formatter` (agent) | `@tsh-product-management:jira-formatter` | Applies the benchmark template and prepares verification diffs — haiku |
 | `terminology-extractor` (agent) | `@tsh-product-management:terminology-extractor` | Extracts term candidates from material and sweeps codebase identifiers for Reconcile mode — sonnet |
 
-The three entry points — `analyze-materials`, `explore-materials` and
-`domain-dictionary` — are `disable-model-invocation: true` — commands, not routing
+The four entry points — `analyze-materials`, `explore-materials`,
+`domain-dictionary` and `initializing-project-context` — are `disable-model-invocation: true` — commands, not routing
 surfaces, so they cost nothing until you type them. Everything else is
 model-invocable and routes on how people describe the work.
 

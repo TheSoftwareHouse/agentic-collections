@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""Quality gate: every markdown table renders the way it was written.
+
+Why this is worth a script. Each defect below renders instead of failing: the
+table appears, just wrongly, and these documents get exported and read outside
+the team. A row one cell short shifts every later cell into the wrong column, so
+a risk row can show its mitigation text as its status.
+
+Four checks over every markdown file in the repository:
+
+1. RAGGED ROW — a body row whose cell count differs from its header's.
+2. HEADER / SEPARATOR MISMATCH — a header with a different cell count than the
+   `| --- |` line beneath it.
+3. SPLIT TABLE — a blank line between two body rows. The blank ends the table and
+   the rows below render as a second, headerless one.
+4. GLUED TRAILER — text on the line directly after the last row, absorbed into
+   the table instead of closing it.
+
+A pipe escaped as `\\|` counts as content. A pipe inside a code span does NOT:
+GitHub-flavoured markdown splits the cell there too, so write `` `GET\\|POST` ``.
+
+Exit code 0 = clean, 1 = violations found.
+
+Usage:
+    python3 scripts/check_tables.py            # full check
+    python3 scripts/check_tables.py FILE...    # only these files
+"""
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+IGNORED_DIRS = {".git", "node_modules", ".idea", ".vscode", ".claude"}
+FENCE_RE = re.compile(r"^\s*(```|~~~)")
+SEPARATOR_RE = re.compile(r"^\s*\|[\s:\-|]+\|\s*$")
+
+
+def all_markdown():
+    try:
+        probe = subprocess.run(["git", "rev-parse", "--is-inside-work-tree"],
+                               cwd=REPO_ROOT, capture_output=True, text=True)
+        if probe.returncode == 0 and probe.stdout.strip() == "true":
+            out = subprocess.run(
+                ["git", "-c", "core.quotepath=off", "ls-files", "-z", "*.md"],
+                cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout
+            return sorted(p for p in out.split("\0") if p)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        pass
+    found = []
+    for path in REPO_ROOT.rglob("*.md"):
+        rel = path.relative_to(REPO_ROOT)
+        if not any(part in IGNORED_DIRS for part in rel.parts):
+            found.append(rel.as_posix())
+    return sorted(found)
+
+
+def is_row(line):
+    return line.strip().startswith("|")
+
+
+def cell_count(line):
+    return len(re.sub(r"\\\|", "", line).strip().strip("|").split("|"))
+
+
+def check_file(rel):
+    lines = (REPO_ROOT / rel).read_text(encoding="utf-8").split("\n")
+    problems, in_fence, header_cells, header_line = [], False, None, None
+    for i, line in enumerate(lines):
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+            header_cells = None
+            continue
+        if in_fence:
+            continue
+        if not is_row(line):
+            header_cells = None
+            continue
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        nxt2 = lines[i + 2] if i + 2 < len(lines) else ""
+        nxt3 = lines[i + 3] if i + 3 < len(lines) else ""
+        if SEPARATOR_RE.match(line):
+            prev = lines[i - 1] if i > 0 else ""
+            if is_row(prev):
+                if cell_count(prev) != cell_count(line):
+                    problems.append((i + 1, f"header has {cell_count(prev)} column(s)"
+                                            f" but its separator has {cell_count(line)}"))
+                header_cells, header_line = cell_count(prev), i
+            continue
+        if header_cells is not None and cell_count(line) != header_cells:
+            problems.append((i + 1, f"row has {cell_count(line)} cell(s), header on"
+                                    f" line {header_line} has {header_cells} — later"
+                                    f" cells render in the wrong column"))
+        if not nxt.strip() and is_row(nxt2) and not SEPARATOR_RE.match(nxt3):
+            problems.append((i + 2, "blank line inside a table — the rows below render"
+                                    " as a second, headerless table"))
+        if nxt.strip() and not is_row(nxt) and not FENCE_RE.match(nxt):
+            problems.append((i + 2, "no blank line after the table — this line is"
+                                    " absorbed into it"))
+    return problems
+
+
+def main():
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    corpus = set(all_markdown())
+    if args:
+        targets = []
+        for a in args:
+            try:
+                rel = Path(a).resolve().relative_to(REPO_ROOT).as_posix()
+            except ValueError:
+                print(f"skipped (outside the repository): {a}")
+                continue
+            if rel in corpus:
+                targets.append(rel)
+    else:
+        targets = sorted(corpus)
+
+    total = 0
+    for rel in targets:
+        for lineno, message in check_file(rel):
+            print(f"{rel}:{lineno}: {message}")
+            total += 1
+
+    print(f"\nChecked {len(targets)} file(s).")
+    if total:
+        print(f"FAIL: {total} table defect(s).")
+        return 1
+    print("OK: every table renders.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

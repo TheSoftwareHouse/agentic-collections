@@ -12,6 +12,52 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.4.0] - 2026-09-18
+
+### Added
+
+- **A one-command scaffold for a project's context repository**, the new
+  user-invoked skill `/tsh-product-management:initializing-project-context`. Run in
+  the folder where a project should live, it asks four fixed questions — project name,
+  owner (from git config, or "assign later"), where the catalog goes, and which extra
+  delivery layers the project needs — then creates a project catalog `<slug>/` holding
+  `<slug>-context/`.
+- **The generated knowledge base** carries five project workspaces (baseline,
+  architecture, product, delivery, quality) and three layer workspaces every project
+  has (backend, frontend, design), with `mobile` and `platform` available on request.
+  Each has a `README.md` index and a `CLAUDE.md` naming exactly one owner, mirrored in
+  the area map. **All decision records live in one folder**, `docs/decisions/`, with a
+  `Scope` column instead of a folder per layer: one number sequence, one place to look,
+  and the same location and five-status vocabulary as
+  `/tsh-core:managing-decision-records`, so that skill works against it unconfigured.
+- **A quality gate that runs without git.** `check_links.py` fails on a relative link
+  that does not resolve or a filename that is not kebab-case; `check_tables.py` fails
+  on a markdown table that would render wrongly — a ragged row, a blank line splitting
+  a table, a trailer glued onto one. Both read the git index when there is one and walk
+  the tree when there is not.
+- **The generated marketplace ships one plugin, `<slug>-shared`, with four skills**,
+  each carrying the project slug so two installed projects never present two
+  identically named skills: `<slug>-context` reads the knowledge base,
+  `<slug>-knowledge` adds or updates a document in the owning workspace with its index
+  entry and reviewer, `<slug>-links` repairs references, and `<slug>-space` creates a
+  workspace with its owner and area-map row. All four resolve the knowledge base
+  through one shared file, so they work from the context repository, from the catalog,
+  and from any code repository beside it. Decision records are deliberately left to
+  `tsh-core` rather than duplicated.
+- **The plugin is live the moment the skill finishes.** The context repository, the
+  catalog folder and every selected code repository are registered through the
+  `claude plugin` CLI and given a committed settings entry with a portable relative
+  marketplace path, so no install command and no trust dialog stand between the setup
+  and the first use. The closing report says explicitly that the current session cannot
+  see the new plugin and a new one is needed.
+- **A `GUIDE.md` in two halves**, one for readers who never open a terminal and one for
+  engineers, rendered to `GUIDE.pdf` when pandoc or Chrome is available.
+
+The skill never runs git and never overwrites a file; a second run reports what already
+existed. It ships as a 149-line `SKILL.md`, one reference
+(`installation-mechanics.md`), four scripts (`probe.py`, `scaffold.py`,
+`wire_repos.py`, `render_guide_pdf.py`) and the template tree under `templates/`.
+
 ## [0.3.0] - 2026-08-27
 
 ### Added

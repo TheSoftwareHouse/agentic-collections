@@ -1,0 +1,16 @@
+# Changelog
+
+Versions are the `version` in `.claude-plugin/plugin.json`. Merging is releasing;
+teammates pick a version up with
+`/plugin update {{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context`.
+
+## [0.1.0] - {{DATE}}
+
+- Added `{{PROJECT_SLUG}}-context` — reads the knowledge base before work that depends
+  on project facts.
+- Added `{{PROJECT_SLUG}}-knowledge` — adds or updates a document in the owning
+  workspace, with its index entry and its reviewer.
+- Added `{{PROJECT_SLUG}}-links` — repairs broken links, non-kebab filenames and
+  misrendering tables.
+- Added `{{PROJECT_SLUG}}-space` — creates a workspace with exactly one owner and its
+  area-map row.
