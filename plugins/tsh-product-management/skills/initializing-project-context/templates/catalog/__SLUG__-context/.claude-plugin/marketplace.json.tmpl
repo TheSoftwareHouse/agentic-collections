@@ -1,0 +1,16 @@
+{
+  "name": "{{PROJECT_SLUG}}-context",
+  "description": "Claude Code extensions shared across the {{PROJECT_NAME}} project: the skills over its knowledge base, and every other skill, agent or hook more than one role or repository needs.",
+  "owner": {
+    "name": "{{OWNER_NAME}}"
+  },
+  "plugins": [
+    {
+      "name": "{{PROJECT_SLUG}}-shared",
+      "source": "./plugins/{{PROJECT_SLUG}}-shared",
+      "description": "Team-wide Claude Code extensions for {{PROJECT_NAME}}: read the knowledge base, write to it, repair its references, add a workspace.",
+      "category": "productivity",
+      "keywords": ["{{PROJECT_SLUG}}", "project-context", "knowledge-base"]
+    }
+  ]
+}

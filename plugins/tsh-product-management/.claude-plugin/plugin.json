@@ -2,7 +2,7 @@
   "name": "tsh-product-management",
   "displayName": "TSH Product Management",
   "description": "The business-analysis workflow end to end: discovery workshop materials — transcripts, Figma, PDFs, codebase context — become Jira-ready epics and user stories, a per-product domain dictionary and an outcome-based delivery roadmap, behind five human review gates, with a hook that blocks any Jira write before the push gate is approved. Also imports an existing Jira backlog for local iteration. Seven read-only worker subagents keep the heavy reading out of the conversation.",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"
@@ -10,5 +10,17 @@
   "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-product-management",
   "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
   "license": "MIT",
-  "keywords": ["tsh", "product-management", "business-analysis", "requirements", "discovery", "jira", "backlog", "user-stories", "epics", "roadmap", "workshops"]
+  "keywords": [
+    "tsh",
+    "product-management",
+    "business-analysis",
+    "requirements",
+    "discovery",
+    "jira",
+    "backlog",
+    "user-stories",
+    "epics",
+    "roadmap",
+    "workshops"
+  ]
 }

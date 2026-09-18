@@ -1,0 +1,64 @@
+# {{PROJECT_SLUG}}-shared
+
+The Claude Code plugin every **{{PROJECT_NAME}}** repository enables. It ships what the
+whole team shares; anything one repository needs alone stays in that repository.
+
+## The sharing rule
+
+| A skill, agent or hook is needed by… | It lives in |
+| --- | --- |
+| More than one role, or more than one repository | This plugin |
+| One code repository only | That repository's own `.claude/` |
+
+Ties go to the code repository. Promoting later is cheap; a shared plugin full of
+one-team tools taxes every session of every teammate.
+
+## What's in it
+
+Every skill carries the project name, so that with several projects installed the
+`/` menu says which one you are reaching for.
+
+| Skill | Invoke | Does |
+| :-- | :-- | :-- |
+| `{{PROJECT_SLUG}}-context` | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-context` | Reads the knowledge base before work that depends on project facts |
+| `{{PROJECT_SLUG}}-knowledge` | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
+| `{{PROJECT_SLUG}}-links` | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-links` | Finds and repairs broken links, bad filenames and misrendering tables |
+| `{{PROJECT_SLUG}}-space` | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-space` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
+
+Decision records are deliberately **not** here: `/tsh-core:managing-decision-records`
+already owns that format and lifecycle, and `conventions/decisions.md` matches it. Two
+standards for one artifact is how they drift apart.
+
+All four resolve the knowledge base the same way, through
+[shared/locating-the-knowledge-base.md](shared/locating-the-knowledge-base.md), so they
+work from the context repository, from the project catalog and from any code repository
+beside it.
+
+## Enable it in a code repository
+
+The repository sits next to `{{PROJECT_SLUG}}-context/` in the project catalog. Commit
+this to its `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "{{PROJECT_SLUG}}-context": {
+      "source": { "source": "directory", "path": "../{{PROJECT_SLUG}}-context" }
+    }
+  },
+  "enabledPlugins": { "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true }
+}
+```
+
+Start Claude Code in the repository, accept the trust dialog, check `/plugin list`.
+
+## Adding a component
+
+Add `skills/<name>/SKILL.md`, `agents/<name>.md` or `hooks/hooks.json` — only
+`plugin.json` lives inside `.claude-plugin/`. Name a new skill
+`{{PROJECT_SLUG}}-<what-it-does>`, matching the four above. Bump `version` in
+`.claude-plugin/plugin.json`, add a [CHANGELOG.md](CHANGELOG.md) line, run
+`claude plugin validate .` from this folder and from the repository root, then open a
+pull request to the repository owner. Teammates pick it up with
+`/plugin update {{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context`; without the bump the
+update reaches nobody.

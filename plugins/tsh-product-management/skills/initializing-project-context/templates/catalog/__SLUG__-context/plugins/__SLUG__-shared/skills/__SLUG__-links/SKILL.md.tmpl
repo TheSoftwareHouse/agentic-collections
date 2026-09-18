@@ -1,0 +1,58 @@
+---
+name: {{PROJECT_SLUG}}-links
+description: "Finds and repairs broken references in the {{PROJECT_NAME}} knowledge base — relative links that no longer resolve, filenames that are not kebab-case, and markdown tables that render wrongly. Use when the checker scripts report violations, before opening a pull request, or after moving or deleting documents."
+when_to_use: "Trigger on: 'check the links', 'fix the docs', a checker script reporting failures, a pull request blocked on the quality gate, after renaming or deleting documents, a table that renders with shifted columns."
+---
+
+# Fix {{PROJECT_NAME}} references
+
+Detection is deterministic and belongs to the scripts. Repair needs judgment and that
+is the job here.
+
+## Procedure
+
+**Step 1 — Locate the knowledge base.** Read
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-the-knowledge-base.md` and resolve **KB**.
+
+**Step 2 — Detect.** From KB:
+
+```shell
+python3 scripts/check_links.py
+python3 scripts/check_tables.py
+```
+
+Each line is `file:line: problem`. Fix nothing before the whole list is in front of
+you — one rename usually explains several failures.
+
+**Step 3 — Diagnose each broken link, in this order.**
+
+1. **Moved or renamed.** Search the corpus for the basename. One plausible candidate
+   means re-point the link. Several means read the surrounding sentence to choose; if
+   it is still ambiguous, ask.
+2. **Deleted on purpose.** Nothing matches and version control shows a deletion. The
+   reference is stale: remove the link, keeping the sentence readable, or point it at
+   the successor the deletion names.
+3. **Never existed.** No match anywhere. Usually a planned document or a mistake. If
+   it is a list entry, drop it. If the document is genuinely planned, leave plain text
+   without a link.
+
+**Step 4 — Fix naming violations.** Rename to kebab-case **and** update every file
+that referred to the old name, in the same change.
+
+**Step 5 — Fix tables.** Pad the short row to the header's cell count, remove the
+blank line inside the table, add the missing blank line after it, or escape a content
+pipe as `\|`. Never fix a ragged row by deleting a column from the header.
+
+**Step 6 — Verify and report.** Re-run both scripts until clean. Report per finding:
+what was broken, which of the three cases it was, and what you did. List anything left
+unresolved and why.
+
+## Rules
+
+| Severity | Rule |
+| --- | --- |
+| NEVER | Create an empty placeholder file, or delete a document, just to make a link resolve. |
+| NEVER | Change a document's meaning while fixing its references. |
+| MUST | Update every referrer when renaming a file, in the same change. |
+| MUST | Re-run both scripts and show them clean before reporting. |
+| MUST | Ask when two candidate targets are equally plausible, rather than guessing. |
