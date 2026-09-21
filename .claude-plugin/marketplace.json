@@ -10,14 +10,14 @@
       "name": "tsh-core",
       "source": "./plugins/tsh-core",
       "displayName": "TSH Core",
-      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and a bundled Atlassian MCP server for Jira and Confluence.",
+      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and two bundled MCP servers: Atlassian for Jira and Confluence, and Figma for design context.",
       "category": "tooling",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr", "decision-records", "skills", "subagents", "hooks", "plugins", "extensions", "init", "mcp", "jira", "atlassian"]
+      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr", "decision-records", "skills", "subagents", "hooks", "plugins", "extensions", "init", "mcp", "jira", "atlassian", "figma", "design"]
     },
     {
       "name": "tsh-product-engineering",

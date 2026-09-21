@@ -71,9 +71,18 @@ instead of asking whose job it is:
 | One agent, one skill, one discipline | that plugin's own `.mcp.json` |
 
 Atlassian is the first case: engineering, product management and testing all read
-Jira. Playwright is the second: it exists for `tsh-product-testing`'s E2E work and
-stays there. (`tsh-product-engineering` used to bundle it too, until its agents
-moved to the Playwright CLI in 0.7.0.)
+Jira. So is Figma: product engineering judges UI against it, product design works in
+it, product management reads flows out of it during discovery. Playwright is the
+second case: it exists for `tsh-product-testing`'s E2E work and stays there.
+(`tsh-product-engineering` used to bundle it too, until its agents moved to the
+Playwright CLI in 0.7.0.)
+
+A **stack** plugin cannot host a shared server even when it looks like the natural
+owner. Stack plugins install at `project` scope, per repository, while disciplines
+and `tsh-core` install at `user` scope — so a repository that does not install the
+stack plugin gets no server, and hard rule 7 forbids a discipline plugin from
+assuming a stack plugin is present. That is why Figma sits in `tsh-core` rather than
+in `tsh-stack-frontend`, whose `implementing-frontend` gate reads designs too.
 
 **Two facts that decide the boundary, both undocumented in the plugin docs:**
 
@@ -94,11 +103,21 @@ moved to the Playwright CLI in 0.7.0.)
 
 **Bundle a server that needs per-user OAuth; don't bundle one that needs a secret.**
 A remote server the teammate authenticates once through `/mcp` is fine — that is the
-Atlassian case, and the credential never touches the repo. A server needing a token in
-`headers` is not: a static `headers.Authorization` also disables Claude Code's OAuth
-fallback, so it fails outright for anyone who hasn't set the value. Leave those to the
-consuming project, which is why Figma MCP is a `ui-engineer` prerequisite rather than
-a bundled server.
+Atlassian case and the Figma case, and the credential never touches the repo. A server
+needing a token in `headers` is not: a static `headers.Authorization` also disables
+Claude Code's OAuth fallback, so it fails outright for anyone who hasn't set the value.
+Leave those to the consuming project. Atlassian's Bitbucket surface is the worked
+example: the same endpoint exposes it only under API-token authentication, so bundling
+it would ship a server that fails for most installs, and `plugins/tsh-core/README.md`
+carries an opt-in `claude mcp add` command instead.
+
+**Check the server's current auth before applying that test to it.** Figma was this
+rule's don't-bundle example until 0.10.0, on the strength of a `FIGMA_API_KEY` in
+`headers` — and by then Figma's official remote server had replaced that with plain
+OAuth at `https://mcp.figma.com/mcp`, which made it an instance of the bundle-this
+case rather than the counter-example. The rule did not change; the server did. A
+vendor moving from tokens to OAuth is normal, so re-read the vendor's setup docs
+rather than inheriting a verdict from this file.
 
 An `.mcp.json` change is a `plugins/` change, so hard rule 3 applies in full: version
 bump and `CHANGELOG.md` entry in the same commit.

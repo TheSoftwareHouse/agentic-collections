@@ -2,7 +2,7 @@
   "name": "tsh-product-engineering",
   "displayName": "TSH Product Engineering",
   "description": "Spec-driven feature implementation: committed plan files, delegated implementer subagents, and TSH's structured pre-merge code review.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

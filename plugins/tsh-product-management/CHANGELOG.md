@@ -12,6 +12,22 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.1] - 2026-09-21
+
+### Changed
+
+- **The Figma MCP server is now bundled by `tsh-core` 0.10.0, so it is no longer
+  yours to connect.** The README called it "a prerequisite, not a bundled server"
+  because it needed per-user authentication — which is exactly the property that
+  makes a server bundleable, as Atlassian already showed. Figma's official remote
+  server authenticates through `/mcp`, so it sits in `tsh-core` alongside Atlassian.
+  Install `tsh-core`, sign in once per machine, and both work.
+- Nothing in the workflow changed. `reading-workshop-materials.md` still says to
+  check what the session actually exposes and never to assume a tool name, which
+  stays right whether the server comes from `tsh-core` or from a teammate's own
+  `claude mcp add`. Design analysis still reports a blocker rather than skipping
+  silently when no Figma server answers.
+
 ## [0.3.0] - 2026-08-27
 
 ### Added
