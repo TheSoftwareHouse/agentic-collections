@@ -12,6 +12,7 @@ Use this reference when editing provider-level configuration, stages, tags, time
 - [Environment defaults](#environment-defaults)
 - [API Gateway access logs and stage throttling](#api-gateway-access-logs-and-stage-throttling)
 - [Tracing is on](#tracing-is-on)
+- [What the pipeline must do](#what-the-pipeline-must-do)
 - [CORS defaults belong to the handler layer](#cors-defaults-belong-to-the-handler-layer)
 
 The provider-level configuration every function in the service inherits:
@@ -95,6 +96,16 @@ level — see the Non-negotiable Rules table in `SKILL.md` and
 
 ## API Gateway access logs and stage throttling
 
+**This section is written for a REST API.** The settings below — the
+`provider.logs.restApi` block, `fullExecutionData`, `roleManagedExternally` —
+and the throttling call further down are REST-specific. An HTTP API configures
+both through `apigatewayv2` with a different access-log format and different
+stage settings, which this plugin does not cover yet; treat the *reasoning*
+here as transferable and verify every setting name against the v2
+documentation before applying it. An HTTP API also has **no execution logging
+and no X-Ray**, so its access log is the only gateway-side record there is —
+which raises, not lowers, how much the format below matters.
+
 Access logs are the only request-level trail a deployed API has — who called,
 from where, how often, and whether the gateway or your code rejected it. A
 handler's own log cannot see any of that. Turn them on for every deployed
@@ -140,11 +151,46 @@ one form fails with "not found" the day someone flips the flag.
 
 Enable X-Ray for every deployed stage: `tracing: { lambda: true, apiGateway: true }`
 at provider level, and `tracingConfig: { enabled: true }` on every state machine.
+**`apiGateway: true` applies to a REST API only** — API Gateway does not support
+X-Ray on an HTTP API at all, so a service on HTTP API gets Lambda and state
+machine traces with no gateway segment in front of them, and the trace starts at
+the function rather than at the request. Set only `lambda: true` there, and know
+that the gateway's own latency and its integration errors are invisible to
+tracing; its access log is the only record.
 A trace is the only view that joins the gateway, the function, the state machine
 and the downstream call into one request; logs alone reconstruct it by hand, if
 at all. This is what the `xray:*` entries in the wildcard carve-out exist for — a
 carve-out for actions nothing uses is dead weight in the check. The cost is per
 sampled trace, and the default sampling rule keeps it small.
+
+## What the pipeline must do
+
+Three obligations in this reference land on "the pipeline", and a service is
+not deployable until something actually carries them. This is the contract;
+how it is built — the CI system, OIDC to the account, the deploy role's
+permissions — belongs to `tsh-platform-engineering`, referenced by name and
+never assumed installed.
+
+1. **Preflight.** Before deploying, check the account-level API Gateway
+   CloudWatch logging role exists in the target region and fail with an
+   actionable message when it does not; the stack deliberately does not manage
+   it. Check the deploy role can read the stage's database secret only if a
+   step of the pipeline genuinely needs the value — packaging never does.
+2. **Deploy, then throttle.** Run `deploy` for the stage, then apply the
+   stage's rate and burst limits and read them back, per the section above.
+   A deploy whose throttle step is skipped ships an unprotected endpoint that
+   reports success.
+3. **Migrate from inside the network.** Run the database migrations against
+   the stage's database from somewhere that can reach it — for a database with
+   no public endpoint, that is a migration function inside the VPC, not a
+   developer machine or a runner on the public internet. The expand phase runs
+   before the application deploys; a contract phase is a separately approved
+   run after an observation window.
+
+Write the contract into the generated `README.md` under *Deploying*, as a
+numbered list the pipeline author can tick off. A README that says "the
+pipeline applies throttling" without saying that there is no pipeline yet is
+how the account default of 10 000 requests per second reaches production.
 
 ## CORS defaults belong to the handler layer
 

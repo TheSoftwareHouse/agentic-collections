@@ -8,6 +8,7 @@ guessed column type.
 ## Table of Contents
 
 - [Why the Bundler and the ORM Are One Decision](#why-the-bundler-and-the-orm-are-one-decision)
+- [Wiring the bundler into packaging](#wiring-the-bundler-into-packaging)
 - [The Three Pairings](#the-three-pairings)
 - [If a Column's Type Ever Feels Like a Guess](#if-a-columns-type-ever-feels-like-a-guess)
 
@@ -47,6 +48,22 @@ Bundler and ORM are therefore offered as one paired choice at bootstrap, never
 as two independent questions — asking them separately lets someone assemble
 esbuild with a decorator-based ORM without ever being told what that
 combination does.
+
+## Wiring the bundler into packaging
+
+Neither bundler is invoked directly: the framework plugin that owns packaging
+calls it. `serverless-esbuild` for esbuild, `serverless-webpack` for webpack —
+declared in `plugins` and configured under `custom`. Name the one that matches
+the chosen pairing when generating or reviewing a service; a bundler chosen in
+`package.json` with no plugin wiring it in packages nothing.
+
+This plugin carries esbuild's configuration in
+[`compiler-options-for-serverless.md`](./compiler-options-for-serverless.md)
+and the module-format consequences in
+[`runtime-and-module-format.md`](./runtime-and-module-format.md). It does
+**not** carry a webpack configuration: for the webpack pairing it gives the
+compiler settings and the shared-output-directory trap, and the webpack config
+itself is the team's to write.
 
 ## The Three Pairings
 

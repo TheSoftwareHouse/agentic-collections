@@ -8,6 +8,8 @@ Use this reference when adding, reviewing or debugging a check that runs against
 - [Every deployed function declares its own concurrency limit](#every-deployed-function-declares-its-own-concurrency-limit)
 - [No dangling logical-id reference](#no-dangling-logical-id-reference)
 - [Configuration that is present but malformed](#configuration-that-is-present-but-malformed)
+- [Execute the packaged artifact](#execute-the-packaged-artifact)
+- [The verify gate](#the-verify-gate)
 - [Keep the check separate from the source](#keep-the-check-separate-from-the-source)
 
 `package` (or the packaging step of `deploy`) produces the CloudFormation
@@ -98,6 +100,47 @@ string only in AWS) — a schema expecting a non-empty string is satisfied by
 a placeholder without it pretending to be a real ARN. This gives one
 definition of "valid" that both packaging and the running handler agree on,
 instead of two definitions that can quietly drift apart.
+
+## Execute the packaged artifact
+
+Every check above reads the template. None of them proves that the code inside
+the zips runs. The compiler and bundler skill's rule — *verify by executing the
+packaged artifact* — has this shape, in two assertions that both run after
+`package` and before any deploy, and neither of which touches AWS:
+
+- **Every packaged bundle loads.** For each function zip, extract it and import
+  the handler entry in a fresh Node process. It must load as a module without
+  throwing. This is the only cheap moment to catch what the type-check cannot
+  see: a CommonJS dependency inside the ESM bundle, a `.js` entry the runtime
+  would read as CommonJS, an external that is not actually available, a
+  dynamic `require()` the bundler silently left unresolved.
+- **The packaged health handler runs.** Invoke the health handler from the
+  packaged bundle — not from source — against the local database, with the
+  stage's environment resolved locally the way the local stage does. It must
+  answer `ok`. That proves the bundle can reach a database through the driver
+  the bundler actually produced, which a source-level test runner never
+  exercises.
+
+A failure here is a failure of the artifact, not of the source, and the source
+suite will not reproduce it. Report it as such.
+
+## The verify gate
+
+One command is the gate, locally and in CI, and a subset of it is not
+"verified". The house shape, in order:
+
+```text
+verify        = verify:source && verify:artifact
+verify:source = check-node-version && typecheck && lint && test:unit && audit
+verify:artifact = package --stage <stage> && check:template && check:artifact
+```
+
+`audit` fails on known vulnerabilities in the dependency tree — the frozen tree
+of an end-of-life framework is exactly what it exists to catch. `test:unit`
+excludes `test/integration/`; `test:integration` runs it against the local
+database and belongs in CI with a database service. Keep a `verify:offline`
+that skips only `audit` for a machine without registry access, and make it say
+so in its output rather than reporting the run as fully verified.
 
 ## Keep the check separate from the source
 

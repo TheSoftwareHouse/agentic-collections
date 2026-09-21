@@ -30,7 +30,8 @@ deployable service as three independent skills.
   payload type inferred rather than hand-written, the `AppError` → `HttpError`
   hierarchy with every `name` a string literal, structured logging with the
   request id, and what belongs in the
-  init phase versus the handler body. Carries a severity-tagged review checklist
+  init phase versus the handler body, and the rule that every real repository has
+  an integration test against the local database. Carries a severity-tagged review checklist
   for existing serverless function changes.
 - **`configuring-serverless-service`** — service and stage configuration,
   per-function definitions, least-privilege IAM with a named carve-out for the
@@ -48,7 +49,11 @@ deployable service as three independent skills.
   opens with a single `AskUserQuestion` call and generates the complete starter
   — service definition and handler layer alike — on OSLS, never on the
   end-of-life Serverless Framework v3, with every dependency version resolved
-  from the registry rather than written from memory.
+  from the registry rather than written from memory. The starter ships a health
+  endpoint, an integration test for every real repository, the TSH toolchain
+  baseline and a `verify` gate that audits dependencies and executes the packaged
+  artifact, states the contract a deploy pipeline must fulfil, requires every bootstrap option that switches off part of the plugin's guidance to name that gap in its own description — REST versus HTTP API, esbuild versus webpack, PostgreSQL versus anything else, and closes by
+  seeding `CLAUDE.md` and the first decision records through `tsh-core`.
 
 The plugin's most consequential design decision lives in this last skill's
 bootstrap: the **bundler and the ORM are offered as one paired choice**, never as

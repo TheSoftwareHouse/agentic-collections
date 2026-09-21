@@ -66,6 +66,7 @@ handler/service, middleware, validation, error, and logging rules.
 |Severity|Check|Owning reference|
 |---|---|---|
 |[HIGH]|A service test MUST supply fakes as parameters rather than stubbing a module-level import.|[`testing-lambda-code.md`](./testing-lambda-code.md)|
+|[HIGH]|Every real repository MUST have an integration test against the local database under `test/integration/`, excluded from the unit run; a repository covered only through its fake is untested.|[`testing-lambda-code.md`](./testing-lambda-code.md)|
 |[HIGH]|A change to the middleware chain MUST be covered by a handler-level test that asserts the full response — status, headers, and body — including `Access-Control-Allow-Origin` on an **error** response, the only assertion that proves the registration order.|[`testing-lambda-code.md`](./testing-lambda-code.md)|
 |[MEDIUM]|A service test MUST NOT assert against a real database, queue, or third-party API.|[`testing-lambda-code.md`](./testing-lambda-code.md)|
 

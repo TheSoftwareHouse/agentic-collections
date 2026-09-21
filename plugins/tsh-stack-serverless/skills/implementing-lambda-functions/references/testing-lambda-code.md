@@ -11,6 +11,7 @@ it is.
 - [Two layers, two kinds of test](#two-layers-two-kinds-of-test)
 - [Testing the service with fakes](#testing-the-service-with-fakes)
 - [Testing the handler and the middleware chain](#testing-the-handler-and-the-middleware-chain)
+- [Integration tests prove the fake](#integration-tests-prove-the-fake)
 - [What a test must not do](#what-a-test-must-not-do)
 
 ## Two layers, two kinds of test
@@ -26,6 +27,7 @@ what changed.
 | --- | --- | --- |
 | Service | The business logic produces the right result and the right thrown error for a given input and given fakes | Every service, as the default and cheapest test |
 | Handler + middleware chain | Validation, CORS, error mapping, and response shaping behave correctly end to end | Only when the change touches the chain itself, not every handler |
+| Repository, against the local database | The real SQL behaves the way the fake claims: transactions roll back on throw, row locks hold, an atomic decrement refuses a short stock | Every real repository, once — it is the only thing that proves the fakes have not drifted |
 
 ## Testing the service with fakes
 
@@ -73,6 +75,32 @@ handler file names, check where a sibling test file can live without being
 picked up as a second candidate entry point; some bundlers glob for a handler
 file's name and would treat a co-located spec file as another handler unless
 it is placed elsewhere.
+
+## Integration tests prove the fake
+
+A fake repository is a claim about how the real one behaves. Nothing checks
+that claim unless the real repository is tested too — against a real
+database, with the same calls the services make through the fake.
+
+Put those tests in `test/integration/<repository>.integration.spec.ts`. They
+run against the local database from `docker-compose.yaml`, read its connection
+string from the test setup rather than from `.env`, and are excluded from the
+unit run by path — `test:unit` never needs Docker, `test:integration` always
+does, and `verify` runs both. Each test creates what it needs and cleans up
+after itself, so the suite is order-independent and safe to re-run.
+
+What they assert is the **contract the fake promises**, not the ORM:
+
+- A transaction rolls back every write when the callback throws — the
+  behaviour a service relies on when it throws a domain error midway.
+- A row-level lock holds: two concurrent readers of the same row for update
+  serialise rather than both proceeding.
+- An atomic conditional update — decrement stock only if enough is available
+  — returns "not applied" when short, and applies exactly once when not.
+- Listing honours the filter, the ordering and the limit the fake implements.
+
+One test file per repository, kept short. The moment a fake gains a behaviour
+the integration test does not cover, the fake is lying and nobody knows.
 
 ## What a test must not do
 

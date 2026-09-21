@@ -17,6 +17,27 @@ scope, and so does `tsh-core`.
 /plugin install tsh-stack-serverless@tsh-agentic-collections
 ```
 
+## Start here
+
+**A new service, from an empty repository.** There is nothing for Claude to
+route from yet, so ask for it:
+
+```shell
+/tsh-stack-serverless:configuring-serverless-service
+```
+
+It asks four questions in one go — build and persistence stack, HTTP layer,
+database, orchestration — and generates the whole starter from the answers:
+service definition, handler layer, tests, local development, the `verify`
+gate, and the project's own `CLAUDE.md` and decision records. Needs Node at
+the runtime's major and a running Docker daemon.
+
+**An existing service.** Nothing to type. Describe the work — "add a POST
+/orders endpoint", "scope this IAM statement", "the bundle builds but the
+Lambda throws at runtime" — and the matching skill loads on its own. The
+commands in the table below are there for when you want to be explicit, not
+because you have to be.
+
 ## What's in it
 
 | Skill | Invoke | Covers |
@@ -28,15 +49,43 @@ scope, and so does `tsh-core`.
 All three are model-invocable — Claude loads them when the work matches
 their description, so you don't have to remember to type the command.
 
-The bundler and the ORM are **one paired choice**, not two: the bootstrap
-procedure in `configuring-serverless-service` asks for both together in a
-single question, because esbuild cannot emit `emitDecoratorMetadata` and
-pairing it with a decorator-based ORM without a mitigation compiles clean and
-fails at runtime, silently. `configuring-typescript-for-serverless` carries
-the full trade-off table the bootstrap links to rather than restates.
-
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates
 arrive with `/plugin update`.
+
+## Choices this plugin has an opinion on
+
+Three decisions the bootstrap asks about, where the answer changes which of
+this plugin's rules still apply afterwards. Every option is generated either
+way — the point is that none of them is silent about what it costs.
+
+- **The bundler and the ORM are one choice, not two.** esbuild cannot emit
+  `emitDecoratorMetadata` and never will — the emit needs TypeScript's type
+  system, which esbuild deliberately does not have. Pair it with a
+  decorator-based ORM and entities compile with **no build error** while the
+  metadata is silently dropped, surfacing at runtime as a missing or
+  wrongly-guessed column type. So the bootstrap asks once:
+  esbuild + Drizzle, webpack + `ts-loader` + TypeORM, or esbuild + TypeORM
+  behind a compiler pass. `configuring-typescript-for-serverless` carries the
+  full trade-off table.
+
+- **REST API is what the operational guidance covers end to end.** Access
+  logging, stage throttling and the packaged-template checks are written
+  against it, and it is what the source boilerplate runs. HTTP API is cheaper
+  per request, lower latency and ships a built-in JWT authorizer — but it has
+  **no X-Ray tracing at all**, no execution logs, no WAF, no API keys or
+  per-client throttling, no resource policies or private endpoints, and no
+  caching. Reach for HTTP API when the API is consumed by your own frontend
+  behind JWT and none of that list matters; reach for REST when any of it
+  does — in practice WAF decides it for anything public. Note that gateway
+  request validation is a weaker argument here than it looks: this plugin
+  already requires the handler to validate the whole event against one schema,
+  so the gateway's copy saves a billed invocation, not a class of bug.
+
+- **PostgreSQL is the assumed datastore.** The connection-budget arithmetic,
+  the secret's shape and the local `docker-compose.yaml` are all built around
+  a connection-per-invocation relational database. Another engine works; a
+  request-per-call datastore like DynamoDB makes most of that reasoning
+  meaningless rather than merely different.
 
 ## Not covered yet
 
@@ -56,6 +105,22 @@ Deliberate gaps, so they read as scope rather than oversight:
 - **Authentication** — the source material this plugin was derived from
   carries no example, and inventing one here would be guidance TSH has not
   agreed to.
+- **The deploy pipeline itself** — `configuring-serverless-service` states what
+  the pipeline must do (preflight, deploy then throttle, migrate from inside the
+  network) and has the bootstrap write that contract into the starter's README.
+  How to build it — CI system, OIDC, the deploy role — is `tsh-platform-engineering`.
+- **Webpack configuration** — the bundler-and-ORM pairing offers
+  webpack + `ts-loader` + TypeORM and carries the compiler settings it needs,
+  but not the `serverless-webpack` setup or the webpack config itself.
+- **Event sources other than HTTP and Step Functions** — SQS with its
+  partial-batch response, schedules, EventBridge rules: the handler side is
+  covered, the event-source and IAM configuration is not.
+- **Datastores other than PostgreSQL** — the connection-budget arithmetic, the
+  secret shape and the local database assume Postgres.
+- **HTTP API operations** — the bootstrap offers HTTP API and generates a
+  working service on it, but the access-logging, stage-throttling and
+  packaged-template guidance is written for REST API. The `apigatewayv2`
+  equivalents are not covered; the bootstrap says so when the option is chosen.
 - **Multi-account deployment** — this plugin owns one service's definition,
   not the account topology or pipeline that promotes it across accounts. That
   sits above what a single `serverless.yml` can express.

@@ -40,6 +40,8 @@ service-root/
 │                                  #   machine, log group, ARN reference and
 │                                  #   stack output from the directory name
 ├── functions/
+│   ├── health/                    # GET /health with any HTTP layer: SELECT 1,
+│   │                              #   answers only ok | unavailable
 │   └── <function-name>/
 │       ├── function.ts            # typed function definition: runtime config,
 │       │                          #   the execution role it uses, its
@@ -67,6 +69,15 @@ service-root/
 │                                  #   packaging-and-template-checks.md, under
 │                                  #   whatever name and language fit the
 │                                  #   project's own tooling
+├── test/
+│   └── integration/               # real-database tests, one per repository,
+│       └── <repo>.integration.spec.ts  # excluded from test:unit
+├── docs/
+│   └── decisions/                 # the bootstrap answers as ADR 0001-0004
+├── CLAUDE.md                      # seeded by /tsh-core:managing-claude-context
+├── AGENTS.md                      # the short entry point CLAUDE.md expands on
+├── eslint.config.*                # ESLint flat config with Prettier; lint-staged
+│                                  #   and commitlint configured alongside
 ├── .npmrc                         # engine-strict=true — see local-development.md
 ├── .nvmrc                         # the runtime's Node major, for nvm use
 ├── .env.dist                      # every variable config/ reads, with a safe
@@ -122,6 +133,16 @@ packaged template. The name, language and runner are a project choice —
 nothing here is a fixed artifact to copy. What each check must assert is
 in [`packaging-and-template-checks.md`](./packaging-and-template-checks.md).
 
+**`test/integration/`.** One file per real repository, run against the local
+database and excluded from the unit run. This is what keeps every
+`FakeOrdersRepository`-style fake honest — see the testing reference in
+`implementing-lambda-functions`.
+
+**`docs/decisions/`, `CLAUDE.md`, `AGENTS.md`.** The project's memory, written
+by the bootstrap's last step through `tsh-core`: the bootstrap answers as the
+first decision records, and the conventions this starter obeys as the context
+every later session loads.
+
 ## Wiring the bootstrap answers
 
 - **Build and persistence stack** (question 1) decides the bundler config
@@ -131,7 +152,8 @@ in [`packaging-and-template-checks.md`](./packaging-and-template-checks.md).
 - **HTTP layer** (question 2) decides whether `functions/` contains
   HTTP-triggered definitions at all, and which API Gateway integration type
   their `function.ts` declares. "No endpoints" produces a `functions/`
-  directory with only non-HTTP entries (or none yet).
+  directory with only non-HTTP entries (or none yet); any HTTP layer also
+  produces `functions/health/`.
 - **Persistence target** (question 3) decides whether `config/secrets.ts`
   and its accompanying execution-role statement exist at all, and whether
   `docker-compose.yaml` ships a local database for offline runs. "None" means
