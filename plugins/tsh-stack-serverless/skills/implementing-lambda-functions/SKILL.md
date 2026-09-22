@@ -70,10 +70,13 @@ Implementation progress:
 ```
 
 **Step 1 — Discover local conventions.** Read the repository's existing
-functions for its validation library, error hierarchy, logger, and test runner
-before introducing a different one. This skill states the structural rules that
-hold regardless of which of those a repository chose; it does not mandate any
-one of them.
+functions before introducing anything different. The validation library (zod)
+and the shape of a log line are settled in the library policy that
+`configuring-serverless-service` carries; the **test runner is deliberately
+not** — follow what the repository uses, and ask rather than introduce one
+where there is none. A repository already standardised on something else keeps
+it: local convention outranks a default, and swapping a library is its own
+task.
 
 **Step 2 — Load relevant references.** Read
 [`handler-and-service-split.md`](./references/handler-and-service-split.md)

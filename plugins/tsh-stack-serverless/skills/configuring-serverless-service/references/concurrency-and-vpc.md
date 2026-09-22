@@ -59,8 +59,7 @@ it, so the exemption cannot silently widen to cover a real stage.
 Attaching every function to a VPC by default causes two concrete problems:
 
 1. **It breaks a clean checkout.** A VPC-attached function needs real
-   subnet and security-group ids. A boilerplate or a freshly bootstrapped
-   service has none, so `package`/`deploy` fails before there is even an AWS
+   subnet and security-group ids. A new or freshly cloned service has none, so `package`/`deploy` fails before there is even an AWS
    account behind it — and the same failure hits CI on every pull request.
 2. **It is not free.** A VPC-attached Lambda has no route to the public
    internet without a NAT Gateway — a fixed monthly cost plus per-GB data

@@ -55,12 +55,19 @@ configuration:
 - **Cookies** — session identifiers are as sensitive as the token they stand
   in for.
 
-An input/output logging middleware commonly ships a default redaction list.
-Verify what it actually redacts for the version in use rather than assuming —
-redaction defaults have changed between middleware versions, and a repository
-that pins an older version may not get the coverage a newer default provides.
-Treat the three items above as a floor to enforce explicitly, not as something
-the middleware is trusted to have covered.
+**Do not assume the logging middleware redacts anything.** middy 7 ships
+`omitPaths: []` — an empty list, so an input/output logger added with default
+options writes the entire event and the entire response, bodies and
+authorization headers included. Read the installed version's own source or
+documentation rather than trusting a remembered default; redaction defaults
+differ between middleware versions and between middlewares.
+
+Enforce the floor explicitly, and **omit the whole `headers` and
+`multiValueHeaders` objects rather than naming individual keys**. The logging
+middleware's `before` hook runs ahead of the header normalizer, so it sees
+whatever casing the client sent: a path list naming `authorization` sails past
+an `Authorization` header, and the token is in the log. Omitting the containers
+costs a little debugging convenience and removes the whole class of miss.
 
 ## console is not a logger
 

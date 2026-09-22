@@ -10,6 +10,7 @@ Use this reference when adding, reviewing or debugging a check that runs against
 - [Configuration that is present but malformed](#configuration-that-is-present-but-malformed)
 - [Execute the packaged artifact](#execute-the-packaged-artifact)
 - [The verify gate](#the-verify-gate)
+- [What the template cannot tell you](#what-the-template-cannot-tell-you)
 - [Keep the check separate from the source](#keep-the-check-separate-from-the-source)
 
 `package` (or the packaging step of `deploy`) produces the CloudFormation
@@ -135,12 +136,40 @@ verify:source = check-node-version && typecheck && lint && test:unit && audit
 verify:artifact = package --stage <stage> && check:template && check:artifact
 ```
 
+Keep a plain `test` script as well, aliasing whichever run a developer wants by
+default — `npm test` is the entry point every person and every tool reaches for
+first, and a repository where it errors out reads as broken.
+
 `audit` fails on known vulnerabilities in the dependency tree — the frozen tree
 of an end-of-life framework is exactly what it exists to catch. `test:unit`
 excludes `test/integration/`; `test:integration` runs it against the local
 database and belongs in CI with a database service. Keep a `verify:offline`
 that skips only `audit` for a machine without registry access, and make it say
 so in its output rather than reporting the run as fully verified.
+
+## What the template cannot tell you
+
+Some stage-level settings never reach the packaged template at all. OSLS does
+not emit an `AWS::ApiGateway::Stage` resource: access logging, gateway tracing
+and stage tags are applied through the API Gateway SDK during `deploy`, after
+CloudFormation is done. A check that looks for them in the template finds
+nothing and — worse — a check written to *assert* they are present fails on a
+correctly configured service.
+
+So split the two:
+
+- **Assert in the template** what CloudFormation owns: IAM, reserved
+  concurrency, logical-id references, function environments.
+- **Read back after deploying** what the framework applies through the SDK:
+  access logging on the stage, `tracingEnabled`, stage tags, and the throttle
+  the pipeline sets. `aws apigateway get-stage` returns all of them.
+
+The second half belongs to the pipeline, next to the throttling step that
+already reads its own values back — see the pipeline contract in
+[`service-and-stage-configuration.md`](./service-and-stage-configuration.md).
+Verify the behaviour of the framework version in use before assuming either
+half: which resources a framework emits is exactly the kind of thing that
+changes between majors.
 
 ## Keep the check separate from the source
 

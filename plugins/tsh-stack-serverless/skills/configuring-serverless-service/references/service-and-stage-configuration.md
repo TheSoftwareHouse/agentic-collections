@@ -6,10 +6,12 @@ Use this reference when editing provider-level configuration, stages, tags, time
 
 - [OSLS, not Serverless Framework v3](#osls-not-serverless-framework-v3)
 - [Prefer a typed configuration file over a static one](#prefer-a-typed-configuration-file-over-a-static-one)
+- [Do not configure a default](#do-not-configure-a-default)
 - [Stage derivation](#stage-derivation)
 - [Naming and tags](#naming-and-tags)
 - [Timeouts](#timeouts)
 - [Environment defaults](#environment-defaults)
+- [Every HTTP service has a health endpoint](#every-http-service-has-a-health-endpoint)
 - [API Gateway access logs and stage throttling](#api-gateway-access-logs-and-stage-throttling)
 - [Tracing is on](#tracing-is-on)
 - [What the pipeline must do](#what-the-pipeline-must-do)
@@ -48,6 +50,19 @@ leaning on the framework's own variable-resolution syntax for anything
 conditional. A value resolved in TypeScript is visible to the type checker
 and to a plain `grep`; a value resolved by the framework's own templating
 syntax is neither.
+
+## Do not configure a default
+
+Every line in the service configuration should change something. A setting
+written at its own default value costs more than it looks: it reads as
+load-bearing, so the next person leaves it alone rather than risk breaking
+something, and its comment ends up carrying a claim nobody re-checks.
+
+The pattern to watch for is a rule that says "never turn X off" answered with a
+line that tries to turn X on. Check what the option actually controls, and check
+the default, before writing it — and when the answer is "this is already the
+default", the correct configuration is no line at all. A rule about not
+disabling something is satisfied by not disabling it.
 
 ## Stage derivation
 
@@ -94,6 +109,29 @@ downstream resource's identifier). Never place a secret value at either
 level — see the Non-negotiable Rules table in `SKILL.md` and
 [`iam-and-secrets.md`](./iam-and-secrets.md).
 
+## Every HTTP service has a health endpoint
+
+`GET /health` exists on every service that exposes HTTP at all, and it is the
+one endpoint a monitor, a load balancer and a deploy check can all agree on.
+Three rules make it useful rather than decorative:
+
+- **It touches what the service depends on.** A handler that returns `200`
+  without checking anything proves only that Lambda can run code. Where the
+  service has a database, run a short `SELECT 1` under a statement timeout well
+  below the function timeout, and release the connection in a `finally`.
+- **It answers `ok` or `unavailable`, and nothing else.** No error message, no
+  stack, no dependency name, no version. A monitor reads this endpoint, and it
+  is usually unauthenticated — every detail in the body is detail an attacker
+  gets for free. The failure's cause belongs in the log, under the request id.
+- **It is exempt from nothing else.** It declares its own
+  `reservedConcurrency` like every other function, and it runs under the same
+  execution role rules.
+
+A health endpoint is also what makes the packaged-artifact check in
+[`packaging-and-template-checks.md`](./packaging-and-template-checks.md)
+possible: it is the one handler that can be invoked from the packaged bundle
+against a local database and asserted on.
+
 ## API Gateway access logs and stage throttling
 
 **This section is written for a REST API.** The settings below — the
@@ -130,6 +168,13 @@ stage, and hold three settings deliberately:
   The account-level API Gateway logging role is a one-time, per-account,
   per-region setting the account owner enters by hand; the deploy checks that it
   exists and fails with an actionable message when it does not.
+
+**None of the settings above appear in the packaged template.** OSLS applies
+stage-level configuration — access logging, `tracingEnabled`, stage tags —
+through the API Gateway SDK during `deploy`, not as an `AWS::ApiGateway::Stage`
+resource, so a packaging-time check cannot confirm any of it. Read it back with
+`aws apigateway get-stage` after deploying, in the same pipeline step that reads
+the throttle back.
 
 **Stage throttling cannot be expressed in the service configuration.** The
 framework exposes `throttle` only inside a usage plan, which applies to API-key
@@ -187,7 +232,7 @@ never assumed installed.
    before the application deploys; a contract phase is a separately approved
    run after an observation window.
 
-Write the contract into the generated `README.md` under *Deploying*, as a
+Write the contract into the service's `README.md` under *Deploying*, as a
 numbered list the pipeline author can tick off. A README that says "the
 pipeline applies throttling" without saying that there is no pipeline yet is
 how the account default of 10 000 requests per second reaches production.

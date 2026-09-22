@@ -6,7 +6,7 @@ thrown error to an HTTP response.
 ## Table of Contents
 
 - [One schema per function](#one-schema-per-function)
-- [Choosing a schema library](#choosing-a-schema-library)
+- [The schema library is zod](#the-schema-library-is-zod)
 - [The error hierarchy](#the-error-hierarchy)
 - [Exposed vs masked](#exposed-vs-masked)
 - [What the validation middleware does not replace](#what-the-validation-middleware-does-not-replace)
@@ -38,19 +38,18 @@ The validation middleware (see [`middleware-chain.md`](./middleware-chain.md))
 runs the schema before the handler body executes. A handler must not receive
 an event it has not already validated.
 
-## Choosing a schema library
+## The schema library is zod
 
-This skill does not mandate one schema library. Discover which one the
-repository already uses — most TypeScript-first choices support structural
-type inference the same way — and use it consistently for every function in
-that repository. Mixing two schema libraries across functions in the same
-service is a maintenance cost with no offsetting benefit.
+**zod** is settled — see the library policy in
+`configuring-serverless-service`. Use it for every function in a service; two
+schema libraries in one service is a maintenance cost with no offsetting
+benefit.
 
-If a repository has no established schema library yet and the choice is
-genuinely open, that is a decision this skill cannot make for the reader: as a
-subagent, report the blocker to the caller rather than picking silently; in the
-main conversation, ask the user with `AskUserQuestion` before writing the first
-schema.
+A repository already standardised on something else keeps what it has: local
+convention outranks this default, and migrating a validation library is its own
+task, never a side effect of adding an endpoint. What does not change either
+way is the rule above — one schema for the whole event, with the payload type
+inferred from it.
 
 ## The error hierarchy
 

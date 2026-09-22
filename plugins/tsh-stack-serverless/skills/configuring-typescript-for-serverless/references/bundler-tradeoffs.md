@@ -44,10 +44,12 @@ at runtime, the first time that entity is mapped: TypeORM falls back to metadata
 that was never produced, and the column gets **a missing or wrongly-guessed
 type**. Nothing in the build output says so, because nothing in the build failed.
 
-Bundler and ORM are therefore offered as one paired choice at bootstrap, never
-as two independent questions — asking them separately lets someone assemble
-esbuild with a decorator-based ORM without ever being told what that
-combination does.
+Bundler and ORM are therefore one decision, never two independent ones —
+treating them separately is how a service ends up on esbuild with a
+decorator-based ORM without anyone being told what that combination does. Which
+ORM TSH recommends for a new service is not settled; the constraint below is,
+and it holds whichever way that lands. See the library policy in
+`configuring-serverless-service`.
 
 ## Wiring the bundler into packaging
 

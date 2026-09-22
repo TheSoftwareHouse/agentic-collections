@@ -1,7 +1,7 @@
 # TSH Stack: Serverless
 
-TSH conventions for AWS Lambda services built with OSLS v4 — or an existing
-Serverless Framework v3 project — on Node.js 22+: compiler and bundler configuration, handler
+TSH practices for AWS Lambda services on OSLS v4, Node.js 22+ — what we
+recommend and when, which libraries we use and which we avoid: compiler and bundler configuration, handler
 implementation, and the deployable service definition.
 
 This is a **stack** plugin, not a discipline plugin. Install it into the
@@ -17,34 +17,13 @@ scope, and so does `tsh-core`.
 /plugin install tsh-stack-serverless@tsh-agentic-collections
 ```
 
-## Start here
-
-**A new service, from an empty repository.** There is nothing for Claude to
-route from yet, so ask for it:
-
-```shell
-/tsh-stack-serverless:configuring-serverless-service
-```
-
-It asks four questions in one go — build and persistence stack, HTTP layer,
-database, orchestration — and generates the whole starter from the answers:
-service definition, handler layer, tests, local development, the `verify`
-gate, and the project's own `CLAUDE.md` and decision records. Needs Node at
-the runtime's major and a running Docker daemon.
-
-**An existing service.** Nothing to type. Describe the work — "add a POST
-/orders endpoint", "scope this IAM statement", "the bundle builds but the
-Lambda throws at runtime" — and the matching skill loads on its own. The
-commands in the table below are there for when you want to be explicit, not
-because you have to be.
-
 ## What's in it
 
 | Skill | Invoke | Covers |
 | :-- | :-- | :-- |
 | `configuring-typescript-for-serverless` | `/tsh-stack-serverless:configuring-typescript-for-serverless` | Node runtime and TypeScript version to target, the `tsconfig.json` baseline for bundler-emitted ESM handler code, and choosing esbuild versus webpack with `ts-loader` |
 | `implementing-lambda-functions` | `/tsh-stack-serverless:implementing-lambda-functions` | The thin-handler and pure-service split, middy middleware chain ordering, event validation against one schema, the `AppError` → `HttpError` hierarchy, structured logging, init-phase work, testing, and a review checklist |
-| `configuring-serverless-service` | `/tsh-stack-serverless:configuring-serverless-service` | Service and stage configuration, per-function definitions, least-privilege IAM, per-function reserved concurrency, opt-in VPC attachment, secrets resolved at runtime, packaged-template checks, API Gateway access logs and stage throttling, local development with `serverless-offline`, Step Functions task rules — `Retry`, `Catch`, timeouts, error names as literals — and the bootstrap procedure that generates a complete starter — service definition and handler layer both — on OSLS |
+| `configuring-serverless-service` | `/tsh-stack-serverless:configuring-serverless-service` | Service and stage configuration, per-function definitions, least-privilege IAM, per-function reserved concurrency, opt-in VPC attachment, the library policy — what we use, what we avoid, and the two choices the team has not settled — how a serverless project is structured, service and stage configuration, least-privilege IAM, per-function reserved concurrency, opt-in VPC, secrets resolved at runtime, packaged-template checks, API Gateway access logs and stage throttling, local development with `serverless-offline`, and Step Functions task rules |
 
 All three are model-invocable — Claude loads them when the work matches
 their description, so you don't have to remember to type the command.
@@ -54,19 +33,30 @@ arrive with `/plugin update`.
 
 ## Choices this plugin has an opinion on
 
-Three decisions the bootstrap asks about, where the answer changes which of
-this plugin's rules still apply afterwards. Every option is generated either
-way — the point is that none of them is silent about what it costs.
+Where this plugin takes a position, and where it deliberately does not. The
+full policy — including what we avoid and why — is in
+`configuring-serverless-service`'s `library-policy.md`.
 
-- **The bundler and the ORM are one choice, not two.** esbuild cannot emit
+**Settled:** OSLS v4 over Serverless Framework (v3 is end of life, v4 a
+different product), the service configuration in TypeScript rather than
+`serverless.yml`, middy 7, zod, PostgreSQL, Secrets Manager, Step Functions
+with the definition in ASL. **Not settled:** the ORM for a new service, and
+the test runner — the plugin says so and tells the model to ask rather than
+pick.
+
+Three of those decisions change which of this plugin's other rules still
+apply, so none of them is silent about what it costs.
+
+- **The bundler and the ORM are one choice, not two** — whichever ORM the team
+  settles on. esbuild cannot emit
   `emitDecoratorMetadata` and never will — the emit needs TypeScript's type
   system, which esbuild deliberately does not have. Pair it with a
   decorator-based ORM and entities compile with **no build error** while the
   metadata is silently dropped, surfacing at runtime as a missing or
-  wrongly-guessed column type. So the bootstrap asks once:
-  esbuild + Drizzle, webpack + `ts-loader` + TypeORM, or esbuild + TypeORM
-  behind a compiler pass. `configuring-typescript-for-serverless` carries the
-  full trade-off table.
+  wrongly-guessed column type. So the two are decided together: webpack with
+  `ts-loader` for a decorator-based ORM, esbuild for a decorator-free one, or
+  esbuild behind a compiler pass when a decorator ORM is non-negotiable.
+  `configuring-typescript-for-serverless` carries the full trade-off table.
 
 - **REST API is what the operational guidance covers end to end.** Access
   logging, stage throttling and the packaged-template checks are written
@@ -97,9 +87,9 @@ Deliberate gaps, so they read as scope rather than oversight:
   TypeORM track rather than one neutral procedure, because the migration
   tooling differs between them, not only the entity syntax — which is why it
   did not ship with v0.1.0.
-- **Step Functions beyond the basics** — the bootstrap already generates a
-  state machine with one function per task, `Retry` on transient errors,
-  `Catch` to a `Fail` state and `TimeoutSeconds` per step. `Map` and
+- **Step Functions beyond the basics** — the task rules are covered: one
+  function per task, `Retry` on transient errors only, `Catch` to a `Fail`
+  state, `TimeoutSeconds` per step, error names as string literals. `Map` and
   `Parallel`, compensation, and running a workflow locally with Step Functions
   Local are planned for v0.2 as `implementing-step-functions-workflows`.
 - **Authentication** — the source material this plugin was derived from
@@ -107,20 +97,23 @@ Deliberate gaps, so they read as scope rather than oversight:
   agreed to.
 - **The deploy pipeline itself** — `configuring-serverless-service` states what
   the pipeline must do (preflight, deploy then throttle, migrate from inside the
-  network) and has the bootstrap write that contract into the starter's README.
+  network) and says to write that contract into the service's README.
   How to build it — CI system, OIDC, the deploy role — is `tsh-platform-engineering`.
-- **Webpack configuration** — the bundler-and-ORM pairing offers
-  webpack + `ts-loader` + TypeORM and carries the compiler settings it needs,
+- **Webpack configuration** — the bundler-and-ORM pairing covers
+  webpack + `ts-loader` and the compiler settings it needs,
   but not the `serverless-webpack` setup or the webpack config itself.
 - **Event sources other than HTTP and Step Functions** — SQS with its
   partial-batch response, schedules, EventBridge rules: the handler side is
   covered, the event-source and IAM configuration is not.
 - **Datastores other than PostgreSQL** — the connection-budget arithmetic, the
   secret shape and the local database assume Postgres.
-- **HTTP API operations** — the bootstrap offers HTTP API and generates a
-  working service on it, but the access-logging, stage-throttling and
+- **The ORM and the test runner for a new service** — not gaps in coverage but
+  open team decisions; the library policy names them as such and requires
+  asking rather than defaulting.
+- **HTTP API operations** — the access-logging, stage-throttling and
   packaged-template guidance is written for REST API. The `apigatewayv2`
-  equivalents are not covered; the bootstrap says so when the option is chosen.
+  equivalents are not covered; the guidance says so where it matters, so a
+  service on HTTP API is not silently treated as covered.
 - **Multi-account deployment** — this plugin owns one service's definition,
   not the account topology or pipeline that promotes it across accounts. That
   sits above what a single `serverless.yml` can express.

@@ -39,7 +39,7 @@ proposing anything. **Local conventions outrank this skill's defaults.** Apply
 this guidance where the service is silent, and record a deliberate deviation
 rather than silently mixing conventions.
 
-The bundler-and-ORM pairing decided at bootstrap (see
+The bundler-and-ORM pairing (see
 [`bundler-tradeoffs.md`](./references/bundler-tradeoffs.md)) constrains the
 decorator-related compiler flags below — do not add
 `experimentalDecorators`/`emitDecoratorMetadata` on the assumption they are
@@ -118,8 +118,8 @@ Ships in this plugin — if this skill loaded, they are installed.
   owns everything inside the handler once it is compiled: the thin-handler
   split, middleware, validation, and logging.
 - [`configuring-serverless-service`](${CLAUDE_PLUGIN_ROOT}/skills/configuring-serverless-service/SKILL.md) —
-  owns the deployable service definition, including the bootstrap procedure
-  that asks for this skill's bundler-and-ORM pairing up front.
+  owns the deployable service definition and the library policy, which states
+  where this skill's bundler-and-ORM pairing is settled and where it is not.
 
 `tsh-stack-nodejs` ships a sibling, `configuring-typescript-for-nodejs`, covering
 the same language for a Node server process, not a bundled Lambda artifact — its

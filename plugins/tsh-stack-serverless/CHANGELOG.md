@@ -33,37 +33,34 @@ deployable service as three independent skills.
   init phase versus the handler body, and the rule that every real repository has
   an integration test against the local database. Carries a severity-tagged review checklist
   for existing serverless function changes.
-- **`configuring-serverless-service`** — service and stage configuration,
-  per-function definitions, least-privilege IAM with a named carve-out for the
-  actions AWS defines no resource type for, per-function reserved concurrency,
-  opt-in VPC attachment, secrets passed by identifier and resolved at runtime, and
-  assertions to run over the packaged CloudFormation template before the first
-  deploy, API Gateway access logs and stage throttling, local development
-  with `serverless-offline`, a `local` stage, `.env.dist` and a profile-gated
-  database browser, and the Step
-  Functions task rules — `Retry` and `Catch` in the state machine, never in
-  task code, `TimeoutSeconds` below the function timeout, error names as string
-  literals, one directory per workflow and per step registered by a single
-  `defineWorkflow()` call, and X-Ray tracing on by default. Carries the
-  plugin's generative entry point: a four-question bootstrap procedure that
-  opens with a single `AskUserQuestion` call and generates the complete starter
-  — service definition and handler layer alike — on OSLS, never on the
-  end-of-life Serverless Framework v3, with every dependency version resolved
-  from the registry rather than written from memory. The starter ships a health
-  endpoint, an integration test for every real repository, the TSH toolchain
-  baseline and a `verify` gate that audits dependencies and executes the packaged
-  artifact, states the contract a deploy pipeline must fulfil, requires every bootstrap option that switches off part of the plugin's guidance to name that gap in its own description — REST versus HTTP API, esbuild versus webpack, PostgreSQL versus anything else, and closes by
-  seeding `CLAUDE.md` and the first decision records through `tsh-core`.
+- **`configuring-serverless-service`** — the library policy (what TSH uses, what it
+  avoids and why, and the two choices the team has deliberately left open), how a
+  serverless project is structured, service and stage configuration, per-function
+  definitions, least-privilege IAM with a named carve-out for the actions AWS defines
+  no resource type for, per-function reserved concurrency, opt-in VPC attachment,
+  secrets passed by identifier and resolved at runtime, assertions to run over the
+  packaged CloudFormation template including executing it, API Gateway access logs and
+  stage throttling, local development with `serverless-offline`, a `local` stage,
+  `.env.dist` and a profile-gated database browser, the Step Functions task rules —
+  `Retry` and `Catch` in the state machine, never in task code, `TimeoutSeconds` below
+  the function timeout, error names as string literals, one directory per workflow and
+  per step registered by a single `defineWorkflow()` call — the contract a deploy
+  pipeline must fulfil, and X-Ray tracing on by default.
 
-The plugin's most consequential design decision lives in this last skill's
-bootstrap: the **bundler and the ORM are offered as one paired choice**, never as
-two independent questions. esbuild does not implement `emitDecoratorMetadata` and
-cannot — the emit requires TypeScript's type system, which esbuild deliberately
-does not have — and the failure is silent: decorators compile without error and
-the metadata is simply omitted, so an independently assembled esbuild + TypeORM
-service builds cleanly and fails at runtime with a missing or wrongly-guessed
-column type. Asking the two questions separately would let that combination be
-assembled unwarned.
+The plugin's most consequential technical claim is the bundler-and-ORM coupling:
+esbuild does not implement `emitDecoratorMetadata` and cannot — the emit requires
+TypeScript's type system, which esbuild deliberately does not have — and the failure is
+silent, so a service on esbuild with a decorator-based ORM builds cleanly and fails at
+runtime with a missing or wrongly-guessed column type. The two are therefore one
+decision, whichever ORM the team eventually settles on.
+
+**This plugin ships no bootstrap, no `init` and no example project.** It is a body of
+practices, and the intended effect is indirect: with the practices in context, a model
+building a serverless service already works the way TSH works, so what it produces is
+boilerplate-shaped without anything generating a starter. An earlier draft carried a
+four-question bootstrap that emitted a whole example service; it was removed, and the
+project structure it pinned survives as a documented convention in
+`project-structure.md`.
 
 ### Provenance
 
@@ -94,6 +91,7 @@ What did travel, as the substantive portable content:
 - Secrets resolved at runtime from an identifier, never stored as a literal value
   in a function's environment, where the CloudFormation template would keep it
   readable through `lambda:GetFunctionConfiguration`.
-- Assertions over the packaged CloudFormation template, run at package time —
+- Assertions over the packaged CloudFormation template *and* over the packaged
+  artifact itself, run at package time —
   the last cheap moment to catch a wrong logical id or a wildcard statement
   before it fails minutes into a deploy.

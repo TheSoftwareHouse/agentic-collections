@@ -83,6 +83,16 @@ packaged artifact actually runs:
    namespace object instead of the constructor or class it expects, producing
    an error inside the dependency itself at import time.
 
+**The case you are most likely to hit first is the AWS SDK.** Its packages ship
+no `exports` map — only `main` (a CommonJS build) and `module` (an ESM build) —
+and esbuild's default field order for `platform: "node"` prefers `main`. An ESM
+bundle therefore pulls in the CommonJS build, whose internal
+`require("node:https")` the bundle cannot satisfy, and the artifact throws
+`Dynamic require of "node:https" is not supported` the moment it is imported.
+Setting the bundler's main-field order to prefer `module` over `main` fixes it.
+Nothing catches this except executing the packaged artifact: the type-check
+passes, and so does every source-level test.
+
 The common thread: the fix is never to widen module resolution further and hope
 it resolves everything — that is what caused case 3. Instead, pin the
 problematic dependency to a known-good behavior individually: force a static
@@ -96,6 +106,7 @@ adjusting a global setting.
 | --- | --- |
 | MUST | Verify by executing the packaged artifact — not just running the test suite — after changing anything about how the bundler resolves or externalizes a dependency. Source-level test runners bypass bundling entirely and cannot see these failures. |
 | NEVER | Silence a bundler's "cannot resolve" or "critical dependency" warning globally to make output quieter. That warning is frequently the only build-time signal that a dynamic `require()` exists and will fail at runtime; scope any suppression to the specific dependency that is already understood to be safe. |
+| NEVER | Add configuration to *enable* those warnings. They are on by default — this rule is about not turning them off, and there is nothing to switch on. Reaching for an unfamiliar option to satisfy it lands on the wrong knob. |
 | MUST | Treat a fix to dependency resolution (an alias, a pinned entry point, an externals change) as needing the same runtime verification as a production incident would — these bugs reproduce in the deployed artifact and nowhere else. |
 
 ## Diagnosing a Packaging-Only Failure
@@ -105,6 +116,7 @@ adjusting a global setting.
 | `DriverPackageNotInstalledError`, or an equivalent "package not installed" thrown only on the first real invocation | A dependency's dynamic `require()` was invisible to the bundler; the implementation it loads at runtime was never bundled. |
 | `ERR_MODULE_NOT_FOUND` for a package that is not actually a direct dependency | An `externals` entry became a bare ESM import once the bundle switched to native ESM output. |
 | A dependency throws while extending or calling a namespace object (`class X extends <namespace>` or similar) | Global ESM resolution handed that dependency's internal `require()` a module namespace object instead of the value it expected. Pin that dependency to its CommonJS entry point. |
+| `Dynamic require of "node:https" is not supported`, or a similar dynamic require, thrown at import time | The bundler resolved a dependency's CommonJS build into an ESM bundle because the package publishes no `exports` map. Prefer the ESM entry in the bundler's main-field order. |
 | Everything works under the test runner and fails only once packaged and invoked | The test runner executes TypeScript source directly and never exercises the bundler's resolution at all. Verify against the packaged artifact. |
 
 ## Sources

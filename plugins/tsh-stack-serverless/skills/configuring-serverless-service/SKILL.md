@@ -1,7 +1,7 @@
 ---
 name: configuring-serverless-service
-description: "Defines an AWS Lambda service for Serverless Framework or OSLS: service and stage configuration, per-function definitions, least-privilege IAM without wildcard resources, per-function reserved concurrency, opt-in VPC attachment, secrets passed by identifier and resolved at runtime, and assertions over the packaged CloudFormation template. Use when bootstrapping a serverless service, or creating and changing serverless.yml or serverless.ts."
-when_to_use: "Trigger on: bootstrapping a new Serverless Framework or OSLS service, editing serverless.yml or serverless.ts, adding a function definition, scoping an IAM statement for a Lambda execution role, setting reservedConcurrency, attaching a function to a VPC, passing a secret to a function, naming CloudFormation resources, or checking a packaged template before deploying."
+description: "TSH practices for defining an AWS Lambda service on OSLS: which libraries we use and which we avoid, how a serverless project is structured, service and stage configuration, least-privilege IAM without wildcard resources, per-function reserved concurrency, opt-in VPC attachment, secrets passed by identifier and resolved at runtime, and assertions over the packaged CloudFormation template. Use when creating or changing serverless.ts, adding a function, or choosing a dependency."
+when_to_use: "Trigger on: starting or changing an OSLS service, editing serverless.ts, adding a function definition, choosing an ORM, bundler, test runner or any dependency for a serverless service, laying out a serverless project, scoping an IAM statement for a Lambda execution role, setting reservedConcurrency, attaching a function to a VPC, passing a secret to a function, naming CloudFormation resources, or checking a packaged template before deploying."
 ---
 
 # Configuring a serverless service
@@ -16,10 +16,10 @@ nor the compiler and bundler that produce the deployed artifact — that is
 
 ## Applicability and Precedence
 
-Read the project's existing `serverless.yml`/`serverless.ts` and `config/`
-(or equivalent) before proposing anything. Local conventions and an existing
-account topology outrank this skill's defaults; apply this guidance where the
-project is silent, or when bootstrapping from nothing.
+Read the project's existing `serverless.ts` and `config/` (or equivalent)
+before proposing anything. Local conventions and an existing account topology
+outrank this skill's defaults; apply this guidance where the project is silent,
+and in a repository that has nothing yet it is the convention to build to.
 
 ## Version Baseline
 
@@ -48,56 +48,53 @@ skill's guidance as if it still applied.
 
 | Reference | Load when | Covers |
 | --- | --- | --- |
-| [Service and stage configuration](./references/service-and-stage-configuration.md) | Editing provider-level config, stages, or environment defaults | Stage derivation, timeouts, tags, per-stage environment values |
+| [Service and stage configuration](./references/service-and-stage-configuration.md) | Editing provider-level config, stages, environment defaults, the health endpoint, access logs or throttling | Stage derivation, timeouts, tags, per-stage environment values, the health endpoint contract, access logging, stage throttling, tracing, the pipeline contract |
 | [IAM and secrets](./references/iam-and-secrets.md) | Writing or reviewing an IAM statement, or passing a secret to a function | Least-privilege statement shape, the wildcard carve-out, secret containers vs secret values |
 | [Concurrency and VPC](./references/concurrency-and-vpc.md) | Setting `reservedConcurrency`, or deciding whether a function needs a VPC | The starvation and connection-budget argument, VPC as opt-in and its cost |
 | [Packaging and template checks](./references/packaging-and-template-checks.md) | Adding or reviewing a check that runs against the packaged template | What to assert over the packaged CloudFormation template, and why packaging time is the last cheap moment to catch it |
-| [Starter service layout](./references/starter-service-layout.md) | Bootstrapping a new service from an empty or near-empty repository | The canonical file tree — service definition **and** handler layer — and what each file is responsible for |
-| [Local development](./references/local-development.md) | Bootstrapping, or setting up and fixing how the service runs on a developer's machine | `serverless-offline` as dependency **and** plugin, the `local` stage, `.env.dist`, a local database |
-| [Step Functions workflows](./references/step-functions-workflows.md) | Orchestration was chosen at bootstrap, adding a task to a state machine, or a task's error must be caught by the state machine | One function per task, `Retry` and `Catch` in the state machine, `TimeoutSeconds` below the function timeout, error names as string literals |
-| [Bootstrap procedure](./references/bootstrap-procedure.md) | Bootstrapping a new service — always, before generating a single file | The four questions in one call, the handler-layer step, OSLS, registry-resolved versions, local development |
+| [Library policy](./references/library-policy.md) | Choosing or reviewing any dependency, pinning a version, or hitting a choice the team has not settled | What TSH uses, what it avoids and why, the two open questions, resolving versions from the registry, the lint and commit toolchain |
+| [Project structure](./references/project-structure.md) | Laying out a service, adding a file, or reviewing where something was put | How a TSH serverless service is shaped and what each file is responsible for |
+| [Local development](./references/local-development.md) | Setting up or fixing how the service runs on a developer's machine | `serverless-offline` as dependency **and** plugin, the `local` stage, `.env.dist`, a local database |
+| [Step Functions workflows](./references/step-functions-workflows.md) | The service orchestrates anything, adding a task to a state machine, or a task's error must be caught by the state machine | One function per task, `Retry` and `Catch` in the state machine, `TimeoutSeconds` below the function timeout, error names as string literals |
 
 ## Procedure
 
-Two entry points share one set of rules.
-
-**Bootstrapping a new service.** Read
-[`bootstrap-procedure.md`](./references/bootstrap-procedure.md) and follow it
-end to end — it asks the four questions once, then generates the complete
-starter: service definition, handler layer, local development, packaging
-checks, with every dependency version resolved from the registry. The
-reference is the procedure; do not improvise a shorter one from this page.
-
-**Changing an existing service.** Copy and track this checklist:
-
-```text
-Change progress:
-- [ ] Step 1: Read serverless.ts / serverless.yml, config/, and the last packaged template
-- [ ] Step 2: Load the references the change touches
-- [ ] Step 3: Make the change under the rules above
-- [ ] Step 4: Package and run the template checks
-```
-
 **Step 1 — Read the ground truth.** The service definition, `config/`, and the
 packaged template from the last successful package if one exists. Note which
-execution role each function uses and which stage names actually deploy.
+execution role each function uses and which stage names actually deploy. In a
+repository with none of that yet, read
+[`project-structure.md`](./references/project-structure.md) and
+[`library-policy.md`](./references/library-policy.md) instead — they are the
+conventions a new service follows, and following them is what makes the result
+look like every other TSH serverless service.
 
-**Step 2 — Load what the change touches.** Adding a function →
+**Step 2 — Load what the work touches.** Choosing a dependency →
+[`library-policy.md`](./references/library-policy.md). Adding a function →
 [`service-and-stage-configuration.md`](./references/service-and-stage-configuration.md)
 and [`concurrency-and-vpc.md`](./references/concurrency-and-vpc.md). A new
 permission or secret → [`iam-and-secrets.md`](./references/iam-and-secrets.md).
-A new state machine task →
+A state machine task →
 [`step-functions-workflows.md`](./references/step-functions-workflows.md).
+Running it on a developer machine →
+[`local-development.md`](./references/local-development.md).
 
-**Step 3 — Change under the rules.** Every new function declares
-`reservedConcurrency` and an execution role built from scoped statements; a
-new secret is a container plus an identifier, never a value; a new
-CloudFormation reference is derived, never typed by hand.
+**Step 3 — Apply the rules.** Every function declares `reservedConcurrency` and
+an execution role built from scoped statements; a secret is a container plus an
+identifier, never a value; a CloudFormation reference is derived, never typed by
+hand; an HTTP service has a health endpoint that answers only `ok` or
+`unavailable`; every real repository has an integration test against the local
+database.
 
 **Step 4 — Package and check.** Package for the target stage and run the
 assertions from
-[`packaging-and-template-checks.md`](./references/packaging-and-template-checks.md)
-before proposing a deploy. A change that packages but fails a check is not done.
+[`packaging-and-template-checks.md`](./references/packaging-and-template-checks.md),
+including executing the packaged artifact. Work that packages but fails a check
+is not done.
+
+**On a choice the team has not settled** — the greenfield ORM, the test runner —
+ask rather than pick: in the main conversation with `AskUserQuestion`, as a
+subagent by reporting the blocker to the caller. See
+[`library-policy.md`](./references/library-policy.md).
 
 ## Review Procedure
 

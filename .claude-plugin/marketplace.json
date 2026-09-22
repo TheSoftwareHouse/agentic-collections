@@ -166,7 +166,7 @@
       "name": "tsh-stack-serverless",
       "source": "./plugins/tsh-stack-serverless",
       "displayName": "TSH Stack: Serverless",
-      "description": "TSH conventions for AWS Lambda services built with Serverless Framework or OSLS: TypeScript and bundler configuration for a Lambda runtime, handler implementation with middleware, event validation and structured logging, and the service definition itself \u2014 least-privilege IAM, reserved concurrency, secrets resolved at runtime, and checks over the packaged CloudFormation template.",
+      "description": "TSH practices for AWS Lambda services on OSLS: which libraries we use and which we avoid, how a serverless project is structured, TypeScript and bundler configuration for a Lambda runtime, handler implementation with middleware, event validation and structured logging, and the service definition itself — least-privilege IAM, reserved concurrency, secrets resolved at runtime, Step Functions task rules, and checks over the packaged CloudFormation template. No bootstrap and no example project: the practices are what make a service come out TSH-shaped.",
       "category": "engineering",
       "license": "MIT",
       "author": {

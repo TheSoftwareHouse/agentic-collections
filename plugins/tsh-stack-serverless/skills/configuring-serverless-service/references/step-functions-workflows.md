@@ -1,7 +1,7 @@
 # Step Functions workflows
 
-Use this reference when the bootstrap's orchestration answer is Step Functions,
-when adding a task to a state machine, or when a task function throws an error
+Use this reference when a service orchestrates work with Step Functions, when
+adding a task to a state machine, or when a task function throws an error
 the state machine is supposed to react to.
 
 ## Table of Contents
@@ -43,7 +43,7 @@ step's *derived* logical id (`{{fn:<step>}}`, or a `!GetAtt <id>.Arn` tag the
 loader rewrites), never by an id typed by hand. And the service definition
 registers a workflow with **one line** — `defineWorkflow("<directory>")` — a
 helper that derives the state machine key, its logical id, the ARN reference a
-starter function needs, the log group, the stack output, `tracingConfig` and
+calling function needs, the log group, the stack output, `tracingConfig` and
 the `ERROR`-level logging with `includeExecutionData: false`, all from the
 directory name and the ASL file. Adding a workflow is a directory plus one
 line; adding a step is a directory plus one state in the YAML. A single
@@ -88,7 +88,7 @@ match that same literal in `ErrorEquals`. The handler-side rule and code shape
 are in
 [`validation-and-errors.md`](${CLAUDE_PLUGIN_ROOT}/skills/implementing-lambda-functions/references/validation-and-errors.md).
 
-## The shape every generated task takes
+## The shape every task takes
 
 ```yaml
 ReserveInventory:
