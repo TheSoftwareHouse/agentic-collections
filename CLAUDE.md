@@ -38,6 +38,7 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | `tsh-stack-frontend` | Browser-targeted code — TypeScript configuration for bundler-resolved apps, currently React and Vite |
 | `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
 | `tsh-stack-python` | Modern Python — implementation and review practices, and data modelling |
+| `tsh-stack-serverless` | AWS Lambda on OSLS — the library policy, project structure, service definition, handler practices, and packaged-artifact checks |
 | `tsh-stack-aws` | AWS — Terraform resource patterns, Well-Architected defaults, account cost and tagging audits |
 | `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |
 | `tsh-stack-azure` | Azure — Terraform resource patterns, Well-Architected defaults, subscription cost and tagging audits |
