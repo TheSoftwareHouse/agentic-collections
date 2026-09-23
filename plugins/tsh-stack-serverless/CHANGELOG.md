@@ -91,7 +91,8 @@ What did travel, as the substantive portable content:
 - Secrets resolved at runtime from an identifier, never stored as a literal value
   in a function's environment, where the CloudFormation template would keep it
   readable through `lambda:GetFunctionConfiguration`.
-- Assertions over the packaged CloudFormation template *and* over the packaged
-  artifact itself, run at package time —
+- Assertions over the packaged CloudFormation template — including how close it is
+  to CloudFormation's 500-resource limit — *and* over the packaged artifact itself,
+  run at package time —
   the last cheap moment to catch a wrong logical id or a wildcard statement
   before it fails minutes into a deploy.

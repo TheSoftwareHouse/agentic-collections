@@ -36,6 +36,16 @@ function with generous reserved concurrency and a database with a modest
 connection ceiling will exhaust the database long before it exhausts its own
 Lambda limit.
 
+**The budget belongs to the database, not to the service.** That arithmetic is
+only complete while one service owns the database outright. The moment a second
+service connects to the same instance — because the first was split, or because
+a neighbouring service reuses it — each one totals its own functions, each
+concludes it fits, and both assertions pass while the database runs out of
+connections. Declare the ceiling once in a module the connecting services share,
+give each service a named allocation, and have each assert against its own
+allocation rather than against `max_connections`. Count everything that
+connects, including migration runners and anything scheduled.
+
 **Setting the limit to `0` is also the kill switch for one function** —
 useful during an incident, or to disable a function without removing it.
 

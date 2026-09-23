@@ -10,6 +10,7 @@ Use this reference when adding, reviewing or debugging a check that runs against
 - [Configuration that is present but malformed](#configuration-that-is-present-but-malformed)
 - [Execute the packaged artifact](#execute-the-packaged-artifact)
 - [The verify gate](#the-verify-gate)
+- [How close the stack is to the resource limit](#how-close-the-stack-is-to-the-resource-limit)
 - [What the template cannot tell you](#what-the-template-cannot-tell-you)
 - [Keep the check separate from the source](#keep-the-check-separate-from-the-source)
 
@@ -146,6 +147,24 @@ excludes `test/integration/`; `test:integration` runs it against the local
 database and belongs in CI with a database service. Keep a `verify:offline`
 that skips only `audit` for a machine without registry access, and make it say
 so in its output rather than reporting the run as fully verified.
+
+## How close the stack is to the resource limit
+
+CloudFormation allows **500 resources per template**, and a serverless service
+reaches that sooner than people expect. Measured on a packaged template, an HTTP
+function costs roughly **six resources** — the function, its version, its log
+group, and an API Gateway resource, method and permission — on top of about
+seven fixed ones for the deployment bucket, the REST API, the deployment and the
+execution role. That puts the ceiling near **80 HTTP functions in one service**,
+and lower once paths nest, workflows are added, or roles are per-function.
+
+Count the resources in the packaged template and fail the build on a threshold
+below the limit — 400 leaves room to land a feature while a split is planned.
+Discovering this during a deploy is the expensive path: the stack rolls back and
+the fix is an architectural change, not a patch. `versionFunctions: false`
+removes one resource per function and buys headroom, but it is a reprieve rather
+than a solution; past the threshold the answer is splitting the service along a
+domain boundary.
 
 ## What the template cannot tell you
 

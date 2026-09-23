@@ -114,6 +114,13 @@ Deliberate gaps, so they read as scope rather than oversight:
   packaged-template guidance is written for REST API. The `apigatewayv2`
   equivalents are not covered; the guidance says so where it matters, so a
   service on HTTP API is not silently treated as covered.
+- **Scaling beyond one stack** — the packaged-template check reports how close a
+  service is to CloudFormation's 500-resource limit, and the connection budget is
+  defined per database rather than per service. What is *not* covered: when to
+  split a service, how to shape configuration across several of them, or how a
+  large `serverless.ts` should assemble its function list. That guidance will be
+  written from a TSH service that has actually reached the limit, not from
+  reasoning about one.
 - **Multi-account deployment** — this plugin owns one service's definition,
   not the account topology or pipeline that promotes it across accounts. That
   sits above what a single `serverless.yml` can express.
