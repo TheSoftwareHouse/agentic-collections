@@ -67,6 +67,12 @@ def tracked_by_git():
 def corpus():
     """Return (files, dirs) as repository-relative POSIX strings."""
     files = tracked_by_git()
+    if files is not None and not files:
+        # `git init` has happened but nothing is committed yet: the index is empty,
+        # and an empty corpus would pass every check. Walk the tree instead, loudly.
+        print("warning: this is a git repository with no tracked files yet — checking the"
+              " working tree instead. Commit before relying on this gate.", file=sys.stderr)
+        files = None
     if files is None:
         files = set()
         for path in REPO_ROOT.rglob("*"):
@@ -145,6 +151,10 @@ def main():
         print(f"{f}: filename is not kebab-case")
 
     print(f"\nChecked {len(targets)} file(s).")
+    if not targets:
+        print("FAIL: nothing to check — no markdown files in the corpus. An empty corpus"
+              " never passes.")
+        return 1
     if broken or bad_names:
         print(f"FAIL: {len(broken)} broken link(s), {len(bad_names)} naming violation(s).")
         return 1

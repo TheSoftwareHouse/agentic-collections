@@ -45,7 +45,13 @@ def all_markdown():
             out = subprocess.run(
                 ["git", "-c", "core.quotepath=off", "ls-files", "-z", "*.md"],
                 cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout
-            return sorted(p for p in out.split("\0") if p)
+            tracked = sorted(p for p in out.split("\0") if p)
+            if tracked:
+                return tracked
+            # `git init` with nothing committed: an empty index would pass every check.
+            print("warning: this is a git repository with no tracked files yet — checking"
+                  " the working tree instead. Commit before relying on this gate.",
+                  file=sys.stderr)
     except (FileNotFoundError, subprocess.CalledProcessError):
         pass
     found = []
@@ -124,6 +130,10 @@ def main():
             total += 1
 
     print(f"\nChecked {len(targets)} file(s).")
+    if not targets:
+        print("FAIL: nothing to check — no markdown files in the corpus. An empty corpus"
+              " never passes.")
+        return 1
     if total:
         print(f"FAIL: {total} table defect(s).")
         return 1
