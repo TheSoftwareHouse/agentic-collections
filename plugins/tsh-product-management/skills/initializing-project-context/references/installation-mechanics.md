@@ -86,9 +86,10 @@ check_links.py ✔ · check_tables.py ✔ · claude plugin validate marketplace 
 **This session will not show the plugin — its skill list was loaded before the plugin existed. Open a new one:** `claude` here, or in `<slug>-context`, or in any wired code repository. Then: `/<slug>-shared:<slug>-context` to read the knowledge base, `<slug>-knowledge` to add to it, `<slug>-links` to repair references, `<slug>-space` to add a workspace. Teammates accept the trust dialog once on their first session.
 
 ## Pending decisions
-Who initialises `<slug>-context` in git, and when — until then the checker scripts run by hand and there is no pre-push gate · Whether the marketplace later moves to a git URL instead of the sibling checkout · Whether owners marked `TBD` are assigned before the first real content lands
+Who initialises `<slug>-context` in git, and when — until then the checker scripts run by hand and there is no pre-push gate · Whether the marketplace later moves to a git URL instead of the sibling checkout · Whether owners marked `TBD` are assigned before the first real content lands · *(only when the catalog was created next to a repository)* When `<folder_name>/` moves into `<slug>/` — the skill does not move repositories, and until then that repository cannot be wired
 ```
 
-The **Try it now** opening sentence and all three **Pending decisions** are binding:
-without the first, a `/plugin list` in the current session reads as a failed setup;
-without the second, the team inherits three open questions without knowing it.
+The **Try it now** opening sentence and every **Pending decisions** item are binding —
+three, or four when the catalog was created next to a repository: without the first, a
+`/plugin list` in the current session reads as a failed setup; without the second, the
+team inherits open questions without knowing it.

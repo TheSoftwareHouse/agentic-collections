@@ -63,39 +63,61 @@ AskUserQuestion call with exactly these three questions:
 | --- | --- | --- | --- |
 | 1 | `Project` | What is the project called? | `<name_option_a>` — From this folder's name · `<name_option_b>` — From the parent folder's name. Any other name via *Other*. |
 | 2 | `Owner` | Who owns the context repository? | `<git_owner>` — From your git config · `Assign later` — Every owner field reads "TBD — assign an owner". When `git_owner` is null the first option is `Type "Full Name (e-mail)" via Other`. |
-| 3 | `Layout` | Where should the catalog live? | `This folder is the catalog` — `<folder_name>` becomes the catalog; the context repository is created inside it, beside any code repositories already there. Offered first, and only when `can_be_catalog` is true. · `Create <slug>/ here` — a new folder inside `<cwd>` named after the project. |
-| 4 | `Layers` | Which extra layer workspaces does this project need? *(multi-select)* | `Mobile` — mobile applications: platform targets, release process, device constraints · `Platform` — infrastructure and pipelines: environments, provisioning, CI/CD, observability, secrets · `None` — neither for now. Baseline, architecture, product, delivery, quality, backend, frontend and design are always created and are **not** offered here. |
+| 3 | `Layout` | Where should the catalog live? | When `can_be_catalog` is true: `This folder is the catalog` — `<folder_name>` becomes the catalog; the context repository is created inside it, beside any code repositories already there · `Create <slug>/ here` — a new folder inside `<cwd>` named after the project. When it is **false**, the options are the ones under *Inside a code repository* below. |
+| 4 | `Layers` | Which extra layer workspaces does this project need? *(multi-select)* | `Mobile` — mobile applications: platform targets, release process, device constraints · `Platform` — infrastructure and pipelines: environments, provisioning, CI/CD, observability, secrets · `None` — neither for now. Any other layer comes in through *Other* as one kebab-case name (`data-pipelines`, `integrations`) and gets a workspace from the generic template. Baseline, architecture, product, delivery, quality, backend, frontend and design are always created and are **not** offered here — name them in the question text, and say that synonyms of them (`qa` for quality, `infra` for platform, `ui` for frontend) belong in the workspace that exists, not in a second one. |
 
 Skip a question only when `$ARGUMENTS` already answers it unambiguously. The slug is
-never asked: it is the kebab-case of the name, or `<folder_name>` when the folder
-itself is the catalog. It is shown in Step 2 before anything is written.
+never asked: it is the kebab-case of the name, or the probe's `folder_slug` (or
+`parent_slug`) when an existing folder is the catalog — that folder keeps its own name;
+the slug only names `<slug>-context` inside it. It is shown in Step 2 before anything is
+written.
 
 A layer left out costs nothing: `/<slug>-shared:<slug>-space` adds it later. An
 unowned empty folder does cost something, which is why they are not all created.
 
-**When `can_be_catalog` is false** — the current directory is a git repository, so the
-catalog must not be created inside it — offer only `Create <slug>/ here` and `Stop`,
-and say why in the question.
+**Inside a code repository** — `can_be_catalog` is false: the current directory is a git
+repository, and `Create <slug>/ here` would nest the project inside one of its own
+repositories. Replace the two `Layout` options with these, saying why in the question:
+
+- `Parent folder is the catalog` — `<parent_name>/` becomes the catalog; the context
+  repository lands beside this repository. First, and only when `parent_is_git_repo` is
+  false and `parent_writable` is true. Its description must warn: right when the parent
+  holds only this project's repositories, wrong for a general `projects/` folder, whose
+  every session would load the catalog `CLAUDE.md`.
+- `Create <slug>/ next to this repository` — a new catalog in `<parent_name>/`; this
+  repository stays put, and the skill never moves it, so **Pending decisions** gains a
+  fourth item: move `<folder_name>/` into `<slug>/`, then re-run Step 5. Only when
+  `parent_writable` is true.
+- `Stop` — always, and alone when neither parent option qualifies.
 
 **Step 2 — Dry run, then the second fixed call.** Run
 
 ```shell
 python3 ${CLAUDE_SKILL_DIR}/scripts/scaffold.py --name "<name>" --slug <slug> \
   --owner-name "<name>" --owner-email <email> \
-  --layers <chosen…> --parent "<parent>" --dry-run
+  --layers <chosen…> <placement> --dry-run
 ```
 
 Use `--owner-tbd` instead of the two owner flags when `Assign later` was chosen, and
 omit `--layers` entirely when `None` was.
 
-Pass `--parent ".."` and `--slug <folder_name>` when this folder is the catalog;
-`--parent "$PWD"` when a new folder is created here. Show the file
-list (and skips, if any), then make **one** AskUserQuestion call:
+**A `!` overlap warning in the output is a question for the user, not a note.** It means
+a custom layer names, or is a synonym of, a workspace every project already gets. Quote
+it, say which existing workspace covers the topic, and ask whether to drop the layer or
+keep it with a distinct scope — before the `Scaffold` call below, in prose. Two folders
+on one topic split the knowledge, and the routing skill then has two plausible
+destinations for the same document.
+
+`<placement>` follows the `Layout` answer: `--catalog-dir "$PWD" --slug <folder_slug>`
+for *This folder is the catalog*; `--parent "$PWD"` for *Create `<slug>/` here*;
+`--catalog-dir ".." --slug <parent_slug>` for *Parent folder is the catalog*;
+`--parent ".."` for *Create `<slug>/` next to this repository*. Show the file list (and
+skips, if any), then make **one** AskUserQuestion call:
 
 | # | Header | Question | Options |
 | --- | --- | --- | --- |
 | 1 | `Scaffold` | Create these files? | `Create` — Write the files listed above · `Stop` — Write nothing |
-| 2 | `Repos` (only when the catalog already contains other folders) | Which repositories should enable the shared plugin? *(multi-select)* | Each folder name from `siblings` except `<slug>-context`, at most three, plus `None` |
+| 2 | `Repos` (only when the catalog already contains other folders) | Which repositories should enable the shared plugin? *(multi-select)* | Each folder name from `siblings` — from `parent_siblings` when the parent folder is the catalog — except `<slug>-context`, at most three, plus `None`. Not asked when the catalog was created next to this repository: it holds nothing yet. |
 
 **Step 3 — Scaffold.** Same command without `--dry-run`. Capture `CONTEXT_DIR` and
 `SLUG` from the last two lines.
@@ -133,8 +155,8 @@ The exact wording of each is in
 [`installation-mechanics.md`](./references/installation-mechanics.md) §"The closing
 report" — read it before writing. Two parts are binding: **Try it now** opens with the
 fact that this session cannot see the plugin and a new one is needed, and **Pending
-decisions** lists all three unresolved. Everything reported must have happened in this
-run.
+decisions** lists all three unresolved — four when the catalog was created next to
+this repository. Everything reported must have happened in this run.
 
 ## Self-check Before Handoff
 
@@ -142,6 +164,7 @@ run.
 - [ ] Exactly two AskUserQuestion calls with the fixed headers, questions and option shapes
 - [ ] Name and owner were picked or typed by the user; nothing inferred
 - [ ] No git command changed state; no existing file overwritten
+- [ ] The catalog is not inside a git repository; a session started in one used the parent
 - [ ] Both checker scripts and both validations passed, and the report says so
 - [ ] No generated file names a client, an employer or another project
 - [ ] Step 5 ran; context repository and catalog are wired, `claude plugin list` confirmed it; only user-selected code repositories were added

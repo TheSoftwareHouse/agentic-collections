@@ -21,10 +21,17 @@ alone reaches nobody.
   the folder where a project should live, it asks four fixed questions — project name,
   owner (from git config, or "assign later"), where the catalog goes, and which extra
   delivery layers the project needs — then creates a project catalog `<slug>/` holding
-  `<slug>-context/`.
+  `<slug>-context/`. Started inside a code repository, it never nests the catalog
+  there: it offers the parent folder as the catalog, or a new catalog beside the
+  repository, and says which repository still has to move.
 - **The generated knowledge base** carries five project workspaces (baseline,
   architecture, product, delivery, quality) and three layer workspaces every project
-  has (backend, frontend, design), with `mobile` and `platform` available on request.
+  has (backend, frontend, design), with `mobile` and `platform` available on request
+  and any other layer — `data-pipelines`, `integrations` — by name, from a generic
+  template. A custom layer that names an always-created workspace is dropped rather
+  than given a second row in the area map, and one that is a synonym of it — `qa` for
+  quality, `infra` for platform — is reported for the user to decide, because two
+  folders on one topic split both the knowledge and the routing.
   Each has a `README.md` index and a `CLAUDE.md` naming exactly one owner, mirrored in
   the area map. **All decision records live in one folder**, `docs/decisions/`, with a
   `Scope` column instead of a folder per layer: one number sequence, one place to look,
@@ -34,7 +41,8 @@ alone reaches nobody.
   that does not resolve or a filename that is not kebab-case; `check_tables.py` fails
   on a markdown table that would render wrongly — a ragged row, a blank line splitting
   a table, a trailer glued onto one. Both read the git index when there is one and walk
-  the tree when there is not.
+  the tree when there is not — or when the index is still empty after `git init`, with
+  a warning — and neither passes an empty corpus.
 - **The generated marketplace ships one plugin, `<slug>-shared`, with four skills**,
   each carrying the project slug so two installed projects never present two
   identically named skills: `<slug>-context` reads the knowledge base,
@@ -54,7 +62,7 @@ alone reaches nobody.
   engineers, rendered to `GUIDE.pdf` when pandoc or Chrome is available.
 
 The skill never runs git and never overwrites a file; a second run reports what already
-existed. It ships as a 149-line `SKILL.md`, one reference
+existed. It ships as one `SKILL.md`, one reference
 (`installation-mechanics.md`), four scripts (`probe.py`, `scaffold.py`,
 `wire_repos.py`, `render_guide_pdf.py`) and the template tree under `templates/`.
 
