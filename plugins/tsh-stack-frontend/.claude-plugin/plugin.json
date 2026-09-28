@@ -2,7 +2,7 @@
   "name": "tsh-stack-frontend",
   "displayName": "TSH Stack: Frontend",
   "description": "TSH conventions for browser-targeted frontend code: TypeScript compiler configuration for bundler-resolved applications, component implementation patterns with a Figma-first workflow, and WCAG 2.1 AA accessibility implementation.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

@@ -49,6 +49,27 @@ captures the running app with the Playwright CLI and judges it against Figma —
 in `tsh-product-engineering` (installed at user scope). Each side works without the
 other; together they reproduce the full flow.
 
+## Assumes tsh-core
+
+`implementing-frontend` treats reading the design as a hard gate: for a Figma-backed
+task, the design is fetched and studied before any markup, layout or styling is
+written. That read goes through the Figma MCP server **`tsh-core` bundles**. Install
+it — it depends on nothing:
+
+```shell
+/plugin install tsh-core@tsh-agentic-collections
+```
+
+Then run `/mcp` once per machine, pick `figma`, and finish the browser login. Every
+call runs under your own Figma account.
+
+The server deliberately lives there rather than here: this is a `project`-scope
+plugin, so a repository that does not install it would leave the UI verification gate
+in `tsh-product-engineering` with no design source at all. Without a Figma sign-in,
+the gate degrades honestly — components with no design reference are still
+implemented from the plan, and ones that need a design report what is missing rather
+than guessing.
+
 ## Not covered yet
 
 The gaps are scope, not oversight:

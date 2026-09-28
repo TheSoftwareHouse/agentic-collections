@@ -14,6 +14,20 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.2.1] - 2026-09-21
+
+### Changed
+
+- **The README now says where the Figma MCP server comes from: `tsh-core` 0.10.0
+  bundles it.** `implementing-frontend` has always made the design read a hard gate
+  before the first line of markup, without ever saying which server satisfies it —
+  and until now no plugin in this marketplace shipped one. A new **Assumes tsh-core**
+  section covers the install, the one-per-machine `/mcp` sign-in, and why the server
+  is not bundled here: this is a `project`-scope plugin, so hosting it would leave
+  every repository that does not install it — including ones running
+  `tsh-product-engineering`'s UI verification gate — with no design source.
+- No skill content changed.
+
 ## [0.2.0] - 2026-08-26
 
 ### Added

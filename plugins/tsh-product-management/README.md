@@ -99,9 +99,11 @@ is available before the first push rather than assuming. For the same reason
 nothing here pins an `mcp__atlassian__*` name in a tool allowlist: Jira writes go
 through the normal permission prompt, with the hook behind it.
 
-**Figma is a prerequisite, not a bundled server.** It needs per-user
-authentication, so we leave it to the consuming project — connect it there. Without
-it, design analysis is reported as blocked rather than silently skipped.
+**Figma needs the Figma MCP server, and `tsh-core` bundles it too.** Same deal as
+Jira: install `tsh-core`, run `/mcp` once, pick `figma`. Until that sign-in happens,
+design analysis is reported as blocked rather than silently skipped. As with
+Atlassian, nothing here pins a Figma tool name — the workflow uses whatever the
+session exposes.
 
 **PDFs need nothing.** They are read with the standard `Read` tool.
 

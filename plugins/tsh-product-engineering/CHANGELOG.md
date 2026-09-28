@@ -12,6 +12,22 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.7.1] - 2026-09-21
+
+### Changed
+
+- **The Figma MCP server is no longer your problem to supply — `tsh-core` 0.10.0
+  bundles it.** The README said design fetching was "deliberately left to the
+  consuming project" because the server needed per-user authentication. That was
+  true of Figma's older token-based setup; the official remote server authenticates
+  through `/mcp` like Atlassian, so it is now bundled where every consumer can reach
+  it. Install `tsh-core` alongside this plugin and sign in once per machine. Nothing
+  in this plugin's agents or skills changed: they still discover whatever Figma tools
+  the session exposes rather than naming one, which stays correct whether the server
+  arrives from `tsh-core` or from your own `claude mcp add`.
+- Without that sign-in the behaviour is unchanged — `ui-reviewer` reports
+  `VERIFICATION NOT RUN` rather than guessing at a design.
+
 ## [0.7.0] - 2026-08-26
 
 ### Added

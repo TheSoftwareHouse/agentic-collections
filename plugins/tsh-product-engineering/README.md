@@ -41,7 +41,7 @@ they are contracts the two UI agents preload, not commands worth typing.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
-### Prerequisites: Playwright CLI and Figma MCP
+### Prerequisites: the Playwright CLI, and a Figma sign-in
 
 **All browser evidence in this plugin runs on the
 [Playwright CLI](https://www.npmjs.com/package/@playwright/cli)** — the UI
@@ -57,10 +57,13 @@ way). You do not have to remember this: before the first capture, the workflow r
 `playwright-cli --version` (with an `npx` fallback) and, when neither answers, asks
 whether to install it for you or wait while you do it yourself.
 
-**Design fetching needs the Figma MCP server**, which needs per-user
-authentication, so we deliberately leave it to the consuming project — connect it
-there. Without it, agents stop and report what is missing rather than guessing at a
-design; the `ui-reviewer` reports `VERIFICATION NOT RUN`. This applies to the
+**Design fetching needs the Figma MCP server, and `tsh-core` bundles it.** Install
+`tsh-core` alongside this plugin and run `/mcp` once to authenticate; every call then
+runs under your own Figma account. This plugin deliberately does not ship a second
+copy — plugin MCP servers deduplicate by endpoint, and one home per server is what
+keeps its tool names predictable. Until that sign-in happens, agents stop and report
+what is missing rather than guessing at a design; the `ui-reviewer` reports
+`VERIFICATION NOT RUN`. This applies to the
 *judgment* side only: capture itself needs no design reference, and a UI task with
 no design at all is implemented from the plan and never enters the gate. Figma is
 today's single source of EXPECTED — a deliberate scope choice, not a ceiling of the

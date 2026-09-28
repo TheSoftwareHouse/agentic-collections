@@ -82,7 +82,7 @@ what routes the model to the right file; keep it filled in when adding reference
 
 ### The Atlassian connector
 
-**This plugin bundles one MCP server** (`.mcp.json`): Atlassian's official
+**This plugin bundles two MCP servers** (`.mcp.json`). The first is Atlassian's official
 [Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/),
 so Claude reads and updates Jira work items and Confluence pages directly instead of
 waiting for someone to paste a ticket into the conversation. It sits here rather than
@@ -112,6 +112,45 @@ claude mcp add --transport http atlassian-bitbucket https://mcp.atlassian.com/v1
 
 That one covers Jira as well, so disable the bundled `atlassian` entry in `/mcp` if
 you go this route — otherwise both sets of tools sit in the session.
+
+### The Figma connector
+
+**The second is Figma's official
+[remote MCP server](https://developers.figma.com/docs/figma-mcp-server/)**, so Claude
+reads a design directly — the node's layout, variables, components and a rendered
+export — instead of working from a description of it or a screenshot pasted into the
+conversation. It sits here for the same reason Atlassian does: a Figma file is not
+one job's tool. Product engineering judges implemented UI against it, product design
+works in it, and product management reads flows and annotations out of it during
+discovery — and none of that changes with the language a repo is written in. It is
+deliberately **not** in `tsh-stack-frontend`: stack plugins install at `project`
+scope, per repository, so a repository without that plugin would leave the UI
+verification gate with no server, and no discipline plugin may assume a stack plugin
+is installed.
+
+**One step per machine.** Run `/mcp`, pick `figma`, finish the browser login. The
+server is remote and OAuth-authenticated, so every call runs as you — it grants
+nothing you could not already open in Figma yourself. It is available on all seats
+and plans. It appears in `/mcp` as plugin-provided; disable it per project from the
+same panel. Skip the login and the server simply shows as needing authentication;
+agents that need a design report what is missing rather than guessing at one.
+
+**The desktop server is possible, but not bundled.** Figma also runs a local server
+at `http://127.0.0.1:3845/mcp`, served by the desktop app with Dev Mode enabled. It
+is a separate endpoint, so bundling it would show as a failed connection for everyone
+not running the desktop app, and it needs a Dev or Full seat on a paid plan where the
+remote server needs neither. Add it yourself if you want it:
+
+```shell
+claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
+```
+
+**Do not pin either server's tool names.** Not in an agent's `tools:`, not in a
+skill's `allowed-tools:`, not in a hook matcher. One home per server makes those
+names *safer*, not safe — a teammate with their own user-scope `figma` entry wins on
+precedence, and the namespace becomes `mcp__figma__*` rather than
+`mcp__plugin_tsh-core_figma__*`. Discover what the session exposes at runtime, as the
+consuming skills already do.
 
 ## Scope
 

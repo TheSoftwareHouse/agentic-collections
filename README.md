@@ -146,24 +146,31 @@ If it warns that reloading will re-read the conversation, rerun it as
 `/reload-plugins --force`. The reload summary counts only `commands/` directories,
 so `0 skills` is normal and doesn't mean anything failed.
 
-## Step 4 — sign in to Jira, once per machine
+## Step 4 — sign in to Jira and Figma, once per machine
 
-`tsh-core` bundles the Atlassian MCP server, so Claude can read and update Jira work
-items and Confluence pages directly. It needs one interactive login:
+`tsh-core` bundles two MCP servers: the Atlassian one, so Claude reads and updates
+Jira work items and Confluence pages directly, and the Figma one, so it reads designs
+— layout, variables, components and a rendered export — instead of working from a
+description. Both need one interactive login each:
 
 ```shell
 /mcp
 ```
 
-Pick `atlassian`, finish the browser sign-in, and you're done — on this machine, for
-every project. Every call then runs under your own Atlassian account and grants
-nothing you could not already open in Jira yourself. Skip this and the server simply
-shows as needing authentication; nothing else breaks.
+Pick `atlassian`, finish the browser sign-in, then do the same for `figma`. You're
+done — on this machine, for every project. Every call then runs under your own
+account and grants nothing you could not already open in Jira or Figma yourself.
+Atlassian Cloud only; Figma works on all seats and plans. Skip either and that server
+simply shows as needing authentication; nothing else breaks, though the UI
+verification gate in `tsh-product-engineering` will report `VERIFICATION NOT RUN`
+rather than judging a design it cannot read.
 
-Bitbucket is not included. The same server does cover Bitbucket Cloud, but only under
-API-token authentication, which needs an Atlassian org admin to enable it first — see
-[`plugins/tsh-core/README.md`](plugins/tsh-core/README.md) if you want to set that up
-for yourself.
+Two things deliberately left out, both documented in
+[`plugins/tsh-core/README.md`](plugins/tsh-core/README.md) with an opt-in command:
+**Bitbucket**, because the Atlassian server covers it only under API-token
+authentication that needs an org admin to enable first, and **Figma's desktop
+server**, because it is a separate local endpoint that fails for anyone not running
+the desktop app and needs a Dev or Full seat on a paid plan.
 
 ## Using what you installed
 

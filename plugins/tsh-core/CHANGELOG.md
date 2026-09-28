@@ -14,6 +14,61 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.0] - 2026-09-21
+
+### Added
+
+- **The plugin now bundles a second MCP server: Figma's official
+  [remote MCP server](https://developers.figma.com/docs/figma-mcp-server/)**
+  (`.mcp.json`), so a Figma design is readable from any session — the node's layout,
+  variables, components and a rendered export — instead of being described second
+  hand or eyeballed from a screenshot. **One step per machine:** run `/mcp`, pick
+  `figma`, finish the browser OAuth login; every call then runs under that person's
+  own Figma account and grants nothing they could not already open in Figma.
+  Available on all seats and plans. It shows in `/mcp` as plugin-provided and can be
+  disabled there per project.
+- **This closes a gap rather than adding a capability.** Three agents
+  (`ui-engineer`, `ui-reviewer`, `ui-capture-worker`) and nine skills across
+  `tsh-product-engineering`, `tsh-stack-frontend` and `tsh-product-management`
+  already instruct the model to read designs through "the Figma MCP" — and no plugin
+  shipped one. Without it `ui-reviewer` returns `VERIFICATION NOT RUN` and the UI
+  verification gate cannot close, which is the failure this fixes.
+- **Why here and not in a discipline or stack plugin.** It fails both routing
+  questions — a Figma file does not change with the language a repo is written in,
+  and it is the same server for a React app, a native app, or a backlog workshop
+  with no code at all — and it wraps a named tool rather than a TSH opinion. The
+  three disciplines that invoke it in a normal month: **product engineering, product
+  design, product management**. A stack plugin could not host it: stack plugins
+  install at `project` scope, per repository, so a repository without
+  `tsh-stack-frontend` would leave the UI verification gate with no server, and no
+  discipline plugin is permitted to assume a stack plugin is installed. Re-declaring
+  the endpoint in each consumer is not the escape hatch it looks like — plugin
+  servers are deduplicated by endpoint, so it connects once but leaves the
+  `mcp__plugin_<plugin>_figma__*` namespace decided by whichever definition wins, and
+  that tracks plugin load order, which nobody controls.
+- **Routing footprint: 4,076 characters, unchanged by this release** — 3,686 of them
+  actually preloaded, since `init` sets `disable-model-invocation: true`. Verified
+  against the 0.8.0 measurement rather than assumed: no skill frontmatter has changed
+  since. An MCP server puts nothing in the skill listing, so it spends no routing
+  budget at all.
+- **The desktop server is deliberately not bundled.** Figma also ships a local server
+  at `http://127.0.0.1:3845/mcp`, driven by the desktop app. It is a separate
+  endpoint, so bundling it would show as a failed connection in `/mcp` for everyone
+  not running the desktop app, and it needs a Dev or Full seat on a paid plan where
+  the remote server needs neither. The README carries the `claude mcp add` command
+  for anyone who wants to opt in themselves.
+
+### Changed
+
+- **`.claude/rules/plugin-manifests-and-marketplace.md` no longer cites Figma as the
+  example of a server too secret-dependent to bundle.** That rule — bundle a server
+  needing per-user OAuth, not one needing a token in `headers` — is unchanged and
+  still right; Figma was simply the wrong example for it. It described the older
+  `FIGMA_API_KEY` setup, and the official remote server replaced it with plain OAuth,
+  making Figma an instance of the bundle-this case. Bitbucket now carries the
+  don't-bundle example, and the rule records why Figma moved so it is not
+  re-litigated.
+
 ## [0.9.0] - 2026-08-27
 
 ### Added
