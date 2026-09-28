@@ -76,6 +76,7 @@ Copy just the lines you need:
 # Stacks — pick what the project is built on
 /plugin install tsh-stack-frontend@tsh-agentic-collections
 /plugin install tsh-stack-nodejs@tsh-agentic-collections
+/plugin install tsh-stack-serverless@tsh-agentic-collections
 ```
 
 Each install asks you to pick a **scope**:
@@ -300,6 +301,7 @@ Install what the project is built on, at **Project** scope.
 | :-- | :-- | :-- |
 | [`tsh-stack-frontend`](plugins/tsh-stack-frontend) | TypeScript for the browser: version policy, the `tsconfig` baseline for a bundler-resolved app, the React + Vite split-config layout, and getting a real type-check into CI | `/plugin install tsh-stack-frontend@tsh-agentic-collections` |
 | [`tsh-stack-nodejs`](plugins/tsh-stack-nodejs) | TypeScript for Node: version policy, the `tsconfig` baseline for a Node runtime, decorator metadata and class fields; NestJS 11 REST APIs | `/plugin install tsh-stack-nodejs@tsh-agentic-collections` |
+| [`tsh-stack-serverless`](plugins/tsh-stack-serverless) | AWS Lambda on OSLS: which libraries we use and which we avoid, how a serverless project is structured, least-privilege IAM, reserved concurrency, secrets at runtime, Step Functions task rules, and checks that execute the packaged artifact | `/plugin install tsh-stack-serverless@tsh-agentic-collections` |
 
 A stack here is a **runtime target**, not a language. Both plugins carry TypeScript
 guidance, because a browser app and a Node service genuinely need different
