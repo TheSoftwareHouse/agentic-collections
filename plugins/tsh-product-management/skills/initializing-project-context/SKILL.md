@@ -1,6 +1,6 @@
 ---
 name: initializing-project-context
-description: "Scaffolds a project's context repository — a knowledge base with named owners per project and delivery layer, one folder for all decision records, a link-and-table quality gate, and the Claude Code marketplace shipping four project-prefixed skills over it — then enables that plugin in the sibling code repositories and writes a guide for technical and non-technical readers. Run /tsh-product-management:initializing-project-context in the folder where the project should live."
+description: "Scaffolds a project's context repository — a knowledge base with named owners per project and delivery layer, one folder for all decision records, a link-and-table quality gate, and a Claude Code marketplace for the project's own extensions — then enables it, with this plugin's four knowledge-base skills, in the sibling code repositories and writes a guide for technical and non-technical readers. Run /tsh-product-management:initializing-project-context in the folder where the project should live."
 disable-model-invocation: true
 ---
 
@@ -11,12 +11,14 @@ Target: **$ARGUMENTS**
 Creates a **project catalog** `<slug>/` holding `<slug>-context/`, which is both the
 project's knowledge base (plain markdown: five project workspaces, three layer
 workspaces, one decisions folder, a glossary, two conventions, two checker scripts)
-and its Claude Code marketplace — the plugin `<slug>-shared` with four skills,
-`<slug>-context`, `<slug>-knowledge`, `<slug>-links`, `<slug>-space`. Code
-repositories beside it enable that plugin from their own committed settings.
+and its Claude Code marketplace — the plugin `<slug>-shared`, created **empty**, for
+extensions specific to this project. Code repositories beside it enable that plugin
+and `tsh-product-management` from their own committed settings.
 
-**Every generated skill name carries the project slug**, because with two projects
-installed two skills called `project-context` are indistinguishable in the `/` menu.
+**The scaffold copies data, never logic.** The four skills over the knowledge base
+ship in this plugin (`navigating-project-context` and its three siblings) and find it
+on their own, so a fix reaches every project with `/plugin update`. Only the two
+checker scripts are copied: a person or a CI job must run them with no plugin installed.
 
 ## Explicit Exclusions
 
@@ -27,7 +29,9 @@ installed two skills called `project-context` are indistinguishable in the `/` m
   repositories the user selects.
 - No invented owners, decisions or terms. Owner fields are the person the user picks,
   or the literal placeholder `TBD — assign an owner`.
-- No decision-record skill in the generated plugin — `/tsh-core:managing-decision-records`
+- No skill, agent or hook in the generated plugin. It is the slot for the project's
+  own; anything every project needs the same way belongs in this marketplace.
+- No decision-record skill anywhere in the scaffold — `/tsh-core:managing-decision-records`
   owns that format and `conventions/decisions.md` matches it; a second copy would drift.
   The generated files route that skill to `<slug>-context/docs/decisions/` from every
   folder, so records never land in a code repository.
@@ -51,19 +55,20 @@ installed two skills called `project-context` are indistinguishable in the `/` m
 
 | Reference | Load when | Covers |
 | --- | --- | --- |
+| [Edge cases](./references/edge-cases.md) | `can_be_catalog` is false, or the dry run prints a `!` line | The `Layout` options inside a code repository, and how to put an overlap warning to the user |
 | [Installation mechanics](./references/installation-mechanics.md) | Before Step 5, and again at Step 7 | Verified facts about project-scope settings and trust, the per-repository entry, what "out of the box" means, the missing-checkout trade-off, and the closing report's exact wording |
 
 ## Procedure
 
 **Step 1 — Probe, then the first fixed call.** Run
 `python3 ${CLAUDE_SKILL_DIR}/scripts/probe.py` and read its JSON. Then make **one**
-AskUserQuestion call with exactly these three questions:
+AskUserQuestion call with exactly these four questions:
 
 | # | Header | Question | Options (label — description) |
 | --- | --- | --- | --- |
 | 1 | `Project` | What is the project called? | `<name_option_a>` — From this folder's name · `<name_option_b>` — From the parent folder's name. Any other name via *Other*. |
 | 2 | `Owner` | Who owns the context repository? | `<git_owner>` — From your git config · `Assign later` — Every owner field reads "TBD — assign an owner". When `git_owner` is null the first option is `Type "Full Name (e-mail)" via Other`. |
-| 3 | `Layout` | Where should the catalog live? | When `can_be_catalog` is true: `This folder is the catalog` — `<folder_name>` becomes the catalog; the context repository is created inside it, beside any code repositories already there · `Create <slug>/ here` — a new folder inside `<cwd>` named after the project. When it is **false**, the options are the ones under *Inside a code repository* below. |
+| 3 | `Layout` | Where should the catalog live? | When `can_be_catalog` is true: `This folder is the catalog` — `<folder_name>` becomes the catalog; the context repository is created inside it, beside any code repositories already there · `Create <slug>/ here` — a new folder inside `<cwd>` named after the project. When it is **false**, the options are in [edge cases](./references/edge-cases.md) §"Inside a code repository". |
 | 4 | `Layers` | Which extra layer workspaces does this project need? *(multi-select)* | `Mobile` — mobile applications: platform targets, release process, device constraints · `Platform` — infrastructure and pipelines: environments, provisioning, CI/CD, observability, secrets · `None` — neither for now. Any other layer comes in through *Other* as one kebab-case name (`data-pipelines`, `integrations`) and gets a workspace from the generic template. Baseline, architecture, product, delivery, quality, backend, frontend and design are always created and are **not** offered here — name them in the question text, and say that synonyms of them (`qa` for quality, `infra` for platform, `ui` for frontend) belong in the workspace that exists, not in a second one. |
 
 Skip a question only when `$ARGUMENTS` already answers it unambiguously. The slug is
@@ -72,23 +77,8 @@ never asked: it is the kebab-case of the name, or the probe's `folder_slug` (or
 the slug only names `<slug>-context` inside it. It is shown in Step 2 before anything is
 written.
 
-A layer left out costs nothing: `/<slug>-shared:<slug>-space` adds it later. An
+A layer left out costs nothing: `/tsh-product-management:adding-project-context-workspace` adds it later. An
 unowned empty folder does cost something, which is why they are not all created.
-
-**Inside a code repository** — `can_be_catalog` is false: the current directory is a git
-repository, and `Create <slug>/ here` would nest the project inside one of its own
-repositories. Replace the two `Layout` options with these, saying why in the question:
-
-- `Parent folder is the catalog` — `<parent_name>/` becomes the catalog; the context
-  repository lands beside this repository. First, and only when `parent_is_git_repo` is
-  false and `parent_writable` is true. Its description must warn: right when the parent
-  holds only this project's repositories, wrong for a general `projects/` folder, whose
-  every session would load the catalog `CLAUDE.md`.
-- `Create <slug>/ next to this repository` — a new catalog in `<parent_name>/`; this
-  repository stays put, and the skill never moves it, so **Pending decisions** gains a
-  fourth item: move `<folder_name>/` into `<slug>/`, then re-run Step 5. Only when
-  `parent_writable` is true.
-- `Stop` — always, and alone when neither parent option qualifies.
 
 **Step 2 — Dry run, then the second fixed call.** Run
 
@@ -99,14 +89,8 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/scaffold.py --name "<name>" --slug <slug> \
 ```
 
 Use `--owner-tbd` instead of the two owner flags when `Assign later` was chosen, and
-omit `--layers` entirely when `None` was.
-
-**A `!` overlap warning in the output is a question for the user, not a note.** It means
-a custom layer names, or is a synonym of, a workspace every project already gets. Quote
-it, say which existing workspace covers the topic, and ask whether to drop the layer or
-keep it with a distinct scope — before the `Scaffold` call below, in prose. Two folders
-on one topic split the knowledge, and the routing skill then has two plausible
-destinations for the same document.
+omit `--layers` entirely when `None` was. A `!` line in the output is a question for
+the user before the next call — see [edge cases](./references/edge-cases.md) §"Overlap warnings".
 
 `<placement>` follows the `Layout` answer: `--catalog-dir "$PWD" --slug <folder_slug>`
 for *This folder is the catalog*; `--parent "$PWD"` for *Create `<slug>/` here*;
@@ -141,7 +125,10 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --catalog "<catalog>" --slug <
 ```
 
 It wires the context repository (source `.`) and the catalog folder (source
-`./<slug>-context`) before any code repository, preserving existing settings keys.
+`./<slug>-context`) before any code repository, preserving existing settings keys, and
+enables `tsh-product-management@tsh-agentic-collections` in each — without it, a
+teammate who never installed this plugin gets an empty project plugin and none of the
+four skills.
 Then confirm with `claude plugin list` inside `CONTEXT_DIR` that
 `<slug>-shared@<slug>-context` is `enabled`, and put that line in the report.
 
@@ -167,6 +154,7 @@ this repository. Everything reported must have happened in this run.
 - [ ] The catalog is not inside a git repository; a session started in one used the parent
 - [ ] Both checker scripts and both validations passed, and the report says so
 - [ ] No generated file names a client, an employer or another project
+- [ ] The generated plugin holds no skill; the knowledge-base skills were not copied
 - [ ] Step 5 ran; context repository and catalog are wired, `claude plugin list` confirmed it; only user-selected code repositories were added
 - [ ] The report says a new session is required before the plugin appears
 - [ ] GUIDE.md exists; the PDF outcome is stated

@@ -1,17 +1,17 @@
 ---
-name: {{PROJECT_SLUG}}-context
-description: "Reads the {{PROJECT_NAME}} project knowledge — scope, accepted decisions, vocabulary, who owns what — before work that depends on it. Use when a task in any {{PROJECT_NAME}} repository needs project facts: what was decided, what a term means, who owns an area, where a document lives."
-when_to_use: "Trigger on: questions about {{PROJECT_NAME}} scope, requirements, decisions or terminology; starting a feature, review or plan in a {{PROJECT_NAME}} repository; 'what did we decide about', 'who owns', 'what does <term> mean here'; code and documentation disagreeing."
+name: navigating-project-context
+description: "Reads a project's knowledge base — the `<project>-context` repository beside its code: scope, accepted decisions, vocabulary, who owns what — before work that depends on it, and cites the document behind every project fact. Use when a task in a repository of such a project needs project facts: what was decided, what a term means, who owns an area, where a document lives."
+when_to_use: "Trigger on: questions about the project's scope, requirements, decisions or terminology in a repository that has a sibling `*-context` folder; starting a feature, review or plan there; 'what did we decide about', 'who owns', 'what does <term> mean here'; code and documentation disagreeing."
 ---
 
-# {{PROJECT_NAME}} project context
+# Navigating project context
 
 Never answer a project question from memory. Read the corpus, cite the document.
 
 ## Procedure
 
 **Step 1 — Locate the knowledge base.** Read
-`${CLAUDE_PLUGIN_ROOT}/shared/locating-the-knowledge-base.md` and resolve **KB**. Stop
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` and resolve **KB**. Stop
 there if nothing resolves.
 
 **Step 2 — Read only what the task needs**, in this order. The corpus is large by
@@ -36,5 +36,5 @@ reader can check it.
 | MUST | Treat only `Accepted` records as constraints; read a `Superseded` record with its successor. |
 | MUST | Check for a `DEPRECATED` banner under a title before citing the document. |
 | MUST | Use the glossary's canonical terms in identifiers, tickets and documents you write. |
-| NEVER | Edit anything under KB as a side effect of work in a code repository. Use `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-knowledge`, which routes the change to the owner. |
+| NEVER | Edit anything under KB as a side effect of work in a code repository. Use `/tsh-product-management:writing-project-knowledge`, which routes the change to the owner. |
 | MUST | When knowledge and code disagree, report both sources and name the workspace owner who decides. Do not silently pick one. |

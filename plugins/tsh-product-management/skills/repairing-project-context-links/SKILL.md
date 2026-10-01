@@ -1,18 +1,18 @@
 ---
-name: {{PROJECT_SLUG}}-links
-description: "Finds and repairs broken references in the {{PROJECT_NAME}} knowledge base — relative links that no longer resolve, filenames that are not kebab-case, and markdown tables that render wrongly. Use when the checker scripts report violations, before opening a pull request, or after moving or deleting documents."
-when_to_use: "Trigger on: 'check the links', 'fix the docs', a checker script reporting failures, a pull request blocked on the quality gate, after renaming or deleting documents, a table that renders with shifted columns."
+name: repairing-project-context-links
+description: "Finds and repairs broken references in a project's `<project>-context` knowledge base — relative links that no longer resolve, filenames that are not kebab-case, and markdown tables that render wrongly — using the repository's own checker scripts. Use when those scripts report violations, before opening a pull request there, or after moving or deleting documents."
+when_to_use: "Trigger on: 'check the links', 'fix the docs' in a `*-context` repository; `check_links.py` or `check_tables.py` reporting failures; a pull request blocked on the quality gate; after renaming or deleting documents; a table that renders with shifted columns."
 ---
 
-# Fix {{PROJECT_NAME}} references
+# Repairing project-context links
 
-Detection is deterministic and belongs to the scripts. Repair needs judgment and that
-is the job here.
+Detection is deterministic and belongs to the scripts the context repository ships.
+Repair needs judgment and that is the job here.
 
 ## Procedure
 
 **Step 1 — Locate the knowledge base.** Read
-`${CLAUDE_PLUGIN_ROOT}/shared/locating-the-knowledge-base.md` and resolve **KB**.
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` and resolve **KB**.
 
 **Step 2 — Detect.** From KB:
 
@@ -22,7 +22,8 @@ python3 scripts/check_tables.py
 ```
 
 Each line is `file:line: problem`. Fix nothing before the whole list is in front of
-you — one rename usually explains several failures.
+you — one rename usually explains several failures. A `FAIL: nothing to check` means
+the corpus is empty or unreadable, not clean: report it and stop.
 
 **Step 3 — Diagnose each broken link, in this order.**
 

@@ -43,28 +43,38 @@ alone reaches nobody.
   a table, a trailer glued onto one. Both read the git index when there is one and walk
   the tree when there is not — or when the index is still empty after `git init`, with
   a warning — and neither passes an empty corpus.
-- **The generated marketplace ships one plugin, `<slug>-shared`, with four skills**,
-  each carrying the project slug so two installed projects never present two
-  identically named skills: `<slug>-context` reads the knowledge base,
-  `<slug>-knowledge` adds or updates a document in the owning workspace with its index
-  entry and reviewer, `<slug>-links` repairs references, and `<slug>-space` creates a
-  workspace with its owner and area-map row. All four resolve the knowledge base
-  through one shared file, so they work from the context repository, from the catalog,
-  and from any code repository beside it. Decision records are deliberately left to
-  `tsh-core` rather than duplicated.
-- **The plugin is live the moment the skill finishes.** The context repository, the
+- **Four model-invocable skills over any project's knowledge base**, in this plugin
+  rather than copied into each project: `navigating-project-context` reads it and cites
+  the source, `writing-project-knowledge` adds or updates a document in the owning
+  workspace with its index entry and reviewer, `repairing-project-context-links`
+  repairs what the checker scripts report, and `adding-project-context-workspace`
+  creates a workspace with its owner and area-map row. A bundled
+  `shared/locate_project_context.py` finds the context repository from the repository
+  itself, from the catalog, or from anywhere inside a code repository beside it, so a
+  fix to any of the four reaches every project with `/plugin update`. Decision records
+  are deliberately left to `tsh-core` rather than duplicated.
+- **The generated marketplace ships one empty plugin, `<slug>-shared`**, as the slot
+  for extensions specific to that project. The scaffold copies data — the knowledge
+  base, its conventions, its owners — and the two checker scripts, which must run with
+  no plugin installed; it copies no skill.
+- **The plugins are live the moment the skill finishes.** The context repository, the
   catalog folder and every selected code repository are registered through the
   `claude plugin` CLI and given a committed settings entry with a portable relative
   marketplace path, so no install command and no trust dialog stand between the setup
-  and the first use. The closing report says explicitly that the current session cannot
+  and the first use. Each also enables `tsh-product-management` at project scope, so a
+  teammate of any role gets the four knowledge-base skills without installing them. The closing report says explicitly that the current session cannot
   see the new plugin and a new one is needed.
 - **A `GUIDE.md` in two halves**, one for readers who never open a terminal and one for
   engineers, rendered to `GUIDE.pdf` when pandoc or Chrome is available.
 
 The skill never runs git and never overwrites a file; a second run reports what already
-existed. It ships as one `SKILL.md`, one reference
-(`installation-mechanics.md`), four scripts (`probe.py`, `scaffold.py`,
+existed. It ships as one `SKILL.md`, two references
+(`edge-cases.md`, `installation-mechanics.md`), four scripts (`probe.py`, `scaffold.py`,
 `wire_repos.py`, `render_guide_pdf.py`) and the template tree under `templates/`.
+`tests/smoke_test.py` replays, in a temporary directory, the edge cases found by running
+it by hand — a catalog inside a code repository, a brownfield catalog, a folder name that
+is not kebab-case, custom and colliding layers, an empty quality gate — plus the settings
+merge and the knowledge-base locator; run it before changing the scaffold.
 
 ## [0.3.2] - 2026-10-02
 

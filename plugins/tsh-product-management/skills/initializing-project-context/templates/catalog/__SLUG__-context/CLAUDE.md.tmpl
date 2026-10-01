@@ -18,9 +18,11 @@ Start at [docs/README.md](docs/README.md). Why it exists and how to use it:
 3. **One space, one owner.** Every workspace under `docs/` has a `CLAUDE.md` naming its
    owner; read it before editing there, and the owner reviews the change. Standard:
    [conventions/ownership.md](conventions/ownership.md).
-4. **Shared extensions only in `plugins/`.** A skill, agent or hook lands in
-   `plugins/{{PROJECT_SLUG}}-shared/` only when more than one role or repository needs
-   it; anything repository-specific stays in that repository's own `.claude/`. Rule:
+4. **Only project-specific extensions in `plugins/`.** A skill, agent or hook lands in
+   `plugins/{{PROJECT_SLUG}}-shared/` only when it is specific to this project and more
+   than one role or repository needs it; anything repository-specific stays in that
+   repository's own `.claude/`, and anything every project needs the same way belongs
+   in the company marketplace — the skills over this knowledge base are there. Rule:
    [plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md).
 
 ## Quality gate
@@ -36,16 +38,16 @@ python3 scripts/check_tables.py
 Run them before opening a pull request. Table defects in particular fail silently —
 the table renders, just wrongly — and these documents get exported for people outside
 the team. With the shared plugin installed,
-`/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-links` runs both and repairs what it finds.
+`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
 
 ## Working here
 
 | I want to… | Use |
 | --- | --- |
-| Read what the project has decided or defined | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-context` |
-| Add or update a document | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-knowledge` |
-| Create a new workspace | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-space` |
-| Fix broken links or tables | `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-links` |
+| Read what the project has decided or defined | `/tsh-product-management:navigating-project-context` |
+| Add or update a document | `/tsh-product-management:writing-project-knowledge` |
+| Create a new workspace | `/tsh-product-management:adding-project-context-workspace` |
+| Fix broken links or tables | `/tsh-product-management:repairing-project-context-links` |
 | Record a decision | `/tsh-core:managing-decision-records`, targeting `docs/decisions/` in this repository |
 
 ## Keeping this current

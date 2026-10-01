@@ -1,10 +1,10 @@
 ---
-name: {{PROJECT_SLUG}}-knowledge
-description: "Adds or updates a document in the {{PROJECT_NAME}} knowledge base — picks the owning workspace, applies the state-of-today rule, updates the workspace index, and names the owner who reviews it. Use when something learned, agreed or changed on the project should be written down."
-when_to_use: "Trigger on: 'write this down', 'document this', 'update the doc on X', recording a requirement, constraint, integration detail or process change; correcting a document that no longer matches reality; a workshop or call that produced knowledge worth keeping."
+name: writing-project-knowledge
+description: "Adds or updates a document in a project's knowledge base — the `<project>-context` repository — picking the owning workspace, applying the state-of-today rule, updating the workspace index, and naming the owner who reviews it. Use when something learned, agreed or changed on such a project should be written down."
+when_to_use: "Trigger on: 'write this down', 'document this', 'update the doc on X' in a project with a `*-context` repository; recording a requirement, constraint, integration detail or process change; correcting a document that no longer matches reality; a workshop or call that produced knowledge worth keeping."
 ---
 
-# Add or update {{PROJECT_NAME}} knowledge
+# Writing project knowledge
 
 Writes into the knowledge base, under the rules of the workspace that owns the topic.
 The failure this prevents is a second document saying something different: knowledge
@@ -13,7 +13,7 @@ added beside the existing document instead of into it.
 ## Procedure
 
 **Step 1 — Locate the knowledge base.** Read
-`${CLAUDE_PLUGIN_ROOT}/shared/locating-the-knowledge-base.md` and resolve **KB**.
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` and resolve **KB**.
 
 **Step 2 — Find the owning workspace.** Read `KB/docs/README.md`. Pick the one
 workspace whose scope covers the topic, then read its `CLAUDE.md` — it carries the

@@ -6,9 +6,11 @@ git repository itself; each child folder is.
 - **`{{PROJECT_SLUG}}-context/`** is the project's knowledge base and its Claude Code
   marketplace. Read its `CLAUDE.md` and `docs/README.md` before making a claim about
   the project's scope, decisions, vocabulary or ownership.
-- Every other folder is a code repository. Each enables the shared plugin
-  `{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context` in its own `.claude/settings.json`;
-  `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-context` is the entry point to the
+- Every other folder is a code repository. Each enables, in its own
+  `.claude/settings.json`, the project plugin
+  `{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context` and
+  `tsh-product-management@tsh-agentic-collections`, whose
+  `/tsh-product-management:navigating-project-context` is the entry point to the
   knowledge base from inside any of them.
 
 ## Decision records belong to the context repository

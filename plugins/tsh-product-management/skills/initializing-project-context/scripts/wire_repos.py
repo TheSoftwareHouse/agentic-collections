@@ -19,10 +19,19 @@ For every target it merges into <target>/.claude/settings.json:
 
     extraKnownMarketplaces.<slug>-context = {source: directory, path: <as above>}
     enabledPlugins["<slug>-shared@<slug>-context"] = true
+    extraKnownMarketplaces.tsh-agentic-collections = {source: github, repo: ...}
+    enabledPlugins["tsh-product-management@tsh-agentic-collections"] = true
 
-Existing keys are preserved; only these two entries are added or updated. A
-settings file that is not valid JSON is left untouched and reported. Nothing is
-written with --dry-run. The script never runs git.
+The first pair is the project's own plugin, which starts empty. The second pair
+brings the skills that read and maintain the knowledge base — they ship in
+tsh-product-management, not in the project — to every teammate of every role,
+not only to the people who installed that plugin themselves. The second pair is
+only ever added: an entry the settings file already has, including a `false`,
+is left as it is.
+
+Existing keys are preserved. A settings file that is not valid JSON is left
+untouched and reported. Nothing is written with --dry-run. The script never
+runs git.
 
 With --register (the normal mode) it first runs, inside each target:
 
@@ -31,7 +40,8 @@ With --register (the normal mode) it first runs, inside each target:
 
 so the plugin is live on this machine at once — no trust dialog, no restart —
 and then rewrites the absolute path the CLI stores into the portable relative
-one. Teammates reach the same state through the trust dialog on their first
+one. tsh-product-management is not installed by the CLI step: whoever runs the
+scaffold is running one of its skills, so it is already live on this machine. Teammates reach the same state through the trust dialog on their first
 interactive session.
 
 Usage:
@@ -47,6 +57,12 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# Where the knowledge-base skills come from. The marketplace name must match the
+# `name` in agentic-collections' own .claude-plugin/marketplace.json.
+COMPANY_MARKETPLACE = "tsh-agentic-collections"
+COMPANY_SOURCE = {"source": "github", "repo": "TheSoftwareHouse/agentic-collections"}
+KNOWLEDGE_PLUGIN = f"tsh-product-management@{COMPANY_MARKETPLACE}"
 
 
 def register(target, context_dir, plugin_id):
@@ -79,6 +95,8 @@ def merge_settings(target, context_name, plugin_id, rel_path, dry_run):
         "source": {"source": "directory", "path": rel_path}
     }
     settings.setdefault("enabledPlugins", {})[plugin_id] = True
+    settings["extraKnownMarketplaces"].setdefault(COMPANY_MARKETPLACE, {"source": COMPANY_SOURCE})
+    settings["enabledPlugins"].setdefault(KNOWLEDGE_PLUGIN, True)
     changed = json.dumps(settings, sort_keys=True) != before
     if changed and not dry_run:
         settings_path.parent.mkdir(parents=True, exist_ok=True)

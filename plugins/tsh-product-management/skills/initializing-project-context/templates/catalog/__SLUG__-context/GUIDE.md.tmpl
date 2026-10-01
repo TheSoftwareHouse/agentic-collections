@@ -65,17 +65,19 @@ and Claude Code loads the catalog's `CLAUDE.md` in any session started below it.
 **One repository, two roles.** Plain markdown under `docs/` and `conventions/` is the
 knowledge base — edited by people, reviewed by owners, never compiled. The
 `.claude-plugin/marketplace.json` publishes `plugins/{{PROJECT_SLUG}}-shared/`, the one
-plugin carrying the team's shared skills, agents and hooks.
+plugin for skills, agents and hooks **specific to this project**. It starts empty.
 
-**The four skills.** Every name carries the project, so with several projects installed
-the `/` menu says which one you are reaching for.
+**The four skills.** Reading and maintaining a knowledge base works the same in every
+project, so those skills are not copied here: they ship in `tsh-product-management` from
+the company marketplace, find this repository on their own, and reach every project
+with one `/plugin update` when they improve.
 
 | Skill | Does |
 | :-- | :-- |
-| `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-context` | Reads the knowledge base before work that depends on project facts |
-| `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
-| `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-links` | Repairs broken links, bad filenames and misrendering tables |
-| `/{{PROJECT_SLUG}}-shared:{{PROJECT_SLUG}}-space` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
+| `/tsh-product-management:navigating-project-context` | Reads the knowledge base before work that depends on project facts |
+| `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
+| `/tsh-product-management:repairing-project-context-links` | Repairs broken links, bad filenames and misrendering tables |
+| `/tsh-product-management:adding-project-context-workspace` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
 
 Decision records are deliberately not among them: `/tsh-core:managing-decision-records`
 owns that format, and `conventions/decisions.md` matches it, so there is one standard
@@ -93,9 +95,15 @@ repository already knows.
   "extraKnownMarketplaces": {
     "{{PROJECT_SLUG}}-context": {
       "source": { "source": "directory", "path": "../{{PROJECT_SLUG}}-context" }
+    },
+    "tsh-agentic-collections": {
+      "source": { "source": "github", "repo": "TheSoftwareHouse/agentic-collections" }
     }
   },
-  "enabledPlugins": { "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true }
+  "enabledPlugins": {
+    "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true,
+    "tsh-product-management@tsh-agentic-collections": true
+  }
 }
 ```
 
@@ -115,10 +123,11 @@ python3 scripts/check_tables.py
 The first catches links that no longer resolve and filenames that are not kebab-case.
 The second catches tables that render wrongly — a row one cell short shifts every later
 cell into the wrong column, which nothing warns you about and readers see first.
-`{{PROJECT_SLUG}}-links` runs both and repairs what it finds.
+`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
 
-**Where a new skill goes.** Needed by more than one role or repository → this plugin,
-named `{{PROJECT_SLUG}}-<what-it-does>`. One repository only → that repository's
+**Where a new skill goes.** Needed by every project the same way → the company
+marketplace, not here. Needed by more than one role or repository of this project → this
+plugin, named `{{PROJECT_SLUG}}-<what-it-does>`. One repository only → that repository's
 `.claude/`. Ties go to the repository.
 
 **A day with it.** You start Claude Code in a code repository. The catalog `CLAUDE.md`

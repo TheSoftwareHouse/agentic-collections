@@ -1,30 +1,23 @@
-# Locating the {{PROJECT_NAME}} knowledge base
+# Locating the project's knowledge base
 
-Every skill in this plugin starts here. The plugin is enabled in three kinds of
-folder, and the knowledge base sits in a different place in each, so resolve it
-before reading anything.
-
-Try these in order and use the first that exists:
-
-| Candidate | You are in |
-| --- | --- |
-| `./docs/README.md` | the context repository itself |
-| `./{{PROJECT_SLUG}}-context/docs/README.md` | the project catalog |
-| `../{{PROJECT_SLUG}}-context/docs/README.md` | a code repository beside the context repository |
+Every project-context skill in this plugin starts here. The plugin is enabled in the
+context repository, in the project catalog and in each code repository beside it, and
+the knowledge base sits somewhere different relative to each, so resolve it before
+reading anything:
 
 ```shell
-for d in . ./{{PROJECT_SLUG}}-context ../{{PROJECT_SLUG}}-context; do
-  [ -f "$d/docs/README.md" ] && echo "KB=$d" && break
-done
+python3 ${CLAUDE_PLUGIN_ROOT}/shared/locate_project_context.py
 ```
 
-Call the winner **KB** and build every later path from it: `KB/docs/`,
-`KB/docs/decisions/README.md`, `KB/conventions/`.
+It prints `KB=<path>` and `SLUG=<slug>`. Build every later path from **KB** —
+`KB/docs/`, `KB/docs/decisions/README.md`, `KB/conventions/` — and use **SLUG** where a
+skill names the project's own plugin, `<SLUG>-shared`.
 
-**If none of them exists, stop and say so.** The plugin is installed but the
-knowledge base is not checked out next to this repository. Tell the user to place a
-checkout of `{{PROJECT_SLUG}}-context` in the project catalog beside this repository,
-and do not answer project questions from memory in the meantime.
+| Exit | Means | Do |
+| --- | --- | --- |
+| 0 | Found | Continue with KB |
+| 1 | No context repository from here upward | Stop. Say the knowledge base is not checked out beside this repository, and that a checkout of `<project>-context` belongs in the project catalog. Do not answer project questions from memory in the meantime. |
+| 2 | Several in one folder | Ask which project the task belongs to, from the printed candidates. Never pick one. |
 
 ## Where a decision record goes
 
@@ -44,6 +37,8 @@ repository. Anything another repository or another role would need to know goes 
 
 ## What binds, wherever you read from
 
+- `KB/CLAUDE.md` and the owning workspace's `CLAUDE.md` outrank the skill that sent you
+  here. They are the project's rules; the skill is the procedure.
 - Only decision records with status `Accepted` are constraints. A `Superseded` record
   is read together with its successor, never alone.
 - A document carrying a `DEPRECATED` banner under its title is history, not current
