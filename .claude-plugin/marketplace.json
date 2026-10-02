@@ -49,7 +49,7 @@
       "name": "tsh-product-management",
       "source": "./plugins/tsh-product-management",
       "displayName": "TSH Product Management",
-      "description": "The business-analysis workflow end to end: discovery workshop materials — transcripts, Figma, PDFs, codebase context — become Jira-ready epics and user stories and an outcome-based delivery roadmap, behind five human review gates, with a hook that blocks any Jira write before the push gate is approved. Also imports an existing Jira backlog for local iteration. Seven read-only worker subagents keep the heavy reading out of the conversation.",
+      "description": "The business-analysis workflow end to end: discovery workshop materials — transcripts, Figma, PDFs, codebase context — become Jira-ready epics and user stories, a per-product domain dictionary and an outcome-based delivery roadmap, behind five human review gates, with a hook that blocks any Jira write before the push gate is approved. Also imports an existing Jira backlog for local iteration. Seven read-only worker subagents keep the heavy reading out of the conversation.",
       "category": "product",
       "license": "MIT",
       "author": {

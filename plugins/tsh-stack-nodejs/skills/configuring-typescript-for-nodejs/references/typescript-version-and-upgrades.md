@@ -130,11 +130,11 @@ consult the release notes for the full list.
 | `noUncheckedSideEffectImports` | `false` | `true` |
 
 It also **deprecates** `target: es5`, `downlevelIteration`, `moduleResolution: node`
-(`node10`), `module: amd`/`umd`/`systemjs`/`none`, `outFile`, the legacy
+(`node10`) and `classic`, `module: amd`/`umd`/`systemjs`/`none`, `outFile`, the legacy
 `module Foo {}` namespace syntax, `baseUrl`, `esModuleInterop: false` and
 `alwaysStrict: false` — each errors unless you set `"ignoreDeprecations": "6.0"`,
 which is a temporary measure, not a setting to live with; the removals land in
-7.0. `moduleResolution: classic` is the one outright removal in 6.0. Running `tsc foo.ts` with a `tsconfig.json` present is now an error.
+7.0. Running `tsc foo.ts` with a `tsconfig.json` present is now an error.
 
 Two of those defaults bite Node services specifically: `types: []` means ambient
 Node globals disappear until you add `"types": ["node"]`, and the floating `target`

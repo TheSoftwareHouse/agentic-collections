@@ -139,8 +139,9 @@ Check during any audit:
   section 3a reads the row and admits a reversed decision as binding.
 - No row is still `Proposed` for a decision the code has clearly implemented. Report
   this rather than fixing it — promoting a status asserts an agreement.
-- Every `Superseded by NNNN` names a record that exists, and that record names this
-  one back.
+- Every row marked `Superseded` belongs to a record whose `Superseded by` field
+  names a record that exists, and that record's `Supersedes` field names this one
+  back.
 - The binding note is present above the table, and the `CLAUDE.md` pointer still
   carries the filter sentence.
 

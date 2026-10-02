@@ -11,7 +11,8 @@ All notable changes to `tsh-stack-gcp` are documented here, following
 - `auditing-gcp-cost` carried AWS vocabulary: Firestore was described as
   "provisioned vs on-demand mode" (DynamoDB's billing model; Firestore bills per
   operation and distinguishes Native from Datastore mode), the audit was told to
-  read Deployment Manager templates (end of support 2025-12-31), and the label
+  read Deployment Manager templates (support discontinued 2026-04-01, service turned
+  down after 2027-06-30), and the label
   compliance table was headed "Missing Tags".
 - `implementing-gcp-terraform` listed its own label set (environment, team, cost
   centre, managed-by) instead of the Core 5 the audit checks for.

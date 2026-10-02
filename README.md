@@ -310,7 +310,7 @@ Install what the project is built on, at **Project** scope.
 | [`tsh-stack-azure`](plugins/tsh-stack-azure) | Azure: Terraform patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity defaults, and a cost and tagging audit via Resource Graph | `/plugin install tsh-stack-azure@tsh-agentic-collections` |
 
 A stack here is a **runtime target** or a **cloud provider**, not a language — a
-repository has exactly one of each. The frontend, Node and serverless plugins all
+repository has one cloud and one or more runtime targets. The frontend, Node and serverless plugins all
 carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle
 genuinely need different compiler configuration — and because most projects have a
 frontend whatever their backend is written in. Install the ones the repo is built on.
