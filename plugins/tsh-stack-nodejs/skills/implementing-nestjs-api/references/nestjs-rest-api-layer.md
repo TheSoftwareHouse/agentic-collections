@@ -152,7 +152,7 @@ Resolve these choices from the target repository's existing API contract before 
 | --- | --- | --- |
 | URL prefix and versioning | No version prefix, URI versioning, header/media-type versioning, or the established gateway prefix | Apply one coherent strategy to routes, `Location` headers, OpenAPI servers/paths, and deprecation policy. Do not mix strategies across features without an explicit boundary. |
 | OpenAPI exposure | No public document, internal-only document, checked-in/generated artifact, or published document | Decide who can access the document, how it is authenticated, whether it is generated in CI, and how breaking changes are reviewed. `@nestjs/swagger` is required when this is the selected Nest integration. |
-| Pagination and filter envelope | The established collection envelope, cursor-based results, offset/page results, or an intentionally unpaginated bounded collection | Define metadata, stable ordering, limits, and filter encoding consistently. Delegate generic pagination and DataGrid guidance to `tsh-implementing-backend`; do not duplicate that standard here. |
+| Pagination and filter envelope | The established collection envelope, cursor-based results, offset/page results, or an intentionally unpaginated bounded collection | Define metadata, stable ordering, limits, and filter encoding consistently. Generic pagination and data-grid conventions are outside this reference; follow the project's established envelope. |
 
 Once selected, apply the decision consistently to new routes and response DTOs. Record exceptions at the owning API boundary rather than silently creating a second contract.
 

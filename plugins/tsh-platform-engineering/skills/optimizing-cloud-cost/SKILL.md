@@ -1,7 +1,7 @@
 ---
 name: optimizing-cloud-cost
 description: "The cloud-agnostic cost framework TSH provisions against: matching a workload to a pricing model (reserved, committed-use, spot, serverless), storage tiering with lifecycle policies, the mandatory cost-allocation tag set and how to enforce it, right-sizing method, and the cost-impact estimate every infrastructure proposal carries. Use when sizing new infrastructure, estimating the cost of a change, or setting up tagging and budget governance — not for auditing a specific account, which is the cloud-specific skill's job."
-when_to_use: "Trigger on: estimating the cost impact of an infrastructure change, choosing between on-demand, reserved or committed capacity and spot, whether a workload should be serverless on cost grounds, storage class and lifecycle policy design, defining or enforcing cost-allocation tags, budget alerts and anomaly detection, scheduling non-production workloads off, or the general question of how to make infrastructure cheaper. Auditing a live account is `auditing-aws-cost` or `auditing-gcp-cost` in the cloud's own plugin."
+when_to_use: "Trigger on: estimating the cost impact of an infrastructure change, choosing between on-demand, reserved or committed capacity and spot, whether a workload should be serverless on cost grounds, storage class and lifecycle policy design, defining or enforcing cost-allocation tags, budget alerts and anomaly detection, scheduling non-production workloads off, or the general question of how to make infrastructure cheaper. Auditing a live account is `auditing-aws-cost`, `auditing-gcp-cost` or `auditing-azure-cost` in the cloud's own plugin."
 ---
 
 # Optimizing Cloud Cost
@@ -12,7 +12,7 @@ storage tier fits an access pattern, what every resource must be tagged with.
 
 **Auditing a live account is a different job**, and a cloud-specific one — it needs that
 provider's service families, CLI verbs and billing API. Where the cloud's plugin is
-installed, `auditing-aws-cost` or `auditing-gcp-cost` owns that. This skill still
+installed, `auditing-aws-cost`, `auditing-gcp-cost` or `auditing-azure-cost` owns that. This skill still
 carries what a proposal needs without them.
 
 ## Applicability and Precedence

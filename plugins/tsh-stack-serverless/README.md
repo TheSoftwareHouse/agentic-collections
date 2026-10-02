@@ -1,6 +1,7 @@
 # TSH Stack: Serverless
 
-TSH practices for AWS Lambda services on OSLS v4, Node.js 22+ — what we
+TSH practices for AWS Lambda services on OSLS v4 (the `osls` npm package: the
+community-maintained open-source fork of Serverless Framework v3), Node.js 24 on `arm64` — what we
 recommend and when, which libraries we use and which we avoid: compiler and bundler configuration, handler
 implementation, and the deployable service definition.
 

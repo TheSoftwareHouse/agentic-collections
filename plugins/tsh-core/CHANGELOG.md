@@ -14,6 +14,28 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.1] - 2026-10-02
+
+### Fixed
+
+- **One status vocabulary for decision records.** `managing-claude-context`'s
+  indexing reference listed `Proposed`, `Accepted`, `Superseded by NNNN`, `Deprecated`
+  (no `Rejected`, which its own example used), while `managing-decision-records`
+  defines five values with `Superseded` and a separate `Superseded by` field — and
+  requires the status to be identical in record and index, which the two lists made
+  impossible. The index now carries the record's five values verbatim.
+- `writing-technical-documents`' decision-records reference prescribed a section
+  order (decision, consequences, reasoning, alternatives) that contradicted the
+  format `managing-decision-records` owns. It now states the craft rule — decision
+  first, everything else short — and defers the structure to the owning skill.
+- `init` claimed never to override a rule of the skills it orchestrates, then
+  required a decision index unconditionally where `managing-claude-context` creates
+  one only when records exist or are wanted. The rule is now marked as init's own
+  addition, with the reasoning (a bootstrap counts as wanting one).
+- `authoring-claude-extensions` said MCP servers were "not covered at all" while its
+  packaging reference claimed plugins wrap them. Both now say the same thing:
+  bundling is a one-line `.mcp.json`, writing a server is out of scope.
+
 ## [0.10.0] - 2026-09-21
 
 ### Added

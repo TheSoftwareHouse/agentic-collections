@@ -122,7 +122,7 @@ Passing one check does not imply passing the other. These are separate checks wi
 |[HIGH]|Persistence tests MUST use a real supported database engine and rollback or truncate between tests; an in-memory substitute MUST NOT support claims about SQL, constraints, locking, or transactions.|[`nestjs-testing.md`](./nestjs-testing.md)|
 |[HIGH]|Event/outbox tests MUST assert the outbox row commits and rolls back with the state change in the same transaction.|[`nestjs-testing.md`](./nestjs-testing.md)|
 |[MEDIUM]|Builders MUST return fresh data; tests MUST arrange cross-feature state through exported ports or the public API, never peer internals.|[`nestjs-testing.md`](./nestjs-testing.md)|
-|[LOW]|Full browser E2E coverage and Playwright organization belong to `tsh-e2e-testing`; do not relabel an HTTP integration test as full E2E.|[`nestjs-testing.md`](./nestjs-testing.md)|
+|[LOW]|Full browser E2E coverage and Playwright organization are QA's work, outside this skill; do not relabel an HTTP integration test as full E2E.|[`nestjs-testing.md`](./nestjs-testing.md)|
 
 ## Configuration and Security Checks
 

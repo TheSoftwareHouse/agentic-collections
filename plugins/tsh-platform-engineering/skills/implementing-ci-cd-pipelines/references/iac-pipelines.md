@@ -22,8 +22,8 @@ world and will happily propose recreating your entire infrastructure.
 | Element | Implementation | Why |
 | :-- | :-- | :-- |
 | Cloud credentials | OIDC — e.g. `aws-actions/configure-aws-credentials@v4` | No long-lived secrets |
-| State backend | S3 + DynamoDB, GCS, or Azure Blob | Persistent state, concurrency protection |
-| State locking | DynamoDB table or the backend's native locking | Two concurrent applies corrupt state |
+| State backend | S3, GCS, or Azure Blob | Persistent state, concurrency protection |
+| State locking | The backend's native locking — S3 via `use_lockfile = true` (Terraform ≥ 1.10), GCS and Azure Blob lock natively; DynamoDB locking is deprecated since Terraform 1.11 | Two concurrent applies corrupt state |
 | Plan artifact | `terraform plan -out=tfplan`, uploaded | Apply matches the reviewed plan |
 | PR comment | `actions/github-script` or a plan commenter | Reviewers see the diff before merge |
 | Security scan | `tfsec`, `checkov`, or `trivy config` | Misconfiguration caught before apply |

@@ -45,7 +45,7 @@ other records refer to this one.
 | Path | Relative link to the record |
 | Tags | Comma-separated topics, for matching a task to a decision |
 | Description | One line: what was decided, not why |
-| Status | `Proposed`, `Accepted`, `Superseded by NNNN`, or `Deprecated` |
+| Status | One of the five values `managing-decision-records` defines — `Proposed`, `Accepted`, `Superseded`, `Rejected`, `Deprecated` — identical to the record's own status field; the successor link lives in the record's `Superseded by` field |
 
 ```markdown
 # Decision records
@@ -58,7 +58,7 @@ A `Superseded` record is read together with its successor, never alone.
 | --- | --- | --- | --- |
 | [0001](0001-use-postgresql.md) | database, persistence | PostgreSQL is the primary datastore | Accepted |
 | [0002](0002-vertical-slice-modules.md) | architecture, modules | Features are vertical slices, not layers | Accepted |
-| [0003](0003-rest-over-graphql.md) | api, graphql | REST stays; GraphQL was rejected | Superseded by 0007 |
+| [0003](0003-rest-over-graphql.md) | api, graphql | REST stays; GraphQL was rejected (see 0007) | Superseded |
 | [0004](0004-event-sourcing.md) | architecture, events | Event-source the ledger | Proposed |
 | [0005](0005-mongodb.md) | database | MongoDB as primary datastore | Rejected |
 | [0007](0007-adopt-graphql.md) | api, graphql | GraphQL for the public API | Accepted |

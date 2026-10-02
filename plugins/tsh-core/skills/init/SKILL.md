@@ -47,7 +47,9 @@ what the first run built.
 
 This skill does not:
 
-- restate, soften or override any rule owned by the skills it orchestrates
+- restate, soften or override any rule owned by the skills it orchestrates — with
+  one addition of its own, marked in the rules table: the decision index is always
+  left in place
 - write or edit product code, configuration logic, tests, or infrastructure
 - invent a convention or a decision — it records what exists and asks about the
   rest
@@ -62,7 +64,7 @@ This skill does not:
 | MUST | Execute `managing-claude-context`'s procedure in full as Step 1, starting with its inventory. Init never writes before that audit has run. |
 | NEVER | Overwrite an existing `CLAUDE.md` wholesale. Revise in place and report what changed. (Owned by `managing-claude-context`; restated because it blocks.) |
 | MUST | Read the owning skill's `SKILL.md` before touching its artifact — never work its area from memory. |
-| MUST | Leave the repository with a decision index — `docs/decisions/README.md`, or the existing archive location — even when no decision has been recorded yet. An empty indexed archive is the correct starting state. |
+| MUST | Leave the repository with a decision index — `docs/decisions/README.md`, or the existing archive location — even when no decision has been recorded yet. An empty indexed archive is the correct starting state. (Init's own rule, not the owner's: `managing-claude-context` wires an index only where records exist or are wanted; a bootstrap counts as wanting one.) |
 | NEVER | Invent a decision record to fill an empty archive. Propose candidates in the report; a human confirms and `managing-decision-records` governs the writing. |
 | MUST | Wire the maintenance section into root `CLAUDE.md` exactly per `./references/wiring-tsh-core-skills.md` — conditional phrasing, every path in backticks, never a leading `@`. |
 | MUST | End with a report of what was created, what was repaired and what was left alone, and flag the result as a proposal for human review. |

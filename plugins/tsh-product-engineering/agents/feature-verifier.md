@@ -33,7 +33,7 @@ exactly what is missing; never improvise scenarios or guess a URL.
 ## Evidence rules
 
 - **Browser scenarios**: drive the app with the Playwright CLI (`playwright-cli`,
-  or `npx playwright-cli`; neither available → stop and report that the machine
+  or `npx playwright cli`; neither available → stop and report that the machine
   needs `npm install -g @playwright/cli@latest`). Use a named session: `open`,
   `goto` the pinned URL, `snapshot` to get element refs, then `click`/`fill`/`press`
   to walk the scenario's steps. At each stated step save a screenshot into

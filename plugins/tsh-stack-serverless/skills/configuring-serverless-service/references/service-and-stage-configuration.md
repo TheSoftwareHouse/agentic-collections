@@ -26,8 +26,8 @@ are not specific to any one function.
 A new service installs the framework as OSLS — `"serverless": "npm:osls@^4"`
 in `devDependencies`, so the `serverless` binary and every plugin keep working
 unchanged. Serverless Framework v3 reached end of life at the close of 2024. On
-a Node 22 service that shows up immediately: its configuration schema flags
-`nodejs22.x` as an unknown runtime on every package, `@serverless/typescript`
+a Node 24 service that shows up immediately: its configuration schema flags
+`nodejs24.x` as an unknown runtime on every package, `@serverless/typescript`
 needs a cast for the same value, and it pins AWS SDK v2 — already in
 maintenance mode — into every install. None of that is a warning to explain
 away in a README; it is the framework telling you it stopped tracking AWS.

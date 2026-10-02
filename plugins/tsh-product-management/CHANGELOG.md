@@ -12,6 +12,29 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.2] - 2026-10-02
+
+### Fixed
+
+- **The Gate 2 hook no longer blocks Confluence.** `hooks.json` matches `confluence`
+  so the Atlassian server's mixed tool set reaches the script, and the script then
+  applied the Jira Gate 2 policy to every non-read call — so `createConfluencePage`
+  in a repository with a pending ledger was denied with "Gate 2 not approved",
+  which broke the domain dictionary's own Confluence handoff. Both policies are
+  about Jira issues; a tool whose name carries `confluence` and not `jira` now goes
+  to the normal permission prompt.
+- The hook matcher was case-sensitive while the script was not, so a server keyed
+  `Atlassian` bypassed the hook entirely. The matcher now accepts either case.
+- Community Atlassian servers name every tool `jira_get_issue`-style; the product
+  prefix defeated the verb classification and held every read at the gate, contrary
+  to the "reads are never gated" promise. The prefix is stripped before classifying.
+- Consistency: `delegating-to-workers.md` said six workers ship (seven do); Import
+  Mode saved to `specifications/<project-or-topic>/` where every other path uses
+  `<workshop-name>`; the ledger's 1.75 row named `roadmap.md` although the artifact
+  reviewed at that gate is `.roadmap-proposal.md`.
+- `plugin.json`'s description now names the domain dictionary and the hook, matching
+  what the plugin ships.
+
 ## [0.3.1] - 2026-09-21
 
 ### Changed

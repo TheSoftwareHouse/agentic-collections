@@ -14,6 +14,20 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.1.1] - 2026-10-02
+
+### Fixed
+
+- **Four NestJS references delegated to skills that do not exist here** —
+  `tsh-implementing-backend`, `tsh-e2e-testing` (twice) and
+  `tsh-implementing-observability`, names carried over from the Copilot collection.
+  Each sentence now states the scope boundary without naming a skill.
+- **TypeScript 6.0 facts.** Two references said 6.0 "removed" `moduleResolution:
+  node`/`node10`, `target: es5`, `downlevelIteration`, `outFile` and the legacy
+  module kinds. 6.0 deprecates them behind `ignoreDeprecations: "6.0"`; the removals
+  land in 7.0. Corrected in both, in step with the same fix in `tsh-stack-frontend`
+  0.2.2.
+
 ## [0.1.0] - 2026-08-12
 
 Initial release. This plugin is one half of the split of `tsh-stack-typescript`,

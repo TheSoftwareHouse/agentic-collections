@@ -101,7 +101,7 @@ The redaction policy MUST be explicit and tested:
 - Keep redaction before the logger, exporter, or trace serializer. Add regression tests for representative nested payloads and failure paths.
 - Keep personal data out of metric labels and trace attributes unless an explicit privacy review permits a bounded, non-identifying value.
 
-Use `tsh-implementing-observability` for the general logging, metrics, and tracing workflow. This reference adds the Nest-specific composition seams and the security boundary; it does not select a logging vendor or duplicate a general observability standard.
+The general logging, metrics and tracing standard is outside this reference. This reference adds the Nest-specific composition seams and the security boundary; it does not select a logging vendor or duplicate a general observability standard.
 
 ## Health and Readiness
 

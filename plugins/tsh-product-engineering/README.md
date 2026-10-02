@@ -52,7 +52,7 @@ files on disk — `actual.png`, `computed-styles.json`, `a11y-snapshot.yml` unde
 scenarios — and only paths and measured values enter model context, which is why it
 replaced the Playwright MCP server this plugin bundled through 0.6.0. Have
 `playwright-cli` on the machine: `npm install -g @playwright/cli@latest`, or a
-project-local install reached via `npx playwright-cli` (Node.js required either
+project-local install reached via `npx playwright cli` (Node.js required either
 way). You do not have to remember this: before the first capture, the workflow runs
 `playwright-cli --version` (with an `npx` fallback) and, when neither answers, asks
 whether to install it for you or wait while you do it yourself.

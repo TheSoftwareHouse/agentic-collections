@@ -51,7 +51,8 @@ on every machine.
 configuration's `plugins` list; either half alone produces a `serverless
 offline` command that does not exist, discovered on the first `npm run dev`.
 Pin a major that knows the declared runtime — `nodejs22.x` needs 13.9 or later
-on the Serverless Framework v3 line and 14.4 or later on the OSLS v4 line.
+on the Serverless Framework v3 line and 14.4 or later on the OSLS v4 line, and
+`nodejs24.x` a release whose CHANGELOG (linked below) lists it.
 
 Run it against a stage that never deploys:
 

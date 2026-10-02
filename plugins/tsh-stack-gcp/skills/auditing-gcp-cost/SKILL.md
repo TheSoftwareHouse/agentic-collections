@@ -114,8 +114,9 @@ Audit progress:
 
 1. **Confirm scope.** Project ID, region or all regions, service focus. Default to
    exhaustive. Ask if the project is not identifiable.
-2. **Read the infrastructure code first.** Find Terraform (`*.tf`, `terragrunt.hcl`) and
-   Deployment Manager templates. Extract everything that drives cost: `machine_type`,
+2. **Read the infrastructure code first.** Find Terraform (`*.tf`, `terragrunt.hcl`); Deployment
+   Manager reached end of support at the close of 2025, so treat any remaining
+   templates as a migration finding, not a source. Extract everything that drives cost: `machine_type`,
    `disk_size_gb`, `disk_type`, `tier`, `availability_type`, node counts. Note
    anti-patterns — hardcoded machine types, missing lifecycle rules, over-provisioned
    module defaults, uncapped disk autoresize.

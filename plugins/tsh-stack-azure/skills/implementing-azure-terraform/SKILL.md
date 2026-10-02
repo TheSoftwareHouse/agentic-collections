@@ -85,7 +85,10 @@ Apply these unless the project documents a reason not to:
 2. **Private endpoints** for PaaS data services, with the matching private DNS zone.
 3. **Diagnostic settings to Log Analytics**, with explicit retention.
 4. **Resource locks** (`CanNotDelete`) on production data resources and their vaults.
-5. **Azure Policy as code** via `azurerm_policy_assignment`.
+5. **Azure Policy as code** via the scope-specific assignment resources —
+   `azurerm_subscription_policy_assignment`, `azurerm_resource_group_policy_assignment`,
+   `azurerm_management_group_policy_assignment` (the single `azurerm_policy_assignment`
+   was removed in azurerm 3.0).
 6. **Customer-managed keys** for sensitive data, held in a purge-protected Key Vault.
 7. **One resource group per environment or module boundary**, so lifecycle and
    permissions align with the thing being deployed.

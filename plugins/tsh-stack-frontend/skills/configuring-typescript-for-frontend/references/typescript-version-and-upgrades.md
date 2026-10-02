@@ -128,11 +128,12 @@ properties; Vite's template now enables it.
 | `rootDir` | inferred from the file set | the directory holding `tsconfig.json` |
 | `noUncheckedSideEffectImports` | `false` | `true` |
 
-It also **removes** `target: es5`, `downlevelIteration`, `moduleResolution: node`
-and `classic`, `module: amd`/`umd`/`systemjs`/`none`, `outFile`, and the legacy
-`module Foo {}` namespace syntax. `baseUrl` is deprecated — it errors unless you set
+It also **deprecates** `target: es5`, `downlevelIteration`, `moduleResolution: node`
+(`node10`), `module: amd`/`umd`/`systemjs`/`none`, `outFile`, the legacy
+`module Foo {}` namespace syntax and `baseUrl` — each errors unless you set
 `"ignoreDeprecations": "6.0"`, which is a temporary measure, not a setting to live
-with. The `dom` lib now includes `dom.iterable` and `dom.asynciterable` by default,
+with; the removals land in 7.0. `moduleResolution: classic` is the one outright
+removal in 6.0. The `dom` lib now includes `dom.iterable` and `dom.asynciterable` by default,
 and `moduleResolution: bundler` is finally allowed with `module: commonjs`.
 
 Two of those defaults matter most in a frontend repo: `strict: true` means a

@@ -39,7 +39,7 @@ gate's shared `ui-verification/figma-expected.png`, written by the capture worke
    patterns — load them by name; when it is not, the project's own conventions
    from the plan's Technical Context govern alone.
 4. Verify in a real browser, per component, driving the app with the Playwright CLI
-   (`playwright-cli`, or `npx playwright-cli`; neither available → stop and report
+   (`playwright-cli`, or `npx playwright cli`; neither available → stop and report
    that the machine needs `npm install -g @playwright/cli@latest`). Open a named
    session, resize the viewport to the design's breakpoint, go to the pinned dev
    server URL, save a screenshot to an explicit file path

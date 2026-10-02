@@ -84,7 +84,9 @@ so one workshop's approval never carries into the next.
 
 What keeps it out of everyone else's way is the script, not the registration: it
 stands down entirely in a repository with no BA artifacts on disk, so ordinary
-Jira work elsewhere is unaffected. Confirm it is live with `/hooks`.
+Jira work elsewhere is unaffected. Confluence tools are never gated — both policies
+are about Jira issues — so publishing a domain dictionary or a page goes through the
+normal permission prompt. Confirm the hook is live with `/hooks`.
 
 ## Prerequisites
 

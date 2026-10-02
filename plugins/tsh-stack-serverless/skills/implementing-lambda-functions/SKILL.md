@@ -17,7 +17,8 @@ for that.
 ## Version Baseline
 
 This skill targets AWS Lambda functions deployed with **OSLS v4 or Serverless
-Framework v3**, on **Node.js 22+**, with **middy** as the middleware framework
+Framework v3**, on **Node.js 24** (`nodejs24.x`; `nodejs22.x` stays in range until its
+2027-04-30 deprecation, never for a new service), with **middy** as the middleware framework
 the chain-ordering guidance assumes. A new service starts on OSLS — Serverless
 Framework v3 is end of life; `configuring-serverless-service` carries the
 reasoning.
