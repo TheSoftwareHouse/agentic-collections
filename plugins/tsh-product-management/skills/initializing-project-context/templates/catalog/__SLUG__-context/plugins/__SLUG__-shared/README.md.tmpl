@@ -1,0 +1,69 @@
+# {{PROJECT_SLUG}}-shared
+
+The Claude Code plugin every **{{PROJECT_NAME}}** repository enables, for the skills,
+agents and hooks that are **specific to this project** and needed by its whole team.
+It starts empty.
+
+## What it is not for
+
+The skills that read and maintain this knowledge base are the same in every project,
+so they are not copied here. They ship in `tsh-product-management`, which every
+repository of this project enables alongside this plugin, and they find the knowledge
+base on their own:
+
+| Skill | Does |
+| :-- | :-- |
+| `/tsh-product-management:navigating-project-context` | Reads the knowledge base before work that depends on project facts |
+| `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
+| `/tsh-product-management:repairing-project-context-links` | Finds and repairs broken links, bad filenames and misrendering tables |
+| `/tsh-product-management:adding-project-context-workspace` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
+
+A fix to one of them reaches every project with `/plugin update`. If one of them is
+wrong for {{PROJECT_NAME}}, change it there or say so to its maintainers — do not fork
+a copy into this plugin.
+
+## The sharing rule
+
+| A skill, agent or hook is needed by… | It lives in |
+| --- | --- |
+| Every project the same way | `tsh-agentic-collections`, not here |
+| More than one role or repository of {{PROJECT_NAME}} | This plugin |
+| One code repository only | That repository's own `.claude/` |
+
+Ties go to the code repository. Promoting later is cheap; a shared plugin full of
+one-team tools taxes every session of every teammate.
+
+## Enable it in a code repository
+
+The repository sits next to `{{PROJECT_SLUG}}-context/` in the project catalog. Commit
+this to its `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "{{PROJECT_SLUG}}-context": {
+      "source": { "source": "directory", "path": "../{{PROJECT_SLUG}}-context" }
+    },
+    "tsh-agentic-collections": {
+      "source": { "source": "github", "repo": "TheSoftwareHouse/agentic-collections" }
+    }
+  },
+  "enabledPlugins": {
+    "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true,
+    "tsh-product-management@tsh-agentic-collections": true
+  }
+}
+```
+
+Start Claude Code in the repository, accept the trust dialog, check `/plugin list`.
+
+## Adding a component
+
+Add `skills/<name>/SKILL.md`, `agents/<name>.md` or `hooks/hooks.json` — only
+`plugin.json` lives inside `.claude-plugin/`. Name a new skill
+`{{PROJECT_SLUG}}-<what-it-does>`, so that with several projects installed the `/` menu
+says which one it belongs to. Bump `version` in `.claude-plugin/plugin.json`, add a
+[CHANGELOG.md](CHANGELOG.md) line, run `claude plugin validate .` from this folder and
+from the repository root, then open a pull request to the repository owner. Teammates
+pick it up with `/plugin update {{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context`;
+without the bump the update reaches nobody.

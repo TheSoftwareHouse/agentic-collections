@@ -1,0 +1,57 @@
+# {{PROJECT_SLUG}}-context
+
+Knowledge base and Claude Code marketplace of the **{{PROJECT_NAME}}** project.
+Start at [docs/README.md](docs/README.md). Why it exists and how to use it:
+[GUIDE.md](GUIDE.md).
+
+## Rules
+
+1. **State of today.** A living document describes only the currently accepted state.
+   History lives in version control and in decision records. Two live documents never
+   contradict; [docs/decisions/](docs/decisions/README.md) is the tie-breaker.
+2. **Decisions live in one place — this repository.** Every record is a file in
+   [docs/decisions/](docs/decisions/README.md), indexed there with a `Scope` column,
+   **never in a code repository**. **Only `Accepted` binds.** Write one with
+   `/tsh-core:managing-decision-records`, pointing it at `docs/decisions/` as the
+   archive; that skill owns the format, the statuses and the index schema, and
+   [conventions/decisions.md](conventions/decisions.md) matches them.
+3. **One space, one owner.** Every workspace under `docs/` has a `CLAUDE.md` naming its
+   owner; read it before editing there, and the owner reviews the change. Standard:
+   [conventions/ownership.md](conventions/ownership.md).
+4. **Only project-specific extensions in `plugins/`.** A skill, agent or hook lands in
+   `plugins/{{PROJECT_SLUG}}-shared/` only when it is specific to this project and more
+   than one role or repository needs it; anything repository-specific stays in that
+   repository's own `.claude/`, and anything every project needs the same way belongs
+   in the company marketplace — the skills over this knowledge base are there. Rule:
+   [plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md).
+
+## Quality gate
+
+Every relative link must resolve and every markdown filename must be kebab-case; every
+markdown table must render. Both are checked by:
+
+```shell
+python3 scripts/check_links.py
+python3 scripts/check_tables.py
+```
+
+Run them before opening a pull request. Table defects in particular fail silently —
+the table renders, just wrongly — and these documents get exported for people outside
+the team. With the shared plugin installed,
+`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
+
+## Working here
+
+| I want to… | Use |
+| --- | --- |
+| Read what the project has decided or defined | `/tsh-product-management:navigating-project-context` |
+| Add or update a document | `/tsh-product-management:writing-project-knowledge` |
+| Create a new workspace | `/tsh-product-management:adding-project-context-workspace` |
+| Fix broken links or tables | `/tsh-product-management:repairing-project-context-links` |
+| Record a decision | `/tsh-core:managing-decision-records`, targeting `docs/decisions/` in this repository |
+
+## Keeping this current
+
+When structure or conventions change, update the affected file in the same change.
+With `tsh-core` installed, `/tsh-core:managing-claude-context` owns this file and the
+workspace `CLAUDE.md` files; without it, revise by hand and keep this file short.

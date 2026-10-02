@@ -1,0 +1,33 @@
+# {{PROJECT_NAME}} — project catalog
+
+This folder groups every repository of the **{{PROJECT_NAME}}** project. It is not a
+git repository itself; each child folder is.
+
+- **`{{PROJECT_SLUG}}-context/`** is the project's knowledge base and its Claude Code
+  marketplace. Read its `CLAUDE.md` and `docs/README.md` before making a claim about
+  the project's scope, decisions, vocabulary or ownership.
+- Every other folder is a code repository. Each enables, in its own
+  `.claude/settings.json`, the project plugin
+  `{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context` and
+  `tsh-product-management@tsh-agentic-collections`, whose
+  `/tsh-product-management:navigating-project-context` is the entry point to the
+  knowledge base from inside any of them.
+
+## Decision records belong to the context repository
+
+**Every decision record for this project is written to
+`{{PROJECT_SLUG}}-context/docs/decisions/`, never into a code repository** — one folder,
+one number sequence, one index, whichever repository the discussion happened in.
+
+Record one with `/tsh-core:managing-decision-records` and give it that folder as the
+archive location; the record format, the status vocabulary and the index schema are
+that skill's, and `{{PROJECT_SLUG}}-context/conventions/decisions.md` matches them. From
+a code repository the path is `../{{PROJECT_SLUG}}-context/docs/decisions/`; from this
+folder it is `{{PROJECT_SLUG}}-context/docs/decisions/`.
+
+A code repository may keep records about **itself** — its own internal conventions — in
+its own archive. Anything another repository or another role would need to know goes to
+the context repository.
+
+This file loads in every Claude Code session started in a folder below it. Keep it to
+pointers; the rules themselves live in `{{PROJECT_SLUG}}-context/CLAUDE.md`.

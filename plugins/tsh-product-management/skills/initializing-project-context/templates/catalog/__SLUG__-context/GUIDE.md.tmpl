@@ -1,0 +1,142 @@
+# {{PROJECT_NAME}} — the project context repository
+
+*For everyone on the project. Part 1 needs no technical background; Part 2 is for
+people who work in the code repositories.* Repository owner: {{OWNER}}. {{DATE}}.
+
+## Part 1 — For everyone
+
+**Why it exists.** Project knowledge — scope, decisions and their reasons, what a word
+means to the client, who answers for what — usually lives in chats, slides and heads.
+Every newcomer, every hand-over and every AI assistant rediscovers it.
+`{{PROJECT_SLUG}}-context` is the one place where **{{PROJECT_NAME}}** keeps *what is true
+today*, kept current by named people. It is also what the team's AI assistants read
+before they act, so a developer, a tester and an analyst work from the same facts.
+
+**What is in it.** Two kinds of area, plus two supporting files.
+
+| Area | Answers |
+| :-- | :-- |
+| Baseline | What is the project held to? Scope, assumptions, risks, non-functional requirements. |
+| Architecture | How is the system shaped, now and in the target state? |
+| Product | What are we building and why? |
+| Delivery | How is the project run? |
+| Quality | How do we know it works? |
+| Backend, Frontend, Design | How each delivery layer works, and what it has settled. |
+| Decisions | Every decision, one folder, with a scope column. Only accepted ones bind. |
+| Glossary | What does each term mean here? |
+
+**Three principles.**
+
+1. *State of today.* A document describes the current agreed state; history is kept by
+   version control and decision records, not old copies. `DEPRECATED` at the top means
+   history.
+2. *Decisions are recorded once, with reasons.* What was decided, the alternatives, why
+   they lost. They all live in one folder, so there is one place to look and one number
+   sequence. Only `Accepted` records bind. This stops the same debate every quarter.
+3. *One area, one owner.* The owner keeps the area true and reviews every change to
+   it. One person may own several areas; no area has two owners or none. This is what
+   stops someone changing an area they do not understand, and what makes owners care.
+
+**How to use it without writing code.** Open `docs/README.md`, pick the area, follow
+its README. To check a decision, open `docs/decisions/` and read the index: `Accepted`
+is in force, anything else is history, and the `Scope` column says which layer it
+concerns. To change something, contact the owner named in the area table. A PDF you
+receive is a snapshot; the repository is the source.
+
+**What it is not.** Not the backlog tool, not the chat, not the design tool, not the
+code. It ties those together and points at them.
+
+## Part 2 — For engineers
+
+**Layout on your machine.** Every repository sits in one project catalog, with the
+context repository beside them:
+
+```text
+{{PROJECT_SLUG}}/
+├── CLAUDE.md                  # loads in every session below; points at the context repo
+├── {{PROJECT_SLUG}}-context/  # knowledge base + marketplace
+├── <repo-a>/
+└── <repo-b>/
+```
+
+The layout is a contract: the shared plugin is served from `../{{PROJECT_SLUG}}-context`,
+and Claude Code loads the catalog's `CLAUDE.md` in any session started below it.
+
+**One repository, two roles.** Plain markdown under `docs/` and `conventions/` is the
+knowledge base — edited by people, reviewed by owners, never compiled. The
+`.claude-plugin/marketplace.json` publishes `plugins/{{PROJECT_SLUG}}-shared/`, the one
+plugin for skills, agents and hooks **specific to this project**. It starts empty.
+
+**The four skills.** Reading and maintaining a knowledge base works the same in every
+project, so those skills are not copied here: they ship in `tsh-product-management` from
+the company marketplace, find this repository on their own, and reach every project
+with one `/plugin update` when they improve.
+
+| Skill | Does |
+| :-- | :-- |
+| `/tsh-product-management:navigating-project-context` | Reads the knowledge base before work that depends on project facts |
+| `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
+| `/tsh-product-management:repairing-project-context-links` | Repairs broken links, bad filenames and misrendering tables |
+| `/tsh-product-management:adding-project-context-workspace` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
+
+Decision records are deliberately not among them: `/tsh-core:managing-decision-records`
+owns that format, and `conventions/decisions.md` matches it, so there is one standard
+instead of two drifting apart. **What matters is where the record lands.** Every record
+for this project goes to `{{PROJECT_SLUG}}-context/docs/decisions/`, never into a code
+repository — from a code repository that is `../{{PROJECT_SLUG}}-context/docs/decisions/`.
+Give that path to the skill as the archive location. The catalog's `CLAUDE.md` states
+this rule and loads in every session started below it, so an assistant working in a code
+repository already knows.
+
+**Enable the plugin in a code repository.** Commit to its `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "{{PROJECT_SLUG}}-context": {
+      "source": { "source": "directory", "path": "../{{PROJECT_SLUG}}-context" }
+    },
+    "tsh-agentic-collections": {
+      "source": { "source": "github", "repo": "TheSoftwareHouse/agentic-collections" }
+    }
+  },
+  "enabledPlugins": {
+    "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true,
+    "tsh-product-management@tsh-agentic-collections": true
+  }
+}
+```
+
+Start Claude Code there, accept the trust dialog once, check `/plugin list`. Two facts
+worth knowing: a `settings.json` in the catalog folder does **not** reach the
+repositories below it, which is why each repository carries its own; a `CLAUDE.md` in
+the catalog **does** load below it. Without the sibling checkout the plugin cannot
+load, and the skills say so instead of guessing.
+
+**The quality gate.** Two scripts, run before a pull request:
+
+```shell
+python3 scripts/check_links.py
+python3 scripts/check_tables.py
+```
+
+The first catches links that no longer resolve and filenames that are not kebab-case.
+The second catches tables that render wrongly — a row one cell short shifts every later
+cell into the wrong column, which nothing warns you about and readers see first.
+`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
+
+**Where a new skill goes.** Needed by every project the same way → the company
+marketplace, not here. Needed by more than one role or repository of this project → this
+plugin, named `{{PROJECT_SLUG}}-<what-it-does>`. One repository only → that repository's
+`.claude/`. Ties go to the repository.
+
+**A day with it.** You start Claude Code in a code repository. The catalog `CLAUDE.md`
+and the shared plugin are already there. The assistant reads the area map and the
+decision index and works from accepted facts. A document and the code disagree: it
+reports both, you raise it with the owner. Something is learned worth keeping: you run
+the knowledge skill and it lands in the right workspace with the right reviewer. A
+decision is made: you propose a record, the owner confirms its status.
+
+**Open point.** How and by whom this folder becomes a git repository is a pending
+decision. Until then the folder is plain files, the checker scripts are run by hand,
+and the side-by-side layout is the contract.

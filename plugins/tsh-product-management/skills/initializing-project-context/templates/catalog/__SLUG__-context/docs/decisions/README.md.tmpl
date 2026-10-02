@@ -1,0 +1,14 @@
+# Decision records
+
+**Only records with status `Accepted` are binding.** Every other status is history:
+read it to see what was already considered, never apply it as a current constraint. A
+`Superseded` record is read together with its successor, never alone.
+
+All records for **{{PROJECT_NAME}}** live in this one folder, whichever layer they
+concern — the `Scope` column is what narrows them. The format and lifecycle are in
+[conventions/decisions.md](../../conventions/decisions.md). With the `tsh-core` plugin
+installed, `/tsh-core:managing-decision-records` writes a conforming record and keeps
+this index in step.
+
+| Path | Scope | Tags | Description | Status |
+| --- | --- | --- | --- | --- |
