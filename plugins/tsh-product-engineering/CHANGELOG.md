@@ -12,6 +12,27 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.7.2] - 2026-10-02
+
+### Fixed
+
+- **The local Playwright CLI fallback was wrong.** Seven files told Claude to run
+  `npx playwright-cli`, which fetches the unscoped npm package of that name — a
+  deprecated placeholder, not the CLI. The vendor's local form is
+  `npx playwright cli` (the `playwright` package's `cli` subcommand); every
+  occurrence now says so and names the trap.
+- **One owner for `figma-expected.png`.** `verifying-ui` and `ui-reviewer` told the
+  judge to export the Figma reference when missing, while the agent is barred from
+  writing files and `capturing-ui-evidence` already assigns the export to the capture
+  worker. The judge now returns `VERIFICATION NOT RUN` requesting the export instead.
+- `report-format.md` defined `VERIFICATION NOT RUN` as "capture missing or blocked"
+  only; `verifying-ui` also returns it for an unavailable Figma reference, a capture
+  defect and an unmeasured element. The definition now matches the rules.
+- `plan-building-blocks.md` still credited `ui-engineer` with per-component design
+  verification; since 0.7.0 the UI verification gate does that.
+- `plugin.json`'s description now matches the marketplace entry (it omitted the UI
+  verification gate).
+
 ## [0.7.1] - 2026-09-21
 
 ### Changed

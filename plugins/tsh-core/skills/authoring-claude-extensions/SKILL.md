@@ -19,7 +19,9 @@ This skill covers **skills, subagents, hooks, and plugins**.
 > decision record — stop and use `managing-claude-context`.** That skill owns the
 > memory layer; this one owns the things you build.
 
-Not covered at all: MCP servers, agent teams, code intelligence, artifacts.
+Not covered at all: writing an MCP server, agent teams, code intelligence,
+artifacts. Bundling an existing MCP server in a plugin is a one-line `.mcp.json` at
+the plugin root; the packaging reference names it and goes no further.
 
 ## Applicability and Precedence
 

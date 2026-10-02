@@ -11,17 +11,6 @@ management, and evidence-based cloud cost audits.
 /plugin install tsh-platform-engineering@tsh-agentic-collections
 ```
 
-### Prerequisite for the AWS documentation server
-
-The bundled `aws-documentation` MCP server is a Python package launched with `uvx`. If
-you do not have `uv`, that one server fails to start and the rest work normally:
-
-```shell
-brew install uv          # or: curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-The four other servers use `npx` and need nothing extra.
-
 ## What's in it
 
 ### Skills

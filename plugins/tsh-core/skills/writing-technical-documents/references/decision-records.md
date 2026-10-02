@@ -2,7 +2,9 @@
 
 Use this flow for architecture decision records, RFCs, and technical proposals. It
 covers how the craft rules land on these documents — not which sections a given
-ADR format requires.
+ADR format requires. For TSH decision records the section set, order, metadata and
+status vocabulary are owned by `managing-decision-records` (also in `tsh-core`);
+this reference never overrides it.
 
 ## 1. Who the reader is
 
@@ -17,8 +19,10 @@ document; it is not the document.
 
 ## 2. Decision first, always
 
-The first sentence states the decision in the present tense, as settled fact. Then
-the consequences. Then the reasoning. Then, briefly, the alternatives.
+The first sentence states the decision in the present tense, as settled fact.
+Whatever section order the record format prescribes, the reader must meet the
+decision before anything else, and the reasoning, alternatives and consequences
+must each be short enough to be read after it.
 
 > This document explores options for our background job infrastructure. We have
 > several requirements to consider…
@@ -31,7 +35,7 @@ A reader who stops after the first sentence should still leave with the answer.
 
 Each rejected option gets one line: what it was, and the single reason it lost.
 
-Multi-paragraph fair hearings for options you rejected are the largest source of
+Multi-paragraph fair hearings for options you rejected are a major source of
 bloat in decision records, and they are written for the author's comfort rather
 than the reader's use. Give the option a line; if a reader wants to reopen it,
 the line tells them which constraint to attack.

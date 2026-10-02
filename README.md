@@ -12,13 +12,11 @@ publishes three families:
 - **Stacks** (`tsh-stack-frontend` and friends) — *what we work with*. One per
   technology stack. Install the ones a given project is built on.
 
-> **Heads up:** three of the five **discipline** plugins are still **empty
-> scaffolds** — `tsh-product-testing`, `tsh-product-design` and
-> `tsh-platform-engineering`. Installing them works and is worth doing now — you'll
-> pick up agents and skills automatically as we land them — but they contribute no
-> components yet. An empty component list after installing one of those is
-> expected, not a broken install. **`tsh-core`, `tsh-product-engineering`,
-> `tsh-product-management` and the stack plugins ship real skills today.**
+> **Heads up:** one discipline plugin, `tsh-product-design`, is still an **empty
+> scaffold**. Installing it works and is worth doing now — you'll pick up agents and
+> skills automatically as we land them — but it contributes no components yet, so an
+> empty component list after installing it is expected, not a broken install.
+> **Every other plugin ships real skills today.**
 
 Requires Claude Code v2.1 or newer:
 
@@ -77,6 +75,10 @@ Copy just the lines you need:
 /plugin install tsh-stack-frontend@tsh-agentic-collections
 /plugin install tsh-stack-nodejs@tsh-agentic-collections
 /plugin install tsh-stack-serverless@tsh-agentic-collections
+/plugin install tsh-stack-python@tsh-agentic-collections
+/plugin install tsh-stack-aws@tsh-agentic-collections
+/plugin install tsh-stack-gcp@tsh-agentic-collections
+/plugin install tsh-stack-azure@tsh-agentic-collections
 ```
 
 Each install asks you to pick a **scope**:
@@ -273,7 +275,7 @@ Everyone, at **User** scope.
 
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
-| [`tsh-core`](plugins/tsh-core) | What holds regardless of role and stack — Git worktree lifecycle, and the house standard for writing technical documents | `/plugin install tsh-core@tsh-agentic-collections` |
+| [`tsh-core`](plugins/tsh-core) | What holds regardless of role and stack — Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format, a one-command project setup, and the bundled Atlassian and Figma MCP servers | `/plugin install tsh-core@tsh-agentic-collections` |
 
 One plugin, not a family. Anything that would change if you switched job belongs in
 a discipline plugin; anything that would change if the repo switched language
@@ -302,11 +304,16 @@ Install what the project is built on, at **Project** scope.
 | [`tsh-stack-frontend`](plugins/tsh-stack-frontend) | TypeScript for the browser: version policy, the `tsconfig` baseline for a bundler-resolved app, the React + Vite split-config layout, and getting a real type-check into CI | `/plugin install tsh-stack-frontend@tsh-agentic-collections` |
 | [`tsh-stack-nodejs`](plugins/tsh-stack-nodejs) | TypeScript for Node: version policy, the `tsconfig` baseline for a Node runtime, decorator metadata and class fields; NestJS 11 REST APIs | `/plugin install tsh-stack-nodejs@tsh-agentic-collections` |
 | [`tsh-stack-serverless`](plugins/tsh-stack-serverless) | AWS Lambda on OSLS: which libraries we use and which we avoid, how a serverless project is structured, least-privilege IAM, reserved concurrency, secrets at runtime, Step Functions task rules, and checks that execute the packaged artifact | `/plugin install tsh-stack-serverless@tsh-agentic-collections` |
+| [`tsh-stack-python`](plugins/tsh-stack-python) | Modern Python 3.12+: implementation and review practices, and Pydantic v2 / dataclass / SQLModel / SQLAlchemy 2.0 data modelling | `/plugin install tsh-stack-python@tsh-agentic-collections` |
+| [`tsh-stack-aws`](plugins/tsh-stack-aws) | AWS: Terraform patterns for VPC, EKS, RDS and S3, Well-Architected defaults, and an evidence-based cost and tagging audit of a live account | `/plugin install tsh-stack-aws@tsh-agentic-collections` |
+| [`tsh-stack-gcp`](plugins/tsh-stack-gcp) | GCP: Terraform patterns for VPC, GKE, Cloud SQL, Cloud Storage and Cloud Run, Workload Identity and CMEK defaults, and a cost and labelling audit of a live project | `/plugin install tsh-stack-gcp@tsh-agentic-collections` |
+| [`tsh-stack-azure`](plugins/tsh-stack-azure) | Azure: Terraform patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity defaults, and a cost and tagging audit via Resource Graph | `/plugin install tsh-stack-azure@tsh-agentic-collections` |
 
-A stack here is a **runtime target**, not a language. Both plugins carry TypeScript
-guidance, because a browser app and a Node service genuinely need different
-compiler configuration — and because most projects have a frontend whatever their
-backend is written in. Install one, the other, or both.
+A stack here is a **runtime target** or a **cloud provider**, not a language — a
+repository has one cloud and one or more runtime targets. The frontend, Node and serverless plugins all
+carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle
+genuinely need different compiler configuration — and because most projects have a
+frontend whatever their backend is written in. Install the ones the repo is built on.
 
 Every stack gets its own plugin, named `tsh-stack-<stack-name>` — PHP, Java, Go
 and the rest are expected members of this family. Each appears here once it has

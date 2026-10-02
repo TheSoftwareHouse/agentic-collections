@@ -48,7 +48,8 @@ harmless; whether they do anything depends on which bundler is in use.
 ## Version Baseline
 
 This plugin targets **OSLS v4 or Serverless Framework v3**, AWS Lambda, and
-**Node.js 22+** — a new service starts on OSLS, since Serverless Framework v3
+**Node.js 24** (`nodejs24.x`; `nodejs22.x` stays in range until its 2027-04-30
+deprecation, never for a new service) — a new service starts on OSLS, since Serverless Framework v3
 is end of life and its type package stops at `nodejs20.x`. Before proposing a
 config, read the project's `package.json` (`engines`, the `serverless` or
 `osls` dependency) and the service configuration's declared runtime. If the
@@ -83,7 +84,7 @@ the service configuration's declared runtime. Note the current bundler and
 whether the service uses a decorator-based ORM before proposing anything.
 
 **Step 2 — Confirm the version baseline.** Stop and report if the project sits
-outside OSLS v4 / Serverless Framework v3 or Node.js 22+.
+outside OSLS v4 / Serverless Framework v3, or on a Node runtime older than 22.
 
 **Step 3 — Settle the bundler-and-ORM pairing before touching decorator
 flags.** Read

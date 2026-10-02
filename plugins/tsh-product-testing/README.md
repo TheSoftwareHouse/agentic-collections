@@ -36,9 +36,11 @@ Invoked as `@tsh-product-testing:e2e-engineer`.
 committed to a test — and `context7` for Playwright API documentation. For Playwright,
 query the library ID `/microsoft/playwright.dev` directly rather than resolving it.
 
-This mirrors the Playwright server in `tsh-product-engineering`. Installing both gives
-you two independently namespaced servers; that is expected, and each plugin stays
-usable on its own.
+`tsh-product-engineering` no longer bundles a Playwright server: since its 0.7.0 its
+agents drive the Playwright CLI, which writes screenshots, computed styles and
+accessibility snapshots to files. This plugin keeps the MCP because E2E authoring and
+de-flaking need the live accessibility tree and element refs in context. Installing
+both is expected, and each plugin stays usable on its own.
 
 ## Assumes tsh-core
 

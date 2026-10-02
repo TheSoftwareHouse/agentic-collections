@@ -2,7 +2,9 @@
 
 Use this reference when bundling extensions for another repository or a marketplace. A
 plugin is the **packaging layer**, not a fifth kind of extension: it wraps skills,
-subagents, hooks and MCP servers into one installable, versioned unit.
+subagents and hooks into one installable, versioned unit — and, through an
+`.mcp.json` at the plugin root, existing MCP servers, which this reference does not
+cover beyond naming that file.
 
 The trigger is distribution, never capability. Build the thing, use it in one place,
 package it once it has survived contact with real work.

@@ -17,7 +17,8 @@ that is [`verifying-ui`](../verifying-ui/SKILL.md).
 ## Applicability and Precedence
 
 Local repository rules outrank this skill. If `playwright-cli` is not on PATH, use
-`npx playwright-cli`; if neither works, that is a blocker to escalate (the fix is
+`npx playwright cli` (the `playwright` package's `cli` subcommand — never
+`npx playwright-cli`, which fetches a deprecated package); if neither works, that is a blocker to escalate (the fix is
 `npm install -g @playwright/cli@latest`), never a reason to improvise another
 capture method.
 

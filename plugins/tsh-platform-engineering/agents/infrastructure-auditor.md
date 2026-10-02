@@ -58,8 +58,8 @@ Remediation goes in the report as code the reader can apply. You never apply it.
    credentials, missing approval gates on production, no plan artifact between plan and
    apply, absent security scanning, secrets echoed into logs.
 4. **Inventory live state** where credentials allow. The per-service checklist lives in
-   the target cloud's own skill — `auditing-aws-cost` or `auditing-gcp-cost`, in
-   `tsh-stack-aws` or `tsh-stack-gcp`. Where that plugin is installed, use its inventory
+   the target cloud's own skill — `auditing-aws-cost`, `auditing-gcp-cost` or
+   `auditing-azure-cost`, in `tsh-stack-aws`, `tsh-stack-gcp` or `tsh-stack-azure`. Where that plugin is installed, use its inventory
    and its report format; where it is not, inventory what the infrastructure code
    declares and say in the report that live coverage was limited to what you could
    reach.

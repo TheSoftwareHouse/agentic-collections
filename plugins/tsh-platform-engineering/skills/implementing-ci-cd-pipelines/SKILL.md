@@ -66,7 +66,7 @@ Mechanics in [deployment-strategies.md](./references/deployment-strategies.md).
 | Scenario | Approach |
 | :-- | :-- |
 | AWS, Azure or GCP from GitHub Actions or GitLab CI | OIDC federation |
-| AWS from Bitbucket Pipelines | Repository variables plus assume-role |
+| AWS from Bitbucket Pipelines | OIDC — `oidc: true` on the step, a web-identity role trusting Bitbucket's identity provider |
 | Multi-cloud | Vault with CI/CD auth |
 | Small team, single platform | Platform-native secret store |
 

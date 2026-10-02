@@ -14,6 +14,16 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.2.2] - 2026-10-02
+
+### Fixed
+
+- **TypeScript 6.0 facts.** `configuring-typescript-for-frontend` said 6.0
+  "removed" `moduleResolution: node`/`node10`, `target: es5`, `downlevelIteration`,
+  `outFile` and the legacy module kinds, in the rules table and two references. 6.0
+  deprecates them behind `ignoreDeprecations: "6.0"`; the removals land in 7.0.
+  Corrected in step with the same fix in `tsh-stack-nodejs` 0.1.1.
+
 ## [0.2.1] - 2026-09-21
 
 ### Changed

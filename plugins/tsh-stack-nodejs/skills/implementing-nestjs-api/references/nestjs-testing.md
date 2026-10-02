@@ -131,7 +131,7 @@ This preserves the same ownership rules as production code. A test that reaches 
 
 ## Delegated end-to-end coverage
 
-Full end-to-end coverage, Playwright usage, and e2e suite organization belong to `tsh-e2e-testing`. This reference does not restate browser workflows, Page Objects, environment orchestration, authentication setup, or suite-level E2E conventions. Use the delegated skill when a scenario must cross the deployed application boundary or exercise a complete user flow.
+Full end-to-end coverage, Playwright usage, and e2e suite organization are QA's work and outside this skill. This reference does not restate browser workflows, Page Objects, environment orchestration, authentication setup, or suite-level E2E conventions. A scenario that must cross the deployed application boundary or exercise a complete user flow belongs in the project's E2E suite, not here.
 
 The HTTP integration layer here remains responsible for the Nest/Express contract and can be run without a browser. Do not label a controller integration test as full E2E merely because it sends an HTTP request.
 

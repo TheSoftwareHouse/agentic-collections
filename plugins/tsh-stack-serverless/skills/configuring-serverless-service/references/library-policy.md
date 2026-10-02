@@ -22,7 +22,7 @@ inventing a default.
 | Service configuration | **TypeScript** — `serverless.ts` plus a per-function definition | Not `serverless.yml`: the configuration then passes the same type checker as the rest of the code, and a value resolved in TypeScript is visible to `grep`. |
 | HTTP middleware | **middy 7** | Import-only ESM, which is what forces the deployed bundle to ESM. |
 | Validation | **zod** | One schema per function covering the whole event; the payload type is inferred from it, never written a second time. |
-| Runtime | **Node 24 on `arm64`** | `target`, `lib` and `@types/node` all match this major. |
+| Runtime | **Node 24 on `arm64`** — `nodejs24.x`, supported by Lambda until 2028-04-30; `nodejs22.x` is deprecated on 2027-04-30 | `target`, `lib` and `@types/node` all match this major. |
 | Database | **PostgreSQL** | The connection-budget arithmetic and the secret's shape assume a connection-per-invocation relational database. |
 | Secrets | **AWS Secrets Manager** | The stack owns the container, a human owns the value, the function receives an identifier. |
 | Orchestration | **Step Functions**, definition in ASL | Declarative YAML, one directory per step. |

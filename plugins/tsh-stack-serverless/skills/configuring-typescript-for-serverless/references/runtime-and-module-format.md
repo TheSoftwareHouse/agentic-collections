@@ -14,7 +14,7 @@ tests but fails once the packaged artifact runs.
 ## Pinning the Runtime
 
 The Node major declared in the service configuration (the function or provider
-runtime, e.g. `nodejs22.x`) and the Node major the code is built against are two
+runtime, e.g. `nodejs24.x`) and the Node major the code is built against are two
 separate settings that must agree, and nothing forces them to.
 
 | Severity | Rule |

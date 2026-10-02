@@ -17,8 +17,8 @@ skip verification and never guess the design.
 ## Inputs pinned before the first iteration
 
 - **Playwright CLI availability**, checked once, before the first UI delegation:
-  run `playwright-cli --version`, falling back to `npx --no-install playwright-cli
-  --version`. When neither responds, ask the user (AskUserQuestion) whether to
+  run `playwright-cli --version`, falling back to `npx --no-install playwright cli
+  --version` (never `npx playwright-cli`, a deprecated npm package). When neither responds, ask the user (AskUserQuestion) whether to
   install it now (`npm install -g @playwright/cli@latest`) or wait while they
   install it themselves — never start the gate with the CLI missing, and never let
   this blocker surface first inside a subagent, which cannot ask.

@@ -4,6 +4,23 @@ All notable changes to `tsh-product-testing` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-10-02
+
+### Fixed
+
+- **`auditing-accessibility` no longer competes with the frontend stack's
+  `ensuring-accessibility`.** Its description and trigger list claimed "implementing
+  an accessible widget, form or dialog" and "building an accessible modal, menu,
+  tabs, combobox or form" — the exact triggers of the implementation skill in
+  `tsh-stack-frontend`, which already pointed back here. Both now route one way:
+  auditing an existing page is this plugin, building the component is the stack.
+- `e2e-engineer` preloaded `auditing-accessibility` (about 130 lines on every E2E
+  delegation) and never used it; the preload is gone. The locator rule that a
+  missing accessible name is a finding stays in `writing-playwright-e2e-tests`.
+- README claimed the bundled Playwright MCP "mirrors the Playwright server in
+  `tsh-product-engineering`"; that plugin dropped its server in 0.7.0 for the
+  Playwright CLI. The README now explains why the two plugins use different tools.
+
 ## [0.2.0] - 2026-08-22
 
 First content release. Ports the QA collection from `copilot-collections`,

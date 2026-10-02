@@ -34,7 +34,7 @@ main conversation, ask the user. Never fabricate values or proceed on partial ev
 
 | Severity | Rule |
 | --- | --- |
-| MUST | Take EXPECTED only from the Figma MCP: resolve the node from the Figma URL, export the node image, and save it as the shared `figma-expected.png`. If the Figma MCP is unavailable or the node cannot be resolved, the result is `VERIFICATION NOT RUN` — never a guess. |
+| MUST | Take EXPECTED only from the Figma MCP: resolve the node from the Figma URL and read the design specs from it; the reference image is the shared `figma-expected.png` that the capture worker exported. If the Figma MCP is unavailable, the node cannot be resolved, or `figma-expected.png` is missing, the result is `VERIFICATION NOT RUN` naming the missing input — never a guess, and never an export of your own: the capture worker is the single owner of that file. |
 | NEVER | Open figma.com in a browser to fetch a design, or save a browser, login, or error screenshot as `figma-expected.png`. The browser is for the running app (ACTUAL) only. |
 | MUST | Require all three ACTUAL artifacts for the current iteration — `actual.png`, `computed-styles.json`, `a11y-snapshot.yml` — before issuing any PASS or FAIL. Missing or partial artifacts → `VERIFICATION NOT RUN` with blocker guidance. |
 | NEVER | Substitute code reading, type checks, builds, or test results for verification. They clarify context; the verdict comes only from Figma EXPECTED versus captured ACTUAL. |
@@ -55,11 +55,11 @@ main conversation, ask the user. Never fabricate values or proceed on partial ev
 1. **Validate inputs.** Figma URL for the exact component, the user-confirmed pinned
    dev server URL (used unchanged — never rediscovered, normalized, or port-swapped),
    the component name, and the iteration artifact directory.
-2. **Ensure EXPECTED (ensure-or-fetch).** Check for a valid shared
-   `figma-expected.png` at `specifications/<task-id>/ui-verification/`. Present and
-   the Figma URL/node unchanged → reuse it. Missing or node changed → export it now
-   via the Figma MCP. Only a genuine export failure justifies `VERIFICATION NOT RUN`.
-   Also extract from Figma the specs to compare: layer hierarchy, layout direction,
+2. **Ensure EXPECTED.** Check for the shared `figma-expected.png` at
+   `specifications/<task-id>/ui-verification/`, exported by the capture worker.
+   Present and the Figma URL/node unchanged → use it. Missing or node changed →
+   `VERIFICATION NOT RUN` requesting the capture worker export it; never export it
+   yourself. Extract from Figma the specs to compare: layer hierarchy, layout direction,
    alignment, spacing, frame width, typography, colors, radii, shadows, variants,
    states.
 3. **Confirm ACTUAL.** The three capture artifacts for THIS iteration, produced by

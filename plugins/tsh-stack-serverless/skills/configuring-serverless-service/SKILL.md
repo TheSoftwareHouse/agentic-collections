@@ -24,7 +24,8 @@ and in a repository that has nothing yet it is the convention to build to.
 ## Version Baseline
 
 This skill targets **AWS Lambda through OSLS v4 or Serverless Framework v3,
-Node.js 22+**. The two are not equals: **a new service installs OSLS** —
+Node.js 24** (`nodejs24.x` on `arm64`; `nodejs22.x` stays in range until its
+2027-04-30 deprecation, never for a new service). The two frameworks are not equals: **a new service installs OSLS** —
 `"serverless": "npm:osls@^4"` — never Serverless Framework v3. v3 reached end
 of life at the close of 2024: no security fixes, a runtime schema and type
 package that stop at `nodejs20.x`, and AWS SDK v2 pinned underneath. It stays

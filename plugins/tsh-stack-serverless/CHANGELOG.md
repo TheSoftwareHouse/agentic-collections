@@ -10,6 +10,19 @@ under `[Unreleased]` would be false the moment it was pushed. Every entry below 
 a released version, and its version bump landed in the same commit as the change it
 describes.
 
+## [0.1.1] - 2026-10-02
+
+### Fixed
+
+- **One Node runtime.** `library-policy.md` settled on **Node 24 on `arm64`**
+  while the Version Baseline of all three skills, the README and two references
+  still said **Node.js 22+**. Node 24 is the right one — it is what the OSLS
+  boilerplate deploys (`nodejs24.x`, `engines >=24 <25`) and `nodejs22.x` is
+  deprecated on Lambda on 2027-04-30 — so every other mention now says 24, with
+  22 kept in range for existing services only.
+- "OSLS" was never expanded anywhere a newcomer would look. The README now says
+  what the `osls` package is.
+
 ## [0.1.0] - 2026-09-18
 
 Initial release: portable TSH conventions for AWS Lambda services built with

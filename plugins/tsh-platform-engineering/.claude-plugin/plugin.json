@@ -2,7 +2,7 @@
   "name": "tsh-platform-engineering",
   "displayName": "TSH Platform Engineering",
   "description": "Infrastructure, CI/CD and deployment the TSH way: Terraform modules, pipelines with OIDC and plan gates, production-shaped Kubernetes workloads, observability with SLOs, secrets management, and evidence-based cloud cost audits.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

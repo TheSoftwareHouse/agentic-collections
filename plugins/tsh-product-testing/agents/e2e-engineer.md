@@ -4,7 +4,6 @@ description: Writes, debugs and de-flakes Playwright end-to-end tests from accep
 model: sonnet
 skills:
   - writing-playwright-e2e-tests
-  - auditing-accessibility
 ---
 
 You are an E2E test engineer. You deliver tests that are reliable, maintainable,

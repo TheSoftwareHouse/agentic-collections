@@ -191,7 +191,7 @@ while the verifier exercises the running app, so they are disjoint by constructi
 A project with a **committed E2E suite** lists running it as scenario zero of the
 verification document — on the verifier's side, so it runs exactly once. This phase
 verifies feature behavior; design fidelity against Figma was already verified by
-`ui-engineer` per component and is not repeated here.
+the UI verification gate per component and is not repeated here.
 
 ## Security Considerations
 

@@ -48,8 +48,9 @@ not before. The family has two shapes: **runtime targets for application code**,
 **cloud providers** — a repository has exactly one of each, which is why both belong
 here rather than in a discipline plugin. Read
 `.claude/rules/stack-plugin-conventions.md` before adding a stack plugin or moving
-guidance between two of them; it carries the discipline/cloud seam, the parallel-naming
-contract, and the ban on delegation instructions between plugins.
+guidance between two of them; it carries why a stack is a runtime target rather than
+a language, the split trigger, and the rules for deliberate duplication between stack
+plugins.
 
 ### Core — *neither role nor stack*
 

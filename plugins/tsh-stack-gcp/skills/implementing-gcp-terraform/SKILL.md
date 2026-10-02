@@ -72,7 +72,8 @@ Apply these unless the project documents a reason not to:
 6. **Private Google Access** per subnet, so Google-API traffic never touches Cloud NAT.
 7. **Organization policies as code** with `google_org_policy_policy`.
 8. **VPC Service Controls** for projects handling sensitive data.
-9. **Labels on everything** — environment, team, cost centre, managed-by.
+9. **Labels on everything** — the Core 5 in GCP's lowercase dialect: `cost_center`,
+    `environment`, `service`, `owner`, `data_class`.
 10. **Regional HA for production** datastores, zonal below it.
 
 ## Procedure

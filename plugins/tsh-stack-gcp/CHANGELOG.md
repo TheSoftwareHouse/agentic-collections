@@ -4,6 +4,19 @@ All notable changes to `tsh-stack-gcp` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-02
+
+### Fixed
+
+- `auditing-gcp-cost` carried AWS vocabulary: Firestore was described as
+  "provisioned vs on-demand mode" (DynamoDB's billing model; Firestore bills per
+  operation and distinguishes Native from Datastore mode), the audit was told to
+  read Deployment Manager templates (support discontinued 2026-04-01, service turned
+  down after 2027-06-30), and the label
+  compliance table was headed "Missing Tags".
+- `implementing-gcp-terraform` listed its own label set (environment, team, cost
+  centre, managed-by) instead of the Core 5 the audit checks for.
+
 ## [0.1.0] - 2026-08-22
 
 Initial release. Carries the GCP-specific half of TSH's infrastructure guidance, split

@@ -2,7 +2,7 @@
   "name": "tsh-stack-nodejs",
   "displayName": "TSH Stack: Node.js",
   "description": "TSH conventions for TypeScript on Node.js: compiler configuration for a Node runtime, and NestJS API implementation and review.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

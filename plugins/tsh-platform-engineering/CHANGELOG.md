@@ -4,6 +4,28 @@ All notable changes to `tsh-platform-engineering` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-10-02
+
+### Fixed
+
+- README documented a bundled `aws-documentation` server and "four other servers";
+  this plugin's `.mcp.json` declares `context7` only (the AWS server ships in
+  `tsh-stack-aws`). The section is gone and the 0.2.0 entry below is corrected.
+- **Bitbucket Pipelines.** Two tables said AWS access from Bitbucket is "repository
+  variables plus assume-role", contradicting the OIDC-only rule in
+  `managing-secrets`; Bitbucket has supported OIDC since 2021. Both rows now say so.
+- **Azure was missing from every cloud delegation.** `optimizing-cloud-cost`, the
+  `infrastructure-auditor` and `devops-engineer` agents named only the AWS and GCP
+  stack skills; `auditing-azure-cost` and `tsh-stack-azure` are now named alongside.
+- The cost-allocation tag set contradicted itself: `decision-framework.md` listed
+  `environment`, `team`, `cost-centre`, `project` while `tagging-standards.md`
+  defines the Core 5. The multi-cloud reference now points at the Core 5.
+- Stale tooling facts: Terraform state locking recommended a DynamoDB table
+  (deprecated since Terraform 1.11 in favour of S3 `use_lockfile`), and the
+  Kubernetes validation step offered `kubeval` (archived) beside `kubeconform`.
+- `structured-logging.md`'s sample log carried `user_id` while the same file forbids
+  personal identifiers in log fields.
+
 ## [0.2.0] - 2026-08-22
 
 First content release. Ports the DevOps collection from `copilot-collections`,
@@ -20,8 +42,9 @@ restructured for Claude Code.
 - **`shared/discovering-infrastructure-context.md`** — one copy of the platform, IaC
   dialect, cloud, version-pin, policy and GitOps detection logic, loaded by every
   skill through `${CLAUDE_PLUGIN_ROOT}`.
-- **`.mcp.json`** with `context7` and the AWS Labs `aws-documentation` server, both
-  read-only.
+- **`.mcp.json`** with `context7`, read-only. (This line originally also claimed the
+  AWS Labs `aws-documentation` server, which ships in `tsh-stack-aws` — see the
+  cloud-boundary section below.)
 
 ### Split along the cloud boundary
 
