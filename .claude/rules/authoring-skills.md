@@ -40,7 +40,8 @@ writing a new one.
   would be a routing coin flip.
 - Changing a model-invocable skill's description means running
   `python3 scripts/lint-descriptions.py` and the routing suite, and a new skill adds a
-  routing case. Commands and case format: `.claude/rules/plugin-evals.md`.
+  routing case. Commands and how to read the output: `evals/README.md`; case format:
+  `.claude/rules/plugin-evals.md`.
   A pair the lint flags but that is genuinely distinct goes in `allowed_pairs` of
   `scripts/description-lint.json` as `{"a", "b", "reason"}`, with IDs in the form
   `tsh-<plugin>:<skill>` or `tsh-<plugin>:@<agent>` — and only with a routing case

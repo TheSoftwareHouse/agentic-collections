@@ -8,8 +8,9 @@ paths:
 
 **Routing cases prove the right skill fires when plugins are installed together; they
 use free, deterministic graders and run on every pull request that touches `plugins/**`
-or `evals/**` once the `ANTHROPIC_API_KEY` repository secret exists.** A new or renamed model-invocable skill adds routing cases; a description
-change re-runs the suite. Run command and known failures: `evals/README.md`.
+or `evals/**` once the `ANTHROPIC_API_KEY` repository secret exists.** A new or renamed
+model-invocable skill adds routing cases; a description change re-runs the suite. How
+to run both checks, read their output, and lift a quarantine: `evals/README.md`.
 
 ## Where cases live
 

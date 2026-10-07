@@ -199,20 +199,16 @@ Validate before pushing:
 claude plugin validate ./plugins/tsh-core   # per plugin
 claude plugin validate .                    # the marketplace catalog
 python3 scripts/lint-descriptions.py        # skill and agent description lint
-claude plugin eval . --eval-dir evals --tag routing \
-  --trust-plugin --no-publish --ablation none \
-  --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 3 \
-  --json evals/results/latest.json          # routing evals
 ```
 
 `validate` should print `✔ Validation passed`. Warnings don't fail validation; add
 `--strict` to treat them as errors. To test the catalog end to end without pushing, see
 `.claude/rules/plugin-manifests-and-marketplace.md`.
 
-The eval spends API budget on the signed-in account, about USD 0.12 per case. In
-GitHub Actions the lint and plugin validation run on every pull request, and the
-routing evals on pull requests that touch `plugins/` or `evals/` once the
-`ANTHROPIC_API_KEY` repository secret exists.
+After changing a model-invocable description, also run the routing evals; they spend
+API budget on the signed-in account, about USD 0.12 per case. `evals/README.md` is the
+one place that documents how to run both checks, what their output means, and what CI
+runs — keep commands there rather than copying them here.
 
 ## Where the rest lives
 
