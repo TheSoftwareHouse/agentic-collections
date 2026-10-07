@@ -1,0 +1,61 @@
+name: Plugin evals
+
+on:
+  pull_request:
+    paths:
+      - plugins/**
+      - evals/**
+      - .github/workflows/plugin-evals.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check for ANTHROPIC_API_KEY
+        id: key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Routing evals skipped: ANTHROPIC_API_KEY is not available (fork pull request or secret not configured)."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.has_key == 'true'
+
+      - name: Install Claude Code
+        if: steps.key.outputs.has_key == 'true'
+        run: |
+          # Pinned like the model: a CLI rollout must not look like a plugin regression.
+          # Raise it deliberately after re-running the suites locally on the new version.
+          curl -fsSL https://claude.ai/install.sh | bash -s 2.1.280
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run routing evals
+        if: steps.key.outputs.has_key == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: >
+          claude plugin eval . --eval-dir evals --tag routing
+          --trust-plugin --no-publish --ablation none
+          --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 3
+          --json evals/results/routing.json --report evals/results/routing.html
+
+      - name: Upload eval results
+        if: always() && steps.key.outputs.has_key == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: routing-eval-results
+          path: evals/results/
+          if-no-files-found: ignore

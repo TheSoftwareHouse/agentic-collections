@@ -3,8 +3,10 @@
 ## What this repo is
 
 A **Claude Code plugin marketplace** for The Software House. It is not an
-application: there is no build step, no test suite, no dependencies, and no runtime.
-Everything here is Markdown and JSON that Claude Code loads.
+application: there is no build step and no runtime. The plugins are Markdown and JSON
+that Claude Code loads; the only code is repository tooling that checks them — a
+standard-library Python description lint in `scripts/` and a `claude plugin eval`
+routing suite in `evals/`.
 
 It publishes three families: `tsh-<discipline>` for *how we work*,
 `tsh-stack-<stack-name>` for *what we work with*, and `tsh-core` — a single,
@@ -92,6 +94,8 @@ and `tsh-core` with you, because it depends on nothing at all.
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read `.claude/rules/core-plugin-admission.md` first | `templates/SKILL.md` |
 | An MCP server three or more disciplines drive | `plugins/tsh-core/.mcp.json` — read `.claude/rules/plugin-manifests-and-marketplace.md`, then `core-plugin-admission.md` | the existing entry |
 | An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — Playwright in `tsh-product-testing` is the worked example | that file |
+| A routing eval case | `evals/routing/<case>/case.yaml` | an existing case in `evals/routing/` |
+| A behavioural eval suite for one plugin | `plugins/<plugin>/evals/<case>/case.yaml` — read `.claude/rules/plugin-evals.md` first | — |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
 **Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
@@ -194,11 +198,21 @@ Validate before pushing:
 ```shell
 claude plugin validate ./plugins/tsh-core   # per plugin
 claude plugin validate .                    # the marketplace catalog
+python3 scripts/lint-descriptions.py        # skill and agent description lint
+claude plugin eval . --eval-dir evals --tag routing \
+  --trust-plugin --no-publish --ablation none \
+  --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 3 \
+  --json evals/results/latest.json          # routing evals
 ```
 
-Expect `✔ Validation passed`. Warnings don't fail validation; add `--strict` to treat
-them as errors. To test the catalog end to end without pushing, see
+`validate` should print `✔ Validation passed`. Warnings don't fail validation; add
+`--strict` to treat them as errors. To test the catalog end to end without pushing, see
 `.claude/rules/plugin-manifests-and-marketplace.md`.
+
+The eval spends API budget on the signed-in account, about USD 0.12 per case. In
+GitHub Actions the lint and plugin validation run on every pull request, and the
+routing evals on pull requests that touch `plugins/` or `evals/` once the
+`ANTHROPIC_API_KEY` repository secret exists.
 
 ## Where the rest lives
 

@@ -376,7 +376,14 @@ Test against the working tree without installing anything:
 ```shell
 claude --plugin-dir ./plugins/tsh-product-testing
 claude plugin validate ./plugins/tsh-product-testing
+python3 scripts/lint-descriptions.py
+claude plugin eval . --eval-dir evals --tag routing \
+  --trust-plugin --no-publish --ablation none \
+  --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 3 \
+  --json evals/results/latest.json
 ```
+
+The description lint and plugin validation run in GitHub Actions on every pull request. The routing evals run on pull requests that touch `plugins/` or `evals/`, once the `ANTHROPIC_API_KEY` secret is configured.
 
 ## License
 

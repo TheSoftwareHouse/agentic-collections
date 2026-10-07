@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: a11y-audit-not-build
+description: An audit request with both a11y skills installed must route to auditing-accessibility, not ensuring-accessibility.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-testing", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Our QA lead wants an accessibility compliance check of the existing checkout page before Friday's release.
+    Go through it and report every WCAG 2.1 AA violation with its success criterion.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: audit-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-accessibility"'
+    arm: with-only
+  - name: build-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-accessibility"'
+    min: 0
+    max: 0

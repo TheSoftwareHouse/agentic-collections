@@ -38,6 +38,13 @@ writing a new one.
 - Verbs carry meaning between related skills. `managing-` claims format and lifecycle,
   `writing-` claims prose. Two skills claiming the same artifact under the same verb
   would be a routing coin flip.
+- Changing a model-invocable skill's description means running
+  `python3 scripts/lint-descriptions.py` and the routing suite, and a new skill adds a
+  routing case. Commands and case format: `.claude/rules/plugin-evals.md`.
+  A pair the lint flags but that is genuinely distinct goes in `allowed_pairs` of
+  `scripts/description-lint.json` as `{"a", "b", "reason"}`, with IDs in the form
+  `tsh-<plugin>:<skill>` or `tsh-<plugin>:@<agent>` — and only with a routing case
+  proving the two route apart.
 - **One exception: user-invoked entry points.** A skill with
   `disable-model-invocation: true` is a command, not a routing surface — its
   description is never preloaded, so it cannot collide with anything. It may take a
