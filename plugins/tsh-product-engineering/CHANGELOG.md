@@ -26,7 +26,8 @@ alone reaches nobody.
   timeouts — unless they are labelled as mitigations and the user agrees, and it
   reports the same faulty pattern wherever else it occurs. Two references cover
   bugs that will not reproduce and the techniques for narrowing a cause, including
-  `git bisect run` driven by the repro test.
+  `git bisect run` driven by the repro test — always in a throwaway worktree, so it
+  never checks out old commits under uncommitted work or other agents.
 
 ### Changed
 
@@ -36,7 +37,15 @@ alone reaches nobody.
 - `software-engineer` preloads `debugging-code` and follows it whenever a delegated
   task is a fix for a reported failure — a review or verification finding, a failing
   test, a stack trace. Until now those follow-ups were implemented with no
-  requirement to reproduce the failure or find its cause first.
+  requirement to reproduce the failure or find its cause first. As a subagent it
+  cannot ask the user, so a failure it cannot reproduce, and any step that needs the
+  user's agreement or a plan, comes back as a reported deviation with the skill's
+  full report — never as a workaround that turns the Definition of Done green. It
+  never runs `git bisect`; it reports the commit range instead.
+- `creating-implementation-plans` persists an established root cause handed over by
+  `debugging-code` in the plan's Technical Context — the causal chain, its evidence
+  and the reach of the fix — so implementers fix that cause instead of
+  re-investigating it.
 
 ## [0.7.2] - 2026-10-02
 

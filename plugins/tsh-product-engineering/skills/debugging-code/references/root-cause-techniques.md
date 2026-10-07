@@ -29,18 +29,30 @@ passes it.
 ## 2. Bisect when there is a last known good commit
 
 If it worked at some commit and fails now, `git bisect` finds the commit that broke it
-in about log₂(n) steps. Automate it with the failing test from step 3 of the skill:
+in about log₂(n) steps. Automate it with the failing test from step 3 of the skill.
+
+**Bisect in a throwaway worktree, never in the tree you are fixing.** Bisect checks
+out every commit it tests: in a tree with uncommitted changes it either refuses to
+start or carries them into each old commit and blames the wrong one, and it rewrites
+files under anyone else working in the same tree. A delegated implementer does not
+bisect at all — it reports the good and bad commits, and the main conversation runs
+this.
 
 ```shell
-git bisect start <bad-commit> <good-commit>
-git bisect run <command that runs only the repro test>
-git bisect reset
+tmp=$(mktemp -d)
+git worktree add --detach "$tmp" <bad-commit>
+git -C "$tmp" bisect start <bad-commit> <good-commit>
+git -C "$tmp" bisect run <command that runs only the repro test>
+git -C "$tmp" bisect reset
+git worktree remove "$tmp"
 ```
 
 The command must exit `0` when the commit is good, `1`–`124` or `126`–`127` when bad,
-and `125` to skip a commit that cannot be tested (it does not build, say). If the repro
-test does not exist at older commits, write it to a file outside the tree and have the
-command copy it in before running.
+and `125` to skip a commit that cannot be tested (it does not build, say). The repro
+test is uncommitted, so it does not exist in the worktree: keep a copy outside both
+trees and have the command copy it in before running. Ignored directories such as
+installed dependencies are not in the worktree either; install them there if the test
+needs them.
 
 The commit bisect finds is where the bug was *introduced*, not necessarily where the
 cause lives. A dependency bump or a config change often surfaces a latent fault
