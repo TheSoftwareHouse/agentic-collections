@@ -12,6 +12,41 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.0] - 2026-10-07
+
+### Added
+
+- **`debugging-code` — fix a bug at its cause, not at its symptom.** Until now a bug
+  went through `orchestrating-feature-implementation`, which either demanded a plan
+  or let a "trivial" fix through with nothing requiring the cause to be found. The
+  new skill reproduces the failure, secures a test that fails for the
+  reported reason — existing, corrected or new — names the root cause as a causal chain with evidence, measures how far the fix reaches before applying
+  the minimal fix, and keeps the test as a regression guard. It forbids
+  symptom-site patches — null guards, swallowed exceptions, retries, longer
+  timeouts — unless they are labelled as mitigations and the user agrees, and it
+  reports the same faulty pattern wherever else it occurs. Two references cover
+  bugs that will not reproduce and the techniques for narrowing a cause, including
+  `git bisect run` driven by the repro test — always in a throwaway worktree, so it
+  never checks out old commits under uncommitted work or other agents.
+
+### Changed
+
+- `orchestrating-feature-implementation` routes a bug whose cause is not yet known
+  to `debugging-code`, and takes it back as a plan when the fix outgrows a minimal
+  change.
+- `software-engineer` preloads `debugging-code` and follows it whenever a delegated
+  task is a fix for a reported failure — a review or verification finding, a failing
+  test, a stack trace. Until now those follow-ups were implemented with no
+  requirement to reproduce the failure or find its cause first. As a subagent it
+  cannot ask the user, so a failure it cannot reproduce, and any step that needs the
+  user's agreement or a plan, comes back as a reported deviation with the skill's
+  full report — never as a workaround that turns the Definition of Done green. It
+  never runs `git bisect`; it reports the commit range instead.
+- `creating-implementation-plans` persists an established root cause handed over by
+  `debugging-code` in the plan's Technical Context — the causal chain, its evidence
+  and the reach of the fix — so implementers fix that cause instead of
+  re-investigating it.
+
 ## [0.7.2] - 2026-10-02
 
 ### Fixed

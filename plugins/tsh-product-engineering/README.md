@@ -1,6 +1,6 @@
 # TSH Product Engineering
 
-Spec-driven feature implementation: committed plan files, delegated implementer subagents, and TSH's structured pre-merge code review.
+Spec-driven feature implementation: committed plan files, delegated implementer subagents, root-cause bug fixing guarded by a regression test, and TSH's structured pre-merge code review.
 
 Install at **user scope** — this plugin travels with you, not with a repository. It
 carries TSH's spec-driven implementation workflow: a plan file the team can read and
@@ -20,6 +20,7 @@ conversation, and a delegated review gate at the end.
 | :-- | :-- | :-- |
 | `orchestrating-feature-implementation` | `/tsh-product-engineering:orchestrating-feature-implementation` | Drives implementation end to end: plan readiness, delegation to the agents below (parallel where the plan allows), and a verification pyramid — scoped task checks, one checkpoint per phase, one final full pass |
 | `creating-implementation-plans` | `/tsh-product-engineering:creating-implementation-plans` | Authors `*.plan.md` files from a menu of building blocks — verifiable tasks, persisted technical context, parallel groups |
+| `debugging-code` | `/tsh-product-engineering:debugging-code` | Fixes a bug at its root cause: assess, reproduce, secure a failing test — existing, corrected or new — name the causal chain with evidence, measure the reach of the fix, apply it minimally, keep the test as a regression guard, report sibling occurrences |
 | `reviewing-code` | `/tsh-product-engineering:reviewing-code` | TSH's structured review: plan comparison, executed test suites, anti-patterns, security, scalability |
 | `reviewing-ui` | `/tsh-product-engineering:reviewing-ui` | One UI verification pass: fresh Playwright-CLI capture judged against the Figma design — PASS, FAIL, or VERIFICATION NOT RUN with a complete difference table |
 | `verifying-ui` | model-invoked only | The judging standard behind UI verification: categories, strict tolerances, PASS gate, report format — preloaded by `ui-reviewer` |
