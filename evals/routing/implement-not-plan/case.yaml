@@ -22,3 +22,9 @@ graders:
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
     min: 0
     max: 0
+  - name: debugging-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0

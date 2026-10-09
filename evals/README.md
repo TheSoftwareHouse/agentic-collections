@@ -242,6 +242,7 @@ it passes 6 of 6, then restore the `routing` tag and remove its row here.
 | Case | Observed | Fix lives in |
 | :-- | :-- | :-- |
 | `claude-extension-not-context` | A request to run prettier automatically after every edit loads Claude Code's built-in `update-config` instead of `authoring-claude-extensions` in 15 of 15 runs | `tsh-core`: decide whether `authoring-claude-extensions` claims hook requests, then reword its description or the case's expectation |
+| `debug-not-implement` | A regression report loads `debugging-code` first in 5 of 6 runs; in the sixth Claude searches the code before any skill. As a ticket 1 of 6, with a stack trace naming files 0 of 6 | `tsh-product-engineering`: the `debugging-code` description, so it loads before code is read or searched |
 | `nestjs-review-layers` | A pre-merge review of a pasted NestJS diff loads neither `reviewing-code` nor `implementing-nestjs-api` in 6 of 6 runs; Claude reviews it directly | `tsh-product-engineering` and `tsh-stack-nodejs`: the `reviewing-code` and `implementing-nestjs-api` descriptions |
 | `terraform-module-layers` | Writing a reusable AWS RDS module loads both layers in 5 of 6 runs; in the sixth only `implementing-aws-terraform` | `tsh-platform-engineering`: the `implementing-terraform-modules` description |
 | `ui-review-not-standard` | A "does this page match the Figma design" request loads `verifying-ui` instead of `reviewing-ui` in 5 of 6 runs | `tsh-product-engineering`: the `reviewing-ui` and `verifying-ui` descriptions |

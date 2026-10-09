@@ -9,6 +9,7 @@
     "tsh-platform-engineering:implementing-observability",
     "tsh-platform-engineering:implementing-terraform-modules",
     "tsh-platform-engineering:managing-secrets",
+    "tsh-product-engineering:debugging-code",
     "tsh-product-engineering:discovering-technical-context",
     "tsh-product-engineering:reviewing-ui",
     "tsh-product-engineering:verifying-ui",
