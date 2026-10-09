@@ -1,7 +1,7 @@
 ---
 name: orchestrating-feature-implementation
 description: "Implements a feature, ticket, or plan end to end from the main conversation: confirms a plan file exists, delegates each task to implementer subagents — in parallel where the plan allows — gates on their reports, then closes with the plan's final verification phase: code review and functional verification in parallel. Use for any feature request or multi-file change, before the first file is edited."
-when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code."
+when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code; fixing a bug whose cause is not yet known is debugging-code."
 ---
 
 # Orchestrating Feature Implementation
@@ -54,6 +54,7 @@ of it.
 | UI verification verdict — Figma comparison on captured artifacts, per gate iteration | `ui-reviewer` subagent |
 | Any other implementation task — backend, logic, tests, config | `software-engineer` subagent |
 | Trivial single-file change with no design decision | Inline, in this conversation |
+| A bug whose cause is not yet established | `debugging-code`, in this conversation — a fix that outgrows a minimal change comes back here as a plan carrying the established root cause |
 | Code review, in the final verification phase | `code-reviewer` subagent |
 | Functional verification of the delivered feature, in the final verification phase | `feature-verifier` subagent |
 | Authoring E2E test suites, infrastructure/CI, discovery or analysis work | Out of scope here — name the gap to the user instead of improvising |
