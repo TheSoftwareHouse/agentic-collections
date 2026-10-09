@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: cloud-cost-estimate-not-audit
+description: Costing infrastructure that is not deployed yet must route to optimizing-cloud-cost, not to auditing-aws-cost, even when the design targets AWS.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-aws"]
+runs: 1
+execution:
+  prompt: |
+    We're designing the infrastructure for a new nightly report-generation service on AWS; nothing is deployed yet.
+    For the design review I need the cost section of the proposal: which pricing model fits the batch workers (on-demand, Savings Plans or spot), what lifecycle the generated PDFs in storage should have, and which cost-allocation tags we make mandatory.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: framework-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    arm: with-only
+  - name: audit-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-aws-cost"'
+    min: 0
+    max: 0

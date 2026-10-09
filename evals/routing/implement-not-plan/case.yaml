@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: implement-not-plan
+description: A request to build a multi-part ticket must route to orchestrating-feature-implementation, which owns getting a plan in place, not straight to creating-implementation-plans.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Build ticket PAY-142: a customer can request a refund for a paid order from the order details page, and we issue it through Stripe.
+    It touches the orders API, the Stripe integration and the order page.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: implement-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    arm: with-only
+  - name: plan-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    min: 0
+    max: 0
+  - name: debugging-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0

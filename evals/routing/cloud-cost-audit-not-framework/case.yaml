@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: cloud-cost-audit-not-framework
+description: A cost audit of a live AWS account, with the discipline and the AWS plugin installed together, must route to auditing-aws-cost, not the cloud-agnostic optimizing-cloud-cost framework.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-aws"]
+runs: 1
+execution:
+  prompt: |
+    Our AWS bill went from $14k to $21k last month and nobody knows why.
+    Go through the production account in eu-west-1: find what is driving the spend, idle or orphaned resources, and anything untagged, and give me a report I can show the CTO.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: audit-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-aws-cost"'
+    arm: with-only
+  - name: framework-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    min: 0
+    max: 0

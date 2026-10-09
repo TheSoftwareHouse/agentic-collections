@@ -1,0 +1,28 @@
+schema_version: "1.1"
+name: debug-not-implement
+description: A regression with no known cause must route to debugging-code, not orchestrating-feature-implementation.
+# Quarantined 2026-10-09: debugging-code loads first in 5 of 6 runs on claude-sonnet-5-5;
+# in the sixth Claude searches the code before loading any skill. Worded as a ticket it
+# loads in 1 of 6, and with a stack trace naming files in 0 of 6: Claude reads the files
+# first. Restore the routing tag once debugging-code is loaded before reading or searching.
+tags: [known-failure]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Since yesterday's deploy, checkout fails with "Something went wrong" for every order that uses a discount code; orders without one go through fine.
+    It worked last week and nobody touched the discount feature on purpose. Fix it.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: debugging-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0

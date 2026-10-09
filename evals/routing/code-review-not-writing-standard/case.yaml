@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: code-review-not-writing-standard
+description: A pre-merge PR review must route to reviewing-code and must not pull in tsh-core's writing-technical-documents, which tsh-core installs into every session.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Review PR #212, the new refunds endpoint, before we merge it.
+    Check it against specifications/PAY-142/stripe-refunds.plan.md, run the tests and the linter, and tell me whether it's ready to merge.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: writing-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    min: 0
+    max: 0

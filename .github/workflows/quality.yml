@@ -1,0 +1,46 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  routing-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Test the check scripts
+        run: python3 -m unittest discover -s scripts/tests
+      - name: Lint descriptions
+        run: python3 scripts/lint-descriptions.py --github
+      - name: Check routing eval cases
+        run: python3 scripts/check-eval-cases.py --github
+
+  validate-plugins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Claude Code
+        run: |
+          # Pinned like the model: a CLI rollout must not look like a plugin regression.
+          # Raise it deliberately after re-running the suites locally on the new version.
+          curl -fsSL https://claude.ai/install.sh | bash -s 2.1.280
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      # Validation is offline: no API key is needed.
+      - name: Validate marketplace and plugins
+        run: |
+          claude plugin validate .
+          for p in plugins/*/; do claude plugin validate "$p" || exit 1; done

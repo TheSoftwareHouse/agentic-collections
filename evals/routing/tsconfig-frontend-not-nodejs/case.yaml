@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: tsconfig-frontend-not-nodejs
+description: A Vite path-alias problem in a monorepo that also holds a NestJS service must route to configuring-typescript-for-frontend, not configuring-typescript-for-nodejs.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-frontend", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    In our monorepo, apps/web is a React + Vite app and apps/api is a NestJS service.
+    In apps/web the `@/components` path alias resolves fine in VS Code, but `vite build` fails with "Failed to resolve import". Fix the web app's TypeScript and Vite config.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: frontend-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-frontend"'
+    arm: with-only
+  - name: nodejs-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-nodejs"'
+    min: 0
+    max: 0

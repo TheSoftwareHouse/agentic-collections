@@ -1,0 +1,22 @@
+{
+  "warn_above": 0.35,
+  "fail_above": 0.50,
+  "exclusive_bonus": 0.15,
+  "exclusive_groups": [
+    {
+      "name": "runtime targets",
+      "plugins": ["tsh-stack-nodejs", "tsh-stack-serverless", "tsh-stack-python"]
+    },
+    {
+      "name": "cloud providers",
+      "plugins": ["tsh-stack-aws", "tsh-stack-gcp", "tsh-stack-azure"]
+    }
+  ],
+  "allowed_pairs": [
+    {
+      "a": "tsh-product-testing:auditing-accessibility",
+      "b": "tsh-stack-frontend:ensuring-accessibility",
+      "reason": "Audit vs build; a11y-audit-not-build and a11y-build-not-audit prove they route apart."
+    }
+  ]
+}
