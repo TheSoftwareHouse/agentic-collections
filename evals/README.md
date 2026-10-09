@@ -2,15 +2,18 @@
 
 Two checks catch a skill that fires on the wrong request: a free description lint
 that flags skills whose descriptions read alike, and a routing eval suite that
-proves which skill Claude actually loads. Both run from the repository root.
+proves which skill Claude actually loads. A third, free check keeps the eval cases
+honest. All three run from the repository root.
 
 | Check | Command | Cost | Runs in CI |
 | :-- | :-- | :-- | :-- |
 | Description lint | `python3 scripts/lint-descriptions.py` | free, under a second | every pull request |
 | Routing evals | the `claude plugin eval` command [below](#run-the-suite) | about USD 0.12 per case, billed to your account | pull requests touching `plugins/` or `evals/` |
+| Case check | `python3 scripts/check-eval-cases.py` | free, under a second | every pull request |
 
 Run the lint whenever you change a skill or agent description. Run the evals when
-the lint flags your skill, or when you add or rename a model-invocable skill.
+the lint flags your skill, or when you add or rename a model-invocable skill. Run
+the case check whenever you add, change or rename a case or a skill.
 
 ## Description lint
 
@@ -55,7 +58,8 @@ no longer exists.
    ([measure one case](#measure-one-case)). The lint shows where to look; the eval
    shows whether routing is actually broken.
 3. If the two genuinely route apart and the wording cannot diverge further, add
-   the pair to `allowed_pairs` in `scripts/description-lint.json`:
+   the pair to `allowed_pairs` in `scripts/description-lint.json`, as the a11y
+   pair already is:
 
    ```json
    { "a": "tsh-product-testing:auditing-accessibility",
@@ -157,11 +161,38 @@ These lines appear on **every** run, passing ones included, and are not failures
 
 `evals/results/` is gitignored. Delete it whenever you like.
 
+## Case check
+
+A must-not-fire grader passes whenever its pattern matches nothing, so a
+misspelled or renamed skill would leave it green forever, proving nothing. The
+case check reads every `evals/routing/*/case.yaml` without running a model and
+exits 1 when:
+
+- a grader names a skill that none of the case's `plugins` ships, or one with
+  `disable-model-invocation: true`
+- `name` differs from the directory, or a plugin path does not resolve
+- the case leaves the routing shape: `runs: 1`, `max_turns: 1`,
+  `allowed_tools: [Skill]`, no `scaffold_script`, only `tool_used` graders on
+  `Skill`, and at least one must-not-fire grader
+- the tags hold neither or both of `routing` and `known-failure`
+- a `known-failure` case is missing from [Known failures](#known-failures), or
+  that table lists a case that is not quarantined
+
+It always prints how many model-invocable skills have a must-fire case in a
+non-quarantined case. `--coverage` lists the ones that have none; `--github` emits
+annotations on the offending line.
+
+The two scripts have unit tests in `scripts/tests/`:
+
+```shell
+python3 -m unittest discover -s scripts/tests
+```
+
 ## In CI
 
 | Workflow | Trigger | Does |
 | :-- | :-- | :-- |
-| `.github/workflows/quality.yml` | every pull request, and pushes to `main` | runs the lint with `--github` and `claude plugin validate` on the catalog and each plugin |
+| `.github/workflows/quality.yml` | every pull request, and pushes to `main` | runs the script unit tests, the lint and the case check with `--github`, and `claude plugin validate` on the catalog and each plugin |
 | `.github/workflows/plugin-evals.yml` | pull requests touching `plugins/**`, `evals/**` or the workflow itself | runs the suite command above; uploads `evals/results/` as the `routing-eval-results` artifact |
 
 The eval workflow needs the `ANTHROPIC_API_KEY` repository secret. Without it — on
@@ -172,8 +203,12 @@ running the suite locally on the new version.
 ## Add or change a case
 
 Copy an existing case directory and change the name, prompt, plugins and skill
-names. Every new or renamed model-invocable skill needs one must-fire and one
-must-not-fire case against its nearest sibling in the lint ranking. The case
+names, then run the case check. Every new or renamed model-invocable skill needs
+one must-fire and one must-not-fire case against its nearest sibling in the lint
+ranking. The lint compares words, so also look for siblings it cannot see: a
+discipline skill and a stack skill that cover the same job in different words,
+such as `optimizing-cloud-cost` and `auditing-aws-cost`, are installed together in
+most repositories. The case
 shape, grader idioms and cost rules are in `.claude/rules/plugin-evals.md`, which
 Claude Code loads when you open any file under `evals/`.
 
@@ -190,4 +225,5 @@ it passes 6 of 6, then restore the `routing` tag and remove its row here.
 
 | Case | Observed | Fix lives in |
 | :-- | :-- | :-- |
+| `claude-extension-not-context` | A request to run prettier automatically after every edit loads Claude Code's built-in `update-config` instead of `authoring-claude-extensions` in 15 of 15 runs | `tsh-core`: decide whether `authoring-claude-extensions` claims hook requests, then reword its description or the case's expectation |
 | `ui-review-not-standard` | A "does this page match the Figma design" request loads `verifying-ui` instead of `reviewing-ui` in 5 of 6 runs | `tsh-product-engineering`: the `reviewing-ui` and `verifying-ui` descriptions |

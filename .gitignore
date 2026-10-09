@@ -4,3 +4,4 @@ spec/
 specifications/
 evals/results/
 plugins/*/evals/results/
+__pycache__/

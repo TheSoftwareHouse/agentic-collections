@@ -70,7 +70,7 @@ def parse_frontmatter(path):
         if not match:
             continue
         key, raw = match.group(1), match.group(2).strip()
-        if key in ("description", "when_to_use"):
+        if key in ("description", "when_to_use") and raw[:1] not in ("|", ">"):
             nxt = next((ln for ln in block[i + 1:] if ln.strip()), None)
             if nxt is not None and not re.match(r"^[A-Za-z_][\w-]*:", nxt):
                 raise ParseError(f"multi-line value for '{key}'")
@@ -97,14 +97,14 @@ def parse_scalar(key, raw):
     return re.sub(r"\s+#.*$", "", raw)
 
 
-def collect():
+def collect(root=ROOT):
     """Return (components, errors). A component is a dict with id, plugin, kind, path, text."""
     components, errors = [], []
     patterns = [("skill", "plugins/*/skills/*/SKILL.md"), ("agent", "plugins/*/agents/*.md")]
     for kind, pattern in patterns:
-        for path in sorted(ROOT.glob(pattern)):
-            rel = path.relative_to(ROOT).as_posix()
-            plugin = path.relative_to(ROOT / "plugins").parts[0]
+        for path in sorted(root.glob(pattern)):
+            rel = path.relative_to(root).as_posix()
+            plugin = path.relative_to(root / "plugins").parts[0]
             try:
                 fm, desc_line = parse_frontmatter(path)
             except ParseError as exc:
@@ -152,14 +152,15 @@ def exclusive(plugin_a, plugin_b, groups):
     )
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    ap.add_argument("--root", type=Path, default=ROOT, help="repository root (default: this repository)")
     ap.add_argument("--warn-above", type=float)
     ap.add_argument("--fail-above", type=float)
     ap.add_argument("--top", type=int, default=10, help="rows to print (default 10)")
     ap.add_argument("--github", action="store_true", help="emit GitHub annotations")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
     warn = args.warn_above if args.warn_above is not None else config["warn_above"]
@@ -168,7 +169,7 @@ def main():
     groups = config.get("exclusive_groups", [])
     allowed = {frozenset((p["a"], p["b"])) for p in config.get("allowed_pairs", [])}
 
-    components, errors = collect()
+    components, errors = collect(args.root)
     for rel, msg in errors:
         print(f"ERROR {rel}: cannot parse frontmatter ({msg})", file=sys.stderr)
         if args.github:
@@ -206,11 +207,11 @@ def main():
 
     print(f"{len(components)} components; warn > {warn:.2f}, fail > {fail:.2f} "
           f"(+{bonus:.2f} for mutually exclusive plugins)")
-    print(f"{'score':>5}  {'level':<5}  pair")
+    print(f"{'score':>5}  {'level':<7}  pair")
     for score, level, extra, pair_allowed, a, b in rows[: args.top]:
         note = " [exclusive]" if extra else ""
         note += " [allowed]" if pair_allowed else ""
-        print(f"{score:5.2f}  {level:<5}  {a['id']} / {b['id']}{note}")
+        print(f"{score:5.2f}  {level:<7}  {a['id']} / {b['id']}{note}")
 
     failed = bool(errors)
     for score, level, _, _, a, b in rows:

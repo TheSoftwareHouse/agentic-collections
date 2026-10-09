@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-descriptions:
+  routing-checks:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -21,7 +21,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - run: python3 scripts/lint-descriptions.py --github
+      - name: Test the check scripts
+        run: python3 -m unittest discover -s scripts/tests
+      - name: Lint descriptions
+        run: python3 scripts/lint-descriptions.py --github
+      - name: Check routing eval cases
+        run: python3 scripts/check-eval-cases.py --github
 
   validate-plugins:
     runs-on: ubuntu-latest

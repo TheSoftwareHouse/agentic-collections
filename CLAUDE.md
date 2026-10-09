@@ -199,6 +199,7 @@ Validate before pushing:
 claude plugin validate ./plugins/tsh-core   # per plugin
 claude plugin validate .                    # the marketplace catalog
 python3 scripts/lint-descriptions.py        # skill and agent description lint
+python3 scripts/check-eval-cases.py         # routing cases name real, routable skills
 ```
 
 `validate` should print `✔ Validation passed`. Warnings don't fail validation; add
@@ -207,7 +208,7 @@ python3 scripts/lint-descriptions.py        # skill and agent description lint
 
 After changing a model-invocable description, also run the routing evals; they spend
 API budget on the signed-in account, about USD 0.12 per case. `evals/README.md` is the
-one place that documents how to run both checks, what their output means, and what CI
+one place that documents how to run these checks, what their output means, and what CI
 runs — keep commands there rather than copying them here.
 
 ## Where the rest lives
