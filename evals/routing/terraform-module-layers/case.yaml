@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: terraform-module-layers
+description: Writing a reusable Terraform module for an AWS resource must load both layers, the discipline's implementing-terraform-modules and the stack's implementing-aws-terraform, and not the AWS cost audit.
+# Quarantined 2026-10-09: both skills load in 5 of 6 runs on claude-sonnet-5-5; in the
+# sixth only implementing-aws-terraform does. Restore the routing tag once
+# implementing-terraform-modules is loaded alongside the cloud's own skill every time.
+tags: [known-failure, cross-plugin, layered]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-aws"]
+runs: 1
+execution:
+  prompt: |
+    Write a reusable Terraform module for our PostgreSQL database on AWS RDS: Multi-AZ in production, encrypted storage and validated input variables.
+    Three services will each instantiate it with their own settings.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: module-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-terraform-modules"'
+    arm: with-only
+  - name: aws-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-aws-terraform"'
+    arm: with-only
+  - name: audit-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-aws-cost"'
+    min: 0
+    max: 0

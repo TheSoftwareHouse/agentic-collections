@@ -9,13 +9,17 @@ check reads every evals/routing/<case>/case.yaml and fails when:
   `disable-model-invocation: true`, which the model can never load;
 - `name` differs from the directory name, or a plugin path does not resolve;
 - the case breaks the routing shape in .claude/rules/plugin-evals.md: `runs: 1`,
-  `max_turns: 1`, `allowed_tools: [Skill]`, no `scaffold_script`, `tool_used`
-  graders on Skill only, and at least one must-not-fire grader;
+  `max_turns: 1`, `allowed_tools: [Skill]`, no `scaffold_script`, graders that are
+  either `tool_used` on Skill or `regex` over the trace naming a skill or agent, and
+  at least one must-not-fire grader;
 - a case is tagged neither `routing` nor `known-failure`, or both;
 - a `known-failure` case is missing from the Known failures table in
-  evals/README.md, or that table lists a case that is not quarantined.
+  evals/README.md, or that table lists a case that is not quarantined;
+- a model-invocable skill has no must-fire assertion in a non-quarantined case
+  and is not listed in scripts/eval-coverage-baseline.json, or the baseline lists
+  a skill that now has one or no longer exists. The baseline only shrinks.
 
-`--coverage` also lists model-invocable skills that no case asserts must fire.
+`--coverage` also lists every model-invocable skill without a must-fire case.
 
 Standard library only. case.yaml is read with a parser for the subset the cases
 use — scalars, flow lists, `|` block scalars, one level of mapping or list of
@@ -31,6 +35,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 KEY = re.compile(r"^([A-Za-z_][\w-]*):(?:\s+(.*))?$")
 SKILL_IN_PATTERN = re.compile(r"([a-z0-9][a-z0-9-]*)\"\s*$")
+# In a trace regex, each alternative names its key, then the optional plugin prefix, then the name.
+NAME_IN_TRACE_PATTERN = re.compile(r"(skill|subagent_type)\W.*?\(\?:\[\\w-\]\+:\)\?([a-z0-9][a-z0-9-]*)")
 STATUS_TAGS = ("routing", "known-failure")
 
 
@@ -202,7 +208,7 @@ def check_case(case_dir, root):
     if "scaffold_script" in execution:
         err("routing cases must not declare scaffold_script", "execution.scaffold_script")
 
-    skills = {}
+    skills, agents = {}, set()
     plugins = data.get("plugins")
     if not isinstance(plugins, list) or not plugins:
         err("plugins must be a non-empty list", "plugins")
@@ -214,6 +220,8 @@ def check_case(case_dir, root):
             continue
         for skill_md in sorted(plugin_dir.glob("skills/*/SKILL.md")):
             skills.setdefault(skill_md.parent.name, []).append((plugin_dir.name, skill_md))
+        for agent_md in sorted(plugin_dir.glob("agents/*.md")):
+            agents.add(agent_md.stem)
 
     graders = data.get("graders")
     if not isinstance(graders, list) or not graders:
@@ -223,31 +231,44 @@ def check_case(case_dir, root):
     for n, grader in enumerate(graders):
         key = f"graders.{n}"
         label = grader.get("name", f"#{n + 1}")
-        if grader.get("type") != "tool_used" or grader.get("tool") != "Skill":
-            err(f"grader '{label}' must be type tool_used on tool Skill", f"{key}.type")
+        if grader.get("type") == "tool_used" and grader.get("tool") == "Skill":
+            field, negative = "input_match", grader.get("max") == 0
+            found = SKILL_IN_PATTERN.search(str(grader.get(field, "")))
+            names = [("skill", found.group(1))] if found else []
+        elif grader.get("type") == "regex" and grader.get("target") == "trace":
+            if grader.get("match", "contains") not in ("contains", "not_contains"):
+                err(f"grader '{label}': match must be contains or not_contains", f"{key}.match")
+                continue
+            field, negative = "pattern", grader.get("match") == "not_contains"
+            names = NAME_IN_TRACE_PATTERN.findall(str(grader.get(field, "")))
+        else:
+            err(f"grader '{label}' must be tool_used on tool Skill, or regex with target: trace",
+                f"{key}.type")
             continue
-        found = SKILL_IN_PATTERN.search(str(grader.get("input_match", "")))
-        if not found:
-            err(f"grader '{label}': cannot read a skill name from input_match; end the pattern "
-                "with the skill name and its closing quote, as in .claude/rules/plugin-evals.md",
-                f"{key}.input_match")
+        if not names:
+            err(f"grader '{label}': cannot read a skill or agent name from {field}; follow the "
+                "idioms in .claude/rules/plugin-evals.md", f"{key}.{field}")
             continue
-        skill = found.group(1)
-        owners = skills.get(skill, [])
-        if not owners:
-            err(f"grader '{label}' names skill '{skill}', which none of the case's plugins ships",
-                f"{key}.input_match")
-            continue
-        if any(frontmatter_flag(md, "disable-model-invocation") == "true" for _, md in owners):
-            err(f"grader '{label}' names '{skill}', which has disable-model-invocation: true "
-                "and can never be routed to", f"{key}.input_match")
-        negative = grader.get("max") == 0
         negatives += negative
-        if not negative:
-            must_fire.update(f"{plugin}:{skill}" for plugin, _ in owners)
+        for kind, name in names:
+            if kind == "subagent_type":
+                if name not in agents:
+                    err(f"grader '{label}' names agent '{name}', which none of the case's plugins ships",
+                        f"{key}.{field}")
+                continue
+            owners = skills.get(name, [])
+            if not owners:
+                err(f"grader '{label}' names skill '{name}', which none of the case's plugins ships",
+                    f"{key}.{field}")
+                continue
+            if any(frontmatter_flag(md, "disable-model-invocation") == "true" for _, md in owners):
+                err(f"grader '{label}' names '{name}', which has disable-model-invocation: true "
+                    "and can never be routed to", f"{key}.{field}")
+            if not negative:
+                must_fire.update(f"{plugin}:{name}" for plugin, _ in owners)
     if graders and not negatives:
-        err("no must-not-fire grader (max: 0): assert that the nearest sibling did not fire",
-            "graders")
+        err("no must-not-fire grader (max: 0 or match: not_contains): assert that the nearest "
+            "sibling did not fire", "graders")
     return errors, must_fire, tags
 
 
@@ -263,6 +284,8 @@ def model_invocable_skills(root):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--root", type=Path, default=ROOT, help="repository root (default: this repository)")
+    ap.add_argument("--baseline", type=Path,
+                    help="skills allowed to lack a case (default: <root>/scripts/eval-coverage-baseline.json)")
     ap.add_argument("--coverage", action="store_true",
                     help="list model-invocable skills no case asserts must fire")
     ap.add_argument("--github", action="store_true", help="emit GitHub annotations")
@@ -287,13 +310,31 @@ def main(argv=None):
         errors.append(("evals/README.md", 1,
                        f"Known failures lists '{name}', which is not a known-failure case"))
 
+    invocable = model_invocable_skills(root)
+    uncovered = sorted(invocable - covered)
+    baseline_path = args.baseline or root / "scripts" / "eval-coverage-baseline.json"
+    try:
+        baseline_rel = baseline_path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        baseline_rel = str(baseline_path)
+    baseline = set()
+    if baseline_path.exists():
+        baseline = set(json.loads(baseline_path.read_text(encoding="utf-8")).get("uncovered", []))
+    for ident in uncovered:
+        if ident not in baseline:
+            plugin, skill = ident.split(":")
+            errors.append((f"plugins/{plugin}/skills/{skill}/SKILL.md", 1,
+                           f"{ident} has no must-fire routing case; add a must-fire and a "
+                           "must-not-fire case (.claude/rules/plugin-evals.md)"))
+    for ident in sorted(baseline - set(uncovered)):
+        reason = "now has a must-fire case" if ident in invocable else "is not a model-invocable skill"
+        errors.append((baseline_rel, 1, f"{ident} {reason}; remove it from the baseline"))
+
     for rel, line, msg in errors:
         print(f"ERROR {rel}:{line}: {msg}", file=sys.stderr)
         if args.github:
             print(f"::error file={rel},line={line}::{msg}")
 
-    invocable = model_invocable_skills(root)
-    uncovered = sorted(invocable - covered)
     print(f"{len(case_dirs)} routing cases, {len(quarantined)} quarantined; "
           f"{len(invocable) - len(uncovered)} of {len(invocable)} model-invocable skills "
           f"have a passing must-fire case")

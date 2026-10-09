@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from helpers import FixtureRepo, load_script, run_main
@@ -25,9 +26,25 @@ def grader(name, skill, negative):
     return "\n".join(lines)
 
 
+TRACE_PATTERN = ("'(?:\\\\?\"skill\\\\?\"\\s*:\\s*\\\\?\"(?:[\\w-]+:)?{skill}\\\\?\")"
+                 "|(?:\\\\?\"subagent_type\\\\?\"\\s*:\\s*\\\\?\"(?:[\\w-]+:)?{agent}\\\\?\")'")
+
+
+def trace_grader(name, skill, agent, negative=False, target="trace"):
+    lines = [
+        f"  - name: {name}",
+        "    type: regex",
+        f"    target: {target}",
+        f"    pattern: {TRACE_PATTERN.format(skill=skill, agent=agent)}",
+    ]
+    if negative:
+        lines.append("    match: not_contains")
+    return "\n".join(lines)
+
+
 def case_yaml(name, fire="audit", sibling="build", tags="[routing]", max_turns=1,
-              allowed="[Skill]", plugins='["../../../plugins/tsh-a"]', extra=""):
-    graders = []
+              allowed="[Skill]", plugins='["../../../plugins/tsh-a"]', extra="", more=()):
+    graders = list(more)
     if fire:
         graders.append(grader("fired", fire, negative=False))
     if sibling:
@@ -78,7 +95,12 @@ class Check(unittest.TestCase):
         self.repo.skill("tsh-a", "audit", "Audits pages")
         self.repo.skill("tsh-a", "build", "Builds components")
         self.repo.skill("tsh-a", "manual", "Entry point", extra="disable-model-invocation: true\n")
+        self.repo.agent("tsh-a", "auditor", "Runs the audit")
         self.readme([])
+        self.baseline(["tsh-a:build"])
+
+    def baseline(self, uncovered):
+        self.repo.write("scripts/eval-coverage-baseline.json", json.dumps({"uncovered": uncovered}))
 
     def tearDown(self):
         self.repo.cleanup()
@@ -158,6 +180,7 @@ class Check(unittest.TestCase):
     def test_listed_quarantined_case_passes_but_earns_no_coverage(self):
         self.case("x", tags="[known-failure]")
         self.readme(["x"])
+        self.baseline(["tsh-a:audit", "tsh-a:build"])
         code, out, err = self.run_check()
         self.assertEqual(code, 0, err)
         self.assertIn("1 quarantined; 0 of 2", out)
@@ -165,6 +188,40 @@ class Check(unittest.TestCase):
     def test_directory_without_case_file_fails(self):
         (self.repo.root / "evals/routing/empty").mkdir(parents=True)
         self.assert_fails_with("directory has no case.yaml")
+
+    def test_new_skill_without_a_case_fails(self):
+        self.case("audit-not-build")
+        self.repo.skill("tsh-a", "fresh", "Brand new")
+        self.assert_fails_with("tsh-a:fresh has no must-fire routing case")
+
+    def test_baseline_entry_that_gained_a_case_fails(self):
+        self.case("audit-not-build")
+        self.baseline(["tsh-a:audit", "tsh-a:build"])
+        self.assert_fails_with("tsh-a:audit now has a must-fire case; remove it from the baseline")
+
+    def test_baseline_entry_for_a_missing_skill_fails(self):
+        self.case("audit-not-build")
+        self.baseline(["tsh-a:build", "tsh-a:gone"])
+        self.assert_fails_with("tsh-a:gone is not a model-invocable skill")
+
+    def test_trace_regex_naming_skill_or_agent_counts_as_must_fire(self):
+        self.case("audit-not-build", fire=None, more=[trace_grader("fired", "audit", "auditor")])
+        code, out, err = self.run_check()
+        self.assertEqual(code, 0, err)
+        self.assertIn("1 of 2 model-invocable skills", out)
+
+    def test_trace_regex_naming_an_unknown_agent_fails(self):
+        self.case("audit-not-build", fire=None, more=[trace_grader("fired", "audit", "auditr")])
+        self.assert_fails_with("names agent 'auditr'")
+
+    def test_trace_regex_not_contains_is_a_must_not_fire(self):
+        self.case("x", sibling=None, more=[trace_grader("not-fired", "build", "auditor", negative=True)])
+        code, _, err = self.run_check()
+        self.assertEqual(code, 0, err)
+
+    def test_regex_over_another_target_fails(self):
+        self.case("x", more=[trace_grader("fired", "audit", "auditor", target="last_message")])
+        self.assert_fails_with("must be tool_used on tool Skill, or regex with target: trace")
 
 
 if __name__ == "__main__":

@@ -50,10 +50,14 @@ graders: [...]
 - Write the prompt the way a teammate would phrase it. A negative control must belong to
   a different skill (`a11y-neither-on-unrelated` is a Playwright request).
 - **Don't make the first turn about finding files.** The sandbox has no repository, but
-  Glob, Grep and Read still work. A prompt that names a plan file, or asks for "the files
-  each task touches", makes Claude search before it loads a skill, and the turn cap ends
-  the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in 6 once its
-  prompt stopped pointing at an existing plan.
+  Glob, Grep and Read still work. A prompt that names a plan file, a pull request, or asks
+  for "the files each task touches", makes Claude search before it loads a skill, and the
+  turn cap ends the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in
+  6 once its prompt stopped pointing at an existing plan.
+- **Don't paste the whole answer's input either.** Given a short snippet to review,
+  Claude answered directly without loading any skill in 6 of 6 runs
+  (`nestjs-review-layers`). That is a finding about the descriptions, so the case is
+  quarantined rather than reworded around it.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
   `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one;
   `claude-extension-not-context` loses to `update-config`. A failing must-fire grader with
@@ -93,7 +97,25 @@ Routing cases use `tool_used` on `Skill`. Both idioms, verified in this repo:
 ```
 
 The optional `<plugin>:` prefix in the pattern matches both `skill` and `plugin:skill`
-spellings. `arm: with-only` marks the must-fire grader as a plugin-fired indicator when
+spellings.
+
+When the right answer is either loading a skill or delegating to the agent that runs it,
+`tool_used` cannot say so, because it checks one tool. Use a `regex` over the trace with
+one alternative per route; `ui-capture-not-judging` is the worked example:
+
+```yaml
+# must fire: the skill, or the agent that runs it
+- name: capture-fired
+  type: regex
+  target: trace
+  pattern: '(?:\\?"skill\\?"\s*:\s*\\?"(?:[\w-]+:)?<skill-name>\\?")|(?:\\?"subagent_type\\?"\s*:\s*\\?"(?:[\w-]+:)?<agent-name>\\?")'
+```
+
+Anchor every alternative on `"skill"` or `"subagent_type"`: the session's init line
+lists every skill and agent by name, so a bare name always matches. `\\?` accepts the
+quote with or without the JSON escaping the docs describe. Add `match: not_contains` for
+a must-not-fire. `scripts/check-eval-cases.py` reads skill and agent names out of both
+idioms, so keep to them. `arm: with-only` marks the must-fire grader as a plugin-fired indicator when
 someone runs with ablation; CI runs `--ablation none`.
 
 ## Cost
@@ -118,7 +140,11 @@ Expected stderr, not a failure: the Playwright and Context7 mocks were not start
 
 - **A new or renamed model-invocable skill adds at least one must-fire and one
   must-not-fire routing case**, the latter against its nearest sibling from
-  `python3 scripts/lint-descriptions.py`. Skills with `disable-model-invocation: true`
+  `python3 scripts/lint-descriptions.py`. `scripts/check-eval-cases.py` enforces the
+  must-fire half: a skill without one fails unless `scripts/eval-coverage-baseline.json`
+  lists it, and that baseline only shrinks.
+- **A layered request asserts both layers.** When a discipline skill and a stack skill
+  should load together, give the case a must-fire grader for each and tag it `layered`. Skills with `disable-model-invocation: true`
   need none: their description is never preloaded.
 - **A description change re-runs the suite** and the lint before the PR.
 - **`python3 scripts/check-eval-cases.py` passes before the PR.** It is the only thing
@@ -141,10 +167,14 @@ A pull request supplies its own `case.yaml`, and CI runs it as the CI identity.
 `allowed_tools` is not what keeps it contained. On Claude Code 2.1.280 a session with
 `allowed_tools: [Skill]` still offered Task, Glob, Grep, Read, Skill, TaskStop and
 ToolSearch, and a subagent did use Glob and Read in the sandbox's empty working
-directory. Bash, Write, Edit and WebFetch were absent. The CLI removes them unless
-`--allow-tools` grants them, and without a scaffold there is nothing to read but the
-case's own sandbox. `scripts/check-eval-cases.py` still enforces `allowed_tools: [Skill]`
-and rejects `scaffold_script`, so a case cannot ask for more. **Behavioural suites that need Bash, Edit or Write through `--allow-tools` or
+directory. Bash, Write, Edit and WebFetch were absent. Claude still tried to call Bash,
+and the CLI refused it: "No such tool available: Bash. Bash is disabled for this session,
+in subagents as well as here." The CLI withholds those tools unless `--allow-tools` grants
+them, and without a scaffold there is nothing to read but the case's own sandbox.
+`scripts/check-eval-cases.py` still enforces `allowed_tools: [Skill]` and rejects
+`scaffold_script`, so a case cannot ask for more.
+
+**Behavioural suites that need Bash, Edit or Write through `--allow-tools` or
 `--scaffold` must not run in the PR workflow.** Run them locally or in a separate,
 trusted-only workflow. Do not add `--allow-tools`, `--scaffold`, `--allow-real-servers`
 or `--mocks off` to the CI command.

@@ -172,15 +172,25 @@ exits 1 when:
   `disable-model-invocation: true`
 - `name` differs from the directory, or a plugin path does not resolve
 - the case leaves the routing shape: `runs: 1`, `max_turns: 1`,
-  `allowed_tools: [Skill]`, no `scaffold_script`, only `tool_used` graders on
-  `Skill`, and at least one must-not-fire grader
+  `allowed_tools: [Skill]`, no `scaffold_script`, graders that are `tool_used` on
+  `Skill` or a `regex` over the trace naming a skill or agent, and at least one
+  must-not-fire grader
 - the tags hold neither or both of `routing` and `known-failure`
 - a `known-failure` case is missing from [Known failures](#known-failures), or
   that table lists a case that is not quarantined
 
-It always prints how many model-invocable skills have a must-fire case in a
-non-quarantined case. `--coverage` lists the ones that have none; `--github` emits
-annotations on the offending line.
+- a model-invocable skill has no must-fire grader in a non-quarantined case and
+  is not listed in `scripts/eval-coverage-baseline.json`
+- that baseline lists a skill that now has such a case, or that no longer exists
+
+The baseline holds the skills that predate the rule and have no case yet. It only
+shrinks: a new skill fails the check until it has a case, and a skill that gains
+one must leave the baseline in the same pull request. A quarantined case does not
+count, so a skill whose only case is quarantined stays in the baseline.
+
+The run prints how many model-invocable skills have a must-fire case.
+`--coverage` lists the ones that have none; `--github` emits annotations on the
+offending line.
 
 The two scripts have unit tests in `scripts/tests/`:
 
@@ -208,7 +218,13 @@ one must-fire and one must-not-fire case against its nearest sibling in the lint
 ranking. The lint compares words, so also look for siblings it cannot see: a
 discipline skill and a stack skill that cover the same job in different words,
 such as `optimizing-cloud-cost` and `auditing-aws-cost`, are installed together in
-most repositories. The case
+most repositories.
+
+When a request should load a discipline skill **and** a stack skill together —
+the layering this repository is designed around — give the case two must-fire
+graders, one per layer, plus a must-not-fire grader on a nearby skill that
+belongs to neither, and tag it `layered`. `terraform-module-layers` is the worked
+example. The case
 shape, grader idioms and cost rules are in `.claude/rules/plugin-evals.md`, which
 Claude Code loads when you open any file under `evals/`.
 
@@ -226,4 +242,6 @@ it passes 6 of 6, then restore the `routing` tag and remove its row here.
 | Case | Observed | Fix lives in |
 | :-- | :-- | :-- |
 | `claude-extension-not-context` | A request to run prettier automatically after every edit loads Claude Code's built-in `update-config` instead of `authoring-claude-extensions` in 15 of 15 runs | `tsh-core`: decide whether `authoring-claude-extensions` claims hook requests, then reword its description or the case's expectation |
+| `nestjs-review-layers` | A pre-merge review of a pasted NestJS diff loads neither `reviewing-code` nor `implementing-nestjs-api` in 6 of 6 runs; Claude reviews it directly | `tsh-product-engineering` and `tsh-stack-nodejs`: the `reviewing-code` and `implementing-nestjs-api` descriptions |
+| `terraform-module-layers` | Writing a reusable AWS RDS module loads both layers in 5 of 6 runs; in the sixth only `implementing-aws-terraform` | `tsh-platform-engineering`: the `implementing-terraform-modules` description |
 | `ui-review-not-standard` | A "does this page match the Figma design" request loads `verifying-ui` instead of `reviewing-ui` in 5 of 6 runs | `tsh-product-engineering`: the `reviewing-ui` and `verifying-ui` descriptions |
