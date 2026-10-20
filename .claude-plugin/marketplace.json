@@ -163,6 +163,19 @@
       "keywords": ["tsh", "stack", "python", "pydantic", "sqlmodel", "sqlalchemy", "asyncio"]
     },
     {
+      "name": "tsh-stack-php",
+      "source": "./plugins/tsh-stack-php",
+      "displayName": "TSH Stack: PHP",
+      "description": "TSH conventions for PHP 7.4–8.5 and Symfony 5.4–8.x: version-aware design and implementation (YAGNI and KISS first, justified patterns, refactoring, PSR-12), Symfony framework features with their version differences, and a PHP code reviewer agent.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "php", "symfony", "doctrine", "psr-12", "design-patterns", "refactoring", "code-review"]
+    },
+    {
       "name": "tsh-stack-serverless",
       "source": "./plugins/tsh-stack-serverless",
       "displayName": "TSH Stack: Serverless",

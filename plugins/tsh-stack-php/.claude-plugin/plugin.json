@@ -1,0 +1,14 @@
+{
+  "name": "tsh-stack-php",
+  "displayName": "TSH Stack: PHP",
+  "description": "TSH conventions for PHP 7.4–8.5 and Symfony 5.4–8.x: version-aware design and implementation (YAGNI and KISS first, justified patterns, refactoring, PSR-12), Symfony framework features with their version differences, and a PHP code reviewer agent.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-stack-php",
+  "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
+  "license": "MIT",
+  "keywords": ["tsh", "stack", "php", "symfony", "doctrine", "psr-12", "design-patterns", "refactoring", "code-review"]
+}
