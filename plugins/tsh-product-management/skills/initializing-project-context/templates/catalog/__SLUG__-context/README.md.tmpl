@@ -9,7 +9,8 @@ vocabulary, ownership — and the Claude Code plugin the whole team shares.
 | Find a document or its owner | [docs/README.md](docs/README.md) |
 | Check what was decided | [docs/decisions/](docs/decisions/README.md) |
 | Look up a term | [docs/glossary.md](docs/glossary.md) |
-| Use the knowledge from a code repository | Enable the plugin per [plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md), then `/tsh-product-management:navigating-project-context` |
-| Check links and tables before a pull request | `python3 scripts/check_links.py && python3 scripts/check_tables.py` |
+| Use the knowledge from a code repository | Connect it once with `/tsh-product-management:initializing-project-context` (*Attach repository*), then `/tsh-product-management:navigating-project-context` |
+| Change a document | A branch and a pull request — in the git host's web editor, or with `/tsh-product-management:writing-project-knowledge` |
+| Check before a pull request | `python3 scripts/check_links.py && python3 scripts/check_tables.py && python3 scripts/check_decisions.py` |
 
 Repository owner: {{OWNER}}. Created {{DATE}}.

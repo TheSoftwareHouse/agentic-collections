@@ -35,9 +35,9 @@ backlog instead.
 | `analyze-materials` | `/tsh-product-management:analyze-materials` | Entry point for the full workflow: materials or an existing Jira backlog in, reviewed epics and stories out |
 | `explore-materials` | `/tsh-product-management:explore-materials` | Entry point for Explore Mode: a business-context summary, deliberately stopping short of any backlog item |
 | `domain-dictionary` | `/tsh-product-management:domain-dictionary` | Entry point for the per-product domain dictionary: canonical business terms, not domain-driven design |
-| `initializing-project-context` | `/tsh-product-management:initializing-project-context` | Entry point that scaffolds a project catalog with its context repository: a knowledge base with one owner per area, all decisions in one folder, a link-and-table gate, and an empty marketplace for the project's own extensions — then enables it, with this plugin, in the sibling code repositories |
-| `navigating-project-context` | `/tsh-product-management:navigating-project-context` | Reads a project's `<project>-context` knowledge base before work that depends on it — decisions, vocabulary, owners — and cites the source |
-| `writing-project-knowledge` | `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, with its index entry and the owner who reviews it |
+| `initializing-project-context` | `/tsh-product-management:initializing-project-context` | Entry point with three modes: *New project* scaffolds the context repository — a knowledge base with one owner per area, all decisions in one folder, a four-script pipeline gate, an empty marketplace for the project's own Markdown skills — commits it locally and publishes it to an empty repository on any git host after asking; *Attach repository* connects a code repository, committed for the team's own and local-only for a client's; *Add URL* publishes a knowledge base started alone |
+| `navigating-project-context` | `/tsh-product-management:navigating-project-context` | Reads a project's `<project>-context` knowledge base, wherever the clone sits, before work that depends on it — decisions, vocabulary, owners — keeping the clone current without touching work in progress, and cites file, last change and owner |
+| `writing-project-knowledge` | `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, with its index entry, on its own branch — pushed only after asking — for the owner to review |
 | `repairing-project-context-links` | `/tsh-product-management:repairing-project-context-links` | Repairs what the context repository's checker scripts report: broken links, non-kebab filenames, misrendering tables |
 | `adding-project-context-workspace` | `/tsh-product-management:adding-project-context-workspace` | Creates a knowledge-base workspace with exactly one owner and its area-map row |
 | `orchestrating-business-analysis` | `/tsh-product-management:orchestrating-business-analysis` | Runs the workflow: the five gates, the delegation, the persistent writes, the Jira push |
@@ -62,9 +62,11 @@ surfaces, so they cost nothing until you type them. Everything else is
 model-invocable and routes on how people describe the work.
 
 The four project-context skills are the one part of this plugin that people outside
-product management use. `initializing-project-context` therefore enables the plugin at
-project scope in every repository of a project it scaffolds, so an engineer or tester
-gets them without installing anything — together with the rest of this plugin.
+product management use. `initializing-project-context` therefore enables the plugin in
+every repository it connects, so an engineer or tester gets them without installing
+anything — together with the rest of this plugin. A second hook protects what it writes
+there: an edit that would remove or change the `tsh:project-context` block in
+`CLAUDE.md` or `CLAUDE.local.md` is denied. It runs only for edits of those two files.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 

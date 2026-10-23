@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""Quality gate: the project plugin stays Markdown-only, and every change to it
+ships a new version.
+
+Why this is worth a script. Everyone on the project installs
+`{{PROJECT_SLUG}}-shared` from this repository and receives its updates. A hook,
+an MCP server or a script in it would run on every teammate's machine on the
+strength of one merged pull request, so the plugin carries instructions only —
+anything executable belongs in a company plugin, reviewed there. And Claude Code
+delivers a plugin update only when `version` changes: a change merged without a
+bump silently reaches nobody.
+
+Checks `plugins/`:
+
+1. EXECUTABLE — `hooks/`, `.mcp.json`, `.lsp.json`, `bin/`, `scripts/`, or any
+   file other than Markdown, `plugin.json` and `.gitkeep`.
+2. SHELL ACCESS — a skill or agent granting `Bash` (`allowed-tools`, `tools`), or
+   a `!` command line in a skill, which runs when the skill loads.
+3. NO VERSION — `plugin.json` without `version`.
+4. NOT BUMPED — with `--base <ref>`: files under the plugin changed since `<ref>`
+   but `version` did not.
+
+Exit code 0 = clean, 1 = violations found.
+
+Usage:
+    python3 scripts/check_plugin.py                       # 1–3
+    python3 scripts/check_plugin.py --base origin/main    # 1–4, in a pull request
+"""
+
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+PLUGINS = REPO_ROOT / "plugins"
+FORBIDDEN = {"hooks", ".mcp.json", ".lsp.json", "bin", "scripts"}
+ALLOWED_SUFFIXES = {".md"}
+ALLOWED_NAMES = {"plugin.json", ".gitkeep"}
+BASH_GRANT = re.compile(r"^(allowed-tools|tools)\s*:.*\bBash\b", re.M)
+BANG_LINE = re.compile(r"^\s*!`|^!\s*\S", re.M)
+
+
+def git(*args):
+    r = subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True)
+    return r.returncode, r.stdout
+
+
+def version_at(ref, rel):
+    code, out = git("show", f"{ref}:{rel}")
+    if code != 0:
+        return None
+    try:
+        return json.loads(out).get("version")
+    except ValueError:
+        return None
+
+
+def main():
+    base = sys.argv[sys.argv.index("--base") + 1] if "--base" in sys.argv else None
+    problems = []
+    for plugin in sorted(p for p in PLUGINS.iterdir() if p.is_dir()) if PLUGINS.is_dir() else []:
+        rel_plugin = plugin.relative_to(REPO_ROOT).as_posix()
+        for f in sorted(plugin.rglob("*")):
+            rel = f.relative_to(REPO_ROOT).as_posix()
+            parts = set(f.relative_to(plugin).parts)
+            if parts & FORBIDDEN:
+                problems.append(f"{rel}: EXECUTABLE — not allowed in the project plugin")
+                continue
+            if f.is_file() and f.suffix not in ALLOWED_SUFFIXES and f.name not in ALLOWED_NAMES:
+                problems.append(f"{rel}: EXECUTABLE — only Markdown and plugin.json belong here")
+                continue
+            if f.is_file() and f.suffix == ".md" and {"skills", "agents"} & parts:
+                text = f.read_text(encoding="utf-8")
+                if BASH_GRANT.search(text):
+                    problems.append(f"{rel}: SHELL ACCESS — grants Bash")
+                if "skills" in parts and BANG_LINE.search(text):
+                    problems.append(f"{rel}: SHELL ACCESS — a `!` command runs when the skill loads")
+        manifest = plugin / ".claude-plugin" / "plugin.json"
+        try:
+            version = json.loads(manifest.read_text(encoding="utf-8")).get("version")
+        except (OSError, ValueError):
+            version = None
+        if not version:
+            problems.append(f"{rel_plugin}/.claude-plugin/plugin.json: NO VERSION")
+        elif base:
+            code, changed = git("diff", "--name-only", f"{base}...HEAD", "--", rel_plugin)
+            if code != 0:
+                problems.append(f"{rel_plugin}: cannot compare with {base} — fetch it first "
+                                f"(git fetch origin +refs/heads/<branch>:refs/remotes/origin/<branch>)")
+            elif changed.strip() and version_at(base, f"{rel_plugin}/.claude-plugin/plugin.json") == version:
+                problems.append(f"{rel_plugin}: NOT BUMPED — files changed since {base}, version still {version}; "
+                                "bump it and add a CHANGELOG.md line")
+    for p in problems:
+        print(p)
+    print(f"{len(problems)} problem(s)" if problems else "OK: project plugin is Markdown-only and versioned")
+    return 1 if problems else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

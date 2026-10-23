@@ -3,9 +3,12 @@
 
 Creates, under --parent (default: the current directory):
 
-    <slug>/                      the project catalog
-    <slug>/CLAUDE.md             pointer loaded in every session below
+    <slug>/                      a project folder
     <slug>/<slug>-context/       knowledge base + Claude Code marketplace
+
+or, with --catalog-dir DIR, just DIR/<slug>-context/. Where the folder sits is the
+person's choice, not a contract: code repositories reach the knowledge base by its
+git URL, and each person's clone can be anywhere.
 
 from the templates in ../templates. Every template path and file body has
 {{PROJECT_NAME}}, {{PROJECT_SLUG}}, {{OWNER}}, {{OWNER_NAME}}, {{OWNER_EMAIL}}

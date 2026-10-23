@@ -87,6 +87,7 @@ the decision instead of writing a plausible rule.
 | NEVER | Use `@path` imports to reduce context. Imports load in full at launch; they organise, they never save. |
 | MUST | Split downward into a nested `CLAUDE.md` once the root file grows per-package or per-subsystem sections. |
 | NEVER | Overwrite an existing `CLAUDE.md` wholesale. Revise in place and report what changed and why. |
+| NEVER | Remove, edit, move or summarise a block fenced by `<!-- tsh:<name> START` … `<!-- tsh:<name> END -->`, in `CLAUDE.md` or `CLAUDE.local.md`. A TSH tool owns it and rewrites it itself; keep it byte for byte when trimming, and count its lines against the 200-line target like any other. |
 | MUST | Confirm what actually loaded with `/context` before reporting the work finished. |
 
 ## Reference Loading

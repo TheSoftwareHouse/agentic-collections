@@ -3,8 +3,10 @@
 ## What this repo is
 
 A **Claude Code plugin marketplace** for The Software House. It is not an
-application: there is no build step, no test suite, no dependencies, and no runtime.
-Everything here is Markdown and JSON that Claude Code loads.
+application: there is no build step, no dependencies, and no runtime.
+Everything here is Markdown and JSON that Claude Code loads — except the project-context
+scripts in `tsh-product-management`, which run git on people's clones and have the
+repo's only test suite: `.claude/rules/project-context-contract.md`.
 
 It publishes three families: `tsh-<discipline>` for *how we work*,
 `tsh-stack-<stack-name>` for *what we work with*, and `tsh-core` — a single,

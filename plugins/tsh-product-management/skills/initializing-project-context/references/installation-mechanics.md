@@ -1,31 +1,40 @@
 # Installation mechanics
 
-Read before wiring repositories, when asked "why not install once in the catalog", or
-when a session in a code repository cannot see the plugin. Verified on Claude Code
-2.1.263, 2026-09-13, by experiment and against the documentation; the
-`tsh-product-management` rows re-verified 2026-09-30.
+Read before wiring repositories, when a session in a code repository cannot see the
+plugin, and when writing the closing report. Verified on Claude Code 2.1.263
+(2026-09-13) and 2.1.303 (2026-10-23), by experiment against a local git host and
+against the documentation.
 
 ## What was verified
 
 | Fact | How |
 | --- | --- |
-| Project-scope settings apply only to the **folder the session starts in**. A `.claude/settings.json` in the catalog does **not** reach repositories below it: `claude plugin list` there shows the plugin `disabled`. | Installed at catalog scope; listed from `repo/`, `repo/sub/`, sibling. Docs: settings are read "from the session's primary working directory". |
-| A `.claude/settings.json` inside `<repo>/` with the relative source `../<slug>-context` works: plugin `enabled`, skill visible in a real session started in `<repo>/`. | Wrote the file; `claude plugin list`; `claude -p` listed the plugin's skill. |
-| Until the repository folder is **trusted** (the dialog at the first interactive session), its project settings are ignored, so the marketplace is not added and the plugin is not listed. | Untrusted `/tmp` repo: plugin absent, warning "this workspace has not been trusted". |
-| `claude plugin marketplace add ../x --scope project` writes an **absolute** path — useless for teammates. | Observed `/private/tmp/…` in the written file. |
-| A project `settings.json` declaring `tsh-agentic-collections` from GitHub does not disturb a machine that already registered it under that name from elsewhere: the existing registration wins, `tsh-product-management` stays `enabled`, and a session in a code repository ran `navigating-project-context` and resolved the context repository beside it. | `claude plugin marketplace list` unchanged; `claude plugin list`; `claude -p` from `<repo>/`. |
-| A `CLAUDE.md` in the catalog **does** load in sessions below it. | Docs: files "in the directory hierarchy above the working directory are loaded at launch"; confirmed by quoting it from a child session. |
+| Project-scope settings apply only to the folder the session starts in; each code repository carries its own. | Installed at a parent folder's scope; `claude plugin list` from a child showed `disabled`. |
+| Until the folder is **trusted** (the dialog at the first interactive session), project settings are ignored — no marketplace, no plugin. | Untrusted repository: plugin absent, warning "this workspace has not been trusted". |
+| Settings declarations register at the start of an **interactive** session; `claude -p` does not register them. The person running init gets the plugin at once only through the CLI step (`--register`). | Hand-written settings + `claude plugin list` showed nothing until the CLI step. |
+| A git-URL marketplace copies each plugin to `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` — only the plugin folder, never `docs/`. | Inspected the cache after install from a local git host. |
+| An update arrives only when `version` in `plugin.json` changes. A commit to `docs/` only, or a skill change without a bump, delivers nothing. | `plugin update` → "already at the latest version" in both cases; delivered after a bump. |
+| Adding a marketplace of the same name from another source **replaces** the source; installed plugins update from the new one, no reinstall. | `marketplace add` with a folder, then a git URL. |
+| Reading a folder outside the session's folder prompts for permission, unless it is in `permissions.additionalDirectories`. | `claude -p` refused; allowed after the entry in `settings.local.json`. |
+| `CLAUDE.local.md` loads like `CLAUDE.md`, and git does not ignore it by itself. | A session quoted it; `git status` listed it as untracked. |
+| A plugin hook with `if: "Edit(**/CLAUDE.md)"` starts only for that file; other edits never spawn it. | Logged invocations across edits of several files. |
 
-Consequences: the skill wires each repository with `wire_repos.py --register`
-(CLI registration, then the relative path, existing keys preserved), and puts a
-`CLAUDE.md` — not a `settings.json` — in the catalog.
+## Commit mode and local mode
 
-## The entry per repository
+| | Commit mode — a repository the team may commit config to | Local mode — the client's repository, or no URL yet |
+| --- | --- | --- |
+| Settings file | `.claude/settings.json` | `.claude/settings.local.json` |
+| Project pointer | `tsh:project-context` block in `CLAUDE.md` | the same block in `CLAUDE.local.md` |
+| Kept out of git | `.claude/settings.local.json` (read access) | both files, in `.git/info/exclude` — never the client's `.gitignore` |
+| Who commits | the person, in a pull request; the skill never does | nobody, ever |
+| Teammates | get it with the next pull, accept the trust dialog once | each runs *Attach repository* once |
+
+The settings entry:
 
 ```json
 {
   "extraKnownMarketplaces": {
-    "<slug>-context": { "source": { "source": "directory", "path": "../<slug>-context" } },
+    "<slug>-context": { "source": { "source": "git", "url": "<URL>", "sparsePaths": [".claude-plugin", "plugins"] } },
     "tsh-agentic-collections": { "source": { "source": "github", "repo": "TheSoftwareHouse/agentic-collections" } }
   },
   "enabledPlugins": {
@@ -35,47 +44,33 @@ Consequences: the skill wires each repository with `wire_repos.py --register`
 }
 ```
 
-The second pair is what brings the four knowledge-base skills to every role. It is only
-ever added, never overwritten: a repository that already declares the company
-marketplace, or has disabled the plugin, keeps its own entry.
+The company pair brings the four knowledge-base skills to every role. It is only ever
+added: an existing entry, including a `false`, is kept. `settings.local.json`
+additionally gets `permissions.additionalDirectories: ["<this person's clone>"]` — a
+path on one machine, which is why it is never in the committed file.
 
-A relative `directory` path resolves against the repository's main checkout, so it
-holds from a git worktree too. On trusting the folder Claude Code adds the
-marketplace with no separate prompt.
+Without a URL the source is the clone's absolute path, and the repository is wired in
+local mode whatever was asked: a committed path would be wrong on every other machine.
+*Add URL* followed by *Attach repository* moves it to the URL.
 
-## "Out of the box" — two paths, one verified here
+A local `settings.local.json` and `CLAUDE.local.md` exist only in the checkout they were
+written in. A git worktree of a client repository does not have them; the locator still
+finds the project through the main checkout, but the project plugin and the pointer
+block are missing in that worktree's sessions.
 
-| Who | How the plugin becomes live | Status |
-| --- | --- | --- |
-| The person running the scaffold | `wire_repos.py --register` runs, inside **the context repository itself and each chosen code repository**, `claude plugin marketplace add <abs context dir> --scope project` and `claude plugin install <slug>-shared@<slug>-context --scope project`, then rewrites the stored absolute path to the portable one — `.` for the context repository, `../<slug>-context` for a code repository. Result: `claude plugin list` shows `enabled` and a session started there runs `navigating-project-context`, with no trust dialog and no restart. | **Verified** in a fresh, untrusted repository and in a context repository referring to itself with `.`. |
-| A teammate cloning the repository | The committed `.claude/settings.json` declares the marketplace and the plugin; on accepting the trust dialog at their first interactive session Claude Code adds the marketplace "with no separate prompt" and enables the plugin. | **Documented**, not reproduced here: in a non-interactive `claude -p` run, a trusted-by-config folder did **not** auto-register the marketplace, so the auto-add appears to be an interactive-startup behaviour. Tell the team to expect the dialog once. |
+## Publishing by hand
 
-`wire_repos.py` registers via the CLI rather than writing the cache by hand because
-the cache layout (`~/.claude/plugins/known_marketplaces.json`,
-`installed_plugins.json`) is Claude Code's own and changes between releases.
-
-**A settings file alone is not enough on the machine that runs the scaffold.**
-Verified: writing `extraKnownMarketplaces` and `enabledPlugins` by hand and then
-running `claude plugin list` in that folder shows nothing — the marketplace is not
-registered. The CLI step is what registers it. This is why the context repository is
-always wired: a catalog with no code repositories would otherwise finish with a
-correct scaffold and nothing installed, which reads as a failed setup.
-
-## Without the sibling checkout
-
-The source is a path. A machine without `../<slug>-context` gets a marketplace load
-error at startup and no project skills. Serving the marketplace from a git URL would
-remove that dependency; it is a **pending decision** of the user, together with git
-initialisation. Do not switch the source or add `git init` on your own.
-
-## Verifying
+When the person keeps the push for themselves, print exactly:
 
 ```shell
-claude plugin list        # <slug>-shared@<slug>-context — Scope: project, Status: enabled
+# 1. Create an EMPTY repository named <slug>-context on the git host
+#    (no README, no .gitignore — the first push must land in an empty repository).
+# 2. Then, in <CONTEXT_DIR>:
+git remote add origin <URL>
+git push -u origin main
+# 3. Protect the default branch on the host: no direct pushes, one approval.
+# 4. Connect code repositories: /tsh-product-management:initializing-project-context → Attach repository.
 ```
-
-`disabled` → session started in the wrong folder, or the folder is not trusted yet.
-Marketplace error → the sibling checkout is missing or misnamed.
 
 ## The closing report
 
@@ -84,22 +79,21 @@ happened; drop nothing, even when a section is empty.
 
 ```markdown
 ## Created
-<catalog path>; <n> files in <slug>-context; <slug>/CLAUDE.md; optional layers: <chosen or "none">; settings in <targets>; GUIDE.pdf via <renderer or "not rendered: reason">
+<CONTEXT_DIR>; <n> files; optional layers: <chosen or "none">; first commit <sha> on main; GUIDE.pdf via <renderer or "not rendered: reason">
 
-## Skipped (already existed)
-<files, or "nothing">
+## Connected
+<repo> — commit mode: write the two files listed, to commit in a pull request · <repo> — local mode: nothing to commit · or "no code repositories yet — connect them later with Attach repository"
 
 ## Verified
-check_links.py ✔ · check_tables.py ✔ · claude plugin validate marketplace ✔, plugin ✔ · claude plugin list in <slug>-context — <slug>-shared@<slug>-context enabled
+check_links ✔ · check_tables ✔ · check_decisions ✔ · check_plugin ✔ · claude plugin validate marketplace ✔, plugin ✔ · claude plugin list in <slug>-context — <slug>-shared@<slug>-context enabled
 
 ## Try it now
-**This session will not show the plugin — its skill list was loaded before the plugin existed. Open a new one:** `claude` here, or in `<slug>-context`, or in any wired code repository. Then: `/tsh-product-management:navigating-project-context` to read the knowledge base, `writing-project-knowledge` to add to it, `repairing-project-context-links` to repair references, `adding-project-context-workspace` to add a workspace. `<slug>-shared` is empty until the team adds a skill specific to this project. Teammates accept the trust dialog once on their first session.
+**This session will not show the plugin — its skill list was loaded before the plugin existed. Open a new one** in `<slug>-context` or in a connected repository. Then `/tsh-product-management:navigating-project-context`. Teammates accept the trust dialog once on their first session; for a client's repository each runs *Attach repository* once.
 
-## Pending decisions
-Who initialises `<slug>-context` in git, and when — until then the checker scripts run by hand and there is no pre-push gate · Whether the marketplace later moves to a git URL instead of the sibling checkout · Whether owners marked `TBD` are assigned before the first real content lands · *(only when the catalog was created next to a repository)* When `<folder_name>/` moves into `<slug>/` — the skill does not move repositories, and until then that repository cannot be wired
+## Still to do
+<Only what applies:> Publish: <pushed to URL | "not published — only you can see it; Add URL when the empty repository exists" | the printed commands> · Commit the commit-mode files in each connected repository · Protect the default branch on the git host · Assign owners marked TBD before the first real content lands
 ```
 
-The **Try it now** opening sentence and every **Pending decisions** item are binding —
-three, or four when the catalog was created next to a repository: without the first, a
-`/plugin list` in the current session reads as a failed setup; without the second, the
-team inherits open questions without knowing it.
+The **Try it now** opening sentence is binding: without it, a `/plugin list` in the
+current session reads as a failed setup. **Still to do** names everything the person
+must do by hand, because the skill deliberately did not.

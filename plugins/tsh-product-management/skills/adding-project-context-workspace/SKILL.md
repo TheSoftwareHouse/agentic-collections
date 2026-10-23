@@ -13,10 +13,12 @@ readers cannot trust and will not delete.
 ## Procedure
 
 **Step 1 — Locate the knowledge base.** Read
-`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` and resolve **KB**, then
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md`, resolve and sync **KB**,
+and start the write worktree it describes (branch `docs/<topic>`); call it **W** and
+make every change under W, never in KB itself, then
 read `KB/conventions/ownership.md`. It owns the rules below and wins on any conflict.
 
-**Step 2 — Check it is really a new workspace.** Read `KB/docs/README.md`. If an
+**Step 2 — Check it is really a new workspace.** Read `W/docs/README.md`. If an
 existing workspace's scope covers the topic — including under another name, `qa` for
 `quality`, `infra` for `platform` — the answer is a document there, not a new folder:
 say so and stop. A workspace is warranted when the area has its own standing content
@@ -27,7 +29,7 @@ not given; never infer it** from git history or from who is talking. One person 
 own several workspaces. If nobody can be named yet, stop: create the workspace when
 somebody can.
 
-**Step 4 — Create the folder** under `KB/docs/<name>/`, kebab-case, with two files
+**Step 4 — Create the folder** under `W/docs/<name>/`, kebab-case, with two files
 matching the shape in `ownership.md` and the wording of its neighbours:
 
 - `README.md` — what the space holds, and what it does not with a pointer to where
@@ -35,12 +37,15 @@ matching the shape in `ownership.md` and the wording of its neighbours:
 - `CLAUDE.md` — the owner as default reviewer, scope, the rules a newcomer would get
   wrong, and where to start.
 
-**Step 5 — Add the row to the area map** in `KB/docs/README.md`, in the right table:
+**Step 5 — Add the row to the area map** in `W/docs/README.md`, in the right table:
 project workspaces or layer workspaces. **This is the step that gets forgotten, and a
 workspace missing from the map is invisible.**
 
-**Step 6 — Verify and report.** Run both checker scripts from KB, then report the
-files created, the row added, and the owner.
+**Step 6 — Verify, commit, report.** Run both checker scripts from W. Then commit in W and ask with AskUserQuestion — header `Push`, question "Push branch
+`<branch>` to `<remote>` for review?", options `Push` / `Keep local`; on `Push` run
+`write_worktree.py push "<W>" --yes`. Never push without that answer. Report
+the files created, the row added, the owner, the branch, and that the person opens the
+pull request from the link the push printed.
 
 ## Rules
 

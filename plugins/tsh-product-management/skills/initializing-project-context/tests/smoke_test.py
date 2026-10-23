@@ -8,14 +8,15 @@ empty folder never meets, each found once by running the scaffold by hand.
 Everything happens in a temporary directory that is deleted afterwards. The
 fixtures `git init` throwaway folders there to stand in for code repositories —
 the scaffold itself never runs git. Nothing is registered with Claude Code:
-wire_repos.py runs without --register, so the settings merge is tested and the
-user's plugin state is left alone.
+wire_repos.py runs without --register and with its own TSH_CONTEXT_HOME, so the
+settings merge is tested and the user's plugin state and registry are left alone.
 
 Exit 0 when every check passes, 1 otherwise.
 """
 
 import importlib.util
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -101,8 +102,14 @@ def main():
         links, tables = gates(ctx)
         check("check_links.py passes", links[0] == 0, links[1][-300:])
         check("check_tables.py passes", tables[0] == 0, tables[1][-300:])
+        for extra in ("check_decisions.py", "check_plugin.py"):
+            r = py(ctx / "scripts" / extra, cwd=ctx)
+            check(f"{extra} passes", r[0] == 0, r[1][-300:])
         check("checker scripts are executable",
-              all((ctx / "scripts" / s).stat().st_mode & 0o111 for s in ("check_links.py", "check_tables.py")))
+              all((ctx / "scripts" / s).stat().st_mode & 0o111
+                  for s in ("check_links.py", "check_tables.py", "check_decisions.py", "check_plugin.py")))
+        check("template version marker", json.loads((ctx / ".tsh-context.json").read_text()).get("template") == 2)
+        check("Bitbucket pipeline shipped", (ctx / "bitbucket-pipelines.yml").is_file())
         code, out = scaffold("--slug", "acme", "--parent", tmp / "empty", cwd=tmp)
         check("second run creates nothing", code == 0 and "Created (0)" in out, out[-200:])
         if with_claude:
@@ -110,12 +117,12 @@ def main():
                 code, out = run(["claude", "plugin", "validate", str(target)])
                 check(f"claude plugin validate {target.name}", code == 0, out[-300:])
 
-        print("2. Existing folder with code repositories is the catalog")
+        print("2. Existing folder with code repositories receives the knowledge base")
         cat = tmp / "brownfield"
         git_repo(cat / "api")
         git_repo(cat / "web")
         (cat / "web" / ".claude").mkdir()
-        (cat / "web" / ".claude" / "settings.json").write_text(json.dumps(
+        (cat / "web" / ".claude" / "settings.local.json").write_text(json.dumps(
             {"model": "keep-me", "enabledPlugins": {knowledge_plugin(): False}}))
         p = probe(cat)
         check("probe: can_be_catalog", p.get("can_be_catalog") is True)
@@ -123,21 +130,40 @@ def main():
         code, out = scaffold("--slug", "acme", "--catalog-dir", cat, cwd=cat)
         check("scaffold exits 0", code == 0, out[-300:])
         check("context repository beside the code repositories", (cat / "acme-context" / "docs").is_dir())
-        code, out = py(SCRIPTS / "wire_repos.py", "--catalog", cat, "--slug", "acme", "--only", "api", "web")
+        check("no catalog CLAUDE.md is written", not (cat / "CLAUDE.md").exists())
+        env = dict(os.environ, TSH_CONTEXT_HOME=str(tmp / "registry"))
+        r = subprocess.run([sys.executable, str(SCRIPTS / "wire_repos.py"), "--kb", str(cat / "acme-context"),
+                            "--slug", "acme", "--self", "--commit", str(cat / "api"), "--local", str(cat / "web")],
+                           capture_output=True, text=True, env=env)
+        code, out = r.returncode, r.stdout + r.stderr
         check("wire_repos exits 0", code == 0, out[-300:])
-        api = json.loads((cat / "api" / ".claude" / "settings.json").read_text())
-        check("code repository: relative marketplace path",
-              api["extraKnownMarketplaces"]["acme-context"]["source"]["path"] == "../acme-context")
+        check("without a URL, commit mode falls back to local", "no URL yet" in out)
+        api = json.loads((cat / "api" / ".claude" / "settings.local.json").read_text())
+        check("code repository: absolute path source while there is no URL",
+              api["extraKnownMarketplaces"]["acme-context"]["source"] == {"source": "directory", "path": str(cat / "acme-context")})
         check("code repository: both plugins enabled",
               api["enabledPlugins"].get("acme-shared@acme-context") is True
               and api["enabledPlugins"].get(knowledge_plugin()) is True)
+        check("code repository: read access to the clone",
+              api["permissions"]["additionalDirectories"] == [str(cat / "acme-context")])
+        check("nothing committed-mode was written", not (cat / "api" / ".claude" / "settings.json").exists()
+              and not (cat / "api" / "CLAUDE.md").exists())
+        check("pointer block in CLAUDE.local.md", "tsh:project-context START" in (cat / "api" / "CLAUDE.local.md").read_text())
+        excl = (cat / "api" / ".git" / "info" / "exclude").read_text()
+        check("both local files excluded from git", "/CLAUDE.local.md" in excl and "/.claude/settings.local.json" in excl)
+        _, st = run(["git", "status", "--porcelain"], cwd=cat / "api")
+        check("git sees nothing new in the code repository", st.strip() == "", st)
         self_ = json.loads((cat / "acme-context" / ".claude" / "settings.json").read_text())
         check("context repository refers to itself with '.'",
               self_["extraKnownMarketplaces"]["acme-context"]["source"]["path"] == ".")
-        web = json.loads((cat / "web" / ".claude" / "settings.json").read_text())
+        web = json.loads((cat / "web" / ".claude" / "settings.local.json").read_text())
         check("existing settings key preserved", web.get("model") == "keep-me")
         check("an existing `false` for the knowledge plugin is not flipped",
               web["enabledPlugins"][knowledge_plugin()] is False)
+        r = subprocess.run([sys.executable, str(SCRIPTS / "wire_repos.py"), "--kb", str(cat / "acme-context"),
+                            "--slug", "acme", "--local", str(cat / "web")], capture_output=True, text=True, env=env)
+        check("re-running replaces the block, never duplicates it",
+              (cat / "web" / "CLAUDE.local.md").read_text().count("tsh:project-context START") == 1)
 
         print("3. Started inside a code repository")
         repo = git_repo(tmp / "projects-x" / "service")

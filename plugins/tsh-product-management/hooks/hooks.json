@@ -10,6 +10,35 @@
             "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-jira-write.mjs"]
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(**/CLAUDE.md)",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-project-context-block.mjs"]
+          },
+          {
+            "type": "command",
+            "if": "Write(**/CLAUDE.md)",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-project-context-block.mjs"]
+          },
+          {
+            "type": "command",
+            "if": "Edit(**/CLAUDE.local.md)",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-project-context-block.mjs"]
+          },
+          {
+            "type": "command",
+            "if": "Write(**/CLAUDE.local.md)",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/guard-project-context-block.mjs"]
+          }
+        ]
       }
     ]
   }

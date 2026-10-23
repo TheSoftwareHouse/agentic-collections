@@ -12,6 +12,60 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.5.0] - 2026-10-23
+
+### Added
+
+- **The knowledge base works wherever people clone it.** A code repository now names
+  its project's context repository by git URL — Bitbucket, GitHub or any host, SSH or
+  HTTPS — instead of the sibling folder `../<slug>-context`. The first time a skill
+  needs project facts it asks once where this person's clone is or should live (an
+  existing clone above the repository, `~/.tsh/context/<slug>/`, or any folder), then
+  remembers it for every repository of the project. Flat layouts with several projects
+  side by side, a project folder holding the clone and the code, scattered
+  repositories and T3 worktrees all resolve without a question per session.
+- **Reads are kept current without touching work in progress.** Before reading, the
+  clone is fetched at most every ten minutes, never prompting for a password, and
+  fast-forwarded only when it is on the default branch with no uncommitted changes.
+  On any other branch or with changes in progress it is read as it is, and the answer
+  says so first. Nothing ever merges, rebases, stashes, resets or switches branches.
+- **Writes go on their own branch.** `writing-project-knowledge`,
+  `adding-project-context-workspace` and `repairing-project-context-links` write in a
+  separate worktree created from the approved version, commit, and push that branch
+  only after the person says yes. The default branch is never pushed; the pull request
+  is opened by a person.
+- **Answers cite their sources with a date and an owner.** `navigating-project-context`
+  names the file, its last change and the owning workspace's owner behind every fact,
+  and can read a project by URL with no code repository at all.
+- **`initializing-project-context` has three modes.** *New project* scaffolds the
+  context repository, commits it locally, and publishes it to an empty remote only
+  after asking — code repositories and the URL are optional, so a lead can start
+  alone. *Attach repository* connects a code repository: committed settings and a
+  `CLAUDE.md` pointer for the team's own repositories, or a local-only setup that git
+  never sees for a client's (`.git/info/exclude`, never the client's `.gitignore`).
+  *Add URL* publishes a knowledge base started without a remote.
+- **A guard for the project pointer.** A `PreToolUse` hook denies any edit that would
+  remove or change the `tsh:project-context` block in `CLAUDE.md` or
+  `CLAUDE.local.md`. It starts only for edits of those two files.
+- **Two more checker scripts and a pipeline in every new context repository.**
+  `check_decisions.py` catches two decision records with the same number — what two
+  people writing at once produce; `check_plugin.py` keeps the project plugin
+  Markdown-only and refuses a change to it without a version bump.
+  `bitbucket-pipelines.yml` runs all four checkers on every pull request.
+
+### Changed
+
+- New context repositories no longer get a catalog `CLAUDE.md`: it was in no
+  repository, so it reached only the person who ran init. Its rules moved into the
+  context repository's own `CLAUDE.md`, and each connected code repository carries the
+  pointer block.
+- `GUIDE.md` no longer claims the assistant reads the knowledge base before every
+  task. Part 1 is now a guide for non-technical readers: where their copy is, what
+  happens on its own, what never happens without their yes, and how to change a
+  document in the git host's web editor.
+- Existing projects in the old sibling layout keep working unchanged; *Attach
+  repository* moves a repository to the URL-based setup.
+
 ## [0.4.0] - 2026-09-18
 
 ### Added

@@ -52,6 +52,11 @@ Cut on sight:
 The test for keeping a line: would a competent newcomer get this wrong by reading
 the code alone? If no, cut it.
 
+**Never cut a tool-owned block.** Text between `<!-- tsh:<name> START` and
+`<!-- tsh:<name> END -->` — the `tsh:project-context` pointer to a project's knowledge
+base is one — belongs to the TSH tool that wrote it. Keep it byte for byte, wherever
+it sits; trim around it. A plugin hook may deny an edit that touches it.
+
 ## 4. Write instructions the model can evaluate
 
 Specific beats general, and checkable beats aspirational:
