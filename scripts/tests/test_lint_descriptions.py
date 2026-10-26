@@ -52,6 +52,14 @@ class ParseFrontmatter(unittest.TestCase):
         with self.assertRaisesRegex(lint.ParseError, "unterminated"):
             self.parse('description: "never closed')
 
+    def test_block_scalar_on_an_unread_key_is_ignored(self):
+        data, _ = self.parse("name: x\ndescription: fine\nallowed-tools: >")
+        self.assertEqual(data["description"], "fine")
+
+    def test_comment_line_is_not_a_continuation(self):
+        data, _ = self.parse("name: x\ndescription: Does a thing\n# a trailing note")
+        self.assertEqual(data["description"], "Does a thing")
+
 
 class Collect(unittest.TestCase):
     def setUp(self):
@@ -83,6 +91,15 @@ class Collect(unittest.TestCase):
         components, errors = lint.collect(self.repo.root)
         self.assertEqual(components, [])
         self.assertEqual(len(errors), 1)
+
+    def test_disabled_skill_with_block_description_is_excluded_not_an_error(self):
+        # A user-invoked skill is never routed, so an unsupported description must not fail the lint.
+        self.repo.plugin("tsh-a")
+        self.repo.write("plugins/tsh-a/skills/manual/SKILL.md",
+                        "---\nname: manual\ndisable-model-invocation: true\ndescription: >\n  folded\n---\n")
+        components, errors = lint.collect(self.repo.root)
+        self.assertEqual(components, [])
+        self.assertEqual(errors, [])
 
 
 class Main(unittest.TestCase):

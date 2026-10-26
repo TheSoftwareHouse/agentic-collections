@@ -26,7 +26,18 @@ jobs:
       - name: Lint descriptions
         run: python3 scripts/lint-descriptions.py --github
       - name: Check routing eval cases
-        run: python3 scripts/check-eval-cases.py --github
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          # On a pull request, hold the coverage baseline to shrink-only against the base branch.
+          base_args=""
+          if [ -n "$BASE_REF" ]; then
+            git fetch --depth=1 origin "$BASE_REF"
+            if git show "origin/$BASE_REF:scripts/eval-coverage-baseline.json" > /tmp/base-baseline.json 2>/dev/null; then
+              base_args="--base-baseline /tmp/base-baseline.json"
+            fi
+          fi
+          python3 scripts/check-eval-cases.py --github $base_args
 
   validate-plugins:
     runs-on: ubuntu-latest

@@ -4,10 +4,6 @@
   "exclusive_bonus": 0.15,
   "exclusive_groups": [
     {
-      "name": "runtime targets",
-      "plugins": ["tsh-stack-nodejs", "tsh-stack-serverless", "tsh-stack-python"]
-    },
-    {
       "name": "cloud providers",
       "plugins": ["tsh-stack-aws", "tsh-stack-gcp", "tsh-stack-azure"]
     }

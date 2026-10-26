@@ -64,8 +64,8 @@ graders: [...]
   no sibling fired is the sign.
 - **A grader sees subagent tool calls.** When Claude delegates to an agent that loads the
   skill itself, the Skill call still counts, but the turn cap does not bound the
-  subagent. Avoid prompts whose natural answer is delegation; graders cannot accept "the
-  skill or the agent that runs it".
+  subagent. Avoid prompts whose natural answer is delegation; a `tool_used` grader cannot
+  accept "the skill or the agent that runs it" (use a `regex` over the trace for that, below).
 
 ## Graders
 
@@ -142,11 +142,12 @@ Expected stderr, not a failure: the Playwright and Context7 mocks were not start
   must-not-fire routing case**, the latter against its nearest sibling from
   `python3 scripts/lint-descriptions.py`. `scripts/check-eval-cases.py` enforces the
   must-fire half: a skill without one fails unless `scripts/eval-coverage-baseline.json`
-  lists it, and that baseline only shrinks.
-- **A layered request asserts both layers.** When a discipline skill and a stack skill
-  should load together, give the case a must-fire grader for each and tag it `layered`. Skills with `disable-model-invocation: true`
+  lists it, and that baseline only shrinks. Skills with `disable-model-invocation: true`
   need none: their description is never preloaded.
-- **A description change re-runs the suite** and the lint before the PR.
+- **A layered request asserts both layers.** When a discipline skill and a stack skill
+  should load together, give the case a must-fire grader for each and tag it `layered`.
+- **A description change re-runs the lint before the PR**, and the evals when the lint
+  flags the pair or the skill is new or renamed.
 - **`python3 scripts/check-eval-cases.py` passes before the PR.** It is the only thing
   that notices a must-not-fire grader naming a skill that does not exist, which would
   otherwise pass forever. A skill rename updates every case that names it.

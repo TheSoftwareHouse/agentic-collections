@@ -42,6 +42,25 @@ def trace_grader(name, skill, agent, negative=False, target="trace"):
     return "\n".join(lines)
 
 
+def q(regex):
+    """Single-quote a regex for a YAML scalar."""
+    return "'" + regex + "'"
+
+
+def raw_tool_grader(name, pattern, kind="negative"):
+    """A tool_used grader with an arbitrary input_match, for probing the idiom check.
+
+    kind: 'negative' (min 0, max 0), 'min0' (min 0, no max), or 'fire' (defaults to must-fire).
+    """
+    lines = [f"  - name: {name}", "    type: tool_used", "    tool: Skill",
+             f"    input_match: {pattern}"]
+    if kind == "negative":
+        lines += ["    min: 0", "    max: 0"]
+    elif kind == "min0":
+        lines += ["    min: 0"]
+    return "\n".join(lines)
+
+
 def case_yaml(name, fire="audit", sibling="build", tags="[routing]", max_turns=1,
               allowed="[Skill]", plugins='["../../../plugins/tsh-a"]', extra="", more=()):
     graders = list(more)
@@ -204,11 +223,18 @@ class Check(unittest.TestCase):
         self.baseline(["tsh-a:build", "tsh-a:gone"])
         self.assert_fails_with("tsh-a:gone is not a model-invocable skill")
 
-    def test_trace_regex_naming_skill_or_agent_counts_as_must_fire(self):
+    def test_trace_regex_skill_or_agent_does_not_credit_coverage(self):
+        # The grader passes when only the agent fires, so the skill's own description never
+        # has to win: it earns no coverage and must stay in the baseline.
         self.case("audit-not-build", fire=None, more=[trace_grader("fired", "audit", "auditor")])
+        self.assert_fails_with("tsh-a:audit has no must-fire routing case")
+
+    def test_trace_regex_skill_or_agent_passes_when_skill_is_in_the_baseline(self):
+        self.case("audit-not-build", fire=None, more=[trace_grader("fired", "audit", "auditor")])
+        self.baseline(["tsh-a:audit", "tsh-a:build"])
         code, out, err = self.run_check()
         self.assertEqual(code, 0, err)
-        self.assertIn("1 of 2 model-invocable skills", out)
+        self.assertIn("0 of 2 model-invocable skills", out)
 
     def test_trace_regex_naming_an_unknown_agent_fails(self):
         self.case("audit-not-build", fire=None, more=[trace_grader("fired", "audit", "auditr")])
@@ -222,6 +248,59 @@ class Check(unittest.TestCase):
     def test_regex_over_another_target_fails(self):
         self.case("x", more=[trace_grader("fired", "audit", "auditor", target="last_message")])
         self.assert_fails_with("must be tool_used on tool Skill, or regex with target: trace")
+
+    def test_every_input_match_alternative_is_checked(self):
+        pattern = q(r'"skill"\s*:\s*"(?:[\w-]+:)?biuld"|"skill"\s*:\s*"(?:[\w-]+:)?build"')
+        self.case("audit-not-build", sibling=None, more=[raw_tool_grader("no-build", pattern)])
+        self.assert_fails_with("names skill 'biuld'")
+
+    def test_hardcoded_plugin_prefix_breaks_the_idiom(self):
+        self.case("audit-not-build", sibling=None,
+                  more=[raw_tool_grader("no-build", q(r'"skill"\s*:\s*"tsh-zzz:build"'))])
+        self.assert_fails_with("not the idiom")
+
+    def test_bare_trace_alternative_breaks_the_idiom(self):
+        bad = ("  - name: fired\n    type: regex\n    target: trace\n"
+               "    pattern: '(?:\\\\?\"skill\\\\?\"\\s*:\\s*\\\\?\"(?:[\\w-]+:)?audit\\\\?\")|audit'\n")
+        self.case("audit-not-build", fire=None, more=[bad])
+        self.assert_fails_with("not the idiom")
+
+    def test_must_fire_grader_with_min_zero_is_rejected(self):
+        self.case("audit-not-build", fire=None,
+                  more=[raw_tool_grader("audit-ish", q(r'"skill"\s*:\s*"(?:[\w-]+:)?audit"'), kind="min0")])
+        self.assert_fails_with("min: 0 without max: 0")
+
+    def test_grader_that_is_not_a_mapping_fails(self):
+        body = case_yaml("x").split("graders:")[0] + "graders: [a, b]\n"
+        self.repo.write("evals/routing/x/case.yaml", body)
+        self.assert_fails_with("must be a mapping")
+
+    def test_runs_true_is_not_the_integer_one(self):
+        body = case_yaml("x").replace("runs: 1", "runs: true")
+        self.repo.write("evals/routing/x/case.yaml", body)
+        self.assert_fails_with("runs must be 1")
+
+    def test_plugin_path_outside_plugins_fails(self):
+        self.repo.write("fixtures/tsh-a/.claude-plugin/plugin.json", '{"name": "tsh-a"}\n')
+        self.case("x", plugins='["../../../fixtures/tsh-a"]')
+        self.assert_fails_with("must resolve under plugins/")
+
+    def test_routing_case_outside_the_routing_directory_is_still_checked(self):
+        self.repo.write("evals/misplaced/case.yaml", case_yaml("misplaced", sibling="biuld"))
+        self.assert_fails_with("names skill 'biuld'")
+
+    def test_baseline_growth_against_base_fails(self):
+        self.case("audit-not-build")  # build stays uncovered, so the baseline keeps it
+        base = self.repo.write("base.json", json.dumps({"uncovered": []}))
+        code, _, err = self.run_check("--base-baseline", str(base))
+        self.assertEqual(code, 1, err)
+        self.assertIn("is new in the baseline", err)
+
+    def test_baseline_unchanged_against_base_passes(self):
+        self.case("audit-not-build")
+        base = self.repo.write("base.json", json.dumps({"uncovered": ["tsh-a:build"]}))
+        code, _, err = self.run_check("--base-baseline", str(base))
+        self.assertEqual(code, 0, err)
 
 
 if __name__ == "__main__":

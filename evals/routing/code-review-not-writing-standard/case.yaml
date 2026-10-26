@@ -6,8 +6,8 @@ plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering
 runs: 1
 execution:
   prompt: |
-    Review PR #212, the new refunds endpoint, before we merge it.
-    Check it against specifications/PAY-142/stripe-refunds.plan.md, run the tests and the linter, and tell me whether it's ready to merge.
+    I've just finished the new refunds endpoint. Review the change before we merge it:
+    check the error handling and that the tests cover it, and tell me whether it's ready to merge.
   max_turns: 1
   allowed_tools: [Skill]
 graders:

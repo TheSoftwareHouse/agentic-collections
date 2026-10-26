@@ -47,8 +47,9 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 
 Every technology stack gets its own plugin, created when it has real content to ship,
 not before. The family has two shapes: **runtime targets for application code**, and
-**cloud providers** — a repository has exactly one of each, which is why both belong
-here rather than in a discipline plugin. Read
+**cloud providers** — a repository has exactly one cloud provider but may have more than
+one runtime target (a frontend, a Node service and a Lambda bundle can share a repo),
+which is why both belong here rather than in a discipline plugin. Read
 `.claude/rules/stack-plugin-conventions.md` before adding a stack plugin or moving
 guidance between two of them; it carries why a stack is a runtime target rather than
 a language, the split trigger, and the rules for deliberate duplication between stack
@@ -199,17 +200,16 @@ Validate before pushing:
 claude plugin validate ./plugins/tsh-core   # per plugin
 claude plugin validate .                    # the marketplace catalog
 python3 scripts/lint-descriptions.py        # skill and agent description lint
-python3 scripts/check-eval-cases.py         # routing cases name real, routable skills
 ```
 
 `validate` should print `✔ Validation passed`. Warnings don't fail validation; add
 `--strict` to treat them as errors. To test the catalog end to end without pushing, see
 `.claude/rules/plugin-manifests-and-marketplace.md`.
 
-After changing a model-invocable description, also run the routing evals; they spend
-API budget on the signed-in account, about USD 0.12 per case. `evals/README.md` is the
-one place that documents how to run these checks, what their output means, and what CI
-runs — keep commands there rather than copying them here.
+When the lint flags a changed description, or you add or rename a model-invocable skill,
+also run the routing evals; they spend API budget on the signed-in account, about USD 0.12
+per case. `evals/README.md` is the one place that documents how to run these checks, what
+their output means, and what CI runs — keep commands there rather than copying them here.
 
 ## Where the rest lives
 

@@ -53,6 +53,11 @@ class ParseError(Exception):
     pass
 
 
+# The lint reads only these; parsing any other key would fail valid frontmatter it never looks at
+# (a `>` block value on `allowed-tools`, say). `disable-model-invocation` is handled before parsing.
+RELEVANT_KEYS = ("name", "description", "when_to_use")
+
+
 def parse_frontmatter(path):
     """Return ({key: scalar}, line of `description:`); raise ParseError on unsupported shapes."""
     lines = path.read_text(encoding="utf-8").splitlines()
@@ -70,8 +75,12 @@ def parse_frontmatter(path):
         if not match:
             continue
         key, raw = match.group(1), match.group(2).strip()
+        if key not in RELEVANT_KEYS:
+            continue
         if key in ("description", "when_to_use") and raw[:1] not in ("|", ">"):
-            nxt = next((ln for ln in block[i + 1:] if ln.strip()), None)
+            # A comment line is not a continuation, so looking past it finds the next real line.
+            nxt = next((ln for ln in block[i + 1:]
+                        if ln.strip() and not ln.lstrip().startswith("#")), None)
             if nxt is not None and not re.match(r"^[A-Za-z_][\w-]*:", nxt):
                 raise ParseError(f"multi-line value for '{key}'")
         if key == "description":
@@ -97,6 +106,15 @@ def parse_scalar(key, raw):
     return re.sub(r"\s+#.*$", "", raw)
 
 
+def frontmatter_flag(path, key):
+    """Read one frontmatter flag without strict parsing, so an excluded skill never fails the lint."""
+    match = re.match(r"---\n(.*?)\n---", path.read_text(encoding="utf-8"), re.S)
+    if not match:
+        return None
+    flag = re.search(rf"^{re.escape(key)}:\s*(\S+)", match.group(1), re.M)
+    return flag.group(1).strip("\"'").lower() if flag else None
+
+
 def collect(root=ROOT):
     """Return (components, errors). A component is a dict with id, plugin, kind, path, text."""
     components, errors = [], []
@@ -105,12 +123,14 @@ def collect(root=ROOT):
         for path in sorted(root.glob(pattern)):
             rel = path.relative_to(root).as_posix()
             plugin = path.relative_to(root / "plugins").parts[0]
+            # Exclude before parsing: a user-invoked skill's description is never routed, so an
+            # unsupported shape in it must not fail the lint.
+            if kind == "skill" and frontmatter_flag(path, "disable-model-invocation") == "true":
+                continue
             try:
                 fm, desc_line = parse_frontmatter(path)
             except ParseError as exc:
                 errors.append((rel, str(exc)))
-                continue
-            if kind == "skill" and fm.get("disable-model-invocation", "").lower() == "true":
                 continue
             name = fm.get("name") or (path.parent.name if kind == "skill" else path.stem)
             text = f"{fm.get('description', '')} {fm.get('when_to_use', '')}".strip()
@@ -221,8 +241,8 @@ def main(argv=None):
             failed = True
         if args.github:
             kind = "error" if level == "FAIL" else "warning"
-            hint = ('add a "X is <other skill>" disambiguation to the description or '
-                    "when_to_use, or add an allowed_pairs entry with a reason")
+            hint = ("give the description or when_to_use the words that only one of the two skills "
+                    "owns, so their routing text diverges; or add an allowed_pairs entry with a reason")
             for side in (a, b):
                 print(f"::{kind} file={side['path']},line={side['line']},"
                       f"title=Description similarity {score:.2f}::"

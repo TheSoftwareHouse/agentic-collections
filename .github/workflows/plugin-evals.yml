@@ -46,10 +46,13 @@ jobs:
         if: steps.key.outputs.has_key == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        # --max-cost-usd is a safety net, not a budget: at ~USD 0.12 per case it must stay
+        # above the number of non-quarantined routing cases, or the suite aborts mid-run on
+        # every PR. Raise it as cases are added; 10 covers ~80 cases.
         run: >
           claude plugin eval . --eval-dir evals --tag routing
           --trust-plugin --no-publish --ablation none
-          --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 3
+          --model claude-sonnet-5-5 --threshold 1 --max-cost-usd 10
           --json evals/results/routing.json --report evals/results/routing.html
 
       - name: Upload eval results

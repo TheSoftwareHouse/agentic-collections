@@ -40,10 +40,10 @@ It leaves out what the model never chooses between:
 
 Pairs from plugins that are never installed in the same repository get both
 thresholds raised by 0.15 and are marked `[exclusive]`: the cloud providers
-`tsh-stack-aws`, `tsh-stack-gcp` and `tsh-stack-azure`, and the backend runtimes
-`tsh-stack-nodejs`, `tsh-stack-serverless` and `tsh-stack-python`.
-`tsh-stack-frontend` is not in that group, because most projects pair a frontend
-with a backend.
+`tsh-stack-aws`, `tsh-stack-gcp` and `tsh-stack-azure`, because a repository has
+exactly one cloud. Runtime targets are not in that group — a repository can pair a
+frontend with a Node service and a Lambda bundle, so their skills compete for routing
+and are held to the ordinary thresholds.
 
 The run also exits 1 when a component's frontmatter cannot be parsed — a skipped
 file would be a missed collision — or when `allowed_pairs` names a component that
@@ -51,9 +51,9 @@ no longer exists.
 
 ### Act on a flagged pair
 
-1. Add the distinction to one or both descriptions, in the form this repository
-   already uses: "Building accessible components is tsh-stack-frontend's
-   ensuring-accessibility."
+1. Give one or both descriptions the words that only that skill owns, so their routing
+   text diverges — the vocabulary of the job each does, not a mention of the other skill
+   (naming the sibling adds shared words and raises the score).
 2. Write a routing case for the pair and run it with `--runs 6`
    ([measure one case](#measure-one-case)). The lint shows where to look; the eval
    shows whether routing is actually broken.
