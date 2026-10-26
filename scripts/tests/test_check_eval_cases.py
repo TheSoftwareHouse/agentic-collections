@@ -259,6 +259,13 @@ class Check(unittest.TestCase):
                   more=[raw_tool_grader("no-build", q(r'"skill"\s*:\s*"tsh-zzz:build"'))])
         self.assert_fails_with("not the idiom")
 
+    def test_empty_alternative_breaks_the_idiom(self):
+        # A trailing | leaves an empty branch that matches any skill call; it must be rejected,
+        # not dropped, or it would assert nothing while crediting coverage.
+        self.case("audit-not-build", fire=None,
+                  more=[raw_tool_grader("audit-ish", q(r'"skill"\s*:\s*"(?:[\w-]+:)?audit"|'), kind="fire")])
+        self.assert_fails_with("not the idiom")
+
     def test_bare_trace_alternative_breaks_the_idiom(self):
         bad = ("  - name: fired\n    type: regex\n    target: trace\n"
                "    pattern: '(?:\\\\?\"skill\\\\?\"\\s*:\\s*\\\\?\"(?:[\\w-]+:)?audit\\\\?\")|audit'\n")

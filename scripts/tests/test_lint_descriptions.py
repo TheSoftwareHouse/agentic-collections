@@ -101,6 +101,15 @@ class Collect(unittest.TestCase):
         self.assertEqual(components, [])
         self.assertEqual(errors, [])
 
+    def test_disabled_skill_with_a_padded_delimiter_is_still_excluded(self):
+        # parse_frontmatter accepts a fence that strips to '---', so the flag reader must too.
+        self.repo.plugin("tsh-a")
+        self.repo.write("plugins/tsh-a/skills/manual/SKILL.md",
+                        "---  \nname: manual\ndisable-model-invocation: true\ndescription: shared text\n---\n")
+        components, errors = lint.collect(self.repo.root)
+        self.assertEqual(components, [])
+        self.assertEqual(errors, [])
+
 
 class Main(unittest.TestCase):
     def setUp(self):

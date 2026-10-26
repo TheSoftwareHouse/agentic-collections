@@ -111,11 +111,13 @@ def read_names(field, raw):
     hard-coded prefix, a typo'd branch, or a bare name that the session init line always satisfies
     is rejected rather than silently skipped.
     """
-    alts = [a.strip() for a in top_level_alts(raw.strip()) if a.strip()]
-    if not alts:
-        return None
     names = []
-    for alt in alts:
+    for alt in top_level_alts(raw.strip()):
+        alt = alt.strip()
+        if not alt:
+            # An empty alternative — a leading, trailing or doubled | — matches anything, so the
+            # grader asserts nothing; reject the whole pattern rather than skip the empty branch.
+            return None
         if field == "input_match":
             match = INPUT_MATCH_IDIOM.fullmatch(alt)
             if not match:

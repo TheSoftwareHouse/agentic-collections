@@ -107,12 +107,21 @@ def parse_scalar(key, raw):
 
 
 def frontmatter_flag(path, key):
-    """Read one frontmatter flag without strict parsing, so an excluded skill never fails the lint."""
-    match = re.match(r"---\n(.*?)\n---", path.read_text(encoding="utf-8"), re.S)
-    if not match:
+    """Read one frontmatter flag without strict parsing, so an excluded skill never fails the lint.
+
+    Delimiters are recognised exactly as parse_frontmatter does — any line that strips to '---' —
+    so a padded fence like '---  ' does not quietly re-admit a skill the lint should skip.
+    """
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
         return None
-    flag = re.search(rf"^{re.escape(key)}:\s*(\S+)", match.group(1), re.M)
-    return flag.group(1).strip("\"'").lower() if flag else None
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        match = re.match(rf"^{re.escape(key)}:\s*(\S+)", line)
+        if match:
+            return match.group(1).strip("\"'").lower()
+    return None
 
 
 def collect(root=ROOT):
