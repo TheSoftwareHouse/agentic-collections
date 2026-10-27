@@ -15,7 +15,7 @@ Teammates receive these updates by running `/plugin update` — a change to this
 alone reaches nobody. This plugin is new, so the first install needs
 `/plugin marketplace update tsh-agentic-collections` before it appears.
 
-## [0.1.0] - 2026-10-20
+## [0.1.0] - 2026-10-27
 
 Initial release.
 

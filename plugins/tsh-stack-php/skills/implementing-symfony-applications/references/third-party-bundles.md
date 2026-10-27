@@ -36,7 +36,6 @@ Use this reference when a project depends on a popular Symfony bundle or library
 | knplabs/knp-paginator-bundle | v6.11.0 | ^8.2 | ^6.4 \|\| ^7.4 \|\| ^8.0 | not marked abandoned |
 | easycorp/easyadmin-bundle | v5.7.0 | >=8.2 | 6.4, 7.x, 8.x | stable |
 | symfony/webpack-encore-bundle | 2.4.2 | >=8.1.0 | ^5.4 \|\| ^6.2 \|\| ^7.0 \|\| ^8.0 | low maintenance |
-| symfony/twig-bridge | v8.1.7 | >=8.4.1 | 8.1 | not marked abandoned |
 
 ## FOSUserBundle
 
@@ -58,7 +57,7 @@ Use this reference when a project depends on a popular Symfony bundle or library
 
 - `#[MapEntity]` "extends `ValueResolver`" and disables `EntityValueResolver` for a controller.
 - `#[IsGranted]` runs voters, like `isGranted()` and `denyAccessUnlessGranted()`.
-- `#[Template]` lets a controller return an array, handled on `kernel.view`.
+- `#[Template]` (`Symfony\Bridge\Twig\Attribute\Template`, native since Symfony 6.2) lets a controller return an array, handled by TwigBridge's `TemplateAttributeListener` on `kernel.view`.
 - `#[Cache]` is read by `CacheAttributeListener` on `kernel.controller`.
 
 **Pitfall (8.0).** "Automatic mapping of Doctrine entities to controller arguments has been removed. Use the `#[MapEntity]` attribute or the route mapping syntax (`{param:argument}`)."

@@ -2,7 +2,7 @@
 
 Use this reference when you know the project's target PHP version and must decide whether a language feature or function may be used, and what the PHP manual names as the replacement for a deprecated construct.
 
-Detect the target first with [`php-version-detection.md`](./php-version-detection.md). PHP 8.6 has a planned GA of Nov 19, 2026; the timetable notes that "individual releases may be added or removed to accommodate development progress".
+Detect the target first with [`php-version-detection.md`](./php-version-detection.md). PHP 8.6 is not yet released as of writing — never target it. Its release schedule is in [`php-version-detection.md`](./php-version-detection.md#php-86-release-schedule).
 
 ## Quick Lookup
 
