@@ -1,7 +1,7 @@
 ---
 name: reviewing-code
-description: "TSH's pre-merge review of a delivered change set: reads the plan and requirements first, compares the implementation against what was agreed, judges test coverage per layer, actually executes the project's tests, linters and build, then checks high-risk anti-patterns, security, and scalability. Use when a change set, task, or PR must be judged against its plan or acceptance criteria with its suites actually run, not read as a diff."
-when_to_use: "Trigger on: 'review this code', 'review this PR', 'is this ready to merge', verifying an implementation against its *.plan.md or acceptance criteria, judging whether a change is adequately tested, or the review gate closing an implementation workflow. Executes the project's own suites as part of the review; reports findings and never fixes code."
+description: "TSH's pre-merge review of a delivered change set — a pasted diff, a task, or a PR: reads the plan and requirements first, compares the implementation against what was agreed, judges test coverage per layer, runs the project's tests, linters and build when they are available, then checks high-risk anti-patterns, security, and scalability. Use when a change must be judged for merge readiness, whether it arrives as a pasted diff or a branch, against its plan or acceptance criteria when those exist."
+when_to_use: "Trigger on: 'review this code', 'review this PR', 'review this diff before we merge', 'is this ready to merge', verifying an implementation against its *.plan.md or acceptance criteria, judging whether a pasted change or change set is adequately tested, or the review gate closing an implementation workflow. Runs the project's own suites as part of the review when available; reports findings and never fixes code."
 ---
 
 # Reviewing Code

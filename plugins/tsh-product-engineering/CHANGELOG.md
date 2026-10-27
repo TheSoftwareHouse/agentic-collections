@@ -12,6 +12,18 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.2] - 2026-10-27
+
+### Changed
+
+- **`reviewing-code` now routes on a pasted diff, not only a branch or PR.** Its
+  description ended on "with its suites actually run, not read as a diff" — an
+  anti-trigger: a "review this NestJS change before we merge" request with the diff
+  pasted inline loaded no review skill and Claude reviewed it directly. The description
+  now names a pasted diff as a valid review target and frames suite execution as
+  running "when they are available"; the MUST rule to actually run the suites is
+  unchanged.
+
 ## [0.8.1] - 2026-10-27
 
 ### Changed

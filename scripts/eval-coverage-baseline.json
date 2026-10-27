@@ -31,7 +31,6 @@
     "tsh-stack-frontend:implementing-frontend",
     "tsh-stack-gcp:auditing-gcp-cost",
     "tsh-stack-gcp:implementing-gcp-terraform",
-    "tsh-stack-nodejs:implementing-nestjs-api",
     "tsh-stack-python:writing-data-models",
     "tsh-stack-python:writing-modern-python",
     "tsh-stack-serverless:configuring-serverless-service",

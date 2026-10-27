@@ -14,6 +14,17 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.1.2] - 2026-10-27
+
+### Changed
+
+- **`implementing-nestjs-api` now routes on a review request, not only implementation.**
+  Review was buried in the description behind the implementation verbs, so a pre-merge
+  review of a pasted NestJS change did not pull in the stack layer alongside the
+  discipline's code review. The description now names reviewing a NestJS change — a
+  command or query handler, module, TypeORM repository, or DTO — as a first-class
+  trigger.
+
 ## [0.1.1] - 2026-10-02
 
 ### Fixed
