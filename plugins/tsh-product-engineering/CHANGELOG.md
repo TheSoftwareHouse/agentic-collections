@@ -45,7 +45,11 @@ alone reaches nobody.
   match the Figma design?" request loaded the standard instead of the pass that runs
   it. Marking it `disable-model-invocation: true` leaves it reachable where it is
   actually used — preloaded into `ui-reviewer` — and lets such requests route to
-  `reviewing-ui`.
+  `reviewing-ui`. The places that pointed at it as something to load —
+  `reviewing-ui`'s reference table, `capturing-ui-evidence`'s routing text and
+  related-skills list, `orchestrating-feature-implementation` — now say it is read
+  as a file or applied by `ui-reviewer`, and the README no longer lists it as
+  model-invoked.
 
 ## [0.8.0] - 2026-10-07
 

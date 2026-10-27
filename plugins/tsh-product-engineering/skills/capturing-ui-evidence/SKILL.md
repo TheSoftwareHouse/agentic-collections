@@ -1,7 +1,7 @@
 ---
 name: capturing-ui-evidence
-description: "The mechanical capture contract for UI verification: drives the playwright-cli against the pinned dev server URL to collect actual.png, computed-styles.json and a11y-snapshot.yml into the iteration artifact directory. Works with no design reference at all; when — and only when — the caller supplies a Figma URL, it also exports the shared reference image. Evidence collection only — judging the result is verifying-ui."
-when_to_use: "Trigger on: collecting ACTUAL evidence from a running app for UI verification, running playwright-cli capture commands, exporting the shared Figma reference image, or resolving a capture blocker such as a login redirect. Judging the artifacts is verifying-ui; running a full pass is reviewing-ui."
+description: "The mechanical capture contract for UI verification: drives the playwright-cli against the pinned dev server URL to collect actual.png, computed-styles.json and a11y-snapshot.yml into the iteration artifact directory. Works with no design reference at all; when — and only when — the caller supplies a Figma URL, it also exports the shared reference image. Evidence collection only — judging the result is the ui-reviewer agent's job."
+when_to_use: "Trigger on: collecting ACTUAL evidence from a running app for UI verification, running playwright-cli capture commands, exporting the shared Figma reference image, or resolving a capture blocker such as a login redirect. Judging the artifacts is the ui-reviewer agent's job; running a full capture-and-judge pass is reviewing-ui."
 user-invocable: false
 ---
 
@@ -12,7 +12,8 @@ Playwright CLI, plus preparing the shared design reference when the caller suppl
 one. The three ACTUAL artifacts come purely from the running application, so capture
 runs with or without a design reference — the Figma export is a conditional extra
 step, not a prerequisite. Capture never judges whether the UI matches the design —
-that is [`verifying-ui`](../verifying-ui/SKILL.md).
+that is the `ui-reviewer` agent, applying the [`verifying-ui`](../verifying-ui/SKILL.md)
+standard it preloads.
 
 ## Applicability and Precedence
 
@@ -126,5 +127,6 @@ consumes no iteration budget, and capture reruns after the blocker is resolved.
 
 ## Related Skills
 
-- [`verifying-ui`](../verifying-ui/SKILL.md) — the judging standard these artifacts feed.
+- [`verifying-ui`](../verifying-ui/SKILL.md) — the judging standard these artifacts
+  feed; preloaded by `ui-reviewer`, not model-invocable.
 - [`reviewing-ui`](../reviewing-ui/SKILL.md) — orchestrates capture plus judgment as one pass.

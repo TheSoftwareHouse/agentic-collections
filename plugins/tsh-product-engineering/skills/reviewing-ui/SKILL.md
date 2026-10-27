@@ -70,6 +70,6 @@ owns iteration budgets and escalation; this skill is the single pass it repeats.
 
 | Reference | Load when | Covers |
 | --- | --- | --- |
-| [`verifying-ui`](../verifying-ui/SKILL.md) | Interpreting a verdict, tolerances, or the artifact contract | The judging standard the reviewer applies |
+| [`verifying-ui`](../verifying-ui/SKILL.md), read as a file — it is not model-invocable; `ui-reviewer` preloads it | Interpreting a verdict, tolerances, or the artifact contract | The judging standard the reviewer applies |
 | [`capturing-ui-evidence`](../capturing-ui-evidence/SKILL.md) | A capture blocker needs diagnosing, or auth inputs must be prepared | The capture contract, playwright-cli commands, the `.env` auth contract |
 | [UI verification gate](../orchestrating-feature-implementation/references/ui-verification-gate.md) | This pass runs inside feature delivery and returned FAIL | The verify-fix loop, 5-iteration budget, escalation gate |
