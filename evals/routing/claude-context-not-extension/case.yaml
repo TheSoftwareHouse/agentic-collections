@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: claude-context-not-extension
+description: A convention Claude ignores because CLAUDE.md has grown stale must route to managing-claude-context, not authoring-claude-extensions.
+tags: [routing]
+plugins: ["../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    Claude keeps ignoring our rule that database migrations go in db/migrations.
+    It's written in CLAUDE.md, but that file is now about 450 lines and half of it is out of date. Clean up our project instructions so conventions like this actually reach Claude.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: context-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    arm: with-only
+  - name: extension-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?authoring-claude-extensions"'
+    min: 0
+    max: 0

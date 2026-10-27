@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: a11y-neither-on-unrelated
+description: A Playwright E2E request with no accessibility angle must fire neither a11y skill.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-testing", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Write a Playwright end-to-end test for our login flow: a user enters valid credentials on /login, submits the form, and lands on the dashboard with their name in the header.
+    Add a second test for the wrong-password error message.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: audit-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-accessibility"'
+    min: 0
+    max: 0
+  - name: ensure-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-accessibility"'
+    min: 0
+    max: 0

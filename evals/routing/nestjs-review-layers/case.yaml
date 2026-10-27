@@ -1,0 +1,47 @@
+schema_version: "1.1"
+name: nestjs-review-layers
+description: A pre-merge review of a NestJS change must load both layers, the discipline's reviewing-code and the stack's implementing-nestjs-api, and not start implementation.
+# Quarantined 2026-10-09: neither skill loads in 6 of 6 runs on claude-sonnet-5-5; Claude
+# reviews the pasted diff directly. Pointing at a PR instead made Claude look for it first
+# (reviewing-code 2 of 6, implementing-nestjs-api 0 of 6). Restore the routing tag once the
+# reviewing-code and implementing-nestjs-api descriptions bring both in for a pasted change.
+tags: [known-failure, cross-plugin, layered]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Review this change to our NestJS service before we merge it. This is the whole diff:
+
+    ```ts
+    @CommandHandler(CancelOrderCommand)
+    export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
+      constructor(@InjectRepository(Order) private readonly orders: Repository<Order>) {}
+
+      async execute({ orderId }: CancelOrderCommand) {
+        const order = await this.orders.findOneByOrFail({ id: orderId });
+        order.status = 'cancelled';
+        await this.orders.save(order);
+      }
+    }
+    ```
+
+    Is it ready to merge?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: nestjs-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0

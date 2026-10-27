@@ -376,7 +376,12 @@ Test against the working tree without installing anything:
 ```shell
 claude --plugin-dir ./plugins/tsh-product-testing
 claude plugin validate ./plugins/tsh-product-testing
+python3 scripts/lint-descriptions.py      # flags skills whose descriptions read alike
 ```
+
+If you changed a skill or agent description, also run the routing evals. They spend
+API budget on your account, about USD 0.12 per case. How to run both checks and read
+their output, and when CI runs them: [`evals/README.md`](evals/README.md).
 
 ## License
 

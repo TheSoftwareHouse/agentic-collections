@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: ui-review-not-standard
+description: A request to check a page against its Figma design must route to reviewing-ui, not the verifying-ui judging standard.
+# Quarantined 2026-10-07: routes to verifying-ui in 5 of 6 runs on claude-sonnet-5-5.
+# Remove the known-failure tag and restore routing once the reviewing-ui / verifying-ui
+# descriptions are disambiguated in tsh-product-engineering.
+tags: [known-failure]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    I just finished the new pricing page at http://localhost:5173/pricing. Does it match the Figma design at https://www.figma.com/design/AbC123/Pricing?node-id=12-34?
+    Check it and tell me what differs.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: reviewing-ui-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-ui"'
+    arm: with-only
+  - name: verifying-ui-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?verifying-ui"'
+    min: 0
+    max: 0

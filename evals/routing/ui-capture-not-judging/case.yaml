@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: ui-capture-not-judging
+description: A request to collect UI evidence without comparing it must load capturing-ui-evidence or delegate to ui-capture-worker, which runs it, and must not load the verifying-ui judging standard.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Collect the evidence for iteration 2 of the pricing page check: a full-page screenshot, the computed styles and an accessibility snapshot of http://localhost:5173/pricing, saved into the iteration artifact directory.
+    Don't compare anything against Figma yet; that's a separate step.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  # A regex over the trace, because the right answer is either the Skill call or the
+  # Agent call that delegates to the agent running it; tool_used checks one tool only.
+  - name: capture-fired
+    type: regex
+    target: trace
+    pattern: '(?:\\?"skill\\?"\s*:\s*\\?"(?:[\w-]+:)?capturing-ui-evidence\\?")|(?:\\?"subagent_type\\?"\s*:\s*\\?"(?:[\w-]+:)?ui-capture-worker\\?")'
+  - name: judging-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?verifying-ui"'
+    min: 0
+    max: 0
