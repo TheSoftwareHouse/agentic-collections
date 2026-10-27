@@ -54,14 +54,17 @@ graders: [...]
   for "the files each task touches", makes Claude search before it loads a skill, and the
   turn cap ends the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in
   6 once its prompt stopped pointing at an existing plan.
-- **Don't paste the whole answer's input either.** Given a short snippet to review,
-  Claude answered directly without loading any skill in 6 of 6 runs
-  (`nestjs-review-layers`). That is a finding about the descriptions, so the case is
-  quarantined rather than reworded around it.
+- **A pasted snippet can pull Claude into answering directly.** Given a whole diff to
+  review, Claude answered without loading any skill in 6 of 6 runs
+  (`nestjs-review-layers`) until the `reviewing-code` and `implementing-nestjs-api`
+  descriptions were sharpened to claim a pasted-diff review. Treat it as a finding about
+  the descriptions first — sharpen them before deciding the prompt is at fault, and
+  quarantine only if they genuinely cannot diverge.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
-  `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one;
-  `claude-extension-not-context` loses to `update-config`. A failing must-fire grader with
-  no sibling fired is the sign.
+  `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one,
+  and sometimes the built-in is the right owner: `update-config` owns settings.json hooks,
+  so `claude-extension-not-context` was retargeted to an authoring request rather than made
+  to fight it. A failing must-fire grader with no sibling fired is the sign.
 - **A grader sees subagent tool calls.** When Claude delegates to an agent that loads the
   skill itself, the Skill call still counts, but the turn cap does not bound the
   subagent. Avoid prompts whose natural answer is delegation; a `tool_used` grader cannot
