@@ -239,6 +239,6 @@ case or reword its prompt until it passes.
 To lift a quarantine, fix the plugin, [measure the case](#measure-one-case) until
 it passes 6 of 6, then restore the `routing` tag and remove its row here.
 
-None are quarantined right now. When one is, list it here with what was observed
-and where its fix lives, in a table with `Case`, `Observed` and `Fix lives in`
-columns.
+| Case | Observed | Fix lives in |
+| :-- | :-- | :-- |
+| `nestjs-review-layers` | After sharpening both descriptions, a pre-merge review of a pasted NestJS diff loads `reviewing-code` in 6 of 6 runs but `implementing-nestjs-api` in only 2 of 6 — the stack layer drops once the discipline skill is chosen | `tsh-stack-nodejs`: the `implementing-nestjs-api` description, so it co-fires with `reviewing-code` on a pasted NestJS change |

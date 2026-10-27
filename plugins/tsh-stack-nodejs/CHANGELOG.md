@@ -18,12 +18,13 @@ alone reaches nobody.
 
 ### Changed
 
-- **`implementing-nestjs-api` now routes on a review request, not only implementation.**
-  Review was buried in the description behind the implementation verbs, so a pre-merge
-  review of a pasted NestJS change did not pull in the stack layer alongside the
-  discipline's code review. The description now names reviewing a NestJS change — a
-  command or query handler, module, TypeORM repository, or DTO — as a first-class
-  trigger.
+- **`implementing-nestjs-api` now names reviewing a NestJS change as a trigger, not only
+  implementation.** Review was buried in the description behind the implementation verbs.
+  It now names reviewing a NestJS change — a command or query handler, module, TypeORM
+  repository, or DTO — for framework, CQRS and persistence risks, so a review request is
+  likelier to load the stack guidance. (Co-firing it with the discipline's code review on
+  a single pasted diff is still unreliable — 2 of 6 — so that layered case stays tracked
+  in the routing suite.)
 
 ## [0.1.1] - 2026-10-02
 

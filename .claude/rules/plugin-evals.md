@@ -54,12 +54,14 @@ graders: [...]
   for "the files each task touches", makes Claude search before it loads a skill, and the
   turn cap ends the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in
   6 once its prompt stopped pointing at an existing plan.
-- **A pasted snippet can pull Claude into answering directly.** Given a whole diff to
-  review, Claude answered without loading any skill in 6 of 6 runs
-  (`nestjs-review-layers`) until the `reviewing-code` and `implementing-nestjs-api`
-  descriptions were sharpened to claim a pasted-diff review. Treat it as a finding about
-  the descriptions first — sharpen them before deciding the prompt is at fault, and
-  quarantine only if they genuinely cannot diverge.
+- **A pasted snippet can pull Claude into answering directly, and a layered case must win
+  twice.** Given a whole diff to review, Claude first answered without loading any skill
+  (`nestjs-review-layers`). Sharpening `reviewing-code` to claim a pasted-diff review fixed
+  the discipline layer — it now fires 6 of 6 — but the stack layer `implementing-nestjs-api`
+  still co-fires only 2 of 6: once Claude picks one skill it rarely loads a second on the
+  same turn. The case stays quarantined on the stack layer. Treat a non-firing skill as a
+  description finding first, but know that co-firing two skills on turn one is the harder
+  half.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
   `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one,
   and sometimes the built-in is the right owner: `update-config` owns settings.json hooks,

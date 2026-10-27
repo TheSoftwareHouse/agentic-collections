@@ -24,6 +24,7 @@
     "tsh-product-management:writing-project-knowledge",
     "tsh-product-testing:writing-playwright-e2e-tests",
     "tsh-stack-azure:auditing-azure-cost",
+    "tsh-stack-nodejs:implementing-nestjs-api",
     "tsh-stack-azure:implementing-azure-terraform",
     "tsh-stack-frontend:implementing-frontend",
     "tsh-stack-gcp:auditing-gcp-cost",
