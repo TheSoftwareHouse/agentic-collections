@@ -239,6 +239,13 @@ case or reword its prompt until it passes.
 To lift a quarantine, fix the plugin, [measure the case](#measure-one-case) until
 it passes 6 of 6, then restore the `routing` tag and remove its row here.
 
+One exception: when the measurement shows that a Claude Code built-in skill is the
+right owner of the request, the plugin skill should not win it. Narrow that skill's
+description so it stops claiming the request, keep the original prompt as a negative
+control that asserts the plugin's skills stay out, and give the skill a must-fire
+case around a request it does own. `claude-hook-neither-on-settings` and
+`claude-extension-not-context` are the worked pair.
+
 | Case | Observed | Fix lives in |
 | :-- | :-- | :-- |
 | `nestjs-review-layers` | After sharpening both descriptions, a pre-merge review of a pasted NestJS diff loads `reviewing-code` in 6 of 6 runs but `implementing-nestjs-api` in only 2 of 6 — the stack layer drops once the discipline skill is chosen | `tsh-stack-nodejs`: the `implementing-nestjs-api` description, so it co-fires with `reviewing-code` on a pasted NestJS change |

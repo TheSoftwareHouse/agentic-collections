@@ -64,9 +64,12 @@ graders: [...]
   half.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
   `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one,
-  and sometimes the built-in is the right owner: `update-config` owns settings.json hooks,
-  so `claude-extension-not-context` was retargeted to an authoring request rather than made
-  to fight it. A failing must-fire grader with no sibling fired is the sign.
+  and sometimes the built-in is the right owner: `update-config` owns a one-off
+  settings.json hook and beat `authoring-claude-extensions` 15 of 15 times on one. The
+  description stopped claiming "do X automatically", the losing prompt became the
+  negative control `claude-hook-neither-on-settings`, and `claude-extension-not-context`
+  moved to a request the skill does own. A failing must-fire grader with no sibling
+  fired is the sign.
 - **A grader sees subagent tool calls.** When Claude delegates to an agent that loads the
   skill itself, the Skill call still counts, but the turn cap does not bound the
   subagent. Avoid prompts whose natural answer is delegation; a `tool_used` grader cannot
@@ -164,6 +167,12 @@ Expected stderr, not a failure: the Playwright and Context7 mocks were not start
   quarantined:** re-tag `routing` to `known-failure`, add a comment saying why, and list
   it in the Known failures table of `evals/README.md`. Never delete the case or reword
   its prompt until it passes. When the plugin is fixed, restore the `routing` tag.
+  The one exception: when the measurement shows a Claude Code built-in is the right
+  owner of the request, the plugin should not win. Then narrow the skill's description
+  so it stops claiming that request, keep the original prompt as a negative control
+  asserting the plugin's skills stay out, and write the must-fire case around a request
+  the skill does own — `claude-hook-neither-on-settings` and
+  `claude-extension-not-context` are that pair.
 - **Never commit `results/`.** `evals/results/` and `plugins/*/evals/results/` are
   gitignored.
 
