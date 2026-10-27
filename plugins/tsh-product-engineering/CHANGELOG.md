@@ -12,6 +12,18 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.1] - 2026-10-27
+
+### Changed
+
+- **`verifying-ui` no longer auto-loads from the main conversation.** It is the
+  judging standard the `ui-reviewer` agent applies, not a request a user makes
+  directly, yet its description competed with `reviewing-ui`, and a "does this page
+  match the Figma design?" request loaded the standard instead of the pass that runs
+  it. Marking it `disable-model-invocation: true` leaves it reachable where it is
+  actually used — preloaded into `ui-reviewer` — and lets such requests route to
+  `reviewing-ui`.
+
 ## [0.8.0] - 2026-10-07
 
 ### Added

@@ -1,10 +1,7 @@
 schema_version: "1.1"
 name: ui-review-not-standard
-description: A request to check a page against its Figma design must route to reviewing-ui, not the verifying-ui judging standard.
-# Quarantined 2026-10-07: routes to verifying-ui in 5 of 6 runs on claude-sonnet-5-5.
-# Remove the known-failure tag and restore routing once the reviewing-ui / verifying-ui
-# descriptions are disambiguated in tsh-product-engineering.
-tags: [known-failure]
+description: A request to check a page against its Figma design must route to reviewing-ui, which runs the full compare pass, not stop at capturing-ui-evidence.
+tags: [routing]
 plugins: ["../../../plugins/tsh-product-engineering"]
 runs: 1
 execution:
@@ -19,9 +16,9 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-ui"'
     arm: with-only
-  - name: verifying-ui-not-fired
+  - name: capturing-ui-evidence-not-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?verifying-ui"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-ui-evidence"'
     min: 0
     max: 0
