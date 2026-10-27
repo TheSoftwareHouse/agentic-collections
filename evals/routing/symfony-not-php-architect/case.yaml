@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: symfony-not-php-architect
+description: A Messenger transport and retry configuration request in a Symfony 6.4 app must route to implementing-symfony-applications, not architecting-php-code.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-php"]
+runs: 1
+execution:
+  prompt: |
+    In our Symfony 6.4 app the OrderPlaced message is still handled synchronously.
+    Route it to an async transport backed by Doctrine and retry it 3 times with an increasing delay before it lands in a failed transport. Set this up in config/packages/messenger.yaml.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: symfony-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-symfony-applications"'
+    arm: with-only
+  - name: architect-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?architecting-php-code"'
+    min: 0
+    max: 0
