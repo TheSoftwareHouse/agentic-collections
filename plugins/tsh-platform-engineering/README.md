@@ -97,6 +97,11 @@ via `${CLAUDE_PLUGIN_ROOT}`. It detects the CI platform, IaC dialect, cloud prov
 pinned versions, policy and secrets tooling, and GitOps controller — so that detection
 logic lives in one place rather than being duplicated across seven skills.
 
+## Release notes
+
+See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Teammates
+receive updates by running `/plugin update`.
+
 ## Contributing
 
 Add an agent as `agents/<agent-name>.md`, a skill as `skills/<skill-name>/SKILL.md`.
