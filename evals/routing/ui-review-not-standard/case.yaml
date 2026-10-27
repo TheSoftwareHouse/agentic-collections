@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: ui-review-not-standard
-description: A request to check a page against its Figma design must route to reviewing-ui, which runs the full compare pass, not stop at capturing-ui-evidence.
+description: A request to check a page against its Figma design must route to reviewing-ui, which runs the full compare pass — not stop at capturing-ui-evidence, its nearest sibling, and not go to reviewing-code, the other "is this good enough" request in the plugin.
 tags: [routing]
 plugins: ["../../../plugins/tsh-product-engineering"]
 runs: 1
@@ -20,5 +20,11 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-ui-evidence"'
+    min: 0
+    max: 0
+  - name: reviewing-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
     min: 0
     max: 0
