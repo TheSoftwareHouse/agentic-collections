@@ -12,6 +12,17 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.3] - 2026-10-27
+
+### Changed
+
+- **`debugging-code` now claims the investigation, so it loads before Claude reads or
+  searches the code.** A vague regression report ("it worked yesterday") loaded the
+  skill most of the time, but on a stack trace naming files Claude read those files
+  first and never routed to it. The description now says to load it before reading,
+  searching, or editing — locating the cause is the skill's own first step — rather
+  than only "before editing anything".
+
 ## [0.8.2] - 2026-10-27
 
 ### Changed
