@@ -239,6 +239,6 @@ case or reword its prompt until it passes.
 To lift a quarantine, fix the plugin, [measure the case](#measure-one-case) until
 it passes 6 of 6, then restore the `routing` tag and remove its row here.
 
-| Case | Observed | Fix lives in |
-| :-- | :-- | :-- |
-| `claude-extension-not-context` | A request to run prettier automatically after every edit loads Claude Code's built-in `update-config` instead of `authoring-claude-extensions` in 15 of 15 runs | `tsh-core`: decide whether `authoring-claude-extensions` claims hook requests, then reword its description or the case's expectation |
+None are quarantined right now. When one is, list it here with what was observed
+and where its fix lives, in a table with `Case`, `Observed` and `Fix lives in`
+columns.
