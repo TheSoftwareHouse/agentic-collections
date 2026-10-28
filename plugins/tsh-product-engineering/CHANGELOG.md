@@ -12,6 +12,47 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.3] - 2026-10-27
+
+### Changed
+
+- **`debugging-code` now claims the investigation, so it loads before Claude reads or
+  searches the code.** Its description said to load it "before editing anything",
+  which left reading and searching outside the claim: on a regression report with no
+  known cause, Claude sometimes searched the code first and never routed to it (5 of
+  6 runs; 6 of 6 after this change). The description now says to load it before
+  reading, searching, or editing — locating the cause is the skill's own first step.
+  A report that names files in a stack trace was not re-measured and may still pull
+  Claude into reading those files first.
+
+## [0.8.2] - 2026-10-27
+
+### Changed
+
+- **`reviewing-code` now routes on a pasted diff, not only a branch or PR.** Its
+  description ended on "with its suites actually run, not read as a diff" — an
+  anti-trigger: a "review this NestJS change before we merge" request with the diff
+  pasted inline loaded no review skill and Claude reviewed it directly. The description
+  now names a pasted diff as a valid review target and frames suite execution as
+  running "when they are available"; the MUST rule to actually run the suites is
+  unchanged.
+
+## [0.8.1] - 2026-10-27
+
+### Changed
+
+- **`verifying-ui` no longer auto-loads from the main conversation.** It is the
+  judging standard the `ui-reviewer` agent applies, not a request a user makes
+  directly, yet its description competed with `reviewing-ui`, and a "does this page
+  match the Figma design?" request loaded the standard instead of the pass that runs
+  it. Marking it `disable-model-invocation: true` leaves it reachable where it is
+  actually used — preloaded into `ui-reviewer` — and lets such requests route to
+  `reviewing-ui`. The places that pointed at it as something to load —
+  `reviewing-ui`'s reference table, `capturing-ui-evidence`'s routing text and
+  related-skills list, `orchestrating-feature-implementation` — now say it is read
+  as a file or applied by `ui-reviewer`, and the README no longer lists it as
+  model-invoked.
+
 ## [0.8.0] - 2026-10-07
 
 ### Added

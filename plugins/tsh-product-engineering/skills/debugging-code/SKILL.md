@@ -1,6 +1,6 @@
 ---
 name: debugging-code
-description: "Finds and fixes the root cause of a bug: pins the symptom, reproduces it, secures a failing test — existing, corrected or new — narrows to the cause with evidence rather than plausibility, measures how far the fix reaches before applying it minimally, and keeps the test as a regression guard. Use when code behaves wrongly and the cause is not yet known — before editing anything."
+description: "Finds and fixes the root cause of a bug: pins the symptom, reproduces it, secures a failing test — existing, corrected or new — narrows to the cause with evidence rather than plausibility, measures how far the fix reaches before applying it minimally, and keeps the test as a regression guard. Use when code behaves wrongly and the cause is not yet known — load it before reading, searching, or editing the code, because locating the cause is this skill's own first step, not something to do before it."
 when_to_use: "Trigger on: 'fix this bug', 'why does this fail', 'this throws', a pasted stack trace or error log, a test that started failing, a regression after a merge, deploy or dependency upgrade, 'it worked yesterday', a production error that needs a code fix, or a bug ticket. Building new behaviour is orchestrating-feature-implementation; judging a finished fix is reviewing-code."
 ---
 

@@ -14,6 +14,22 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.2] - 2026-10-27
+
+### Changed
+
+- **`authoring-claude-extensions` no longer claims "make Claude do X automatically"
+  or "this should happen every time".** Those are the phrases Claude Code's built-in
+  `update-config` skill routes on, and it is the right owner of a one-off hook in a
+  repository's `settings.json`: measured on `claude-sonnet-5-5`, "run prettier every
+  time Claude edits a TypeScript file" went to the built-in in 15 of 15 runs, so the
+  claim could never win and only muddied the choice. The description now routes on
+  what this skill actually owns — building a skill, subagent or plugin, a hook that
+  ships inside a plugin or must reach a second repository, a workflow pasted into
+  chat repeatedly, a setup shared across repositories — and says outright that a
+  single hook in this repository's `settings.json` is Claude Code configuration. The
+  skill body still decides between a hook and the other primitives when asked.
+
 ## [0.10.1] - 2026-10-02
 
 ### Fixed

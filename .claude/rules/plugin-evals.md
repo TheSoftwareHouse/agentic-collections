@@ -54,14 +54,22 @@ graders: [...]
   for "the files each task touches", makes Claude search before it loads a skill, and the
   turn cap ends the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in
   6 once its prompt stopped pointing at an existing plan.
-- **Don't paste the whole answer's input either.** Given a short snippet to review,
-  Claude answered directly without loading any skill in 6 of 6 runs
-  (`nestjs-review-layers`). That is a finding about the descriptions, so the case is
-  quarantined rather than reworded around it.
+- **A pasted snippet can pull Claude into answering directly, and a layered case must win
+  twice.** Given a whole diff to review, Claude first answered without loading any skill
+  (`nestjs-review-layers`). Sharpening `reviewing-code` to claim a pasted-diff review fixed
+  the discipline layer — it now fires 6 of 6 — but the stack layer `implementing-nestjs-api`
+  still co-fires only 2 of 6: once Claude picks one skill it rarely loads a second on the
+  same turn. The case stays quarantined on the stack layer. Treat a non-firing skill as a
+  description finding first, but know that co-firing two skills on turn one is the harder
+  half.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
-  `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one;
-  `claude-extension-not-context` loses to `update-config`. A failing must-fire grader with
-  no sibling fired is the sign.
+  `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one,
+  and sometimes the built-in is the right owner: `update-config` owns a one-off
+  settings.json hook and beat `authoring-claude-extensions` 15 of 15 times on one. The
+  description stopped claiming "do X automatically", the losing prompt became the
+  negative control `claude-hook-neither-on-settings`, and `claude-extension-not-context`
+  moved to a request the skill does own. A failing must-fire grader with no sibling
+  fired is the sign.
 - **A grader sees subagent tool calls.** When Claude delegates to an agent that loads the
   skill itself, the Skill call still counts, but the turn cap does not bound the
   subagent. Avoid prompts whose natural answer is delegation; a `tool_used` grader cannot
@@ -159,6 +167,12 @@ Expected stderr, not a failure: the Playwright and Context7 mocks were not start
   quarantined:** re-tag `routing` to `known-failure`, add a comment saying why, and list
   it in the Known failures table of `evals/README.md`. Never delete the case or reword
   its prompt until it passes. When the plugin is fixed, restore the `routing` tag.
+  The one exception: when the measurement shows a Claude Code built-in is the right
+  owner of the request, the plugin should not win. Then narrow the skill's description
+  so it stops claiming that request, keep the original prompt as a negative control
+  asserting the plugin's skills stay out, and write the must-fire case around a request
+  the skill does own — `claude-hook-neither-on-settings` and
+  `claude-extension-not-context` are that pair.
 - **Never commit `results/`.** `evals/results/` and `plugins/*/evals/results/` are
   gitignored.
 

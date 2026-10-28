@@ -1,10 +1,7 @@
 schema_version: "1.1"
 name: terraform-module-layers
 description: Writing a reusable Terraform module for an AWS resource must load both layers, the discipline's implementing-terraform-modules and the stack's implementing-aws-terraform, and not the AWS cost audit.
-# Quarantined 2026-10-09: both skills load in 5 of 6 runs on claude-sonnet-5-5; in the
-# sixth only implementing-aws-terraform does. Restore the routing tag once
-# implementing-terraform-modules is loaded alongside the cloud's own skill every time.
-tags: [known-failure, cross-plugin, layered]
+tags: [routing, cross-plugin, layered]
 plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-aws"]
 runs: 1
 execution:

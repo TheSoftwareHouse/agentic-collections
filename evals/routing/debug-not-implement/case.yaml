@@ -1,11 +1,7 @@
 schema_version: "1.1"
 name: debug-not-implement
 description: A regression with no known cause must route to debugging-code, not orchestrating-feature-implementation.
-# Quarantined 2026-10-09: debugging-code loads first in 5 of 6 runs on claude-sonnet-5-5;
-# in the sixth Claude searches the code before loading any skill. Worded as a ticket it
-# loads in 1 of 6, and with a stack trace naming files in 0 of 6: Claude reads the files
-# first. Restore the routing tag once debugging-code is loaded before reading or searching.
-tags: [known-failure]
+tags: [routing]
 plugins: ["../../../plugins/tsh-product-engineering"]
 runs: 1
 execution:
