@@ -47,12 +47,6 @@ function replaceOnce(text, oldString, newString, all) {
 function resultOf(tool, input, current) {
   if (tool === "Write") return input.content ?? "";
   if (tool === "Edit") return replaceOnce(current, input.old_string ?? "", input.new_string ?? "", input.replace_all);
-  if (tool === "MultiEdit") {
-    return (input.edits ?? []).reduce(
-      (text, e) => replaceOnce(text, e.old_string ?? "", e.new_string ?? "", e.replace_all),
-      current
-    );
-  }
   return null;
 }
 

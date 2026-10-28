@@ -202,7 +202,7 @@ python3 -m unittest discover -s scripts/tests
 
 | Workflow | Trigger | Does |
 | :-- | :-- | :-- |
-| `.github/workflows/quality.yml` | every pull request, and pushes to `main` | runs the script unit tests, the lint and the case check with `--github`, and `claude plugin validate` on the catalog and each plugin |
+| `.github/workflows/quality.yml` | every pull request, and pushes to `main` | runs the script unit tests, the lint and the case check with `--github`, `claude plugin validate` on the catalog and each plugin, and the project-context contract tests and init smoke test on Python 3.9 and 3.x (`.claude/rules/project-context-contract.md`) |
 | `.github/workflows/plugin-evals.yml` | pull requests touching `plugins/**`, `evals/**` or the workflow itself | runs the suite command above; uploads `evals/results/` as the `routing-eval-results` artifact |
 
 The eval workflow needs the `ANTHROPIC_API_KEY` repository secret. Without it — on

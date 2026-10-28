@@ -13,6 +13,7 @@ environment. Where a URL must be reachable (wiring in commit mode checks it with
 
 Not covered here, by decision: the sync's pull, the write worktree's push and the
 first push of a new knowledge base — checked by review and by hand on a real host.
+Their refusals are covered, because each is decided before any network call.
 """
 
 import json
@@ -28,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PLUGIN = ROOT / "plugins" / "tsh-product-management"
 LOCATE = PLUGIN / "shared" / "locate_project_context.py"
 GUARD = PLUGIN / "hooks" / "guard-project-context-block.mjs"
+WRITE = PLUGIN / "shared" / "write_worktree.py"
 INIT = PLUGIN / "skills" / "initializing-project-context" / "scripts"
 SCAFFOLD, WIRE, GITSTEPS = INIT / "scaffold.py", INIT / "wire_repos.py", INIT / "context_repo_git.py"
 BLOCK = ("<!-- tsh:project-context START — DO NOT REMOVE. -->\nProject knowledge base: {url}.\n"
@@ -388,6 +390,111 @@ class Init(InitHelpers):
         self.assertNotIn("secret.txt", self.git(kb, "ls-files"))
 
 
+    def test_first_commit_carries_the_knowledge_bases_own_wiring(self):
+        """The order N3 runs: --self before the first commit, so teammates get it and the
+        lead's clone has no untracked file that would later block a pull."""
+        self.w.mkdir()
+        kb = self.scaffold("--catalog-dir", self.w)
+        self.assertEqual(self.py(WIRE, "--kb", kb, "--slug", "acme", "--self")[0], 0)
+        self.assertEqual(self.py(GITSTEPS, "init", kb)[0], 0)
+        self.assertEqual(self.git(kb, "status", "--porcelain"), "", "nothing left outside the first commit")
+        committed = json.loads(self.git(kb, "show", "HEAD:.claude/settings.json"))
+        self.assertEqual(committed["extraKnownMarketplaces"]["acme-context"]["source"],
+                         {"source": "directory", "path": "."}, "the same on every machine")
+        self.py(WIRE, "--kb", kb, "--slug", "acme", "--self", "--commit", self.bare_repo(self.w / "acme-api"))
+        self.assertEqual(self.git(kb, "status", "--porcelain"), "", "N5 re-wiring leaves the clone clean")
+
+
+class WriteWorktree(InitHelpers):
+    """Every git step of a write needs its own --yes, and each refusal below is decided
+    before any network call — no test here fetches or pushes."""
+
+    def setUp(self):
+        super().setUp()
+        self.w.mkdir()
+        self.kb = self.scaffold("--catalog-dir", self.w)
+        self.py(WIRE, "--kb", self.kb, "--slug", "acme", "--self")
+        self.py(GITSTEPS, "init", self.kb)
+
+    def worktree(self, branch, repo=None):
+        """What `start --yes` leaves, made with plain git so no fetch is needed."""
+        repo = repo or self.kb
+        path = repo.parent / f"{repo.name}-worktrees" / branch.replace("/", "-")
+        self.git(repo, "worktree", "add", "-q", "-b", branch, str(path))
+        self.git(repo, "config", f"branch.{branch}.tshContextWrite", "true")
+        return path
+
+    def test_start_refuses_without_a_confirmed_proposal(self):
+        self.assertEqual(self.py(WRITE, "start", self.kb, "Bad Name")[0], 2)
+        self.assertEqual(self.py(WRITE, "start", self.kb, "docs/x", "--yes")[0], 2, "--yes needs --at")
+        self.assertEqual(self.py(WRITE, "start", self.kb, "docs/x")[0], 3, "no remote: the exception")
+        self.assertEqual(self.py(WRITE, "start", self.kb / "docs", "docs/x")[0], 2, "a subfolder of the clone")
+        api = self.bare_repo(self.w / "acme-api")
+        self.assertEqual(self.py(WRITE, "start", api, "docs/x")[0], 2, "a code repository")
+        self.assertFalse((self.w / "acme-context-worktrees").exists())
+        self.assertFalse((self.w / "acme-api-worktrees").exists())
+
+    def test_commit_needs_a_yes_and_never_lands_in_a_published_clone(self):
+        (self.kb / "docs" / "note.md").write_text("# Note\n")
+        self.assertEqual(self.py(WRITE, "commit", self.kb, "--message", "docs: note")[0], 2, "no yes")
+        self.assertEqual(self.py(WRITE, "commit", self.kb, "--message", "docs: note", "--yes")[0], 0,
+                         "no remote yet: the knowledge base itself, after a yes")
+        self.assertEqual(self.py(WRITE, "commit", self.kb, "--message", "again", "--yes")[0], 2, "nothing to commit")
+        self.git(self.kb, "remote", "add", "origin", str(self.tmp / "nowhere.git"))
+        (self.kb / "docs" / "other.md").write_text("# Other\n")
+        self.assertEqual(self.py(WRITE, "commit", self.kb, "--message", "docs: other", "--yes")[0], 2,
+                         "a clone with a remote is the person's own: never committed to")
+
+    def test_write_worktree_commits_and_push_refusals(self):
+        w = self.worktree("docs/release-day")
+        (w / "docs" / "release.md").write_text("# Release\n")
+        code, out, _ = self.py(WRITE, "commit", w, "--message", "docs: release day", "--yes")
+        self.assertEqual(code, 0)
+        self.assertIn("docs: release day", out)
+        self.assertEqual(self.py(WRITE, "push", w)[0], 2, "no yes")
+        self.assertEqual(self.py(WRITE, "push", self.kb, "--yes")[0], 2, "the person's clone")
+        (w / "docs" / "draft.md").write_text("# Draft\n")
+        self.assertEqual(self.py(WRITE, "push", w, "--yes")[0], 2, "uncommitted changes")
+        self.assertEqual(self.py(WRITE, "push", self.worktree("develop"), "--yes")[0], 2, "a default branch")
+        stray = self.kb.parent / "elsewhere"
+        self.git(self.kb, "worktree", "add", "-q", "-b", "docs/stray", str(stray))
+        self.assertEqual(self.py(WRITE, "push", stray, "--yes")[0], 2, "not a write worktree")
+
+    def test_a_worktree_of_another_repository_is_never_committed_or_pushed(self):
+        api = self.bare_repo(self.w / "acme-api")
+        (api / "README.md").write_text("code\n")
+        self.git(api, "add", "README.md")
+        self.git(api, "commit", "-qm", "code")
+        theirs = self.worktree("feature/x", repo=api)
+        (theirs / "secret.env").write_text("TOKEN=1\n")
+        self.assertEqual(self.py(WRITE, "commit", theirs, "--message", "oops", "--yes")[0], 2)
+        self.assertEqual(self.py(WRITE, "push", theirs, "--yes")[0], 2)
+        unmarked = self.kb.parent / f"{self.kb.name}-worktrees" / "docs-unmarked"
+        self.git(self.kb, "worktree", "add", "-q", "-b", "docs/unmarked", str(unmarked))
+        (unmarked / "docs" / "x.md").write_text("# X\n")
+        self.assertEqual(self.py(WRITE, "commit", unmarked, "--message", "x", "--yes")[0], 2,
+                         "a worktree `start` did not make")
+
+    def test_a_missing_message_never_swallows_the_yes(self):
+        w = self.worktree("docs/msg")
+        (w / "docs" / "m.md").write_text("# M\n")
+        self.assertEqual(self.py(WRITE, "commit", w, "--message", "--yes")[0], 2)
+        self.assertEqual(self.py(WRITE, "commit", w, "--yes", "--message")[0], 2)
+        self.assertEqual(self.git(w, "rev-parse", "HEAD"), self.git(self.kb, "rev-parse", "HEAD"), "nothing committed")
+
+
+class SyncMessages(unittest.TestCase):
+    def test_a_failed_pull_names_its_cause(self):
+        sys.path.insert(0, str(PLUGIN / "shared"))
+        from sync_project_context import pull_warning
+        code, message = pull_warning("error: The following untracked working tree files would be overwritten "
+                                     "by merge:\n\t.claude/settings.json\nAborting")
+        self.assertEqual(code, "blocked")
+        self.assertIn(".claude/settings.json", message)
+        self.assertEqual(pull_warning("fatal: Not possible to fast-forward, aborting.")[0], "diverged")
+        self.assertEqual(pull_warning("ssh: connect to host bitbucket.org: timed out")[0], "offline")
+
+
 class Checkers(InitHelpers):
     def setUp(self):
         super().setUp()
@@ -449,10 +556,10 @@ class Hook(Base):
     def test_rewrite_that_keeps_the_block_allowed(self):
         self.assertEqual(self.guard("Write", self.md, content="# Short\n\n" + self.block), "allow")
 
-    def test_local_file_and_multiedit(self):
+    def test_local_file(self):
         local = self.w / "CLAUDE.local.md"
         local.write_text(self.block)
-        self.assertEqual(self.guard("MultiEdit", local, edits=[{"old_string": "START", "new_string": "S"}]), "deny")
+        self.assertEqual(self.guard("Edit", local, old_string="START", new_string="S"), "deny")
 
     def test_files_without_the_block_allowed(self):
         (self.w / "sub").mkdir()

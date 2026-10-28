@@ -91,7 +91,7 @@ check_links ✔ · check_tables ✔ · check_decisions ✔ · check_plugin ✔ �
 **This session will not show the plugin — its skill list was loaded before the plugin existed. Open a new one** in `<slug>-context` or in a connected repository. Then `/tsh-product-management:navigating-project-context`. Teammates accept the trust dialog once on their first session; for a client's repository each runs *Attach repository* once.
 
 ## Still to do
-<Only what applies:> Publish: <pushed to URL | "not published — only you can see it; Add URL when the empty repository exists" | the printed commands> · Commit the commit-mode files in each connected repository · Protect the default branch on the git host · Assign owners marked TBD before the first real content lands
+<Only what applies:> Publish: <pushed to URL | "not published — only you can see it; Add URL when the empty repository exists" | the printed commands> · Commit the commit-mode files in each connected repository · Protect the default branch on the git host · Enable Pipelines in the repository settings (Bitbucket) so `bitbucket-pipelines.yml` runs · Assign owners marked TBD before the first real content lands
 ```
 
 The **Try it now** opening sentence is binding: without it, a `/plugin list` in the

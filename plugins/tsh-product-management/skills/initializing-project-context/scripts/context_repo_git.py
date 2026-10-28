@@ -37,6 +37,8 @@ def git(kb, *args, timeout=60):
         return r.returncode, r.stdout.strip(), r.stderr.strip()
     except subprocess.TimeoutExpired:
         return 124, "", f"timed out after {timeout}s"
+    except OSError as e:
+        return 1, "", str(e)
 
 
 def fail(code, msg):

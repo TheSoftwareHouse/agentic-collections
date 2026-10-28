@@ -58,9 +58,9 @@ repository on the git host.
 **Changing something — no git needed.** Open the file in the git host's web page,
 click *Edit*, describe the change. The host turns it into a *pull request*: a proposed
 change the area's owner reviews and approves. Or ask the assistant ("write down that
-we moved the release to Friday"): it prepares the change separately, shows it to you,
-and asks before sending it. Either way, the change reaches everyone once the owner
-approves it.
+we moved the release to Friday"): it asks before it starts, prepares the change in a
+separate folder, shows it to you, and asks again before saving it and before sending
+it. Either way, the change reaches everyone once the owner approves it.
 
 **Messages you may see.**
 
@@ -68,7 +68,8 @@ approves it.
 | :-- | :-- | :-- |
 | "Read from your branch / your unsaved changes" | Your copy holds a draft, not the approved version | Fine for your own drafts; for facts, ask the owner or finish the change |
 | "Could not reach the server" | No network, VPN or access | Check access; the answer may be out of date |
-| "History on the server differs" | Someone rewrote the main version | Let the assistant make a fresh copy |
+| "History on the server differs" | Someone rewrote the main version | Say yes when the assistant offers a fresh copy; your old copy stays as it is |
+| "A file blocks the update" | A file in your copy is in the way of the new version | Move that file away; the next question updates your copy |
 | "Exists only on this machine" | The project has no address on the git host yet | Ask the repository owner to publish it |
 | "The project knowledge base skill is unavailable" | The assistant's plugin is not installed | Ask your lead, or run the init skill's *Attach repository* |
 
@@ -107,9 +108,9 @@ stashes, resets or switches branches.
 
 **Writing.** `writing-project-knowledge`, `adding-project-context-workspace` and
 `repairing-project-context-links` write in a separate worktree, on a new branch from the
-approved version, beside your clone — never in your clone. They commit, ask before
-pushing that branch, and leave the pull request to you. Nothing is ever pushed to the
-default branch. Decision records go to `docs/decisions/` here through
+approved version, beside your clone — never in your clone. Creating the branch,
+committing and pushing it each wait for their own yes, and the pull request is left to
+you. Nothing is ever pushed to the default branch. Decision records go to `docs/decisions/` here through
 `/tsh-core:managing-decision-records`, never into a code repository.
 
 **The shared plugin.** `.claude-plugin/marketplace.json` publishes

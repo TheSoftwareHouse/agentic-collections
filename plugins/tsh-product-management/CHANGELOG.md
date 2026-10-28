@@ -12,7 +12,7 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
-## [0.5.0] - 2026-10-23
+## [0.5.0] - 2026-10-28
 
 ### Added
 
@@ -23,17 +23,23 @@ alone reaches nobody.
   existing clone above the repository, `~/.tsh/context/<slug>/`, or any folder), then
   remembers it for every repository of the project. Flat layouts with several projects
   side by side, a project folder holding the clone and the code, scattered
-  repositories and T3 worktrees all resolve without a question per session.
+  repositories and T3 worktrees all resolve without a question per session. One gap
+  remains: a T3 worktree of a client repository has no local settings, so the
+  project's own plugin does not load there; the knowledge base is still found.
 - **Reads are kept current without touching work in progress.** Before reading, the
   clone is fetched at most every ten minutes, never prompting for a password, and
   fast-forwarded only when it is on the default branch with no uncommitted changes.
   On any other branch or with changes in progress it is read as it is, and the answer
-  says so first. Nothing ever merges, rebases, stashes, resets or switches branches.
-- **Writes go on their own branch.** `writing-project-knowledge`,
-  `adding-project-context-workspace` and `repairing-project-context-links` write in a
-  separate worktree created from the approved version, commit, and push that branch
-  only after the person says yes. The default branch is never pushed; the pull request
-  is opened by a person.
+  says so first. A local file in the way of the update, or history rewritten on the
+  server, is named as such; for the second the skill offers a fresh copy beside the
+  old one. Nothing ever merges, rebases, stashes, resets or switches branches.
+- **Writes go on their own branch, and every git step waits for its own yes.**
+  `writing-project-knowledge`, `adding-project-context-workspace` and
+  `repairing-project-context-links` propose a branch from the approved version in a
+  separate worktree, and create it, commit it and push it only after three separate
+  answers — the commit after the person has seen the change. `write_worktree.py`
+  refuses each step without `--yes`, as `tsh-core:managing-git-worktrees` does. The
+  default branch is never pushed; the pull request is opened by a person.
 - **Answers cite their sources with a date and an owner.** `navigating-project-context`
   names the file, its last change and the owning workspace's owner behind every fact,
   and can read a project by URL with no code repository at all.
@@ -43,7 +49,9 @@ alone reaches nobody.
   alone. *Attach repository* connects a code repository: committed settings and a
   `CLAUDE.md` pointer for the team's own repositories, or a local-only setup that git
   never sees for a client's (`.git/info/exclude`, never the client's `.gitignore`).
-  *Add URL* publishes a knowledge base started without a remote.
+  *Add URL* publishes a knowledge base started without a remote. The context
+  repository's own settings go into its first commit, so a teammate opening it gets
+  the project plugin too.
 - **A guard for the project pointer.** A `PreToolUse` hook denies any edit that would
   remove or change the `tsh:project-context` block in `CLAUDE.md` or
   `CLAUDE.local.md`. It starts only for edits of those two files.

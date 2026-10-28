@@ -24,25 +24,28 @@ the plugin never needs the documents), else the clone's absolute path, which is
 only ever written in local mode: a committed path would be wrong on every other
 machine.
 
-With --self the knowledge base itself is wired too (source "."), so a session
-started in it has the project plugin.
+With --self the knowledge base itself is wired too (source ".", the same on every
+machine), so a session started in it has the project plugin. Run it before the
+knowledge base's first commit, so the committed scaffold carries it.
 
-With --register, the claude CLI registers the marketplace and installs the plugin
-at the repository's scope, so the person running this can use it at once, without
-the trust dialog and restart. The settings are then re-merged, which also replaces
-the absolute path the CLI writes.
+With --register, the claude CLI registers the marketplace and installs the plugin,
+so the person running this can use it at once, without the trust dialog and
+restart: at the repository's scope in a code repository, after which the settings
+are re-merged to replace the absolute path the CLI writes; and at local scope in the
+knowledge base, so the committed settings.json is never touched.
 
 The block is inserted, or replaced when its markers are already there; the rest of
 the file is never touched. Moving a repository from local to commit mode removes the
-local entry and block, which would otherwise outrank the committed ones. Existing settings keys are preserved; a settings file
-that is not valid JSON is left alone and reported. The person's clone is
+local entry and block, which would otherwise outrank the committed ones. Existing
+settings keys are preserved; a settings file that is not valid JSON is left alone and
+reported. The person's clone is
 remembered for this project (the registry in $TSH_CONTEXT_HOME). The only git
 command run is `git ls-remote` against the URL, before anything is written, so a
 URL nobody can reach is never wired.
 
 Usage:
     python3 wire_repos.py --kb <clone> --slug <slug> [--url <git url>]
-        [--commit <repo>...] [--local <repo>...] [--self] [--register] [--dry-run]
+        [--commit <repo>...] [--local <repo>...] [--self] [--register]
 
 Exit 0 on success, 1 if any repository was skipped or a CLI step failed, 2 on bad
 input (including an unreachable URL).
@@ -97,13 +100,12 @@ def read_json(path):
         return None, f"{path.name} is not valid JSON ({e}); left untouched"
 
 
-def write_text(path, text, dry_run):
-    if not dry_run:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+def write_text(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
 
 
-def merge_settings(path, slug, source, dry_run, extra_dirs=()):
+def merge_settings(path, slug, source, extra_dirs=()):
     data, err = read_json(path)
     if err:
         return None, err
@@ -120,11 +122,11 @@ def merge_settings(path, slug, source, dry_run, extra_dirs=()):
             dirs.append(d)
     changed = json.dumps(data, sort_keys=True) != before
     if changed:
-        write_text(path, json.dumps(data, indent=2) + "\n", dry_run)
-    return ("unchanged" if not changed else "would update" if dry_run else "updated"), None
+        write_text(path, json.dumps(data, indent=2) + "\n")
+    return ("updated" if changed else "unchanged"), None
 
 
-def put_block(path, text, dry_run):
+def put_block(path, text):
     current = path.read_text(encoding="utf-8") if path.exists() else ""
     if BLOCK_RE.search(current):
         new = BLOCK_RE.sub(lambda _: text, current, count=1)
@@ -132,11 +134,11 @@ def put_block(path, text, dry_run):
         new = (current.rstrip("\n") + "\n\n" if current.strip() else "") + text + "\n"
     if new == current:
         return "unchanged"
-    write_text(path, new, dry_run)
-    return "would update" if dry_run else "updated"
+    write_text(path, new)
+    return "updated"
 
 
-def drop_local_wiring(repo, slug, dry_run):
+def drop_local_wiring(repo, slug):
     """Commit mode replaces an earlier local wiring: settings.local.json outranks
     settings.json, so a leftover entry there would keep the old source on this
     machine, and a leftover block in CLAUDE.local.md would point at a local path."""
@@ -150,21 +152,19 @@ def drop_local_wiring(repo, slug, dry_run):
             if key in data and not data[key]:
                 del data[key]
         if json.dumps(data, sort_keys=True) != before:
-            write_text(path, json.dumps(data, indent=2) + "\n", dry_run)
+            write_text(path, json.dumps(data, indent=2) + "\n")
     local_md = repo / "CLAUDE.local.md"
     if local_md.exists():
         text = local_md.read_text(encoding="utf-8")
         new = BLOCK_RE.sub("", text, count=1).strip()
         if new != text.strip():
-            if dry_run:
-                pass
-            elif new:
+            if new:
                 local_md.write_text(new + "\n", encoding="utf-8")
             else:
                 local_md.unlink()
 
 
-def exclude(repo, patterns, dry_run):
+def exclude(repo, patterns):
     code, common, _ = git("rev-parse", "--git-common-dir", cwd=repo)
     if code != 0 or not common:
         return
@@ -173,7 +173,7 @@ def exclude(repo, patterns, dry_run):
     lines = f.read_text(encoding="utf-8").splitlines() if f.exists() else []
     new = [p for p in patterns if p not in lines]
     if new:
-        write_text(f, "\n".join(lines + new) + "\n", dry_run)
+        write_text(f, "\n".join(lines + new) + "\n")
 
 
 def register(repo, source_arg, plugin, scope):
@@ -191,13 +191,13 @@ def register(repo, source_arg, plugin, scope):
     return None
 
 
-def remember(slug, kb, url, dry_run):
+def remember(slug, kb, url):
     home = Path(os.environ.get("TSH_CONTEXT_HOME") or Path.home() / ".tsh" / "context").expanduser()
     reg = home / "registry.json"
     data, _ = read_json(reg)
     data = data or {}
     data.setdefault("projects", {})[slug] = {"path": str(kb), "url": url or ""}
-    write_text(reg, json.dumps(data, indent=2) + "\n", dry_run)
+    write_text(reg, json.dumps(data, indent=2) + "\n")
 
 
 def main():
@@ -209,7 +209,6 @@ def main():
     ap.add_argument("--local", nargs="*", default=[], metavar="REPO", help="repositories in local mode")
     ap.add_argument("--self", action="store_true", help="wire the knowledge base itself (source '.')")
     ap.add_argument("--register", action="store_true", help="install on this machine via the claude CLI")
-    ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
     kb = Path(a.kb).expanduser().resolve()
@@ -238,17 +237,18 @@ def main():
     failures = 0
 
     if a.self:
-        state, err = merge_settings(kb / ".claude" / "settings.json", a.slug,
-                                    {"source": "directory", "path": "."}, a.dry_run)
+        state, err = merge_settings(kb / ".claude" / "settings.json", a.slug, {"source": "directory", "path": "."})
         print(f"  {'!' if err else '+'} {kb.name} (the knowledge base itself): {err or state}")
         failures += bool(err)
-        if a.register and not a.dry_run and not err:
-            e = register(kb, str(kb), plugin, "project")
+        if a.register and not err:
+            # Local scope: the CLI writes this machine's absolute path into the untracked
+            # settings.local.json, never into the committed settings.json, which keeps ".".
+            if Path(git("rev-parse", "--show-toplevel", cwd=kb)[1] or "/").resolve() == kb:
+                exclude(kb, ["/.claude/settings.local.json"])  # never an enclosing repository
+            e = register(kb, str(kb), plugin, "local")
             if e:
                 print(f"  ! {kb.name}: {e}")
                 failures += 1
-            else:
-                merge_settings(kb / ".claude" / "settings.json", a.slug, {"source": "directory", "path": "."}, False)
 
     for mode, repos in (("commit", a.commit), ("local", a.local)):
         for r in repos:
@@ -259,32 +259,31 @@ def main():
                 continue
             source = git_source or {"source": "directory", "path": str(kb)}
             settings = repo / ".claude" / ("settings.json" if mode == "commit" else "settings.local.json")
-            state, err = merge_settings(settings, a.slug, source, a.dry_run)
+            state, err = merge_settings(settings, a.slug, source)
             if err:
                 print(f"  ! {repo.name}: {err}")
                 failures += 1
                 continue
             if mode == "commit":
-                drop_local_wiring(repo, a.slug, a.dry_run)
+                drop_local_wiring(repo, a.slug)
             local = repo / ".claude" / "settings.local.json"
             if not str(kb).startswith(str(repo) + os.sep):
-                merge_settings(local, a.slug, None, a.dry_run, extra_dirs=[str(kb)])
+                merge_settings(local, a.slug, None, extra_dirs=[str(kb)])
             memory = repo / ("CLAUDE.md" if mode == "commit" else "CLAUDE.local.md")
-            bstate = put_block(memory, block(a.url, kb), a.dry_run)
-            exclude(repo, ["/.claude/settings.local.json"] + (["/CLAUDE.local.md"] if mode == "local" else []),
-                    a.dry_run)
+            bstate = put_block(memory, block(a.url, kb))
+            exclude(repo, ["/.claude/settings.local.json"] + (["/CLAUDE.local.md"] if mode == "local" else []))
             print(f"  + {repo.name} [{mode}]: {settings.relative_to(repo)} {state}, {memory.name} block {bstate}")
-            if a.register and not a.dry_run:
+            if a.register:
                 e = register(repo, a.url or str(kb), plugin, "project" if mode == "commit" else "local")
                 if e:
                     print(f"  ! {repo.name}: {e}")
                     failures += 1
                 else:
-                    merge_settings(settings, a.slug, source, False)
-            if mode == "commit" and not a.dry_run:
+                    merge_settings(settings, a.slug, source)
+            if mode == "commit":
                 print(f"    to commit in a pull request: .claude/settings.json, CLAUDE.md")
 
-    remember(a.slug, kb, a.url, a.dry_run)
+    remember(a.slug, kb, a.url)
     return 1 if failures else 0
 
 

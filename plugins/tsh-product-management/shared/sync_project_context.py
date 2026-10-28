@@ -21,6 +21,7 @@ Warning codes, each a sentence the reader of the answer must see:
     index-lock          another git process holds the index; nothing was done
     busy                another sync of this KB is running; read as is
     offline             fetch failed or timed out (network, VPN, credentials)
+    blocked             a local file the update would overwrite stopped the pull
     not-default-branch  the clone is on another branch: reading that branch
     dirty               uncommitted changes in the clone: reading them
     behind              the clone is behind the remote and was not updated
@@ -63,6 +64,24 @@ def net_env(kb):
     if "GIT_SSH_COMMAND" not in env and not git(kb, "config", "--get", "core.sshCommand")[1]:
         env["GIT_SSH_COMMAND"] = f"ssh -o BatchMode=yes -o ConnectTimeout={TIMEOUT}"
     return env
+
+
+def pull_warning(err):
+    """Name why a fast-forward pull failed. A local file in the way is not a network
+    problem, and calling it 'offline' would hide the one thing the person must fix."""
+    low = err.lower()
+    if "would be overwritten" in low:
+        files = [l.strip() for l in err.splitlines() if l.startswith(("\t", "        "))]
+        return ("blocked", "A file in the knowledge-base clone blocks the update"
+                + (f" ({', '.join(files[:5])})" if files else "")
+                + ": the server has the same file. Nothing was changed; move that file away "
+                  "or delete it, and the next read updates the clone.")
+    if "fast-forward" in low or "diverg" in low:
+        return ("diverged", "The knowledge base's history on the server differs from this "
+                            "clone (for example after a force-push). Nothing was changed. "
+                            "Reading the local copy; a fresh clone fixes it.")
+    return ("offline", f"Could not update the clone ({err[-160:] or 'no detail'}): "
+                       "reading the local copy, which may be out of date.")
 
 
 def default_branch(kb, env=None):
@@ -144,7 +163,6 @@ def main():
                 warn("offline", f"Could not reach the server ({err[-160:] or 'no detail'}): "
                                 "reading the local copy, which may be out of date.")
             else:
-                stamp.touch()
                 if not out["default_branch"]:
                     out["default_branch"] = default_branch(kb, env)
                     on_default = out["branch"] is not None and out["branch"] == out["default_branch"]
@@ -154,13 +172,12 @@ def main():
                     code, _, err = git(kb, "pull", "--ff-only", "--no-rebase", "--quiet", "origin", d,
                                        timeout=max(30, TIMEOUT), env=env)
                     out["pulled"] = code == 0
-                    if code != 0 and ("fast-forward" in err or "diverg" in err.lower()):
-                        warn("diverged", "The knowledge base's history on the server differs from this "
-                                         "clone (for example after a force-push). Nothing was changed. "
-                                         "Reading the local copy; a fresh clone fixes it.")
-                    elif code != 0:
-                        warn("offline", f"Could not update the clone ({err[-160:] or 'no detail'}): "
-                                        "reading the local copy, which may be out of date.")
+                    if code != 0:
+                        warn(*pull_warning(err))
+                # A pull blocked by a local file does not count toward the TTL: once the
+                # person moves the file, the next read updates instead of waiting.
+                if not any(w["code"] == "blocked" for w in out["warnings"]):
+                    stamp.touch()
     finally:
         if lock is not None:
             lock.unlink(missing_ok=True)
@@ -179,7 +196,7 @@ def main():
     if out["dirty"]:
         warn("dirty", "Uncommitted changes in the knowledge-base clone: reading them, they are not "
                       "approved knowledge.")
-    if out["behind"] and not any(w["code"] == "diverged" for w in out["warnings"]):
+    if out["behind"] and not any(w["code"] in ("diverged", "blocked") for w in out["warnings"]):
         warn("behind", f"The clone is {out['behind']} commit(s) behind the server and was not updated "
                        "(only a clean default branch is updated automatically).")
     return done()

@@ -25,7 +25,6 @@ from pathlib import Path
 
 SKILL = Path(__file__).resolve().parents[1]
 SCRIPTS = SKILL / "scripts"
-LOCATOR = SKILL.parents[1] / "shared" / "locate_project_context.py"
 
 results = []
 
@@ -108,7 +107,6 @@ def main():
         check("checker scripts are executable",
               all((ctx / "scripts" / s).stat().st_mode & 0o111
                   for s in ("check_links.py", "check_tables.py", "check_decisions.py", "check_plugin.py")))
-        check("template version marker", json.loads((ctx / ".tsh-context.json").read_text()).get("template") == 2)
         check("Bitbucket pipeline shipped", (ctx / "bitbucket-pipelines.yml").is_file())
         code, out = scaffold("--slug", "acme", "--parent", tmp / "empty", cwd=tmp)
         check("second run creates nothing", code == 0 and "Created (0)" in out, out[-200:])
@@ -216,20 +214,6 @@ def main():
         check("after git init with nothing committed: warns, walks the tree, passes",
               code == 0 and "no tracked files yet" in out, out[-300:])
 
-        print("7. Locating the knowledge base")
-        (cat / "api" / "src" / "deep").mkdir(parents=True)
-        for where in (cat, cat / "acme-context", cat / "acme-context" / "docs" / "backend",
-                      cat / "api", cat / "api" / "src" / "deep"):
-            code, out = py(LOCATOR, where)
-            check(f"from {where.relative_to(tmp)}",
-                  code == 0 and f"KB={cat / 'acme-context'}" in out and "SLUG=acme" in out, out[-200:])
-        code, _ = py(LOCATOR, tmp / "projects-x")
-        check("nothing found: exit 1", code == 1)
-        two = tmp / "two"
-        for n in ("a-context", "b-context"):
-            shutil.copytree(ctx, two / n)
-        code, out = py(LOCATOR, two)
-        check("two candidates: exit 2, both listed", code == 2 and "a-context" in out and "b-context" in out)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

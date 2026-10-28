@@ -14,9 +14,10 @@ paths:
 # Project-context: the contract and its tests
 
 The project-context skills run git on other people's clones and write into client
-repositories, so their scripts carry a contract that prose alone cannot keep. It is the
-one place in this repo with a test suite. **After any change to a file this rule covers,
-run both and show them passing before you report the work done:**
+repositories, so their scripts carry a contract that prose alone cannot keep. **After
+any change to a file this rule covers, run both and show them passing before you report
+the work done** — CI runs them too, in the `project-context-tests` job of
+`.github/workflows/quality.yml`, on Python 3.9 and the latest 3.x:
 
 ```shell
 python3 tests/project-context/test_project_context.py
@@ -41,13 +42,16 @@ behaviour is meant to change — change the test in the same change and say what
 | Never | Only |
 | --- | --- |
 | merge, rebase, stash, reset or switch branch in a person's clone | `pull --ff-only` of a clean default branch, through `sync_project_context.py` |
-| push the default branch, push without a yes, force-push | a write worktree's branch after `--yes`; the first push of a new knowledge base after `--yes`, to an empty remote |
+| create a branch or worktree, commit, or push without that step's own yes | `write_worktree.py start --yes --at <sha>`, `commit --yes`, `push --yes`, each after its own answer; the first push of a new knowledge base after `--yes`, to an empty remote |
+| push the default branch, force-push, delete a branch or a worktree | — |
+| commit in a person's clone | only a write worktree; the knowledge base itself only while it has no remote |
 | commit, stage, or touch `.gitignore` in a code repository | files written for the person to commit (commit mode), or kept out of git through `.git/info/exclude` (local mode) |
 | act on a repository that encloses the knowledge base | the knowledge base's own repository |
 | remove or edit the `tsh:project-context` block through an agent | `wire_repos.py` writes and replaces it |
 
 The rows that move data over the network — the sync's pull, the write worktree's push,
-the first push — are deliberately not tested automatically. A change to
+the first push — are deliberately not tested automatically; their refusals are, because
+each is decided before any network call. A change to
 `sync_project_context.py`, `write_worktree.py` or `context_repo_git.py` needs a reviewer
 who checks it against this table, line by line, and a manual run on a scratch repository.
 

@@ -98,14 +98,21 @@ python3 scripts/check_links.py && python3 scripts/check_tables.py && python3 scr
 claude plugin validate . && claude plugin validate plugins/<slug>-shared
 ```
 
-A failure is a defect in this skill's templates: report it, do not hand-patch. Then
-`python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py init "<CONTEXT_DIR>"`.
+A failure is a defect in this skill's templates: report it, do not hand-patch. Then,
+in this order, so the first commit carries the knowledge base's own settings:
+
+```shell
+python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --kb "<CONTEXT_DIR>" --slug <slug> --self
+python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py init "<CONTEXT_DIR>"
+```
 
 **N4 — Remote, only with a URL.** When `Remote` carried a URL:
-`context_repo_git.py remote "<CONTEXT_DIR>" <URL>`. Refused → [edge cases](./references/edge-cases.md)
-§"Remote refused"; continue without a URL. Accepted → call **P** (`Push`). On `Push`:
-`context_repo_git.py first-push "<CONTEXT_DIR>" --yes`. Otherwise, and for *Show me how*,
-print the commands from [installation mechanics](./references/installation-mechanics.md) §"Publishing by hand".
+`python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py remote "<CONTEXT_DIR>" <URL>`.
+Refused → [edge cases](./references/edge-cases.md) §"Remote refused"; continue without a
+URL. Accepted → call **P** (`Push`). On `Push`:
+`python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py first-push "<CONTEXT_DIR>" --yes`.
+Otherwise, and for *Show me how*, print the commands from
+[installation mechanics](./references/installation-mechanics.md) §"Publishing by hand".
 
 **N5 — Wire.** Read [installation mechanics](./references/installation-mechanics.md), then
 always:
@@ -125,12 +132,14 @@ Exit 3 means no renderer — quote the manual command it printed.
 
 **A1 — The project.** From the locator: a wired repository already has the URL — say so,
 and re-running repairs the settings and the block. Otherwise call **A1** (`URL`). Then
-resolve this person's clone with `locate_project_context.py --url <URL>`, following
+resolve this person's clone with
+`python3 ${CLAUDE_PLUGIN_ROOT}/shared/locate_project_context.py --url <URL>`, following
 `${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` for exit 3.
 
 **A2 — The repository.** Call **A2** (`Client`) for the current repository, or each
-selected one. Then run `wire_repos.py --kb <KB> --slug <SLUG> --url <URL> --register`
-with `--commit` or `--local`. A URL `ls-remote` cannot reach stops here, nothing written.
+selected one. Then run `python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --kb <KB> --slug
+<SLUG> --url <URL> --register` with `--commit` or `--local`. A URL `ls-remote` cannot
+reach stops here, nothing written.
 
 ### Add URL
 

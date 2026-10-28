@@ -1,6 +1,6 @@
 ---
 name: writing-project-knowledge
-description: "Adds or updates a document in a project's knowledge base — the `<project>-context` repository — picking the owning workspace, applying the state-of-today rule, updating the workspace index, and naming the owner who reviews it. Use when something learned, agreed or changed on such a project should be written down."
+description: "Adds or updates a document in a project's knowledge base — the `<project>-context` repository — picking the owning workspace, applying the state-of-today rule, updating the workspace index, and naming the owner who reviews it. Use when something learned or changed on such a project should be written down."
 when_to_use: "Trigger on: 'write this down', 'document this', 'update the doc on X' in a project with a `*-context` repository; recording a requirement, constraint, integration detail or process change; correcting a document that no longer matches reality; a workshop or call that produced knowledge worth keeping."
 ---
 
@@ -14,10 +14,11 @@ added beside the existing document instead of into it.
 
 **Step 1 — Locate the knowledge base and open a branch for the change.** Read
 `${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md`, resolve and sync **KB**,
-then start the write worktree it describes, on a branch named `docs/<topic>`. Call the
-printed `WORKTREE` **W**. Read and write under W: it holds the approved version the
-change is reviewed against, and **the person's clone is never edited**, whatever branch
-it is on.
+then follow its §3 steps 1–2: propose the branch `docs/<topic>` with
+`python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py start "<KB>" docs/<topic>` and
+create it only after the person answers `Create`. Call the worktree **W**. Read and
+write under W: it holds the approved version the change is reviewed against, and **the
+person's clone is never edited**, whatever branch it is on.
 
 **Step 2 — Find the owning workspace.** Read `W/docs/README.md`. Pick the one
 workspace whose scope covers the topic, then read its `CLAUDE.md` — it carries the
@@ -42,16 +43,12 @@ Filenames are kebab-case. Link only to files that exist in the repository.
 **Step 5 — Update the index.** Add or adjust the entry in the workspace's `README.md`
 in this same change. A document nothing links to will not be found.
 
-**Step 6 — Verify, commit, offer the push.** From W:
-
-```shell
-python3 scripts/check_links.py && python3 scripts/check_tables.py
-git add -A && git commit -m "docs(<workspace>): <what changed>"
-```
-
-Then ask with AskUserQuestion — header `Push`, question "Push branch `<branch>` to
-`<remote>` for review?", options `Push` / `Keep local`. On `Push`, run
-`write_worktree.py push "<W>" --yes`. Never push without that answer.
+**Step 6 — Verify, then commit and push only on a yes.** From W, run
+`python3 scripts/check_links.py && python3 scripts/check_tables.py` until clean. Then
+§3 steps 4–5 of the shared guide: show the change, ask `Commit`, and on yes run
+`python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py commit "<W>" --message
+"docs(<workspace>): <what changed>" --yes`; then ask `Push`, and on yes run
+`python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py push "<W>" --yes`.
 
 Report: which workspace, which files changed, the branch and where it lives, the owner
 from that workspace's `CLAUDE.md` who reviews it, and the next step for the person —
@@ -68,5 +65,5 @@ after that review is merged.
 | NEVER | Set or change a decision record's status. |
 | MUST | Update the workspace `README.md` index in the same change as the document. |
 | MUST | Leave both checker scripts passing, and name the owner who reviews the change. |
-| NEVER | Write in the person's clone (the one exception — a knowledge base with no remote yet — is in `locating-project-context.md`), push without asking, push to the default branch, or open, merge or approve the pull request. |
+| NEVER | Create the branch, commit or push without that step's own yes; write in the person's clone (the one exception — a knowledge base with no remote yet — is in `locating-project-context.md`); push to the default branch; or open, merge or approve the pull request. |
 | NEVER | Invent a fact to fill a gap. Write what is known and name the gap as a gap. |

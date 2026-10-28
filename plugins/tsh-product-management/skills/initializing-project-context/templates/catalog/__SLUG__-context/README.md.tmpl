@@ -11,6 +11,6 @@ vocabulary, ownership — and the Claude Code plugin the whole team shares.
 | Look up a term | [docs/glossary.md](docs/glossary.md) |
 | Use the knowledge from a code repository | Connect it once with `/tsh-product-management:initializing-project-context` (*Attach repository*), then `/tsh-product-management:navigating-project-context` |
 | Change a document | A branch and a pull request — in the git host's web editor, or with `/tsh-product-management:writing-project-knowledge` |
-| Check before a pull request | `python3 scripts/check_links.py && python3 scripts/check_tables.py && python3 scripts/check_decisions.py` |
+| Check before a pull request | `python3 scripts/check_links.py && python3 scripts/check_tables.py && python3 scripts/check_decisions.py`; the pipeline adds `check_plugin.py`, which compares with the default branch |
 
 Repository owner: {{OWNER}}. Created {{DATE}}.
