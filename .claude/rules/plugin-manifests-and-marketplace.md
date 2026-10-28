@@ -72,10 +72,11 @@ instead of asking whose job it is:
 
 Atlassian is the first case: engineering, product management and testing all read
 Jira. So is Figma: product engineering judges UI against it, product design works in
-it, product management reads flows out of it during discovery. Playwright is the
-second case: it exists for `tsh-product-testing`'s E2E work and stays there.
-(`tsh-product-engineering` used to bundle it too, until its agents moved to the
-Playwright CLI in 0.7.0.)
+it, product management reads flows out of it during discovery. `context7` in
+`tsh-product-testing` is the second case: it exists for that plugin's Playwright API
+lookups and stays there. (Playwright MCP used to be this example — bundled by
+`tsh-product-engineering` until 0.7.0 and by `tsh-product-testing` until 0.3.0, when
+their agents moved to the Playwright CLI. No plugin bundles it now.)
 
 A **stack** plugin cannot host a shared server even when it looks like the natural
 owner. Stack plugins install at `project` scope, per repository, while disciplines

@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: php-architect-not-symfony
+description: A refactoring request in a framework-free PHP library must route to architecting-php-code, not implementing-symfony-applications.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-php"]
+runs: 1
+execution:
+  prompt: |
+    We maintain a small framework-free PHP 8.2 library that calculates shipping costs.
+    ShippingCalculator::calculate() has grown into a 200-line switch over the carrier name, and every new carrier means touching it again. Refactor it into something easier to extend.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: architect-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?architecting-php-code"'
+    arm: with-only
+  - name: symfony-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-symfony-applications"'
+    min: 0
+    max: 0

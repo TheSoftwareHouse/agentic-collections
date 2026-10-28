@@ -139,7 +139,8 @@ verification gate judges through the Figma MCP, exclusively.
 - [`verifying-ui`](../verifying-ui/SKILL.md) and
   [`capturing-ui-evidence`](../capturing-ui-evidence/SKILL.md) — the judging standard
   and capture contract behind the gate; the `ui-reviewer` and `ui-capture-worker`
-  agents load them automatically.
+  agents load them automatically, and `verifying-ui` loads nowhere else
+  (`disable-model-invocation: true`).
 - [`discovering-technical-context`](../discovering-technical-context/SKILL.md) — what
   the implementer agents consult before writing code.
 

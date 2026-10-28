@@ -3,10 +3,12 @@
 ## What this repo is
 
 A **Claude Code plugin marketplace** for The Software House. It is not an
-application: there is no build step, no dependencies, and no runtime.
-Everything here is Markdown and JSON that Claude Code loads — except the project-context
-scripts in `tsh-product-management`, which run git on people's clones and have the
-repo's only test suite: `.claude/rules/project-context-contract.md`.
+application: there is no build step and no runtime. The plugins are Markdown and JSON
+that Claude Code loads; the only code is repository tooling that checks them — a
+standard-library Python description lint in `scripts/` and a `claude plugin eval`
+routing suite in `evals/` — and the project-context scripts in
+`tsh-product-management`, which run git on people's clones and carry their own test
+suite: `.claude/rules/project-context-contract.md`.
 
 It publishes three families: `tsh-<discipline>` for *how we work*,
 `tsh-stack-<stack-name>` for *what we work with*, and `tsh-core` — a single,
@@ -40,6 +42,7 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | `tsh-stack-frontend` | Browser-targeted code — TypeScript configuration for bundler-resolved apps, currently React and Vite |
 | `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
 | `tsh-stack-python` | Modern Python — implementation and review practices, and data modelling |
+| `tsh-stack-php` | PHP 7.4–8.5 — version-aware design, patterns, refactoring and PSR-12; Symfony 5.4–8.x implementation and review; a PHP code reviewer agent |
 | `tsh-stack-serverless` | AWS Lambda on OSLS — the library policy, project structure, service definition, handler practices, and packaged-artifact checks |
 | `tsh-stack-aws` | AWS — Terraform resource patterns, Well-Architected defaults, account cost and tagging audits |
 | `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |
@@ -47,8 +50,9 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 
 Every technology stack gets its own plugin, created when it has real content to ship,
 not before. The family has two shapes: **runtime targets for application code**, and
-**cloud providers** — a repository has exactly one of each, which is why both belong
-here rather than in a discipline plugin. Read
+**cloud providers** — a repository has exactly one cloud provider but may have more than
+one runtime target (a frontend, a Node service and a Lambda bundle can share a repo),
+which is why both belong here rather than in a discipline plugin. Read
 `.claude/rules/stack-plugin-conventions.md` before adding a stack plugin or moving
 guidance between two of them; it carries why a stack is a runtime target rather than
 a language, the split trigger, and the rules for deliberate duplication between stack
@@ -93,7 +97,9 @@ and `tsh-core` with you, because it depends on nothing at all.
 | A whole new plugin | `plugins/tsh-<discipline>/` or `plugins/tsh-stack-<stack-name>/` + an entry in `.claude-plugin/marketplace.json` | an existing plugin |
 | A skill that fits no discipline and no stack | `plugins/tsh-core/skills/<skill-name>/SKILL.md` — read `.claude/rules/core-plugin-admission.md` first | `templates/SKILL.md` |
 | An MCP server three or more disciplines drive | `plugins/tsh-core/.mcp.json` — read `.claude/rules/plugin-manifests-and-marketplace.md`, then `core-plugin-admission.md` | the existing entry |
-| An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — Playwright in `tsh-product-testing` is the worked example | that file |
+| An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — `context7` in `tsh-product-testing` is the worked example | that file |
+| A routing eval case | `evals/routing/<case>/case.yaml` | an existing case in `evals/routing/` |
+| A behavioural eval suite for one plugin | `plugins/<plugin>/evals/<case>/case.yaml` — read `.claude/rules/plugin-evals.md` first | — |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
 **Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
@@ -196,11 +202,17 @@ Validate before pushing:
 ```shell
 claude plugin validate ./plugins/tsh-core   # per plugin
 claude plugin validate .                    # the marketplace catalog
+python3 scripts/lint-descriptions.py        # skill and agent description lint
 ```
 
-Expect `✔ Validation passed`. Warnings don't fail validation; add `--strict` to treat
-them as errors. To test the catalog end to end without pushing, see
+`validate` should print `✔ Validation passed`. Warnings don't fail validation; add
+`--strict` to treat them as errors. To test the catalog end to end without pushing, see
 `.claude/rules/plugin-manifests-and-marketplace.md`.
+
+When the lint flags a changed description, or you add or rename a model-invocable skill,
+also run the routing evals; they spend API budget on the signed-in account, about USD 0.12
+per case. `evals/README.md` is the one place that documents how to run these checks, what
+their output means, and what CI runs — keep commands there rather than copying them here.
 
 ## Where the rest lives
 

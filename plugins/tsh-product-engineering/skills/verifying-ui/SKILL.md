@@ -3,6 +3,7 @@ name: verifying-ui
 description: "The standard for judging implemented UI against its Figma design: EXPECTED comes only from the Figma MCP, ACTUAL only from live Playwright-CLI capture artifacts, compared across structure, layout, dimensions, visual and components under strict tolerances, ending in PASS, FAIL, or VERIFICATION NOT RUN. This is the judging standard the ui-reviewer agent applies — to actually run a verification pass, use reviewing-ui."
 when_to_use: "Trigger on: judging whether a rendered page matches Figma, deciding PASS or FAIL for a UI verification item, interpreting capture artifacts (actual.png, computed-styles.json, a11y-snapshot.yml), or writing a UI verification report. Running a pass end to end is reviewing-ui; collecting the artifacts is capturing-ui-evidence."
 user-invocable: false
+disable-model-invocation: true
 ---
 
 # Verifying UI

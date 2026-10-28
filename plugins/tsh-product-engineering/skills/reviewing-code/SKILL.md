@@ -1,7 +1,7 @@
 ---
 name: reviewing-code
-description: "TSH's pre-merge review of a delivered change set: reads the plan and requirements first, compares the implementation against what was agreed, judges test coverage per layer, actually executes the project's tests, linters and build, then checks high-risk anti-patterns, security, and scalability. Use when a change set, task, or PR must be judged against its plan or acceptance criteria with its suites actually run, not read as a diff."
-when_to_use: "Trigger on: 'review this code', 'review this PR', 'is this ready to merge', verifying an implementation against its *.plan.md or acceptance criteria, judging whether a change is adequately tested, or the review gate closing an implementation workflow. Executes the project's own suites as part of the review; reports findings and never fixes code."
+description: "TSH's pre-merge review of a delivered change set — a pasted diff, a task, or a PR: reads the plan and requirements first, compares the implementation against what was agreed, judges test coverage per layer, runs the project's tests, linters and build when they are available, then checks high-risk anti-patterns, security, and scalability. Use when a change must be judged for merge readiness, whether it arrives as a pasted diff or a branch, against its plan or acceptance criteria when those exist."
+when_to_use: "Trigger on: 'review this code', 'review this PR', 'review this diff before we merge', 'is this ready to merge', verifying an implementation against its *.plan.md or acceptance criteria, judging whether a pasted change or change set is adequately tested, or the review gate closing an implementation workflow. Runs the project's own suites as part of the review when available; reports findings and never fixes code."
 ---
 
 # Reviewing Code
@@ -31,6 +31,7 @@ first and use this process to fill what they leave unstated.
 | MUST | Actually execute the relevant test suites, linters, and build — never accept "tests pass" from the implementation report. |
 | MUST | Treat missing integration coverage as a substantive finding when correctness depends on a real database, transaction boundaries, SQL semantics, migrations, queues, or external services. Unit tests alone do not cover those. |
 | MUST | Check every change for the high-risk anti-patterns listed below and report each hit unless the context documents a justified tradeoff. |
+| MUST | When the change targets a framework or stack that has its own skill available in this session — a NestJS, Terraform, frontend, Python or similar stack skill — load that skill and apply its framework-specific review checklist. This skill owns the review that is the same for every stack; the stack skill owns what is specific to one, and a review of a framework change that skips it is incomplete. Load whichever such skills are present; name none that is absent. |
 | MUST | Give every finding a severity, evidence (file and line), the consequence, and the minimum correction. No redesigns. |
 | NEVER | Report cosmetic or wording-only notes as findings, pad a clean review with invented issues, or escalate severity because an issue repeats — consolidate instead. |
 
@@ -85,7 +86,11 @@ exclusion in the report.
 **Step 5 — Best practices and anti-patterns.** Check against project standards first,
 then general practice (SOLID, DRY, KISS, low cognitive complexity — and no
 over-engineering: flag speculative abstraction as readily as duplication). Then the
-high-risk anti-pattern list above.
+high-risk anti-pattern list above. When the change targets a framework or stack whose
+skill is available this session, load it now and run its review checklist alongside
+this one — it carries the framework-specific risks (for a NestJS change: CQRS
+boundaries, TypeORM transaction and persistence semantics, DTO validation,
+testability) that a stack-agnostic review does not name.
 
 **Step 6 — Security.** Check for OWASP Top 10 classes relevant to the change —
 injection, broken auth/authz, sensitive-data exposure — and anything that would let

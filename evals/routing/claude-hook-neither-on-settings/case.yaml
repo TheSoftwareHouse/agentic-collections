@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: claude-hook-neither-on-settings
+description: A one-off hook in this repository's settings.json belongs to Claude Code's built-in update-config, so neither tsh-core skill may take it. Negative control for the narrowed authoring-claude-extensions description — this is the prompt it lost to the built-in in 15 of 15 runs while it still claimed "do X automatically".
+tags: [routing]
+plugins: ["../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    Every time Claude edits a TypeScript file in this repo, run prettier on that file.
+    It has to happen automatically, every time, not only when Claude remembers to. Set that up.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: extension-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?authoring-claude-extensions"'
+    min: 0
+    max: 0
+  - name: context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0

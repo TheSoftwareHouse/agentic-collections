@@ -4,6 +4,18 @@ All notable changes to `tsh-platform-engineering` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-10-27
+
+### Changed
+
+- **`implementing-terraform-modules` now loads alongside the cloud provider's skill
+  when authoring a reusable module.** A request to write a reusable AWS RDS module
+  pulled in only `implementing-aws-terraform` part of the time, dropping the
+  module-structure layer. The description now leads with the module interface, names
+  authoring a module that several callers instantiate as a trigger, and states that it
+  is the structure layer loaded alongside the provider's resource patterns, not
+  instead of them.
+
 ## [0.2.1] - 2026-10-02
 
 ### Fixed

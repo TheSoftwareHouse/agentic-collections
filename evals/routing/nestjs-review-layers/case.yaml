@@ -1,0 +1,44 @@
+schema_version: "1.1"
+name: nestjs-review-layers
+description: A pre-merge review of a pasted NestJS change must route to reviewing-code and not start implementation, even with the NestJS stack plugin in the session tempting a jump to implementing-nestjs-api.
+# The stack layer (implementing-nestjs-api) is not asserted here: reviewing-code pulls
+# it in on a LATER turn for the framework checklist, which a max_turns: 1 routing case
+# cannot observe. That turn-2 behaviour is verified by a multi-turn probe (see the
+# tsh-product-engineering 0.9.0 CHANGELOG), not by this case. A review names one
+# dominant owner at turn one (reviewing-code); a writing task like terraform-module-layers
+# fires both layers at once, which is why that case stays layered and this one does not.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Review this change to our NestJS service before we merge it. This is the whole diff:
+
+    ```ts
+    @CommandHandler(CancelOrderCommand)
+    export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
+      constructor(@InjectRepository(Order) private readonly orders: Repository<Order>) {}
+
+      async execute({ orderId }: CancelOrderCommand) {
+        const order = await this.orders.findOneByOrFail({ id: orderId });
+        order.status = 'cancelled';
+        await this.orders.save(order);
+      }
+    }
+    ```
+
+    Is it ready to merge?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0

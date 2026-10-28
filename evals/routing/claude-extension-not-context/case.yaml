@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: claude-extension-not-context
+description: A request to package a repeated, hand-pasted workflow so a whole team gets it across repositories must route to authoring-claude-extensions, not managing-claude-context.
+tags: [routing]
+plugins: ["../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    Our team keeps pasting the same code-review checklist into Claude by hand on every project. We want everyone to have it automatically in every repo we work on — maintained in one place, not copied around. What's the right way to set this up in Claude Code, and can you build it?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: extension-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?authoring-claude-extensions"'
+    arm: with-only
+  - name: context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0

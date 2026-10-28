@@ -34,7 +34,10 @@ it costs. Read [Scope](#scope) before adding anything.
 **"I want to build something"** goes to the first, **"I want this repo's memory files
 to be right"** to the second. The first owns skills, subagents, hooks and plugins; the
 second owns `CLAUDE.md`, `.claude/rules/` and the decision index. Each hands off to the
-other rather than overlapping.
+other rather than overlapping. One thing neither claims: a single hook wired into
+this repository's `settings.json`. That is Claude Code's own configuration, which its
+built-in `update-config` skill handles; `authoring-claude-extensions` picks up a hook
+once it ships inside a plugin or has to reach a second repository.
 
 `writing-technical-documents` governs prose craft and never an artifact's
 structure. It will not tell you what sections a user story needs — that belongs to
@@ -219,8 +222,9 @@ is the cost being disclosed. A bundled MCP server adds **no** routing footprint:
 puts nothing in the skill listing. Its cost is tool names, which Claude Code defers
 until a tool is used, so the deciding test is the third one — **name three of the five
 disciplines that use it in a normal month**. A server one discipline uses stays in
-that discipline's plugin, which is why the Playwright server a UI agent drives is not
-here.
+that discipline's plugin, which is why the Playwright MCP server lived in the
+discipline plugins that drove it — never here — until their agents moved to the
+Playwright CLI.
 
 Duplication is not the escape hatch it looks like. Plugin-provided servers are
 deduplicated by **endpoint**, so two plugins declaring the same URL do connect once —

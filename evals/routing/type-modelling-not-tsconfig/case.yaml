@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: type-modelling-not-tsconfig
+description: A question about how to shape a type so an illegal state cannot be built must route to modelling-types-for-nodejs, not to configuring-typescript-for-nodejs, which owns tsconfig and versions.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    In our Node service a handler returns this:
+
+    ```ts
+    interface Result {
+      status: 'success' | 'failure';
+      data?: Order;
+      error?: string;
+    }
+    ```
+
+    Nothing stops someone building `{ status: 'success', error: 'boom' }`, and we keep
+    forgetting to handle new outcomes. How should we model this so those mistakes can't
+    compile?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: modelling-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?modelling-types-for-nodejs"'
+    arm: with-only
+  - name: configuring-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-nodejs"'
+    min: 0
+    max: 0
