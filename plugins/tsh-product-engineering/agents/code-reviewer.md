@@ -26,6 +26,12 @@ coverage, execute the test suites, linters, and build with the project's own com
 (the plan's Technical Context lists them), then check best practices, the high-risk
 anti-patterns, security, and scalability.
 
+When the change targets a framework or stack whose skill is available in this session
+— a NestJS, Terraform, frontend or similar stack skill — load it and apply its
+framework-specific review checklist alongside `reviewing-code`'s. The discipline skill
+owns the review that is the same for every stack; the stack skill owns what is
+specific to one. Load whichever are present; never name one that is absent.
+
 Two boundaries specific to your role:
 
 - The plan is comparison context, never a review target. Plan wording, structure, and

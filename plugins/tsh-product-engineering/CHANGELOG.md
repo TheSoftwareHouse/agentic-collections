@@ -12,6 +12,25 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.9.0] - 2026-10-28
+
+### Changed
+
+- **`reviewing-code` now applies the installed stack's own review checklist, not only the
+  stack-agnostic one.** A pre-merge review of a pasted NestJS diff loaded `reviewing-code`
+  but never pulled in `implementing-nestjs-api` — even across a multi-turn run the stack
+  skill loaded zero times — so CQRS boundaries, TypeORM transaction and persistence
+  semantics, and DTO validation went unchecked. The skill and the `code-reviewer` agent now
+  load whichever stack skill is available for the framework under review (NestJS, Terraform,
+  frontend, …) and run its checklist alongside the discipline review; a multi-turn probe
+  loads `implementing-nestjs-api` in 6 of 6 runs after the change. The instruction names no
+  plugin, so it works for any installed stack skill and stays silent when none is present.
+  This resolves the limitation the `tsh-stack-nodejs` 0.1.2 changelog tracked — the stack
+  layer dropping on a pasted diff — on the discipline side, by loading the stack skill
+  during the review rather than by making two skills route together on a single turn. The
+  routing case `nestjs-review-layers` is no longer quarantined: it asserts the turn-one
+  decision (review, don't implement) that a one-turn routing eval can actually see.
+
 ## [0.8.3] - 2026-10-27
 
 ### Changed
