@@ -23,7 +23,7 @@ alone reaches nobody.
   semantics, and DTO validation went unchecked. The skill and the `code-reviewer` agent now
   load whichever stack skill is available for the framework under review (NestJS, Terraform,
   frontend, …) and run its checklist alongside the discipline review; a multi-turn probe
-  loads `implementing-nestjs-api` in 2 of 2 runs after the change. The instruction names no
+  loads `implementing-nestjs-api` in 6 of 6 runs after the change. The instruction names no
   plugin, so it works for any installed stack skill and stays silent when none is present.
   This resolves the limitation the `tsh-stack-nodejs` 0.1.2 changelog tracked — the stack
   layer dropping on a pasted diff — on the discipline side, by loading the stack skill
