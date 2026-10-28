@@ -310,6 +310,79 @@ Expected: `reviewing-code` and `implementing-nestjs-api` each fire in all 6 runs
 is a regression in `reviewing-code`'s or the `code-reviewer` agent's instruction to
 load the installed stack skill.
 
+## A manual check that is not a routing case: the security baseline catches an IDOR
+
+`reviewing-code`'s Step 6 loads a universal security baseline
+(`references/security-review-checklist.md`) and reports the classes it finds in the
+diff. Whether the baseline *fires* is one question; whether the review *reports* a
+real flaw is the one that matters, and no `tool_used` grader can see it — the finding
+is prose in the model's output, not a tool call. A `regex` grader with `target: trace`
+cannot help either: the loaded checklist text contains "IDOR", "object-level" and
+"access control", so it matches whether or not the model found anything. So this is a
+manual check — grade that the review fires, then read the kept transcripts by hand for
+the finding.
+
+Save this as `evals/routing/_probe-security-idor/case.yaml`, run it, inspect, then
+**delete the directory** (`check-eval-cases.py` rejects its `max_turns: 4`). The diff
+is plain Express on purpose, so the catch comes from the discipline baseline, not a
+stack skill:
+
+```yaml
+schema_version: "1.1"
+name: _probe-security-idor
+description: Manual probe (not committed) — reviewing-code's security baseline must report the IDOR in a framework-agnostic diff.
+tags: [probe]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Review this change before we merge it. It is the whole diff — a route in our
+    Express API. Is it ready to merge?
+
+    ```js
+    // src/routes/orders.js
+    app.post('/orders/:id/cancel', requireLogin, async (req, res) => {
+      const order = await db.orders.findById(req.params.id);
+      order.status = 'cancelled';
+      await db.orders.save(order);
+      res.json({ ok: true });
+    });
+    ```
+  max_turns: 4
+  allowed_tools: [Skill, Read]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+```
+
+Then run with `--keep-temp` so the transcripts survive, and read the final message of
+each run:
+
+```shell
+claude plugin eval . --eval-dir evals --case _probe-security-idor \
+  --runs 6 -j 3 --trust-plugin --no-publish --ablation none \
+  --model claude-sonnet-5-5 --max-cost-usd 2 --keep-temp \
+  --json evals/results/_probe-security-idor.json
+# each run's tracePath in that JSON points at a kept trace.jsonl; the IDOR finding is
+# in the last assistant text message
+rm -rf evals/routing/_probe-security-idor
+```
+
+Expected: `reviewing-code` fires and `orchestrating-feature-implementation` does not in
+all 6 runs, and every run's report names the missing ownership check (IDOR) as a
+blocker-level finding. Measured 6 of 6 on 2026-10-28, `tsh-product-engineering` 0.10.0,
+about USD 0.08 per run. A run that fires the review but does not report the IDOR is a
+regression in the Step 6 baseline or the checklist reference.
+
 ## Known failures
 
 A case that exposes a real routing bug, whose fix belongs in a plugin change, is

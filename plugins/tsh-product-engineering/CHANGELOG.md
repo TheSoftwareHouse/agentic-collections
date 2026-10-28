@@ -12,6 +12,26 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.0] - 2026-10-28
+
+### Changed
+
+- **`reviewing-code`'s security step is now a real checklist, not a one-line reminder.**
+  Step 6 said only "check OWASP Top 10 classes relevant to the change"; a reviewer had
+  no shared definition of what that meant, so coverage depended entirely on the model's
+  recall. The step now loads a new reference,
+  [`references/security-review-checklist.md`](skills/reviewing-code/references/security-review-checklist.md):
+  a small, framework-agnostic baseline of the security classes worth checking on any
+  change — broken access control and object-level authz (IDOR) first, then injection,
+  unsafe deserialization, mass assignment, sensitive-data exposure, hardcoded secrets,
+  crypto and auth weaknesses, SSRF, vulnerable dependencies, and misconfiguration — each
+  with what to look for in a diff and the minimum correction. A new non-negotiable rule
+  makes running it mandatory. The checklist is explicitly a **floor**: a project's own
+  security rules outrank it and apply first, the installed stack skill's security rows
+  run on top (the same stack-load the 0.9.0 change introduced), and a named standard
+  (full OWASP, ASVS, pentest prep) is a separate audit task. No routing surface changes —
+  the reference loads inside the existing skill.
+
 ## [0.9.0] - 2026-10-28
 
 ### Changed
