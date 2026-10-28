@@ -32,6 +32,8 @@ records conventions already discovered, so do not re-derive them.
 | MUST | Use user-visible locators — `getByRole`, `getByLabel`, `getByText`. `getByTestId` only where no user-visible locator is feasible. |
 | MUST | Rely on Playwright's auto-waiting assertions. A test that needs a manual delay to pass is a test that will fail in CI. |
 | MUST | Generate unique test data per run so tests are parallel-safe — e.g. `test-${Date.now()}-${test.info().parallelIndex}`. |
+| MUST | Pin the language version under test before writing any locator — accessible names change with locale, so `getByRole` against the wrong language tests nothing. When the app serves more than one language and neither the plan, the Playwright config nor existing tests settle it, ask the user which version the tests target. Choosing silently and disclosing the choice in the report does not satisfy this rule — the question comes before the first locator. |
+| MUST | Confirm every locator against the running app with the Playwright CLI before the first test run — source code is not evidence of the rendered accessibility tree. Load [playwright-cli-exploration.md](./references/playwright-cli-exploration.md) first and use its commands; never an improvised browser script, which skips the preflight and leaves scratch files in the repository. A test that drives no browser (pure API scenarios) has no locators and nothing to confirm. Skipping is allowed only when the dev server is unreachable, and must be named in the report. |
 | MUST | Verify a new or fixed test with **3+ consecutive passes in headless mode** before reporting it done. One green run proves nothing about flake. |
 | MUST | Read credentials from environment variables. Never hardcode them, never commit them, never print them. |
 | MUST | Mark a test that fails because the *application* is broken as `test.fixme('BUG: <description>')` and report the bug. Never bend the test to make a real defect pass. |
@@ -46,6 +48,7 @@ records conventions already discovered, so do not re-derive them.
 | --- | --- | --- |
 | [Locators, data and mocking](./references/locators-and-anti-flake.md) | Writing any test or Page Object | Locator priority with examples, auto-waiting, test data isolation, what may and may not be mocked |
 | [Debugging and the verification loop](./references/debugging-and-verification-loop.md) | A test is failing, flaky, or newly written and unverified | The bounded debug loop, iteration limits, per-error recovery, flake detection, CI readiness |
+| [Exploring with the Playwright CLI](./references/playwright-cli-exploration.md) | Confirming locators against the running app, or inspecting live page state in the debug loop | Availability preflight, session hygiene, page snapshots, executing a candidate locator, diagnostics |
 
 Read [debugging-and-verification-loop.md](./references/debugging-and-verification-loop.md)
 before starting a fix loop — the iteration limits exist to stop an unbounded chase, and
@@ -78,10 +81,17 @@ broke without opening the file.
 
 1. **Establish context** — the section above, plus the plan's Technical Context.
 2. **Map criteria to scenarios** using the table.
-3. **Explore the running app** to confirm locators before committing to them. The
-   Playwright MCP bundled with this plugin operates on the accessibility tree, which is
-   exactly the view `getByRole` resolves against — so what you see there is what your
-   locator will match. Requires the dev server running.
+3. **Explore the running app** to confirm locators before committing to them, using
+   the Playwright CLI per
+   [playwright-cli-exploration.md](./references/playwright-cli-exploration.md). Its
+   page snapshot is the accessibility tree, which is exactly the view `getByRole`
+   resolves against — so what you see there is what your locator will match — and a
+   candidate locator string can be executed against the live page before it enters a
+   test. Run the reference's availability preflight first; when the CLI is missing
+   and you can ask, offer to install it or to wait — the user chooses, never you.
+   The first snapshot also shows which language the page rendered in — pin the
+   language version under test and confirm they match before reading any accessible
+   names. Requires the dev server running.
 4. **Write Page Objects, then tests**, following the project's existing shape.
 5. **Run and iterate** under the bounded loop in
    [debugging-and-verification-loop.md](./references/debugging-and-verification-loop.md).
@@ -102,6 +112,8 @@ rather than resolving it first.
 |---|---|---|
 
 Coverage: X/Y
+Locators confirmed against the running app: <playwright-cli session | n/a — API-only | skipped: reason>
+Language pinned by: <prompt | Playwright config | existing tests | user answer | n/a>
 
 ### Results
 | File | Pass | Fail | Flaky | Headless |
@@ -113,6 +125,10 @@ Coverage: X/Y
 
 ### Files
 ```
+
+The `Locators confirmed against the running app` and `Language pinned by` lines are
+contract fields — include them verbatim with real values. Stating the same facts in
+prose does not replace them; they exist so compliance is auditable at a glance.
 
 Report honestly. A suite with two `test.fixme()` markers and a named bug is a better
 outcome than a green suite that asserts nothing.
