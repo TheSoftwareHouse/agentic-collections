@@ -54,14 +54,17 @@ graders: [...]
   for "the files each task touches", makes Claude search before it loads a skill, and the
   turn cap ends the run with no Skill call. `implement-not-plan` went from 1 in 6 to 6 in
   6 once its prompt stopped pointing at an existing plan.
-- **A pasted snippet can pull Claude into answering directly, and a layered case must win
-  twice.** Given a whole diff to review, Claude first answered without loading any skill
-  (`nestjs-review-layers`). Sharpening `reviewing-code` to claim a pasted-diff review fixed
-  the discipline layer — it now fires 6 of 6 — but the stack layer `implementing-nestjs-api`
-  still co-fires only 2 of 6: once Claude picks one skill it rarely loads a second on the
-  same turn. The case stays quarantined on the stack layer. Treat a non-firing skill as a
-  description finding first, but know that co-firing two skills on turn one is the harder
-  half.
+- **A review names one dominant owner at turn one; its stack depth comes on a later turn.**
+  Given a whole diff to review, Claude loads `reviewing-code` 6 of 6 — but the stack skill
+  `implementing-nestjs-api` never co-fired on the same turn, because once Claude picks the
+  skill literally named for reviewing it stops. Forcing a second skill onto turn one (that
+  path reached only 2 of 6) fights the stack skill's own "implementing-" name. The fix went
+  the other way: `reviewing-code` and the `code-reviewer` agent now load whichever stack
+  skill is installed for the framework under review and apply its checklist on a later turn,
+  which a multi-turn probe confirms and a `max_turns: 1` routing case cannot see. So
+  `nestjs-review-layers` now asserts only the turn-one truth — `reviewing-code` fires,
+  implementation does not — and is no longer `layered`. Contrast `terraform-module-layers`,
+  a writing task where both layers genuinely fire at once, so its layered assertion holds.
 - **Claude Code's built-in skills are in the session too**: `update-config`,
   `code-review`, `verify`, `debug`, `simplify` and others. A plugin skill can lose to one,
   and sometimes the built-in is the right owner: `update-config` owns a one-off

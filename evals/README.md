@@ -246,6 +246,4 @@ control that asserts the plugin's skills stay out, and give the skill a must-fir
 case around a request it does own. `claude-hook-neither-on-settings` and
 `claude-extension-not-context` are the worked pair.
 
-| Case | Observed | Fix lives in |
-| :-- | :-- | :-- |
-| `nestjs-review-layers` | After sharpening both descriptions, a pre-merge review of a pasted NestJS diff loads `reviewing-code` in 6 of 6 runs but `implementing-nestjs-api` in only 2 of 6 — the stack layer drops once the discipline skill is chosen | `tsh-stack-nodejs`: the `implementing-nestjs-api` description, so it co-fires with `reviewing-code` on a pasted NestJS change |
+**No cases are quarantined right now.**
