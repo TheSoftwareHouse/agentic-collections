@@ -47,6 +47,17 @@ import { join } from "node:path";
 const ATLASSIAN_TOOL_PATTERN = /^mcp__.*(atlassian|jira|rovo|confluence)/i;
 
 /**
+ * Both policies are Jira policies: Gate 2 approves a Jira push, and the protected
+ * statuses are Jira issue statuses. A Confluence write — publishing a domain
+ * dictionary, updating a page — is outside both, so a tool whose name carries
+ * `confluence` and not `jira` is left to the normal permission prompt. The
+ * `hooks.json` matcher still lists `confluence` so the Atlassian server's mixed
+ * tool set reaches this script at all; the exemption is decided here, once.
+ */
+const CONFLUENCE_TOOL_PATTERN = /confluence/i;
+const JIRA_TOOL_PATTERN = /jira/i;
+
+/**
  * Classification is an explicit read allowlist with a gated default, and every
  * pattern is ANCHORED to the start of the bare tool name.
  *
@@ -94,7 +105,11 @@ function classify(bareName) {
  */
 function bareToolName(toolName) {
   const lastSeparator = toolName.lastIndexOf("__");
-  return lastSeparator === -1 ? toolName : toolName.slice(lastSeparator + 2);
+  const bare = lastSeparator === -1 ? toolName : toolName.slice(lastSeparator + 2);
+  // Community servers name every tool `jira_<verb>_…` / `confluence_<verb>_…`;
+  // strip that product prefix so the verb classification below still applies
+  // and reads are not held at the gate.
+  return bare.replace(/^(jira|confluence)_/i, "");
 }
 
 const KEY_FIELD_PATTERN = /(^|_)(issueIdOrKey|issueKey|issueid|key|issues|issueKeys)($|_)/i;
@@ -353,6 +368,10 @@ function main() {
 
   // 1. Not an Atlassian/Jira tool at all.
   if (!ATLASSIAN_TOOL_PATTERN.test(toolName)) allow();
+
+  // 1b. A Confluence tool. Neither policy applies to Confluence; let the normal
+  //     permission rules decide. A name carrying both products is still gated.
+  if (CONFLUENCE_TOOL_PATTERN.test(toolName) && !JIRA_TOOL_PATTERN.test(toolName)) allow();
 
   // 2. Read-only Atlassian call. Checked before any filesystem work so that
   //    fetching issues and searching boards stays fast and never prompts.

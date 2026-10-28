@@ -12,6 +12,119 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.8.3] - 2026-10-27
+
+### Changed
+
+- **`debugging-code` now claims the investigation, so it loads before Claude reads or
+  searches the code.** Its description said to load it "before editing anything",
+  which left reading and searching outside the claim: on a regression report with no
+  known cause, Claude sometimes searched the code first and never routed to it (5 of
+  6 runs; 6 of 6 after this change). The description now says to load it before
+  reading, searching, or editing — locating the cause is the skill's own first step.
+  A report that names files in a stack trace was not re-measured and may still pull
+  Claude into reading those files first.
+
+## [0.8.2] - 2026-10-27
+
+### Changed
+
+- **`reviewing-code` now routes on a pasted diff, not only a branch or PR.** Its
+  description ended on "with its suites actually run, not read as a diff" — an
+  anti-trigger: a "review this NestJS change before we merge" request with the diff
+  pasted inline loaded no review skill and Claude reviewed it directly. The description
+  now names a pasted diff as a valid review target and frames suite execution as
+  running "when they are available"; the MUST rule to actually run the suites is
+  unchanged.
+
+## [0.8.1] - 2026-10-27
+
+### Changed
+
+- **`verifying-ui` no longer auto-loads from the main conversation.** It is the
+  judging standard the `ui-reviewer` agent applies, not a request a user makes
+  directly, yet its description competed with `reviewing-ui`, and a "does this page
+  match the Figma design?" request loaded the standard instead of the pass that runs
+  it. Marking it `disable-model-invocation: true` leaves it reachable where it is
+  actually used — preloaded into `ui-reviewer` — and lets such requests route to
+  `reviewing-ui`. The places that pointed at it as something to load —
+  `reviewing-ui`'s reference table, `capturing-ui-evidence`'s routing text and
+  related-skills list, `orchestrating-feature-implementation` — now say it is read
+  as a file or applied by `ui-reviewer`, and the README no longer lists it as
+  model-invoked.
+
+## [0.8.0] - 2026-10-07
+
+### Added
+
+- **`debugging-code` — fix a bug at its cause, not at its symptom.** Until now a bug
+  went through `orchestrating-feature-implementation`, which either demanded a plan
+  or let a "trivial" fix through with nothing requiring the cause to be found. The
+  new skill reproduces the failure, secures a test that fails for the
+  reported reason — existing, corrected or new — names the root cause as a causal chain with evidence, measures how far the fix reaches before applying
+  the minimal fix, and keeps the test as a regression guard. It forbids
+  symptom-site patches — null guards, swallowed exceptions, retries, longer
+  timeouts — unless they are labelled as mitigations and the user agrees, and it
+  reports the same faulty pattern wherever else it occurs. Two references cover
+  bugs that will not reproduce and the techniques for narrowing a cause, including
+  `git bisect run` driven by the repro test — always in a throwaway worktree, so it
+  never checks out old commits under uncommitted work or other agents.
+
+### Changed
+
+- `orchestrating-feature-implementation` routes a bug whose cause is not yet known
+  to `debugging-code`, and takes it back as a plan when the fix outgrows a minimal
+  change.
+- `software-engineer` preloads `debugging-code` and follows it whenever a delegated
+  task is a fix for a reported failure — a review or verification finding, a failing
+  test, a stack trace. Until now those follow-ups were implemented with no
+  requirement to reproduce the failure or find its cause first. As a subagent it
+  cannot ask the user, so a failure it cannot reproduce, and any step that needs the
+  user's agreement or a plan, comes back as a reported deviation with the skill's
+  full report — never as a workaround that turns the Definition of Done green. It
+  never runs `git bisect`; it reports the commit range instead.
+- `creating-implementation-plans` persists an established root cause handed over by
+  `debugging-code` in the plan's Technical Context — the causal chain, its evidence
+  and the reach of the fix — so implementers fix that cause instead of
+  re-investigating it.
+
+## [0.7.2] - 2026-10-02
+
+### Fixed
+
+- **The local Playwright CLI fallback was wrong.** Seven files told Claude to run
+  `npx playwright-cli`, which fetches the unscoped npm package of that name — a
+  deprecated placeholder, not the CLI. The vendor's local form is
+  `npx playwright cli` (the `playwright` package's `cli` subcommand); every
+  occurrence now says so and names the trap.
+- **One owner for `figma-expected.png`.** `verifying-ui` and `ui-reviewer` told the
+  judge to export the Figma reference when missing, while the agent is barred from
+  writing files and `capturing-ui-evidence` already assigns the export to the capture
+  worker. The judge now returns `VERIFICATION NOT RUN` requesting the export instead.
+- `report-format.md` defined `VERIFICATION NOT RUN` as "capture missing or blocked"
+  only; `verifying-ui` also returns it for an unavailable Figma reference, a capture
+  defect and an unmeasured element. The definition now matches the rules.
+- `plan-building-blocks.md` still credited `ui-engineer` with per-component design
+  verification; since 0.7.0 the UI verification gate does that.
+- `plugin.json`'s description now matches the marketplace entry (it omitted the UI
+  verification gate).
+
+## [0.7.1] - 2026-09-21
+
+### Changed
+
+- **The Figma MCP server is no longer your problem to supply — `tsh-core` 0.10.0
+  bundles it.** The README said design fetching was "deliberately left to the
+  consuming project" because the server needed per-user authentication. That was
+  true of Figma's older token-based setup; the official remote server authenticates
+  through `/mcp` like Atlassian, so it is now bundled where every consumer can reach
+  it. Install `tsh-core` alongside this plugin and sign in once per machine. Nothing
+  in this plugin's agents or skills changed: they still discover whatever Figma tools
+  the session exposes rather than naming one, which stays correct whether the server
+  arrives from `tsh-core` or from your own `claude mcp add`.
+- Without that sign-in the behaviour is unchanged — `ui-reviewer` reports
+  `VERIFICATION NOT RUN` rather than guessing at a design.
+
 ## [0.7.0] - 2026-08-26
 
 ### Added

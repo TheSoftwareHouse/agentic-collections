@@ -10,27 +10,27 @@
       "name": "tsh-core",
       "source": "./plugins/tsh-core",
       "displayName": "TSH Core",
-      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and a bundled Atlassian MCP server for Jira and Confluence.",
+      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and two bundled MCP servers: Atlassian for Jira and Confluence, and Figma for design context.",
       "category": "tooling",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr", "decision-records", "skills", "subagents", "hooks", "plugins", "extensions", "init", "mcp", "jira", "atlassian"]
+      "keywords": ["tsh", "core", "git", "worktree", "workflow", "tooling", "writing", "documentation", "claude-md", "context", "rules", "memory", "adr", "decision-records", "skills", "subagents", "hooks", "plugins", "extensions", "init", "mcp", "jira", "atlassian", "figma", "design"]
     },
     {
       "name": "tsh-product-engineering",
       "source": "./plugins/tsh-product-engineering",
       "displayName": "TSH Product Engineering",
-      "description": "Spec-driven feature implementation: committed plan files, delegated implementer subagents, a Figma-backed UI verification gate driven by Playwright-CLI capture, and TSH's structured pre-merge code review.",
+      "description": "Spec-driven feature implementation: committed plan files, delegated implementer subagents, a Figma-backed UI verification gate driven by Playwright-CLI capture, root-cause bug fixing guarded by a regression test, and TSH's structured pre-merge code review.",
       "category": "engineering",
       "license": "MIT",
       "author": {
         "name": "The Software House",
         "url": "https://tsh.io"
       },
-      "keywords": ["tsh", "engineering", "implementation", "planning", "code-review", "subagents", "ui-verification", "figma", "playwright"]
+      "keywords": ["tsh", "engineering", "implementation", "planning", "code-review", "debugging", "subagents", "ui-verification", "figma", "playwright"]
     },
     {
       "name": "tsh-product-testing",
@@ -49,7 +49,7 @@
       "name": "tsh-product-management",
       "source": "./plugins/tsh-product-management",
       "displayName": "TSH Product Management",
-      "description": "The business-analysis workflow end to end: discovery workshop materials — transcripts, Figma, PDFs, codebase context — become Jira-ready epics and user stories and an outcome-based delivery roadmap, behind five human review gates, with a hook that blocks any Jira write before the push gate is approved. Also imports an existing Jira backlog for local iteration. Six read-only worker subagents keep the heavy reading out of the conversation.",
+      "description": "The business-analysis workflow end to end: discovery workshop materials — transcripts, Figma, PDFs, codebase context — become Jira-ready epics and user stories, a per-product domain dictionary and an outcome-based delivery roadmap, behind five human review gates, with a hook that blocks any Jira write before the push gate is approved. Also imports an existing Jira backlog for local iteration. Seven read-only worker subagents keep the heavy reading out of the conversation.",
       "category": "product",
       "license": "MIT",
       "author": {
@@ -161,6 +161,19 @@
         "url": "https://tsh.io"
       },
       "keywords": ["tsh", "stack", "python", "pydantic", "sqlmodel", "sqlalchemy", "asyncio"]
+    },
+    {
+      "name": "tsh-stack-serverless",
+      "source": "./plugins/tsh-stack-serverless",
+      "displayName": "TSH Stack: Serverless",
+      "description": "TSH practices for AWS Lambda services on OSLS: which libraries we use and which we avoid, how a serverless project is structured, TypeScript and bundler configuration for a Lambda runtime, handler implementation with middleware, event validation and structured logging, and the service definition itself — least-privilege IAM, reserved concurrency, secrets resolved at runtime, Step Functions task rules, and checks over the packaged CloudFormation template. No bootstrap and no example project: the practices are what make a service come out TSH-shaped.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "serverless", "aws", "lambda", "osls", "middy", "esbuild", "api-gateway", "step-functions"]
     }
   ]
 }

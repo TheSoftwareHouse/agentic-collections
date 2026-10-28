@@ -50,7 +50,7 @@ already there before applying this table.
 | GitHub Actions | Azure | OIDC with `azure/login` |
 | GitHub Actions | GCP | OIDC with `google-github-actions/auth` |
 | GitLab CI | AWS or GCP | OIDC with the job JWT |
-| Bitbucket Pipelines | AWS | Repository variables plus assume-role |
+| Bitbucket Pipelines | AWS | OIDC (`oidc: true`) with a web-identity role |
 | Any | Any | Vault with JWT/OIDC auth |
 
 Look up the current syntax with `context7` against the action or provider version the

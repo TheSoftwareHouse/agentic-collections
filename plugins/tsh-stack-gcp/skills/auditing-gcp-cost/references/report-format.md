@@ -61,7 +61,7 @@ descriptions — these go to people who will not read past the first section.
 
 ## 🏷️ Label Compliance
 
-| # | Resource ID | Type | Missing Tags | Status |
+| # | Resource ID | Type | Missing Labels | Status |
 |---|---|---|---|---|
 | 1 | `instance-prod-01` | Compute Engine | `owner`, `data_class` | ❌ FAIL |
 | 2 | `my-bucket` | Cloud Storage | — | ✅ PASS |

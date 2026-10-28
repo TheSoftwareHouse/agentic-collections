@@ -29,12 +29,13 @@ what is missing.
 ## Sources of truth
 
 - **EXPECTED comes only from the Figma MCP**: resolve `fileKey` and `nodeId` from the
-  supplied URL, then ensure-or-fetch the shared `figma-expected.png` at the shared
-  verification root — reuse it when present and the node is unchanged, export it via
-  the Figma MCP node-image export when missing. Extract the design specs (hierarchy,
+  supplied URL, then read the shared `figma-expected.png` at the shared
+  verification root — the capture worker owns that export; when it is missing or the
+  node changed, return `VERIFICATION NOT RUN` requesting it rather than exporting
+  it yourself. Extract the design specs (hierarchy,
   layout, spacing, frame width, typography, colors, radii, variants, states) to
-  compare against. If the Figma MCP is unavailable, the node cannot be resolved, or
-  the export genuinely fails → `VERIFICATION NOT RUN`. Never open figma.com in a
+  compare against. If the Figma MCP is unavailable or the node cannot be resolved →
+  `VERIFICATION NOT RUN`. Never open figma.com in a
   browser, never accept a browser/login/error screenshot as the reference, and never
   judge against memory or source code.
 - **ACTUAL comes only from the caller-provided capture artifacts** produced by

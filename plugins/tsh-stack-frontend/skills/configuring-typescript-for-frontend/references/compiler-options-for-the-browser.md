@@ -138,7 +138,7 @@ on browser support, and downlevelling twice only produces worse output.
 | Severity | Rule |
 | --- | --- |
 | MUST | Use `bundler` for app source. It models what bundlers actually do, including extensionless imports and `exports` maps. |
-| NEVER | Use `moduleResolution: node`/`node10`. Removed in TypeScript 6.0, and wrong for modern packages before that. |
+| NEVER | Use `moduleResolution: node`/`node10`. Deprecated in TypeScript 6.0 and removed in 7.0, and wrong for modern packages before that. |
 | MUST | Put files Node executes directly — `vite.config.ts`, codegen scripts, `*.config.ts` — in a separate config with Node resolution. `bundler` mode lets them import in ways Node will reject. |
 | MUST | Set `moduleDetection: "force"` so every file is treated as a module. Without it, a file with no imports or exports becomes a global script and its top-level names collide. |
 

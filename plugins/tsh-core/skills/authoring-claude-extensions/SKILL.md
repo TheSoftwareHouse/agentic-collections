@@ -1,7 +1,7 @@
 ---
 name: authoring-claude-extensions
-description: "Decides which Claude Code extension a need calls for — skill, subagent, hook, or plugin — and then writes it. Use when building or changing any of those four, when Claude should do something automatically or every time, when a workflow keeps getting pasted into chat, or when a setup has to be shared across repositories."
-when_to_use: "Trigger on: creating or editing a skill, subagent, hook or plugin; \"make Claude do X automatically\"; \"this should happen every time\"; a procedure pasted into chat repeatedly; a side task flooding the conversation; packaging a setup for a second repository or a marketplace; or any question of the form \"should this be a skill or a hook / a rule / an agent?\""
+description: "Decides which Claude Code extension a need calls for — skill, subagent, hook, or plugin — and then writes it. Use when building or changing any of those four, when a workflow keeps getting pasted into chat, when a side task floods the conversation, or when a setup has to be shared across repositories or published as a plugin. A single hook wired into this repository's settings.json is Claude Code's own configuration, not an extension to author."
+when_to_use: "Trigger on: creating or editing a skill, subagent or plugin; a hook that ships inside a plugin or has to reach a second repository; a procedure pasted into chat repeatedly; a side task flooding the conversation; packaging a setup for a second repository or a marketplace; or any question of the form \"should this be a skill or a hook / a rule / an agent?\". Not for adding one hook to this repository's settings.json — that is Claude Code configuration."
 ---
 
 # Authoring Claude Code extensions
@@ -19,7 +19,9 @@ This skill covers **skills, subagents, hooks, and plugins**.
 > decision record — stop and use `managing-claude-context`.** That skill owns the
 > memory layer; this one owns the things you build.
 
-Not covered at all: MCP servers, agent teams, code intelligence, artifacts.
+Not covered at all: writing an MCP server, agent teams, code intelligence,
+artifacts. Bundling an existing MCP server in a plugin is a one-line `.mcp.json` at
+the plugin root; the packaging reference names it and goes no further.
 
 ## Applicability and Precedence
 

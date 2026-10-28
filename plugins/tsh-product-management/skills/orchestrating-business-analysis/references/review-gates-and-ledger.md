@@ -25,7 +25,7 @@ file, never in the conversation. Create
 | 0 | intent-brief.md | pending | — |
 | 1 | extracted-tasks.md | pending | — |
 | 1.5 | quality-review.md | pending | — |
-| 1.75 | roadmap.md | pending | — |
+| 1.75 | .roadmap-proposal.md | pending | — |
 | 2 | jira-tasks.md | pending | — |
 ```
 

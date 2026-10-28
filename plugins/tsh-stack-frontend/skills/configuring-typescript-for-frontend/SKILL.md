@@ -74,7 +74,7 @@ do not hand-edit fields the framework manages.
 | MUST | Enable `strict`. A project that cannot turn it on wholesale enables the individual flags progressively and records the remaining gap — never ships `strict: false` as a permanent state. |
 | MUST | Pin an exact TypeScript version in `devDependencies` (no `^`). TypeScript does not follow semver — patch and minor releases add errors to previously compiling code. |
 | MUST | Use `moduleResolution: bundler` only where a bundler actually resolves the imports. Build-time files that Node executes directly — `vite.config.ts`, scripts — belong in a separate config with a Node resolution mode. |
-| NEVER | Leave `moduleResolution: node`/`node10` in a frontend project. It predates `package.json` `exports`, resolves the wrong entry point for modern packages, and TypeScript 6.0 removed it outright. |
+| NEVER | Leave `moduleResolution: node`/`node10` in a frontend project. It predates `package.json` `exports`, resolves the wrong entry point for modern packages, and TypeScript 6.0 deprecates it (it errors unless `ignoreDeprecations: "6.0"` is set) ahead of removal in 7.0. |
 | MUST | Set `noEmit: true` when a bundler owns the output. `allowImportingTsExtensions` is only legal alongside it, and two tools emitting into the same tree is a debugging trap. |
 | MUST | Mirror every `paths` alias in the bundler's own resolver (or generate both from one source). `tsc` rewrites nothing — an unmirrored alias type-checks and then fails at build or run time. |
 | MUST | Declare bundler-injected globals in a `.d.ts` the project owns — `import.meta.env`, asset imports, `vite/client`. Reaching for `any` because "the bundler provides it" discards the one place those values can be typed. |

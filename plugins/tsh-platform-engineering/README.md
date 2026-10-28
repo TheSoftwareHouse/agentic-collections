@@ -11,17 +11,6 @@ management, and evidence-based cloud cost audits.
 /plugin install tsh-platform-engineering@tsh-agentic-collections
 ```
 
-### Prerequisite for the AWS documentation server
-
-The bundled `aws-documentation` MCP server is a Python package launched with `uvx`. If
-you do not have `uv`, that one server fails to start and the rest work normally:
-
-```shell
-brew install uv          # or: curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-The four other servers use `npx` and need nothing extra.
-
 ## What's in it
 
 ### Skills
@@ -107,6 +96,11 @@ rather than an error if `tsh-core` is absent, but install it — it depends on n
 via `${CLAUDE_PLUGIN_ROOT}`. It detects the CI platform, IaC dialect, cloud provider,
 pinned versions, policy and secrets tooling, and GitOps controller — so that detection
 logic lives in one place rather than being duplicated across seven skills.
+
+## Release notes
+
+See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Teammates
+receive updates by running `/plugin update`.
 
 ## Contributing
 

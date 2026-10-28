@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: a11y-build-not-audit
+description: A build request with both a11y skills installed must route to ensuring-accessibility, not auditing-accessibility.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-testing", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Build a new accessible combobox component for our React app: keyboard navigation, correct ARIA, and screen-reader announcements for the selected option.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: ensure-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-accessibility"'
+    arm: with-only
+  - name: audit-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-accessibility"'
+    min: 0
+    max: 0

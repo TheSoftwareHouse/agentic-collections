@@ -1,6 +1,6 @@
 # Delegating to the BA workers
 
-Six read-only workers ship with this plugin. They keep their file reads, document
+Seven read-only workers ship with this plugin. They keep their file reads, document
 parsing and analysis traffic out of the main conversation and return structured
 content you merge, validate and write.
 

@@ -14,6 +14,32 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.1.2] - 2026-10-27
+
+### Changed
+
+- **`implementing-nestjs-api` now names reviewing a NestJS change as a trigger, not only
+  implementation.** Review was buried in the description behind the implementation verbs.
+  It now names reviewing a NestJS change — a command or query handler, module, TypeORM
+  repository, or DTO — for framework, CQRS and persistence risks, so a review request is
+  likelier to load the stack guidance. (Co-firing it with the discipline's code review on
+  a single pasted diff is still unreliable — 2 of 6 — so that layered case stays tracked
+  in the routing suite.)
+
+## [0.1.1] - 2026-10-02
+
+### Fixed
+
+- **Four NestJS references delegated to skills that do not exist here** —
+  `tsh-implementing-backend`, `tsh-e2e-testing` (twice) and
+  `tsh-implementing-observability`, names carried over from the Copilot collection.
+  Each sentence now states the scope boundary without naming a skill.
+- **TypeScript 6.0 facts.** Two references said 6.0 "removed" `moduleResolution:
+  node`/`node10`, `target: es5`, `downlevelIteration`, `outFile` and the legacy
+  module kinds. 6.0 deprecates them behind `ignoreDeprecations: "6.0"`; the removals
+  land in 7.0. Corrected in both, in step with the same fix in `tsh-stack-frontend`
+  0.2.2.
+
 ## [0.1.0] - 2026-08-12
 
 Initial release. This plugin is one half of the split of `tsh-stack-typescript`,

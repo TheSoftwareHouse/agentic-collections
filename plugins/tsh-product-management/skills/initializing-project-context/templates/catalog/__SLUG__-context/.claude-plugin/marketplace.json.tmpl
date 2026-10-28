@@ -1,0 +1,16 @@
+{
+  "name": "{{PROJECT_SLUG}}-context",
+  "description": "Claude Code extensions specific to the {{PROJECT_NAME}} project: every skill, agent or hook more than one role or repository needs.",
+  "owner": {
+    "name": "{{OWNER_NAME}}"
+  },
+  "plugins": [
+    {
+      "name": "{{PROJECT_SLUG}}-shared",
+      "source": "./plugins/{{PROJECT_SLUG}}-shared",
+      "description": "Team-wide Claude Code extensions specific to {{PROJECT_NAME}}.",
+      "category": "productivity",
+      "keywords": ["{{PROJECT_SLUG}}", "project-context"]
+    }
+  ]
+}

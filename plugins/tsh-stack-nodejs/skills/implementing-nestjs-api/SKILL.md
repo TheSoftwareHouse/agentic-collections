@@ -1,6 +1,6 @@
 ---
 name: implementing-nestjs-api
-description: "Guides implementation and review of NestJS 11 REST APIs with TypeScript, @nestjs/cqrs, TypeORM 0.3, and @nestjs/platform-express. Use when bootstrapping a service, organizing vertical feature slices, adding CQRS behavior, or implementing and reviewing REST API changes."
+description: "Guides implementation and review of NestJS 11 REST APIs with TypeScript, @nestjs/cqrs, TypeORM 0.3, and @nestjs/platform-express. Use when bootstrapping a service, organizing vertical feature slices, adding CQRS behavior, implementing a REST API change, or reviewing a NestJS change — a command or query handler, module, TypeORM repository, or DTO — for framework, CQRS, persistence and testability risks."
 ---
 
 # Implementing NestJS API

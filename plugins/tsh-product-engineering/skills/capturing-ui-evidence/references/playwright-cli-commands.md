@@ -7,11 +7,12 @@ The subset of `playwright-cli` used for UI verification capture. Full docs:
 
 ```bash
 playwright-cli --version                 # global install?
-npx --no-install playwright-cli --version   # local install?
+npx --no-install playwright cli --version   # local install? (NOT `playwright-cli`: that npm name is a deprecated package)
 npm install -g @playwright/cli@latest    # install globally when neither works
 ```
 
-When only the local version is available, prefix every command with `npx `.
+When only the local version is available, run every command as `npx playwright cli <cmd>`
+in place of `playwright-cli <cmd>`.
 
 ## Sessions
 

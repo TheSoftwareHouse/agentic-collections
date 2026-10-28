@@ -71,7 +71,7 @@ than a popup per task.
 
 ## Step I-6 — Save
 
-Save to `specifications/<project-or-topic>/jira-tasks.md`.
+Save to `specifications/<workshop-name>/jira-tasks.md`.
 
 After import, local edits follow the per-change modification flow in
 [`pushing-to-jira.md`](./pushing-to-jira.md) — each change asks whether to push it

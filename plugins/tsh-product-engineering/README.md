@@ -1,6 +1,6 @@
 # TSH Product Engineering
 
-Spec-driven feature implementation: committed plan files, delegated implementer subagents, and TSH's structured pre-merge code review.
+Spec-driven feature implementation: committed plan files, delegated implementer subagents, root-cause bug fixing guarded by a regression test, and TSH's structured pre-merge code review.
 
 Install at **user scope** — this plugin travels with you, not with a repository. It
 carries TSH's spec-driven implementation workflow: a plan file the team can read and
@@ -20,9 +20,10 @@ conversation, and a delegated review gate at the end.
 | :-- | :-- | :-- |
 | `orchestrating-feature-implementation` | `/tsh-product-engineering:orchestrating-feature-implementation` | Drives implementation end to end: plan readiness, delegation to the agents below (parallel where the plan allows), and a verification pyramid — scoped task checks, one checkpoint per phase, one final full pass |
 | `creating-implementation-plans` | `/tsh-product-engineering:creating-implementation-plans` | Authors `*.plan.md` files from a menu of building blocks — verifiable tasks, persisted technical context, parallel groups |
+| `debugging-code` | `/tsh-product-engineering:debugging-code` | Fixes a bug at its root cause: assess, reproduce, secure a failing test — existing, corrected or new — name the causal chain with evidence, measure the reach of the fix, apply it minimally, keep the test as a regression guard, report sibling occurrences |
 | `reviewing-code` | `/tsh-product-engineering:reviewing-code` | TSH's structured review: plan comparison, executed test suites, anti-patterns, security, scalability |
 | `reviewing-ui` | `/tsh-product-engineering:reviewing-ui` | One UI verification pass: fresh Playwright-CLI capture judged against the Figma design — PASS, FAIL, or VERIFICATION NOT RUN with a complete difference table |
-| `verifying-ui` | model-invoked only | The judging standard behind UI verification: categories, strict tolerances, PASS gate, report format — preloaded by `ui-reviewer` |
+| `verifying-ui` | preloaded by `ui-reviewer` only — not model-invocable | The judging standard behind UI verification: categories, strict tolerances, PASS gate, report format |
 | `capturing-ui-evidence` | model-invoked only | The Playwright-CLI capture contract: artifact directory rules, stabilization, and authentication that reuses the project's own login path before proposing one — preloaded by `ui-capture-worker`. Runs with or without a design reference |
 | `discovering-technical-context` | `/tsh-product-engineering:discovering-technical-context` | Project conventions in priority order: plan context → instructions → codebase patterns → external docs |
 | `software-engineer` (agent) | `@tsh-product-engineering:software-engineer` | Implements delegated plan tasks — code, tests, config — and verifies with the plan's commands |
@@ -32,16 +33,19 @@ conversation, and a delegated review gate at the end.
 | `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: runs the checks itself and returns a structured findings report |
 | `feature-verifier` (agent) | `@tsh-product-engineering:feature-verifier` | Executes a plan's verification document against the running app — E2E suites, browser walkthroughs with examined screenshots, API/DB/log checks — with per-scenario evidence |
 
-All skills are model-invocable, and their descriptions are written to route on the
-work you describe rather than on the skill's name — "implement this ticket", "plan
-this feature", "is this ready to merge", "does this page match the design". Each one
-also names the sibling that owns the adjacent job, so they do not compete for the
-same request. `verifying-ui` and `capturing-ui-evidence` stay out of the `/` menu:
-they are contracts the two UI agents preload, not commands worth typing.
+Every skill but `verifying-ui` is model-invocable, and their descriptions are written
+to route on the work you describe rather than on the skill's name — "implement this
+ticket", "plan this feature", "is this ready to merge", "does this page match the
+design". Each one also names the sibling that owns the adjacent job, so they do not
+compete for the same request. `verifying-ui` and `capturing-ui-evidence` stay out of
+the `/` menu: they are contracts the two UI agents preload, not commands worth
+typing. `verifying-ui` is also `disable-model-invocation: true`, so "does this page
+match the design?" routes to `reviewing-ui`, the pass that applies the standard,
+never to the standard itself.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
-### Prerequisites: Playwright CLI and Figma MCP
+### Prerequisites: the Playwright CLI, and a Figma sign-in
 
 **All browser evidence in this plugin runs on the
 [Playwright CLI](https://www.npmjs.com/package/@playwright/cli)** — the UI
@@ -52,15 +56,18 @@ files on disk — `actual.png`, `computed-styles.json`, `a11y-snapshot.yml` unde
 scenarios — and only paths and measured values enter model context, which is why it
 replaced the Playwright MCP server this plugin bundled through 0.6.0. Have
 `playwright-cli` on the machine: `npm install -g @playwright/cli@latest`, or a
-project-local install reached via `npx playwright-cli` (Node.js required either
+project-local install reached via `npx playwright cli` (Node.js required either
 way). You do not have to remember this: before the first capture, the workflow runs
 `playwright-cli --version` (with an `npx` fallback) and, when neither answers, asks
 whether to install it for you or wait while you do it yourself.
 
-**Design fetching needs the Figma MCP server**, which needs per-user
-authentication, so we deliberately leave it to the consuming project — connect it
-there. Without it, agents stop and report what is missing rather than guessing at a
-design; the `ui-reviewer` reports `VERIFICATION NOT RUN`. This applies to the
+**Design fetching needs the Figma MCP server, and `tsh-core` bundles it.** Install
+`tsh-core` alongside this plugin and run `/mcp` once to authenticate; every call then
+runs under your own Figma account. This plugin deliberately does not ship a second
+copy — plugin MCP servers deduplicate by endpoint, and one home per server is what
+keeps its tool names predictable. Until that sign-in happens, agents stop and report
+what is missing rather than guessing at a design; the `ui-reviewer` reports
+`VERIFICATION NOT RUN`. This applies to the
 *judgment* side only: capture itself needs no design reference, and a UI task with
 no design at all is implemented from the plan and never enters the gate. Figma is
 today's single source of EXPECTED — a deliberate scope choice, not a ceiling of the

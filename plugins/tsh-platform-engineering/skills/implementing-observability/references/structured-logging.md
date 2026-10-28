@@ -13,7 +13,6 @@ joined to a trace, which is exactly what is needed during an incident.
   "service": "payment-api",
   "trace_id": "abc123",
   "span_id": "def456",
-  "user_id": "user-789",
   "error": {
     "type": "PaymentGatewayError",
     "message": "Connection timeout"

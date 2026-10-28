@@ -2,7 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__.*(atlassian|jira|rovo|confluence).*",
+        "matcher": "mcp__.*([Aa]tlassian|[Jj]ira|[Rr]ovo|[Cc]onfluence).*",
         "hooks": [
           {
             "type": "command",

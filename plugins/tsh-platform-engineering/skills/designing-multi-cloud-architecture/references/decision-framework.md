@@ -52,7 +52,7 @@ Is analytics / BI the primary cross-cloud integration point?
 
 ### Cost Management
 
-- Tag all resources with `environment`, `team`, `cost-centre`, and `project`
+- Tag all resources with the Core 5 from `optimizing-cloud-cost` — `CostCenter`, `Environment`, `Service`, `Owner`, `DataClass` (lowercase labels on GCP)
 - Use a cross-cloud FinOps platform (CloudHealth, Apptio Cloudability, FOCUS standard)
 - Set budget alerts in each cloud; roll up to a central dashboard
 - Review reserved/committed usage quarterly

@@ -4,6 +4,15 @@ All notable changes to `tsh-stack-azure` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-02
+
+### Fixed
+
+- `implementing-azure-terraform` mandated `azurerm_policy_assignment`, a resource
+  the pinned azurerm 4.x does not have — it was split into scope-specific
+  `azurerm_<scope>_policy_assignment` resources in 3.0, so a plan failed on that
+  line. The skill now names the three current resources.
+
 ## [0.1.0] - 2026-08-22
 
 Initial release, completing the cloud family alongside `tsh-stack-aws` and

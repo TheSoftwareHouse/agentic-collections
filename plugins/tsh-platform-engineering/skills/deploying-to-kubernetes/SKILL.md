@@ -75,7 +75,7 @@ people expect, and is far simpler to operate.
 8. **Package** to the project's convention — see
    [helm-and-kustomize.md](./references/helm-and-kustomize.md).
 9. **Validate** — `kubectl apply --dry-run=server`, `helm template`, and `kubeconform`
-   or `kubeval` where the project has them.
+   where the project has it (`kubeval` is archived).
 
 ## Checklist
 

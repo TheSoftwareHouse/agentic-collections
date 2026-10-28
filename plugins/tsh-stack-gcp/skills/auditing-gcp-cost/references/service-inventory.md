@@ -41,7 +41,7 @@ generation and should move to `n2` or `e2`. Spot VMs on GKE node pools carry up 
 - **Cloud SQL** — tier and machine type, HA enabled on non-production, storage type,
   disk autoresize with no cap, backup retention
 - **AlloyDB** — instance count and machine type
-- **Firestore** — provisioned vs on-demand mode
+- **Firestore** — document reads, writes and deletes billed per operation, stored data and backups; Native vs Datastore mode
 - **Bigtable** — node count, SSD vs HDD storage
 - **Memorystore** — tier and memory size against actual use
 

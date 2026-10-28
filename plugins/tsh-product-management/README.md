@@ -35,6 +35,11 @@ backlog instead.
 | `analyze-materials` | `/tsh-product-management:analyze-materials` | Entry point for the full workflow: materials or an existing Jira backlog in, reviewed epics and stories out |
 | `explore-materials` | `/tsh-product-management:explore-materials` | Entry point for Explore Mode: a business-context summary, deliberately stopping short of any backlog item |
 | `domain-dictionary` | `/tsh-product-management:domain-dictionary` | Entry point for the per-product domain dictionary: canonical business terms, not domain-driven design |
+| `initializing-project-context` | `/tsh-product-management:initializing-project-context` | Entry point that scaffolds a project catalog with its context repository: a knowledge base with one owner per area, all decisions in one folder, a link-and-table gate, and an empty marketplace for the project's own extensions — then enables it, with this plugin, in the sibling code repositories |
+| `navigating-project-context` | `/tsh-product-management:navigating-project-context` | Reads a project's `<project>-context` knowledge base before work that depends on it — decisions, vocabulary, owners — and cites the source |
+| `writing-project-knowledge` | `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, with its index entry and the owner who reviews it |
+| `repairing-project-context-links` | `/tsh-product-management:repairing-project-context-links` | Repairs what the context repository's checker scripts report: broken links, non-kebab filenames, misrendering tables |
+| `adding-project-context-workspace` | `/tsh-product-management:adding-project-context-workspace` | Creates a knowledge-base workspace with exactly one owner and its area-map row |
 | `orchestrating-business-analysis` | `/tsh-product-management:orchestrating-business-analysis` | Runs the workflow: the five gates, the delegation, the persistent writes, the Jira push |
 | `managing-domain-dictionaries` | `/tsh-product-management:managing-domain-dictionaries` | Harvest, Reconcile and Interview modes for the dictionary, checked by eleven review passes and reconciled against a live codebase without editing it |
 | `processing-workshop-transcripts` | `/tsh-product-management:processing-workshop-transcripts` | Raw transcript to a structured document — topics, decisions, action items, preserved quotes |
@@ -51,10 +56,15 @@ backlog instead.
 | `jira-formatter` (agent) | `@tsh-product-management:jira-formatter` | Applies the benchmark template and prepares verification diffs — haiku |
 | `terminology-extractor` (agent) | `@tsh-product-management:terminology-extractor` | Extracts term candidates from material and sweeps codebase identifiers for Reconcile mode — sonnet |
 
-The three entry points — `analyze-materials`, `explore-materials` and
-`domain-dictionary` — are `disable-model-invocation: true` — commands, not routing
+The four entry points — `analyze-materials`, `explore-materials`,
+`domain-dictionary` and `initializing-project-context` — are `disable-model-invocation: true` — commands, not routing
 surfaces, so they cost nothing until you type them. Everything else is
 model-invocable and routes on how people describe the work.
+
+The four project-context skills are the one part of this plugin that people outside
+product management use. `initializing-project-context` therefore enables the plugin at
+project scope in every repository of a project it scaffolds, so an engineer or tester
+gets them without installing anything — together with the rest of this plugin.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -84,7 +94,9 @@ so one workshop's approval never carries into the next.
 
 What keeps it out of everyone else's way is the script, not the registration: it
 stands down entirely in a repository with no BA artifacts on disk, so ordinary
-Jira work elsewhere is unaffected. Confirm it is live with `/hooks`.
+Jira work elsewhere is unaffected. Confluence tools are never gated — both policies
+are about Jira issues — so publishing a domain dictionary or a page goes through the
+normal permission prompt. Confirm the hook is live with `/hooks`.
 
 ## Prerequisites
 
@@ -99,9 +111,11 @@ is available before the first push rather than assuming. For the same reason
 nothing here pins an `mcp__atlassian__*` name in a tool allowlist: Jira writes go
 through the normal permission prompt, with the hook behind it.
 
-**Figma is a prerequisite, not a bundled server.** It needs per-user
-authentication, so we leave it to the consuming project — connect it there. Without
-it, design analysis is reported as blocked rather than silently skipped.
+**Figma needs the Figma MCP server, and `tsh-core` bundles it too.** Same deal as
+Jira: install `tsh-core`, run `/mcp` once, pick `figma`. Until that sign-in happens,
+design analysis is reported as blocked rather than silently skipped. As with
+Atlassian, nothing here pins a Figma tool name — the workflow uses whatever the
+session exposes.
 
 **PDFs need nothing.** They are read with the standard `Read` tool.
 

@@ -62,8 +62,8 @@ is a task description that merely implies deployment.
    Kubernetes, Helm and CI platform syntax, always with the version the project pins in
    the query. Infrastructure APIs change between minors and a plausible-looking stale
    snippet fails at apply time, not at review. Cloud-specific documentation servers and
-   read-only state access ship with the cloud's own plugin — `tsh-stack-aws` and
-   `tsh-stack-gcp` — and are available when the repository has one installed.
+   read-only state access ship with the cloud's own plugin — `tsh-stack-aws`, `tsh-stack-gcp` and
+   `tsh-stack-azure` — and are available when the repository has one installed.
 4. **Implement**, following the project's existing conventions over the skill's
    defaults, and never mixing two conventions in one file.
 5. **Validate** with the non-mutating commands for the dialect. A change you have not

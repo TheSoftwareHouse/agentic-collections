@@ -72,7 +72,9 @@ this skill's rules only where the local convention is silent.
    launch one subagent per task in the group, so the disjoint-files rule is what
    prevents them from overwriting each other.
 7. **Persist the Technical Context** into the plan: stack and versions, conventions,
-   and the verbatim verification commands the Definitions of Done use.
+   and the verbatim verification commands the Definitions of Done use. When the plan
+   takes over a fix that outgrew `debugging-code`, the established root cause goes
+   there too: the causal chain with its evidence, and the measured reach of the fix.
 8. **Draft the verification document.** Read
    [`./references/verification-doc.md`](./references/verification-doc.md), propose
    the candidate checks — browser walkthrough, API calls, database state, log checks,

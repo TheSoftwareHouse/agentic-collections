@@ -1,0 +1,128 @@
+# Decision records
+
+Every decision for **{{PROJECT_NAME}}** is one file in **`docs/decisions/`**, indexed in
+[docs/decisions/README.md](../docs/decisions/README.md). One folder, one number
+sequence, whatever layer the decision concerns — the index's `Scope` column narrows
+them.
+
+This matches the default location and format of the `tsh-core` plugin, so
+`/tsh-core:managing-decision-records` writes a conforming record and updates the index
+without any configuration. Without that plugin, follow this file by hand.
+
+## Why one folder
+
+- **One sequence.** Records split across folders each restart at 001, so three
+  different records answer to "zero zero one" in the same conversation.
+- **One place to look.** A reader asking "was this already decided?" checks a single
+  index, not a folder per layer.
+- **Scope is a column, not a directory.** A decision often touches two layers; a
+  folder forces a false choice, a column does not.
+
+## Files and the index
+
+- Filename: `0001-short-kebab-title.md`, zero-padded, sequential, never reused and
+  never renumbered. The number is how other records refer to this one.
+- The title states the resolution ("Serve images from a CDN"), not the topic.
+- Every record has a row in the index, added in the same change. An unindexed record
+  does not exist.
+- The index is an index, never a copy: path, scope, tags, one-line description, status.
+
+| Column | Holds |
+| --- | --- |
+| Path | Relative link to the record |
+| Scope | `global`, or the layer it belongs to: `backend`, `frontend`, `design`, `mobile`, `platform`, `product`, `delivery`, `quality` |
+| Tags | Comma-separated topics, in the words a task would use |
+| Description | One line: what was decided, not why |
+| Status | One of the five below |
+
+`Scope: global` means the decision binds every layer. Use a layer value only when a
+reader working elsewhere can safely ignore it.
+
+## Where the record is written, and by what
+
+The archive is **`docs/decisions/` in this repository**, always. A decision discussed
+while working in a code repository is still written here — that is what "one folder,
+one sequence" means, and it is the single easiest rule to break, because the tool
+writing the record defaults to the repository the session started in.
+
+| You are working in | The archive path is |
+| --- | --- |
+| this repository | `docs/decisions/` |
+| the project catalog | `{{PROJECT_SLUG}}-context/docs/decisions/` |
+| a code repository beside it | `../{{PROJECT_SLUG}}-context/docs/decisions/` |
+
+Use **`/tsh-core:managing-decision-records`** and give it that path as the archive
+location. That skill owns the record format, the status vocabulary, numbering,
+superseding and the index sync; this file exists to say **where** the records live and
+**what the `Scope` column means**, not to restate the format. Where the two disagree,
+the skill wins and this file is corrected.
+
+Without that plugin installed, follow the template at the end of this file by hand and
+update [docs/decisions/README.md](../docs/decisions/README.md) in the same change.
+
+**A code repository's own archive is a different thing.** A record about that
+repository's internal conventions may live there. Anything another repository or
+another role would need to know belongs here.
+
+## Statuses
+
+Exactly five. Only `Accepted` binds; every other status is history — read it to see
+what was considered, never apply it as a current constraint.
+
+| Status | Means |
+| --- | --- |
+| `Proposed` | Written, not yet agreed. Nothing is built on it. |
+| `Accepted` | Agreed by whoever owns the decision, and in force. |
+| `Superseded` | Was in force; replaced by a later record, which is named. |
+| `Rejected` | Considered and not adopted. |
+| `Deprecated` | Was in force; no longer applies, with no replacement. |
+
+Transitions: `Proposed → Accepted | Rejected`, `Accepted → Superseded | Deprecated`.
+Nothing else. Reviving a superseded or rejected decision means a new record that cites
+the old one, never an edit backwards.
+
+A record's body is frozen once `Accepted`; after that only the status line and
+`Superseded by` change. A `Superseded` record keeps its body, including the parts now
+known to be wrong — it is a historical document.
+
+**Nobody sets a status alone.** Write `Proposed`, say which status you believe is
+correct and who confirms it, and leave it to them.
+
+**Non-binding rows stay in the index.** A `Rejected` row is what answers the next
+person proposing the same thing.
+
+## Template
+
+```markdown
+# 0001: <Title stating the resolution>
+
+- **Status:** Proposed · **Date:** {{DATE}} · **Decided by:** <who>
+- **Scope:** global · **Tags:** <comma-separated>
+- **Supersedes:** — · **Superseded by:** —
+
+## Decision
+
+<The choice, first sentence, present tense, as settled fact.>
+
+## Context
+
+<The constraint that forced it.>
+
+## Alternatives
+
+| Option | Why it lost |
+| --- | --- |
+
+## Consequences
+
+<What gets easier, what gets harder, how reversible it is.>
+```
+
+When the rationale cannot be recovered, say so in the record. An invented rationale is
+worse than an admitted gap, because it gets cited later as if it were true.
+
+## What is not a decision record
+
+A convention — "we use two-space indentation", "handlers live in this folder" — belongs
+in the owning workspace's `CLAUDE.md`, not here. A record is for a choice with
+alternatives that someone might reopen.

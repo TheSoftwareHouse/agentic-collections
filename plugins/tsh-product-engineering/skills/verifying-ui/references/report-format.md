@@ -66,7 +66,8 @@ Rules:
 - When `Clarification Needed` is used, keep the overall result `FAIL` until the user
   confirms the content/data differences are acceptable, and do not promote those
   items into `Recommended Fixes` before that confirmation.
-- `VERIFICATION NOT RUN` is used only when capture is missing or blocked. It is not
-  a pass, not a clean fail, and never a gate pass. The required action is to obtain
-  the live-capture artifacts or resolve the blocker, then rerun verification on
-  fresh artifacts.
+- `VERIFICATION NOT RUN` is used whenever the evidence cannot be trusted: capture
+  missing or blocked, the Figma reference unavailable, a capture defect, or an
+  element under verification left unmeasured. It is not a pass, not a clean fail,
+  and never a gate pass. The required action is to obtain or repair the artifacts
+  or resolve the blocker, then rerun verification on fresh artifacts.

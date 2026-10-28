@@ -135,7 +135,7 @@ output, and it silently flips `useDefineForClassFields` — see below.
 
 | Severity | Rule |
 | --- | --- |
-| NEVER | Use the legacy `moduleResolution: node` (`node10`). It predates `package.json` `exports` and silently resolves the wrong entry point for modern packages — and TypeScript 6.0 removed it outright, so it is also an upgrade blocker. |
+| NEVER | Use the legacy `moduleResolution: node` (`node10`). It predates `package.json` `exports` and silently resolves the wrong entry point for modern packages — and TypeScript 6.0 deprecates it (it errors unless `ignoreDeprecations: "6.0"` is set) ahead of removal in 7.0, so it is also an upgrade blocker. |
 | MUST | Use `node16`/`nodenext` for Node code. This is the only family of settings that models Node's real ESM/CJS rules, including the file-extension requirements in import specifiers. |
 | NEVER | Use `moduleResolution: bundler` for code Node loads directly. It permits extensionless imports that Node rejects at runtime. |
 | MUST | Keep `module` and `moduleResolution` in the same family. Mixing them produces resolution errors that read like missing files. |

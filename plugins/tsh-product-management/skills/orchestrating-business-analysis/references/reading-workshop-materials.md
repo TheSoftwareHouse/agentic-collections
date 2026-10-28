@@ -29,10 +29,10 @@ conversation.
 
 ## Figma and FigJam
 
-Figma MCP is **not bundled with this plugin** — it is a prerequisite the session
-supplies, under whatever tool names that session happens to expose. Check what is
-actually connected before promising design analysis; never assume a particular
-tool name.
+Figma MCP is **not bundled with this plugin** — `tsh-core` bundles it, and the
+teammate signs in once through `/mcp`. Either way the session supplies it, under
+whatever tool names that session happens to expose. Check what is actually
+connected before promising design analysis; never assume a particular tool name.
 
 **Design reading belongs to you, not to a worker.** Workers carry no design tools,
 for the same reason they carry no Atlassian tools: a tool allowlist naming a
