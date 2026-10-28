@@ -31,6 +31,7 @@ first and use this process to fill what they leave unstated.
 | MUST | Actually execute the relevant test suites, linters, and build — never accept "tests pass" from the implementation report. |
 | MUST | Treat missing integration coverage as a substantive finding when correctness depends on a real database, transaction boundaries, SQL semantics, migrations, queues, or external services. Unit tests alone do not cover those. |
 | MUST | Check every change for the high-risk anti-patterns listed below and report each hit unless the context documents a justified tradeoff. |
+| MUST | When the change targets a framework or stack that has its own skill available in this session — a NestJS, Terraform, frontend, Python or similar stack skill — load that skill and apply its framework-specific review checklist. This skill owns the review that is the same for every stack; the stack skill owns what is specific to one, and a review of a framework change that skips it is incomplete. Load whichever such skills are present; name none that is absent. |
 | MUST | Give every finding a severity, evidence (file and line), the consequence, and the minimum correction. No redesigns. |
 | NEVER | Report cosmetic or wording-only notes as findings, pad a clean review with invented issues, or escalate severity because an issue repeats — consolidate instead. |
 
@@ -85,7 +86,11 @@ exclusion in the report.
 **Step 5 — Best practices and anti-patterns.** Check against project standards first,
 then general practice (SOLID, DRY, KISS, low cognitive complexity — and no
 over-engineering: flag speculative abstraction as readily as duplication). Then the
-high-risk anti-pattern list above.
+high-risk anti-pattern list above. When the change targets a framework or stack whose
+skill is available this session, load it now and run its review checklist alongside
+this one — it carries the framework-specific risks (for a NestJS change: CQRS
+boundaries, TypeORM transaction and persistence semantics, DTO validation,
+testability) that a stack-agnostic review does not name.
 
 **Step 6 — Security.** Check for OWASP Top 10 classes relevant to the change —
 injection, broken auth/authz, sensitive-data exposure — and anything that would let
