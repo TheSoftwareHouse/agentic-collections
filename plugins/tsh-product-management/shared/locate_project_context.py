@@ -96,7 +96,8 @@ def marketplace_name(path):
 
 
 def is_context_repo(path):
-    return (path / "docs" / "README.md").is_file() and (path / "conventions" / "ownership.md").is_file()
+    # os.path never raises: a folder nobody may read (/tmp/systemd-private-*) is just not one.
+    return os.path.isfile(path / "docs" / "README.md") and os.path.isfile(path / "conventions" / "ownership.md")
 
 
 def slug_of(kb):
@@ -105,7 +106,7 @@ def slug_of(kb):
 
 
 def is_clone_of(path, slug):
-    return path.is_dir() and is_context_repo(path) and marketplace_name(path) == f"{slug}-context"
+    return os.path.isdir(path) and is_context_repo(path) and marketplace_name(path) == f"{slug}-context"
 
 
 def slug_from_url(url):
@@ -221,7 +222,7 @@ def candidates_above(repo, slug):
     for _ in range(SEARCH_LEVELS):
         d = d.parent
         try:
-            children = sorted(p for p in d.iterdir() if p.is_dir() and not p.name.startswith("."))
+            children = sorted(p for p in d.iterdir() if os.path.isdir(p) and not p.name.startswith("."))
         except OSError:
             children = []
         found += [c.resolve() for c in children if c != repo and is_clone_of(c, slug)]
@@ -240,7 +241,7 @@ def emit(**kv):
 def legacy(start):
     for d in (start, *start.parents):
         hits = [d] if is_context_repo(d) else sorted(
-            p for p in d.glob("*-context") if p.is_dir() and is_context_repo(p))
+            p for p in d.glob("*-context") if os.path.isdir(p) and is_context_repo(p))
         if len(hits) == 1:
             emit(KB=hits[0], SLUG=slug_of(hits[0]), URL="", SOURCE="legacy", REPO="",
                  WIRING="none", BLOCK="n/a", READ_ACCESS="n/a")

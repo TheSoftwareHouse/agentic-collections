@@ -126,6 +126,17 @@ class Layouts(Base):
         code, _, cands2, _ = self.locate(cwd=self.w / "proj2-backend")
         self.assertEqual((code, cands2), (3, [str(self.w / "proj2-context")]), "proj2 is its own choice")
 
+    def test_an_unreadable_folder_nearby_is_skipped(self):
+        """CI runners keep root-only folders in /tmp; a person may have one beside the code."""
+        self.context_repo(self.w / "acme-context", "acme")
+        locked = self.w / "locked"
+        locked.mkdir()
+        locked.chmod(0)
+        self.addCleanup(locked.chmod, 0o755)
+        repo = self.code_repo(self.w / "acme-api", "acme")
+        code, _, cands, err = self.locate(cwd=repo)
+        self.assertEqual((code, cands), (3, [str(self.w / "acme-context")]), err)
+
     def test_project_folder_with_other_files(self):
         """Jakub: project-main-dir/{context-repo, repo-1, other-dir, *.pdf}."""
         root = self.w / "project-main-dir"
