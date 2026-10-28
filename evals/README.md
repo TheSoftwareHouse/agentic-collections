@@ -228,6 +228,88 @@ example. The case
 shape, grader idioms and cost rules are in `.claude/rules/plugin-evals.md`, which
 Claude Code loads when you open any file under `evals/`.
 
+## A manual check that is not a routing case: stack depth in a review
+
+Some behaviour a single turn cannot see. When you ask `reviewing-code` to review a
+pasted NestJS diff, it loads on turn one, then on a **later** turn pulls in the
+installed stack skill (`implementing-nestjs-api`) for the framework-specific
+checklist — the same mechanism for Terraform, frontend, and any other stack skill
+present. A routing case is capped at `max_turns: 1` and structurally cannot observe
+that second turn, so this is **not** a routing case and does **not** run in CI. It is
+a manual check: run it before changing `reviewing-code` or the `code-reviewer` agent,
+and confirm the stack skill still loads.
+
+It is also why this check stays out of CI beyond the turn cap: a multi-turn review can
+delegate to the `code-reviewer` subagent, which `max_turns` does not bound (see the
+cost section in `.claude/rules/plugin-evals.md`). Always run it with `--max-cost-usd`
+set. In practice this prompt has stayed cheap — about USD 0.08 per run, no expensive
+delegation — but the cap is the safety net, not the observed cost.
+
+Save this as `evals/routing/_probe-nestjs-depth/case.yaml` — the leading underscore
+marks it throwaway, and you **delete the directory when done**, because
+`check-eval-cases.py` rejects its `max_turns: 4`:
+
+```yaml
+schema_version: "1.1"
+name: _probe-nestjs-depth
+description: Manual probe (not committed) — reviewing-code must pull in implementing-nestjs-api on a later turn.
+tags: [known-failure]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Review this change to our NestJS service before we merge it. This is the whole diff:
+
+    ```ts
+    @CommandHandler(CancelOrderCommand)
+    export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
+      constructor(@InjectRepository(Order) private readonly orders: Repository<Order>) {}
+
+      async execute({ orderId }: CancelOrderCommand) {
+        const order = await this.orders.findOneByOrFail({ id: orderId });
+        order.status = 'cancelled';
+        await this.orders.save(order);
+      }
+    }
+    ```
+
+    Is it ready to merge?
+  max_turns: 4
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: nestjs-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+```
+
+Then:
+
+```shell
+claude plugin eval . --eval-dir evals --case _probe-nestjs-depth \
+  --runs 6 -j 3 --trust-plugin --no-publish --ablation none \
+  --model claude-sonnet-5-5 --max-cost-usd 1.5
+rm -rf evals/routing/_probe-nestjs-depth
+```
+
+Expected: `reviewing-code` and `implementing-nestjs-api` each fire in all 6 runs, and
+`orchestrating-feature-implementation` in none (measured 6 of 6 on 2026-10-28,
+`tsh-product-engineering` 0.9.0). A run where `implementing-nestjs-api` stops loading
+is a regression in `reviewing-code`'s or the `code-reviewer` agent's instruction to
+load the installed stack skill.
+
 ## Known failures
 
 A case that exposes a real routing bug, whose fix belongs in a plugin change, is
