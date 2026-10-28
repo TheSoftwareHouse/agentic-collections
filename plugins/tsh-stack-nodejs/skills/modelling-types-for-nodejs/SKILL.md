@@ -52,7 +52,7 @@ and this one disagree, the framework skill wins for the files it owns.
 | PREFER | Branded types for ids and validated values that cross module boundaries, constructed through one validating function so the brand means "checked". |
 | PREFER | A `const` object plus a derived union over `enum`; NEVER a numeric `enum` for a persisted or serialized value, whose stored integers become an unversioned contract. |
 | PREFER | `satisfies` over an annotation when you want validation *and* the narrow inferred type (config objects, lookup tables). |
-| NEVER | Add a type parameter that appears only in the return position — it is an unchecked assertion wearing generic syntax; have the caller narrow an `unknown` instead. |
+| NEVER | Add a type parameter that appears only in the return position *to hand back an unproven value* — `parse<T>(raw): T` is an unchecked assertion in generic syntax; have the caller narrow an `unknown` instead. A factory that returns a container of a caller-chosen type (`createSet<T>(): Set<T>`) is the opposite and is fine — it asserts nothing. |
 | MUST | Comment every suppression and prefer `@ts-expect-error` over `@ts-ignore`; never a file-level `@ts-nocheck` in application code. A growing suppression count means a type is modelled wrongly. |
 
 ## Reference Loading

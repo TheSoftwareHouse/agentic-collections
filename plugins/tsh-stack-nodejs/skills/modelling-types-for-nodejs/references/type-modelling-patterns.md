@@ -122,7 +122,12 @@ type Brand<T, B> = T & { readonly [brand]: B };
 type UserId = Brand<string, 'UserId'>;
 type OrderId = Brand<string, 'OrderId'>;
 
-const asUserId = (raw: string): UserId => raw as UserId;   // one checked entry point
+// The one entry point, and it actually checks — the brand means "validated",
+// not "asserted". The `as` is earned only because the line above proved the format.
+function toUserId(raw: string): UserId {
+  if (!UUID_RE.test(raw)) throw new InvalidUserIdError(raw);
+  return raw as UserId;
+}
 
 function loadUser(id: UserId): Promise<User> { /* … */ }
 
@@ -132,7 +137,7 @@ loadUser(someOrderId);   // compile error — structurally identical, nominally 
 | Severity | Rule |
 | --- | --- |
 | PREFER | Branding identifiers that flow across module boundaries, and any value with a validity invariant (validated email, non-empty string, positive integer). |
-| MUST | Funnel construction through a single validating function, so the brand means "checked" rather than "asserted somewhere." |
+| MUST | Funnel construction through a single function that *validates* before it asserts, so the brand means "checked" rather than "asserted somewhere." A constructor that only does `raw as UserId` brands unchecked data and is worse than no brand — it lends false confidence. |
 | AVOID | Branding everything. The cost is conversion noise; spend it where a mix-up is plausible and expensive. |
 
 ## Unions over Enums
@@ -155,7 +160,7 @@ export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 | --- | --- |
 | PREFER | The `const` object pattern above over `enum` in new code. |
 | NEVER | Use a numeric `enum` for a value that is persisted or serialized. Numeric enums accept any number, and the stored integers become an unversioned contract. |
-| AVOID | `const enum`. It requires inlining, which breaks under `isolatedModules` and every transpile-only build. |
+| AVOID | `const enum` in new code — a plain `const` object union does the same job without its inlining footguns. Its members inline at the use site, so a `const enum` **exported from a package** bakes its values into every consumer's build and cannot be changed safely, and an **ambient** one (from a `.d.ts`) cannot be used under `isolatedModules` or `verbatimModuleSyntax` with nothing to inline. A *local* `const enum` does compile under `isolatedModules` — TypeScript emits it as an ordinary enum, so the inlining you reached for is gone anyway. |
 
 `enum` is not forbidden — an existing codebase that uses it consistently should
 stay consistent. But it is banned outright by `erasableSyntaxOnly`, so new code
@@ -191,7 +196,7 @@ function parse(raw: string): unknown { return JSON.parse(raw); }
 
 | Severity | Rule |
 | --- | --- |
-| NEVER | Add a type parameter that appears only in the return position. It is an unchecked assertion wearing generic syntax. |
+| NEVER | Add a type parameter that appears only in the return position *to produce an unproven value* — `parse<T>(raw): T` is an unchecked assertion in generic syntax. This does **not** condemn a factory that returns a container of a caller-chosen type: `createSet<T>(): Set<T>` or `createQueue<T>(): Queue<T>` are fully checked (the result starts empty, `T` only constrains later use) and keep their typing legitimately. The test is whether the function fabricates a `T`-value it cannot justify. |
 | PREFER | Constraining parameters (`<T extends { id: string }>`) so the body can rely on structure. |
 | PREFER | Overloads over a conditional return type when there are two or three concrete call shapes — the error messages are dramatically better. |
 | AVOID | Deep conditional and recursive types in application code. They are slow to check and hostile to debug; they belong in libraries. |
