@@ -59,21 +59,15 @@ jobs:
   project-context-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        # 3.9 is the stock python3 on macOS, the floor the project-context scripts promise.
-        python-version: ["3.9", "3.x"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.x"
       - name: Require node
         # The hook tests skip without node; fail here rather than pass with them skipped.
         run: node --version
       - name: Install Claude Code
-        if: matrix.python-version == '3.x'
         run: |
           # Pinned like the model: a CLI rollout must not look like a plugin regression.
           # Raise it deliberately after re-running the suites locally on the new version.
@@ -84,7 +78,5 @@ jobs:
       - name: Project-context contract tests
         run: python3 tests/project-context/test_project_context.py -v
       - name: Init scaffold smoke test
-        # On the 3.x leg it also validates the generated marketplace with the pinned CLI.
-        run: >
-          python3 plugins/tsh-product-management/skills/initializing-project-context/tests/smoke_test.py
-          ${{ matrix.python-version == '3.x' && '--with-claude' || '' }}
+        # --with-claude also validates the generated marketplace with the pinned CLI.
+        run: python3 plugins/tsh-product-management/skills/initializing-project-context/tests/smoke_test.py --with-claude

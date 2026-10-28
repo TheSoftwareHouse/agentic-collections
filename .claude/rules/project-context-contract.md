@@ -17,7 +17,7 @@ The project-context skills run git on other people's clones and write into clien
 repositories, so their scripts carry a contract that prose alone cannot keep. **After
 any change to a file this rule covers, run both and show them passing before you report
 the work done** — CI runs them too, in the `project-context-tests` job of
-`.github/workflows/quality.yml`, on Python 3.9 and the latest 3.x:
+`.github/workflows/quality.yml`, on the latest Python 3:
 
 ```shell
 python3 tests/project-context/test_project_context.py
@@ -27,7 +27,7 @@ python3 plugins/tsh-product-management/skills/initializing-project-context/tests
 They test **structure**: in both folder layouts — flat (`proj-context` beside
 `proj-backend`) and a project folder (`project/context-repo` beside `project/repo-1`) —
 for the lead's init, a teammate joining, a T3 worktree and a client repository, the
-knowledge base is set up and found. They need only `git`, `python3` (3.9+) and `node`.
+knowledge base is set up and found. They need only `git`, a current `python3` and `node`.
 **They never talk to a git server**: code repositories are local `git init` folders, a
 URL that must be reachable is a local `--bare` folder, the git config has a fake
 identity and no credential helper, and the SSH agent is removed. Keep it that way — no
