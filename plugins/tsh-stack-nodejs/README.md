@@ -27,13 +27,15 @@ both.
 | :-- | :-- | :-- |
 | `configuring-typescript-for-nodejs` | `/tsh-stack-nodejs:configuring-typescript-for-nodejs` | Which TypeScript version to pin, the `tsconfig.json` baseline for a Node runtime, `module`/`moduleResolution` for a deployed Node major, the decorator-metadata and class-field settings NestJS and TypeORM require, upgrades, and staged adoption in an existing repo |
 | `implementing-nestjs-api` | `/tsh-stack-nodejs:implementing-nestjs-api` | NestJS 11 REST APIs: vertical feature slices, CQRS handlers and module boundaries, TypeORM 0.3 persistence, DTO/validation/error contracts, testing layers, configuration and security, WebSocket gateways, and a review checklist |
+| `modelling-types-for-nodejs` | `/tsh-stack-nodejs:modelling-types-for-nodejs` | How to express a backend type so illegal states cannot compile: discriminated unions, branded ids, const-object unions over numeric enums, `satisfies`, `unknown` over `any`, generic discipline, and validating every boundary into a schema-derived type |
 
-Both skills are model-invocable — Claude loads them when the work matches their
+All three skills are model-invocable — Claude loads them when the work matches their
 description, so you don't have to remember to type the command.
 
-The two are designed to work together: `implementing-nestjs-api` assumes the
-compiler baseline the configuration skill establishes, and links to it directly.
-Because they ship in the same plugin, that link always resolves.
+They layer: `configuring-typescript-for-nodejs` sets the compiler baseline,
+`modelling-types-for-nodejs` sets how types are shaped on top of it, and
+`implementing-nestjs-api` assumes both and links to them directly. Because all three
+ship in the same plugin, those links always resolve.
 
 See [`CHANGELOG.md`](CHANGELOG.md) for what changed in each version. Updates arrive
 with `/plugin update`.
@@ -46,9 +48,6 @@ Deliberate gaps, so they read as scope rather than oversight:
   is covered; picking the transpiler is not.
 - **Monorepo project references** beyond a short note.
 - **Non-Nest frameworks** — Express, Fastify, and Hono have no skill of their own.
-- **Type modelling** — unions, branded types, `unknown` over `any`. This left with
-  the old `typescript-conventions` skill and will return as its own skill rather than
-  being duplicated per target.
 
 ## Scope
 

@@ -14,6 +14,23 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.2.0] - 2026-10-28
+
+### Added
+
+- **`modelling-types-for-nodejs` — how to shape a type so the compiler catches the bug,
+  not the runtime.** Type modelling left with the old `typescript-conventions` skill when
+  `tsh-stack-typescript` was split into runtime targets, and the READMEs have promised its
+  return since. It is back as its own skill: discriminated unions that make illegal states
+  unrepresentable, branded ids, const-object unions over numeric enums, `satisfies`,
+  `unknown` over `any`, generic discipline, and validating every boundary into a
+  schema-derived type — with backend examples (DTOs, entities, command and event payloads,
+  HTTP and env boundaries). It sits above `configuring-typescript-for-nodejs`, which keeps
+  tsconfig, versions and decorators; a question about *how to express a type* routes here,
+  one about *how to configure the compiler* routes there. Per this family's deliberate
+  duplication, a browser-targeted copy with component and store-action examples is expected
+  to follow in `tsh-stack-frontend` rather than being shared across a plugin boundary.
+
 ## [0.1.2] - 2026-10-27
 
 ### Changed
