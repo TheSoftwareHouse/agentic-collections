@@ -40,6 +40,10 @@ Exit codes:
      and one CANDIDATE=<path> per existing clone found above the repository. The
      caller asks, then re-runs with --use PATH or --clone PATH.
   4  --use / --clone refused (not a clone of this project, clone failed)
+  5  the name is taken: on this machine `<slug>-context` already names a project with
+     another URL — in the registry, at the default location, or in Claude Code's own
+     marketplace list. Prints SLUG, URL and one CONFLICT=<where> per place. Nothing is
+     read: the project plugin in this repository may be the other project's too.
 
 Actions (each only after the user said yes):
   --use PATH      remember an existing clone for this project
@@ -50,12 +54,15 @@ Actions (each only after the user said yes):
 Writes nothing without an action flag. Never runs a git command that changes a
 repository, except `git clone` under --clone and a line in .git/info/exclude under
 --grant-read. The registry lives in $TSH_CONTEXT_HOME (default ~/.tsh/context).
+Claude Code's marketplace list is read with `claude plugin marketplace list --json`
+($TSH_CONTEXT_CLAUDE names the CLI; empty skips that check).
 """
 
 import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -213,10 +220,11 @@ def remember(slug, path, url):
     registry_path().write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
-def candidates_above(repo, slug):
+def candidates_above(repo, slug, url=""):
     """Existing clones of this project in the folders above the repository:
     the flat layout (proj-context beside proj-backend) and the project folder
-    (project/context-repo beside project/repo-1), whatever the clone is called."""
+    (project/context-repo beside project/repo-1), whatever the clone is called.
+    With a URL, a clone whose origin is another URL is another project's."""
     found, stop = [], Path.home().resolve()
     d = repo
     for _ in range(SEARCH_LEVELS):
@@ -225,10 +233,128 @@ def candidates_above(repo, slug):
             children = sorted(p for p in d.iterdir() if os.path.isdir(p) and not p.name.startswith("."))
         except OSError:
             children = []
-        found += [c.resolve() for c in children if c != repo and is_clone_of(c, slug)]
+        found += [c.resolve() for c in children if c != repo and is_clone_of(c, slug)
+                  and not other_origin(c, url)]
         if d == stop or d == d.parent:
             break
     return list(dict.fromkeys(found))
+
+
+# --- one name, one project ------------------------------------------------------------
+# Claude Code keeps one marketplace per name on a machine, and the registry one clone
+# per slug: two projects called `portal` would share both, and one of them would read
+# the other's knowledge and load the other's skills. The URL tells them apart.
+
+def norm_url(url):
+    """One repository however it is written: SSH or HTTPS, with or without a user, a
+    port, Bitbucket Server's `/scm/`, or `.git`."""
+    u = url.strip().rstrip("/").lower()
+    u = re.sub(r"^[a-z][a-z0-9+.-]*://", "", u)
+    u = re.sub(r"^[^@/]+@", "", u)
+    u = re.sub(r"^([^/:]+):\d+/", r"\1/", u)
+    if not u.startswith("/"):
+        u = u.replace(":", "/", 1)
+    u = re.sub(r"^([^/]+)/scm/", r"\1/", u)
+    return u[: -len(".git")] if u.endswith(".git") else u
+
+
+def same_url(a, b):
+    return bool(a) and bool(b) and norm_url(a) == norm_url(b)
+
+
+def origin_of(path):
+    return git("remote", "get-url", "origin", cwd=path)[1] if path and os.path.isdir(path) else ""
+
+
+def other_origin(path, url):
+    """PATH is a clone of another repository than URL. A folder with no origin proves
+    nothing either way, and the person is asked about it anyway."""
+    theirs = origin_of(path)
+    return bool(url and theirs and not same_url(theirs, url))
+
+
+def known_marketplace(name):
+    """(source, where) of Claude Code's marketplace NAME on this machine, else None.
+    Best effort: no CLI, or no answer, is None."""
+    cli = os.environ.get("TSH_CONTEXT_CLAUDE", "claude")
+    if not cli or not shutil.which(cli):
+        return None
+    try:
+        r = subprocess.run([cli, "plugin", "marketplace", "list", "--json"],
+                           capture_output=True, text=True, timeout=15)
+        entries = json.loads(r.stdout) if r.returncode == 0 else []
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return None
+    for m in entries if isinstance(entries, list) else []:
+        if isinstance(m, dict) and m.get("name") == name:
+            where = m.get("url") or (f"https://github.com/{m['repo']}" if m.get("repo") else "") or m.get("path", "")
+            return m.get("source", ""), where
+    return None
+
+
+def other_projects(slug, url):
+    """Where on this machine `<slug>-context` already names a project other than the
+    one at URL, one line each: a place that knows another URL. A place with no URL
+    (a project with no remote yet) proves nothing, and neither does a repository
+    wired without one."""
+    if not url:
+        return []
+    found = []
+    entry = registry().get(slug)
+    if entry and entry.get("path"):
+        path = entry["path"]
+        urls = [u for u in (entry.get("url"), origin_of(path)) if u]
+        if urls and not any(same_url(u, url) for u in urls):
+            found.append(f"registry: {path} ({urls[0]})")
+    default = home() / slug
+    if is_clone_of(default, slug) and other_origin(default, url):
+        found.append(f"default location: {default} ({origin_of(default)})")
+    known = known_marketplace(f"{slug}-context")
+    if known and known[1]:
+        kind, where = known
+        theirs = origin_of(where) if kind == "directory" else where
+        if theirs and not same_url(theirs, url):
+            found.append(f"Claude Code marketplace {slug}-context: {where} ({theirs})")
+    return found
+
+
+def names_in_use(slug, target):
+    """For a NEW project at TARGET: where on this machine `<slug>-context` already
+    names something else, with or without a URL. TARGET itself, or a clone with
+    TARGET's own URL, is not a conflict — that is a re-run."""
+    target = Path(target).resolve()
+    mine = origin_of(target) if target.is_dir() else ""
+
+    def elsewhere(path=None, url=""):
+        if path and Path(path).expanduser().resolve() == target:
+            return False
+        return not same_url(url, mine)
+
+    found = []
+    entry = registry().get(slug)
+    if entry and entry.get("path"):
+        path = entry["path"]
+        url = entry.get("url") or origin_of(path)
+        if (url or is_clone_of(Path(path), slug)) and elsewhere(path, url):
+            found.append(f"registry: {path} ({url or 'no remote'})")
+    default = home() / slug
+    if is_clone_of(default, slug) and elsewhere(default, origin_of(default)):
+        found.append(f"default location: {default}")
+    known = known_marketplace(f"{slug}-context")
+    if known and known[1]:
+        kind, where = known
+        if (elsewhere(url=where) if kind != "directory"
+                else os.path.isdir(where) and elsewhere(where, origin_of(where))):
+            found.append(f"Claude Code marketplace {slug}-context: {where}")
+    return found
+
+
+def taken_message(slug):
+    return (f"On this machine {slug}-context already names another project. Two projects cannot "
+            f"share a name: its knowledge is not read here, and the {slug}-shared skills in this "
+            f"repository may be that project's. One of the two must be renamed — the project lead "
+            f"decides. If the other project is no longer used on this machine, remove `{slug}` "
+            f"from {registry_path()} and run `claude plugin marketplace remove {slug}-context`.")
 
 
 # --- main -------------------------------------------------------------------------
@@ -313,6 +439,14 @@ def main():
         search_from = repo
     url = source.get("url", "") if source.get("source") == "git" else ""
 
+    clash = other_projects(slug, url)
+    if clash:
+        emit(SLUG=slug, URL=url)
+        for c in clash:
+            emit(CONFLICT=c)
+        print(taken_message(slug), file=sys.stderr)
+        return 5
+
     if args.use or args.clone:
         target = Path(args.use or args.clone).expanduser().resolve()
         if args.clone:
@@ -337,6 +471,10 @@ def main():
             print(f"{target} is not a clone of {slug}-context (its marketplace name differs, or it is "
                   "not a context repository).", file=sys.stderr)
             return 4
+        if other_origin(target, url):
+            print(f"{target} is a clone of another project called {slug} "
+                  f"({origin_of(target)}), not of {url}.", file=sys.stderr)
+            return 4
         remember(slug, target, url)
 
     kb, how = None, None
@@ -353,7 +491,7 @@ def main():
 
     if kb is None:
         emit(SLUG=slug, URL=url, DEFAULT=home() / slug)
-        for c in (candidates_above(search_from, slug) if search_from else []):
+        for c in (candidates_above(search_from, slug, url) if search_from else []):
             emit(CANDIDATE=c)
         if entry:
             print(f"The remembered clone {entry['path']} is gone or no longer this project.", file=sys.stderr)

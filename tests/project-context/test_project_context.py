@@ -16,6 +16,7 @@ first push of a new knowledge base — checked by review and by hand on a real h
 Their refusals are covered, because each is decided before any network call.
 """
 
+import importlib.util
 import json
 import os
 import shutil
@@ -46,7 +47,8 @@ class Base(unittest.TestCase):
                              "[init]\n\tdefaultBranch = main\n[advice]\n\tdetachedHead = false\n")
         self.env = dict(os.environ, HOME=str(self.home), GIT_CONFIG_GLOBAL=str(gitconfig),
                         GIT_CONFIG_NOSYSTEM="1", GIT_TERMINAL_PROMPT="0",
-                        TSH_CONTEXT_HOME=str(self.home / ".tsh" / "context"))
+                        TSH_CONTEXT_HOME=str(self.home / ".tsh" / "context"),
+                        TSH_CONTEXT_CLAUDE="")  # never the person's Claude Code; see fake_claude
         for var in ("GIT_SSH_COMMAND", "SSH_AUTH_SOCK", "GIT_ASKPASS", "SSH_ASKPASS", "GIT_CONFIG_PARAMETERS"):
             self.env.pop(var, None)
         self.w = self.tmp / "work"
@@ -414,6 +416,93 @@ class Init(InitHelpers):
                          {"source": "directory", "path": "."}, "the same on every machine")
         self.py(WIRE, "--kb", kb, "--slug", "acme", "--self", "--commit", self.bare_repo(self.w / "acme-api"))
         self.assertEqual(self.git(kb, "status", "--porcelain"), "", "N5 re-wiring leaves the clone clean")
+
+
+class OneNameOneProject(InitHelpers):
+    """Two clients, each with a project called `portal`, on one machine."""
+    A, B = "git@bitbucket.org:client-a/portal-context.git", "git@bitbucket.org:client-b/portal-context.git"
+
+    def clone_of(self, path, url):
+        kb = self.context_repo(path, "portal")
+        self.git(kb, "init", "-q")
+        self.git(kb, "remote", "add", "origin", url)
+        return kb
+
+    def client_a_in_use(self):
+        kb = self.clone_of(self.w / "client-a" / "portal-context", self.A)
+        repo = self.code_repo(self.w / "client-a" / "web", "portal", url=self.A)
+        self.assertEqual(self.locate("--use", kb, cwd=repo)[0], 0)
+        return kb
+
+    def fake_claude(self, *marketplaces):
+        """Claude Code's marketplace list, without Claude Code."""
+        cli = self.tmp / "bin" / "claude"
+        cli.parent.mkdir(exist_ok=True)
+        cli.write_text("#!/bin/sh\ncat <<'EOF'\n" + json.dumps(list(marketplaces)) + "\nEOF\n")
+        cli.chmod(0o755)
+        return dict(self.env, TSH_CONTEXT_CLAUDE=str(cli))
+
+    def test_the_other_clients_knowledge_is_never_read(self):
+        self.client_a_in_use()
+        repo_b = self.code_repo(self.w / "client-b" / "web", "portal", url=self.B)
+        code, kv, _, err = self.locate(cwd=repo_b)
+        self.assertEqual(code, 5)
+        self.assertNotIn("KB", kv)
+        self.assertIn("client-a", kv["CONFLICT"])
+        self.assertIn("already names another project", err)
+
+    def test_ssh_and_https_are_one_project(self):
+        kb = self.client_a_in_use()
+        https = self.code_repo(self.w / "client-a" / "api", "portal",
+                               url="https://jakub@bitbucket.org/client-a/portal-context")
+        code, kv, _, _ = self.locate(cwd=https)
+        self.assertEqual((code, kv["KB"]), (0, str(kb)))
+        spec = importlib.util.spec_from_file_location("locator", LOCATE)
+        loc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(loc)
+        self.assertTrue(loc.same_url("ssh://git@git.acme.io:7999/shop/x.git", "https://git.acme.io/scm/shop/x.git"))
+        self.assertFalse(loc.same_url(self.A, self.B))
+        self.assertFalse(loc.same_url("", ""))
+
+    def test_a_clone_of_the_other_project_is_neither_offered_nor_used(self):
+        other = self.clone_of(self.w / "portal-context", self.A)
+        repo_b = self.code_repo(self.w / "portal-web", "portal", url=self.B)
+        code, _, cands, _ = self.locate(cwd=repo_b)
+        self.assertEqual((code, cands), (3, []))
+        code, _, _, err = self.locate("--use", other, cwd=repo_b)
+        self.assertEqual(code, 4)
+        self.assertIn("another project called portal", err)
+
+    def test_claude_codes_own_marketplace_of_another_project(self):
+        repo_b = self.code_repo(self.w / "client-b" / "web", "portal", url=self.B)
+        theirs = self.fake_claude({"name": "portal-context", "source": "git", "url": self.A})
+        code, kv, _, _ = self.locate(cwd=repo_b, env=theirs)
+        self.assertEqual(code, 5)
+        self.assertIn("Claude Code marketplace", kv["CONFLICT"])
+        ours = self.fake_claude({"name": "portal-context", "source": "git", "url": self.B})
+        self.assertEqual(self.locate(cwd=repo_b, env=ours)[0], 3, "this project's own marketplace")
+
+    def test_attach_refuses_a_taken_name_and_writes_nothing(self):
+        kb_a = self.client_a_in_use()
+        kb_b = self.context_repo(self.w / "client-b" / "portal-context", "portal")
+        api = self.bare_repo(self.w / "client-b" / "api")
+        code, _, err = self.py(WIRE, "--kb", kb_b, "--slug", "portal", "--url", self.remote_folder("portal"),
+                               "--commit", api)
+        self.assertEqual(code, 2)
+        self.assertIn("already names another project", err)
+        self.assertFalse((api / ".claude").exists())
+        registry = json.loads((self.home / ".tsh" / "context" / "registry.json").read_text())
+        self.assertEqual(registry["projects"]["portal"]["path"], str(kb_a))
+
+    def test_new_project_refuses_a_name_already_used(self):
+        self.client_a_in_use()
+        (self.w / "client-b").mkdir()
+        code, _, err = self.py(SCAFFOLD, "--name", "Portal", "--owner-tbd", "--catalog-dir", self.w / "client-b")
+        self.assertEqual(code, 3)
+        self.assertIn("already used on this machine", err)
+        self.assertFalse((self.w / "client-b" / "portal-context").exists())
+        code, _, err = self.py(SCAFFOLD, "--name", "Portal", "--owner-tbd", "--catalog-dir", self.w / "client-a")
+        self.assertEqual(code, 0, f"a re-run at the project's own clone: {err}")
 
 
 class WriteWorktree(InitHelpers):

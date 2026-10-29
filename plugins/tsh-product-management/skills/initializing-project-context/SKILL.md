@@ -86,7 +86,8 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/scaffold.py --name "<name>" --slug <slug> \
 ```
 
 (`--owner-tbd` for *Assign later*; no `--layers` for *None*; `<placement>` per the
-`Layout` answer, as in the question contract). A `!` line is a question first — see
+`Layout` answer, as in the question contract). A `!` line is a question first, and
+exit 3 means the name is taken on this machine — see
 [edge cases](./references/edge-cases.md). Show the file list, then call **N2**
 (`Scaffold`, `Repos`, `Client`, `Remote`).
 
@@ -139,7 +140,8 @@ resolve this person's clone with
 **A2 — The repository.** Call **A2** (`Client`) for the current repository, or each
 selected one. Then run `python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --kb <KB> --slug
 <SLUG> --url <URL> --register` with `--commit` or `--local`. A URL `ls-remote` cannot
-reach stops here, nothing written.
+reach, or a name this machine already uses for another project, stops here with nothing
+written — see [edge cases](./references/edge-cases.md).
 
 ### Add URL
 

@@ -9,7 +9,8 @@ Everything happens in a temporary directory that is deleted afterwards. The
 fixtures `git init` throwaway folders there to stand in for code repositories —
 the scaffold itself never runs git. Nothing is registered with Claude Code:
 wire_repos.py runs without --register and with its own TSH_CONTEXT_HOME, so the
-settings merge is tested and the user's plugin state and registry are left alone.
+settings merge is tested and the user's plugin state and registry are left alone —
+neither is even read.
 
 Exit 0 when every check passes, 1 otherwise.
 """
@@ -87,6 +88,9 @@ def generated_leftovers(root):
 def main():
     with_claude = "--with-claude" in sys.argv
     tmp = Path(tempfile.mkdtemp(prefix="pctx-smoke-")).resolve()
+    # The scaffold refuses a name this machine already uses: give it an empty registry
+    # and no Claude Code, so the person's own projects never decide the result.
+    os.environ.update(TSH_CONTEXT_HOME=str(tmp / "registry"), TSH_CONTEXT_CLAUDE="")
     try:
         print("1. Empty folder, new catalog")
         code, out = scaffold("--slug", "acme", "--parent", tmp / "empty", cwd=tmp)

@@ -39,9 +39,12 @@ the file is never touched. Moving a repository from local to commit mode removes
 local entry and block, which would otherwise outrank the committed ones. Existing
 settings keys are preserved; a settings file that is not valid JSON is left alone and
 reported. The person's clone is
-remembered for this project (the registry in $TSH_CONTEXT_HOME). The only git
-command run is `git ls-remote` against the URL, before anything is written, so a
-URL nobody can reach is never wired.
+remembered for this project (the registry in $TSH_CONTEXT_HOME). Git is only read:
+`git ls-remote` against the URL, before anything is written, so a URL nobody can
+reach is never wired, and `git remote get-url` of the clones this machine already
+knows. A name this machine already uses for another project — another URL in the
+registry or in Claude Code's marketplace list — is refused before anything is
+written too: the two would share one plugin and one clone.
 
 Usage:
     python3 wire_repos.py --kb <clone> --slug <slug> [--url <git url>]
@@ -59,6 +62,9 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "shared"))
+import locate_project_context as locator  # noqa: E402  the same plugin's own module
 
 COMPANY_MARKETPLACE = "tsh-agentic-collections"
 COMPANY_SOURCE = {"source": "github", "repo": "TheSoftwareHouse/agentic-collections"}
@@ -226,6 +232,11 @@ def main():
             print(f"error: cannot reach {a.url} ({err[-300:] or 'no detail'}). Nothing was written. "
                   "Check the URL and that your SSH key or credential helper works without a prompt.",
                   file=sys.stderr)
+            return 2
+        clash = locator.other_projects(a.slug, a.url)
+        if clash:
+            print(f"error: {locator.taken_message(a.slug)}\n  " + "\n  ".join(clash)
+                  + "\nNothing was written.", file=sys.stderr)
             return 2
     if a.commit and not a.url:
         print("note: no URL yet — repositories asked for commit mode are wired in local mode until "

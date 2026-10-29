@@ -12,7 +12,7 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
-## [0.5.0] - 2026-10-28
+## [0.5.0] - 2026-10-29
 
 ### Added
 
@@ -52,6 +52,13 @@ alone reaches nobody.
   *Add URL* publishes a knowledge base started without a remote. The context
   repository's own settings go into its first commit, so a teammate opening it gets
   the project plugin too.
+- **One name, one project.** Two projects with the same name would share one Claude
+  Code marketplace, one plugin and one clone on a machine that has both, so each would
+  read the other's knowledge and load the other's skills. *New project* now refuses a
+  name this machine already uses, *Attach repository* refuses a name it already uses
+  for another URL, and a skill reading project facts stops with a clear message instead
+  of reading the wrong knowledge base. SSH and HTTPS addresses of one repository count
+  as the same project.
 - **A guard for the project pointer.** A `PreToolUse` hook denies any edit that would
   remove or change the `tsh:project-context` block in `CLAUDE.md` or
   `CLAUDE.local.md`. It starts only for edits of those two files.

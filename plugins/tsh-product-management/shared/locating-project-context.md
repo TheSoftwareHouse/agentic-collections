@@ -26,6 +26,7 @@ the project's own plugin, `<SLUG>-shared`.
 | 2 | Several in one folder (old layout) | Ask which project the task belongs to, from the candidates on stderr. Never pick one. |
 | 3 | Wired, but this person has not chosen a clone yet | Ask **once**, with AskUserQuestion: header `Knowledge`, question "Where should the `<SLUG>` knowledge base live on this machine?", options — each `CANDIDATE` first (`Use <path>` — an existing clone of this project), then `Clone to <DEFAULT>` (recommended when there is no candidate), then `Other folder` (the person types a path). Then re-run with `--use <path>` or `--clone <path>`. The choice is remembered for every repository of the project. |
 | 4 | `--use` / `--clone` refused | Show the message. A path that is another project's clone is never used. |
+| 5 | The name is taken: on this machine `<SLUG>-context` already names another project (each `CONFLICT` says where) | Stop. Say that two projects share the name `<SLUG>`, so this repository's knowledge is not read and its `<SLUG>-shared` skills may be the other project's; quote the message. One of the projects must be renamed by its lead. Never read either clone, never edit the registry or remove a marketplace yourself. |
 
 `--clone` needs read access to the repository on the git host; a failure names the
 cause (no SSH key loaded, no credential helper for HTTPS). Never retry with a different

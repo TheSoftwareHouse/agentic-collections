@@ -28,6 +28,17 @@ layer or keep it with a distinct scope — before call N2, in prose. Two folders
 topic split the knowledge, and the routing skill then has two plausible destinations
 for the same document.
 
+## Name taken
+
+**Scaffold exit 3, or `wire_repos.py` refusing with "already names another project"**:
+on this machine `<slug>-context` already belongs to another project — in the registry,
+at `~/.tsh/context/<slug>/`, or in Claude Code's marketplace list. Two projects of one
+name would share one marketplace, one plugin and one clone, so each would get the
+other's knowledge and skills. Quote where it is taken. For *New project*, ask `Project`
+again for a different name, then repeat the dry run; nothing was written. For *Attach
+repository*, stop: the project's lead must rename one of the two projects. Never edit
+the registry or remove a marketplace to make room.
+
 ## Remote refused
 
 `context_repo_git.py remote` refuses in three cases. Quote its message, then:
