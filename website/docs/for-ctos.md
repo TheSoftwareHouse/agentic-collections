@@ -16,6 +16,7 @@ sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/SKILL.md
   - plugins/tsh-product-engineering/skills/creating-implementation-plans/SKILL.md
   - plugins/tsh-product-engineering/skills/reviewing-code/SKILL.md
+  - plugins/tsh-product-engineering/skills/auditing-application-security/SKILL.md
   - plugins/tsh-product-engineering/skills/reviewing-ui/SKILL.md
   - plugins/tsh-product-engineering/skills/discovering-technical-context/SKILL.md
   - plugins/tsh-product-testing/skills/auditing-accessibility/SKILL.md
@@ -24,7 +25,7 @@ sources:
   - plugins/tsh-core/skills/init/SKILL.md
   - plugins/tsh-core/skills/managing-decision-records/SKILL.md
   - plugins/tsh-product-management/skills/navigating-project-context/SKILL.md
-sources_hash: "2542cff5703ff95788157209d41352db3ea0ad41296a10b4686ed7f80886cc75"
+sources_hash: "16a41aa901fad9e3c1bd18f9dddeefc5b2ab3c36f89b38836cf47a3ec9230406"
 ---
 
 # For CTOs
@@ -67,7 +68,7 @@ Agentic Collections is not an application. It is plugins — skills, agents, hoo
 
 **Context management**: `/tsh-core:init` sets up the `CLAUDE.md` files, path-scoped rules and decision-record index Claude Code loads in a repository, and a project's shared knowledge base gives every connected repository the same decisions, vocabulary and owners, cited by file, last change and owner.
 
-Security is part of every code review: the review runs a universal security baseline of framework-agnostic OWASP classes on top of the project's own rules and the installed stack skill's checks.
+Security is part of every code review: the review runs a universal security baseline of framework-agnostic OWASP classes on top of the project's own rules and the installed stack skill's checks. A whole service gets a separate, read-only security audit that runs only the scanners the project already has, applies OWASP Top 10, ASVS or pen-test preparation when asked, and triages dependency advisories by reachability before severity.
 
 ---
 

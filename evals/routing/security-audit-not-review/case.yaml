@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: security-audit-not-review
+description: A dependency-advisory security triage must route to auditing-application-security, not reviewing-code, which reviews one change set against its plan.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Our `npm audit` just flagged fourteen advisories across the dependency tree. Go
+    through them and tell me which ones actually affect us and what to upgrade, ranked
+    by how exposed we are — I don't want to chase a critical score on a package we never
+    call while a real one sits at the bottom.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: audit-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-application-security"'
+    arm: with-only
+  - name: review-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0
