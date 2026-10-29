@@ -612,6 +612,38 @@ class Checkers(InitHelpers):
         self.assertEqual(code, 1)
         self.assertIn("DUPLICATE NUMBER 0001", out)
 
+    def test_every_shell_form_is_caught_and_nothing_else(self):
+        """Claude Code's own forms (docs: skills, "Inject dynamic context"), and the look-alikes."""
+        skill = self.kb / "plugins" / "acme-shared" / "skills" / "acme-pr" / "SKILL.md"
+        skill.parent.mkdir(parents=True)
+        head = "---\nname: acme-pr\ndescription: PR summary.\n---\n"
+        caught = {
+            "inline at line start": "!`git status`\n",
+            "inline after a space": "- PR diff: !`gh pr diff`\n",
+            "fenced block": "```!\nnode --version\n```\n",
+            "Bash in a list": None,
+            "Bash with CRLF": None,
+        }
+        for name, body in caught.items():
+            if name == "Bash in a list":
+                skill.write_text("---\nname: acme-pr\nallowed-tools:\n  - Read\n  - Bash(gh *)\n---\nBody\n")
+            elif name == "Bash with CRLF":
+                skill.write_text("---\r\nname: acme-pr\r\nallowed-tools: Bash\r\n---\r\nBody\r\n")
+            else:
+                skill.write_text(head + body)
+            code, out, _ = self.run_check("check_plugin.py")
+            self.assertEqual((code, "SHELL ACCESS" in out), (1, True), name)
+        allowed = {
+            "an image": "![Release flow](release.png)\n",
+            "a literal, not a command": "Set KEY=!`cmd` by hand.\n",
+            "prose that names the field": "allowed-tools: Bash is what we never grant.\n",
+            "a plain code block": "```shell\ngit status\n```\n",
+        }
+        for name, body in allowed.items():
+            skill.write_text(head + body)
+            code, out, _ = self.run_check("check_plugin.py")
+            self.assertEqual(code, 0, f"{name}: {out}")
+
     def test_plugin_stays_markdown_only(self):
         plugin = self.kb / "plugins" / "acme-shared"
         (plugin / "skills" / "acme-release").mkdir(parents=True)

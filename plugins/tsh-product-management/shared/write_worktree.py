@@ -18,6 +18,7 @@ locally or on origin, and prints the proposal to confirm:
     BASE=origin/<default>
     BASE_COMMIT=<sha>
     UPSTREAM=origin/<branch>
+    REMOTE=<origin's URL>         where a push would send the branch
 
 `start --yes --at <sha>` repeats the checks and creates exactly that: a new branch
 at the confirmed commit, which must still be on origin/<default>, with no tracking,
@@ -137,7 +138,8 @@ def start(kb, branch, confirmed, at):
     # Once confirmed, a check that no longer passes means the proposal changed under the
     # person: say so with its own code, so the caller proposes again instead of renaming.
     refused = 4 if confirmed else 2
-    if not git(kb, "remote", "get-url", "origin")[1]:
+    remote = git(kb, "remote", "get-url", "origin")[1]
+    if not remote:
         return fail(3, "The knowledge base has no remote: there is no approved version to branch from.")
     env = net_env(kb)
     base = default_branch(kb, env)
@@ -162,7 +164,7 @@ def start(kb, branch, confirmed, at):
 
     if not confirmed:
         print(f"WORKTREE={path}\nBRANCH={branch}\nBASE=origin/{base}\nBASE_COMMIT={tip[:12]}\n"
-              f"UPSTREAM=origin/{branch}")
+              f"UPSTREAM=origin/{branch}\nREMOTE={remote}")
         return 0
 
     code, sha, _ = git(kb, "rev-parse", "--verify", "--quiet", f"{at}^{{commit}}")
@@ -178,7 +180,8 @@ def start(kb, branch, confirmed, at):
         return fail(1, f"Created {path}, but it is not at {sha[:12]} without an upstream: check it by hand.")
     behind = git(kb, "rev-list", "--count", f"{sha}..refs/remotes/origin/{base}")[1]
     print(f"WORKTREE={path}\nBRANCH={branch}\nBASE=origin/{base}\nBASE_COMMIT={head[:12]}\n"
-          f"UPSTREAM=origin/{branch}" + (f"\nBASE_BEHIND={behind}" if behind not in ("", "0") else ""))
+          f"UPSTREAM=origin/{branch}\nREMOTE={remote}"
+          + (f"\nBASE_BEHIND={behind}" if behind not in ("", "0") else ""))
     return 0
 
 

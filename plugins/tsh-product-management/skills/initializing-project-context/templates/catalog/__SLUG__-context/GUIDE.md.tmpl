@@ -122,7 +122,8 @@ guide. No hooks, servers or scripts; every change bumps `version`. Rule and proc
 **The quality gate.** Four scripts in `scripts/`, run by `bitbucket-pipelines.yml` on
 every pull request: links and kebab-case names, tables that render, unique decision
 numbers, a Markdown-only and versioned plugin. On another host, run them in its
-pipeline. Protect the default branch on the host — no direct pushes, one approval.
+pipeline. Protect the default branch on the host — no direct pushes, one approval, the
+pipeline as a required check.
 
 **Where a new skill goes.** Needed by every project the same way → the company
 marketplace, not here. Needed by more than one role or repository of this project → this

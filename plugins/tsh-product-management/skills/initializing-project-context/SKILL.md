@@ -100,12 +100,17 @@ claude plugin validate . && claude plugin validate plugins/<slug>-shared
 ```
 
 A failure is a defect in this skill's templates: report it, do not hand-patch. Then,
-in this order, so the first commit carries the knowledge base's own settings:
+in this order, so the first commit carries the knowledge base's own settings and the
+guide for readers who will not open Markdown:
 
 ```shell
+python3 ${CLAUDE_SKILL_DIR}/scripts/render_guide_pdf.py "<CONTEXT_DIR>"
 python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --kb "<CONTEXT_DIR>" --slug <slug> --self
 python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py init "<CONTEXT_DIR>"
 ```
+
+`render_guide_pdf.py` exit 3 means no renderer: continue, and quote the manual command it
+printed in the report.
 
 **N4 — Remote, only with a URL.** When `Remote` carried a URL:
 `python3 ${CLAUDE_SKILL_DIR}/scripts/context_repo_git.py remote "<CONTEXT_DIR>" <URL>`.
@@ -125,9 +130,6 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/wire_repos.py --kb "<CONTEXT_DIR>" --slug <s
 
 Without a pushed URL every repository is wired in local mode; say so. Confirm with
 `claude plugin list` inside `CONTEXT_DIR` that `<slug>-shared@<slug>-context` is enabled.
-
-**N6 — Guide.** `python3 ${CLAUDE_SKILL_DIR}/scripts/render_guide_pdf.py "<CONTEXT_DIR>"`.
-Exit 3 means no renderer — quote the manual command it printed.
 
 ### Attach repository
 

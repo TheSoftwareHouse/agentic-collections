@@ -1,7 +1,8 @@
 # Question contract
 
 Every question this skill asks, as fixed AskUserQuestion calls. One call per row group,
-questions in the order shown. Context changes option labels, never the shape. Skip a
+questions in the order shown. A question that leads to a change names where it lands —
+the folder, the repository or URL — and whether it stays on this machine. Context changes option labels, never the shape. Skip a
 question only when `$ARGUMENTS` already answers it unambiguously.
 
 ## M — the mode
@@ -28,7 +29,7 @@ question only when `$ARGUMENTS` already answers it unambiguously.
 
 | # | Header | Question | Options |
 | --- | --- | --- | --- |
-| 1 | `Scaffold` | Create these files and commit them locally in `<slug>-context`? | `Create` — Write the files listed above and make the first commit; nothing is pushed · `Stop` — Write nothing |
+| 1 | `Scaffold` | Create these files in `<CONTEXT_DIR>` and commit them there? Nothing leaves this machine. | `Create` — Write the files listed above and make the first commit; nothing is pushed · `Stop` — Write nothing |
 | 2 | `Repos` *(only when git repositories sit beside it)* | Which repositories should be connected to the knowledge base? *(multi-select)* | Each git repository from `siblings` (or `parent_siblings`), at most three, plus `None`. Description: "settings, the project pointer in CLAUDE.md, and read access for you". |
 | 3 | `Client` *(only with `Repos`)* | Which of them belong to the client — nothing may be committed there? *(multi-select)* | The same repositories, plus `None — all are ours`. Description of each: "local mode: config stays on this machine, git ignores it; each teammate connects it themselves". |
 | 4 | `Remote` | Where will `<slug>-context` live on the git host? | `Keep it local for now` — Only you see it; publish later with *Add URL* · `Show me how` — Print how to create an empty repository and push. The URL of an **empty** repository you created on Bitbucket, GitHub or another host comes through *Other*, SSH or HTTPS. |
@@ -37,7 +38,7 @@ question only when `$ARGUMENTS` already answers it unambiguously.
 
 | Header | Question | Options |
 | --- | --- | --- |
-| `Push` | Push `<branch>` of `<slug>-context` to `<URL>` now? | `Push` — Publish it; from now on every change goes through branches and pull requests · `I'll push myself` — Print the command and leave it to you |
+| `Push` | Push `<branch>` of `<CONTEXT_DIR>` to the empty repository `<URL>` now? | `Push` — Publish it; from now on every change goes through branches and pull requests · `I'll push myself` — Print the command and leave it to you |
 
 Never asked without a reachable, empty remote. Never assumed from an earlier answer.
 

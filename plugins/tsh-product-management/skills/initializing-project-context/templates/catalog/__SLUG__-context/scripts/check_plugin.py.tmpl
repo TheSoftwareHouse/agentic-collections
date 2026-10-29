@@ -14,8 +14,10 @@ Checks `plugins/`:
 
 1. EXECUTABLE — `hooks/`, `.mcp.json`, `.lsp.json`, `bin/`, `scripts/`, or any
    file other than Markdown, `plugin.json` and `.gitkeep`.
-2. SHELL ACCESS — a skill or agent granting `Bash` (`allowed-tools`, `tools`), or
-   a `!` command line in a skill, which runs when the skill loads.
+2. SHELL ACCESS — a skill or agent granting `Bash` in its front matter
+   (`allowed-tools`, `tools`, inline or as a list), or a shell command in a skill,
+   which runs when the skill loads: !`cmd` at the start of a line or after a space,
+   or a fenced block opened with ```! . A Markdown image, ![alt](x.png), is neither.
 3. NO VERSION — `plugin.json` without `version`.
 4. NOT BUMPED — with `--base <ref>`: files under the plugin changed since `<ref>`
    but `version` did not.
@@ -38,8 +40,16 @@ PLUGINS = REPO_ROOT / "plugins"
 FORBIDDEN = {"hooks", ".mcp.json", ".lsp.json", "bin", "scripts"}
 ALLOWED_SUFFIXES = {".md"}
 ALLOWED_NAMES = {"plugin.json", ".gitkeep"}
-BASH_GRANT = re.compile(r"^(allowed-tools|tools)\s*:.*\bBash\b", re.M)
-BANG_LINE = re.compile(r"^\s*!`|^!\s*\S", re.M)
+FRONT_MATTER = re.compile(r"\A---[ \t]*\n(.*?)\n---[ \t]*(?:\n|\Z)", re.S)
+# The key and its value, including a YAML list on the following lines.
+TOOLS_FIELD = re.compile(r"^(?:allowed-tools|tools)[ \t]*:(.*(?:\n(?:[ \t]+|-).*)*)", re.M)
+# Claude Code runs !`cmd` at the start of a line or after whitespace, and ```! blocks.
+SHELL_COMMAND = re.compile(r"(?:^|(?<=\s))!`|^[ \t]*(?:`{3,}|~{3,})[ \t]*!", re.M)
+
+
+def grants_bash(text):
+    front = FRONT_MATTER.match(text)
+    return bool(front) and any(re.search(r"\bBash\b", m.group(1)) for m in TOOLS_FIELD.finditer(front.group(1)))
 
 
 def git(*args):
@@ -72,11 +82,11 @@ def main():
                 problems.append(f"{rel}: EXECUTABLE — only Markdown and plugin.json belong here")
                 continue
             if f.is_file() and f.suffix == ".md" and {"skills", "agents"} & parts:
-                text = f.read_text(encoding="utf-8")
-                if BASH_GRANT.search(text):
+                text = f.read_text(encoding="utf-8").replace("\r\n", "\n")
+                if grants_bash(text):
                     problems.append(f"{rel}: SHELL ACCESS — grants Bash")
-                if "skills" in parts and BANG_LINE.search(text):
-                    problems.append(f"{rel}: SHELL ACCESS — a `!` command runs when the skill loads")
+                if "skills" in parts and SHELL_COMMAND.search(text):
+                    problems.append(f"{rel}: SHELL ACCESS — a `!` shell command runs when the skill loads")
         manifest = plugin / ".claude-plugin" / "plugin.json"
         try:
             version = json.loads(manifest.read_text(encoding="utf-8")).get("version")

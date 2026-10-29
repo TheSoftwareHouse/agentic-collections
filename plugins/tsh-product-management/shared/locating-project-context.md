@@ -24,7 +24,7 @@ the project's own plugin, `<SLUG>-shared`.
 | 0 | Found | Continue with KB, then check `BLOCK` and `READ_ACCESS` below |
 | 1 | Not wired, nothing found | Stop. Say this repository is not connected to a project knowledge base, and that `/tsh-product-management:initializing-project-context` connects it (*attach repository*), or that `--url <URL>` reads a known project from anywhere. Do not answer project questions from memory. |
 | 2 | Several in one folder (old layout) | Ask which project the task belongs to, from the candidates on stderr. Never pick one. |
-| 3 | Wired, but this person has not chosen a clone yet | Ask **once**, with AskUserQuestion: header `Knowledge`, question "Where should the `<SLUG>` knowledge base live on this machine?", options — each `CANDIDATE` first (`Use <path>` — an existing clone of this project), then `Clone to <DEFAULT>` (recommended when there is no candidate), then `Other folder` (the person types a path). Then re-run with `--use <path>` or `--clone <path>`. The choice is remembered for every repository of the project. |
+| 3 | Wired, but this person has not chosen a clone yet | Ask **once**, with AskUserQuestion: header `Knowledge`, question "Where should the `<SLUG>` knowledge base live on this machine? A new copy is cloned from `<URL>`.", options — each `CANDIDATE` first (`Use <path>` — an existing clone of this project), then `Clone to <DEFAULT>` (recommended when there is no candidate), then `Other folder` (the person types a path). Then re-run with `--use <path>` or `--clone <path>`. The choice is remembered for every repository of the project. |
 | 4 | `--use` / `--clone` refused | Show the message. A path that is another project's clone is never used. |
 | 5 | The name is taken: on this machine `<SLUG>-context` already names another project (each `CONFLICT` says where) | Stop. Say that two projects share the name `<SLUG>`, so this repository's knowledge is not read and its `<SLUG>-shared` skills may be the other project's; quote the message. One of the projects must be renamed by its lead. Never read either clone, never edit the registry or remove a marketplace yourself. |
 
@@ -40,7 +40,8 @@ restore or edit it yourself.
 
 **`READ_ACCESS=missing`** — sessions in this repository will be asked for permission
 each time they read KB, because it is outside the folder. Offer once: "Allow sessions in
-this repository to read the knowledge base?" On yes, re-run with `--grant-read` — it
+`<REPO>` to read the knowledge base at `<KB>`? One line goes into
+`<REPO>/.claude/settings.local.json`, which git never sees." On yes, re-run with `--grant-read` — it
 writes only to `.claude/settings.local.json`, which stays out of git. On no, carry on;
 reads will prompt.
 
@@ -57,31 +58,36 @@ instead of the approved version, uncommitted changes, an offline or out-of-date 
 a knowledge base nobody else can see yet.
 
 On `diverged` the server's history was rewritten and the clone cannot follow it. Offer,
-with AskUserQuestion (header `Fresh copy`): "Make a fresh copy of the knowledge base in
-`<KB>-fresh`? The current one stays as it is." On yes, run §1 with `--clone
+with AskUserQuestion (header `Fresh copy`): "Clone `<remote>` again into `<KB>-fresh`? The
+current copy stays as it is." On yes, run §1 with `--clone
 "<KB>-fresh"` — the new copy is used from then on; the old one is never deleted, say
 that the person may remove it. On no, keep reading the old one with the warning.
 
 ## 3. Writing — three questions, three answers
 
 Every change to the knowledge base goes through these steps. **Each git step runs only
-after its own yes; one yes never covers another step.**
+after its own yes; one yes never covers another step.** Every question names where the
+change lands — the repository, the branch, the folder — and whether it stays on this
+machine or is sent to the git host; the person answers with the full picture.
 
 1. **Propose.** `python3 PLUGIN/shared/write_worktree.py start "<KB>" docs/<topic>`
-   changes nothing and prints `WORKTREE`, `BRANCH`, `BASE`, `BASE_COMMIT`, `UPSTREAM`.
-2. **Ask `Create`.** AskUserQuestion, header `Create`: "Create branch `<BRANCH>` from
-   `<BASE>` (the remote's default) at `<BASE_COMMIT>`, in `<WORKTREE>`? Your own copy
-   stays untouched." Options `Create` / `Cancel`. On `Create`:
+   changes nothing and prints `WORKTREE`, `BRANCH`, `BASE`, `BASE_COMMIT`, `UPSTREAM`,
+   `REMOTE`.
+2. **Ask `Create`.** AskUserQuestion, header `Create`: "Create branch `<BRANCH>` of the
+   `<SLUG>` knowledge base (`<REMOTE>`) from `<BASE>` at `<BASE_COMMIT>`, in a new folder
+   `<WORKTREE>`? Your own copy at `<KB>` stays untouched; nothing is sent." Options
+   `Create` / `Cancel`. On `Create`:
    `python3 PLUGIN/shared/write_worktree.py start "<KB>" <BRANCH> --yes --at <BASE_COMMIT>`.
    Call `WORKTREE` **W**; read and write only under W.
 3. **Write and check** under W, as the calling skill says.
 4. **Show, then ask `Commit`.** Show the change in the reader's terms: each file with one
    line on what changed, and the diff (`git -C "<W>" diff` and new files) when asked.
-   AskUserQuestion, header `Commit`: "Commit this change on `<BRANCH>`?" Options
-   `Commit` / `Change something` / `Cancel`. On `Commit`:
+   AskUserQuestion, header `Commit`: "Commit this change on `<BRANCH>`, in `<W>`? It stays
+   on this machine; nothing is sent." Options `Commit` / `Change something` / `Cancel`. On `Commit`:
    `python3 PLUGIN/shared/write_worktree.py commit "<W>" --message "<message>" --yes`.
-5. **Ask `Push`.** AskUserQuestion, header `Push`: "Push `<BRANCH>` to `<UPSTREAM>` for
-   review? Base `<BASE>` at `<BASE_COMMIT>`." Options `Push` / `Keep local`. On `Push`:
+5. **Ask `Push`.** AskUserQuestion, header `Push`: "Send branch `<BRANCH>` to `<REMOTE>`
+   for review? `<BASE>` itself is not changed — it changes only when someone merges the
+   pull request." Options `Push` / `Keep local`. On `Push`:
    `python3 PLUGIN/shared/write_worktree.py push "<W>" --yes`. The person opens the pull
    request from the link it prints.
 
@@ -99,7 +105,8 @@ this machine, untouched, for the person to finish or delete. Never delete them y
 **The one exception: no remote yet.** The knowledge base exists only on this machine (a
 lead starting alone) and there is nothing to branch from. Only if KB has no uncommitted
 changes, ask with AskUserQuestion, header `Write`: "This knowledge base has no remote
-yet. Write the change directly in `<KB>`?" Options `Write here` / `Cancel`. On yes,
+yet. Write the change directly in `<KB>` and commit it there? It stays on this
+machine." Options `Write here` / `Cancel`. On yes,
 write in KB, then step 4 with `commit "<KB>"`. Say that the change exists only on this
 machine until the project gets its URL.
 

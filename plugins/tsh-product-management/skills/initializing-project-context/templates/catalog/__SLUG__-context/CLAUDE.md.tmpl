@@ -44,8 +44,9 @@ python3 scripts/check_plugin.py --base origin/<default branch>
 ```
 
 `bitbucket-pipelines.yml` runs all four on every pull request; on another git host, run
-them in its pipeline. Protect the default branch on the host (no direct pushes, one
-approval) — that, not a script, is what guarantees nothing lands unreviewed.
+them in its pipeline. Protect the default branch on the host — no direct pushes, one
+approval, and the pipeline as a required check — that, not a script, is what guarantees
+nothing lands unreviewed.
 
 Table defects in particular fail silently — the table renders, just wrongly — and these
 documents get exported for people outside the team.

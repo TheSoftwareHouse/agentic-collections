@@ -39,7 +39,9 @@ alone reaches nobody.
   separate worktree, and create it, commit it and push it only after three separate
   answers — the commit after the person has seen the change. `write_worktree.py`
   refuses each step without `--yes`, as `tsh-core:managing-git-worktrees` does. The
-  default branch is never pushed; the pull request is opened by a person.
+  default branch is never pushed; the pull request is opened by a person. Every
+  question names where the change lands — the repository and its URL, the branch, the
+  folder — and whether it stays on this machine or is sent.
 - **Answers cite their sources with a date and an owner.** `navigating-project-context`
   names the file, its last change and the owning workspace's owner behind every fact,
   and can read a project by URL with no code repository at all.
@@ -65,8 +67,11 @@ alone reaches nobody.
 - **Two more checker scripts and a pipeline in every new context repository.**
   `check_decisions.py` catches two decision records with the same number — what two
   people writing at once produce; `check_plugin.py` keeps the project plugin
-  Markdown-only and refuses a change to it without a version bump.
-  `bitbucket-pipelines.yml` runs all four checkers on every pull request.
+  Markdown-only — no `Bash` grant in the front matter, no shell command in any form
+  Claude Code runs when a skill loads — and refuses a change to it without a version
+  bump. `bitbucket-pipelines.yml` runs all four checkers on every pull request, and the
+  report tells the lead to make it a required check. `GUIDE.pdf` goes into the first
+  commit, so every teammate has it.
 
 ### Changed
 
