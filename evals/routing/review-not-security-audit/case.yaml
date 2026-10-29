@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: review-not-security-audit
+description: A pre-merge review of one change — even a security-sensitive one — must route to reviewing-code, not auditing-application-security, which audits a whole surface.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    I've finished the change that adds token-based authentication to the orders
+    endpoint. Review it before we merge: check the auth is enforced correctly and that
+    the tests cover it, and tell me whether it's ready to merge.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: audit-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-application-security"'
+    min: 0
+    max: 0
