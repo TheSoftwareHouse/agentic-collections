@@ -12,6 +12,29 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.11.0] - 2026-10-29
+
+### Added
+
+- **`auditing-application-security` — a security audit of a whole service, not one
+  change.** `reviewing-code` reads a diff and cannot see a vulnerability outside it; this
+  skill reads a **surface**. It maps the attack surface entry point by entry point, runs
+  only the security scanners the project already has (SAST, secret, dependency and
+  filesystem scanners — never installing one), applies the universal baseline classes
+  shared with `reviewing-code` plus any named standard (OWASP Top 10, ASVS, pen-test
+  prep) and the installed stack skill's rows, and triages dependency advisories by
+  reachability and exploitability before severity. It reports and never fixes. The
+  companion `references/dependency-triage.md` carries the read-only audit command per
+  ecosystem and the reachability → exploitability → severity → action model.
+- **`security-auditor` agent** — a read-only delegate (`Write`/`Edit` denied) that runs
+  the audit end to end and returns a severity-ranked report, keeping scanner output out
+  of the main conversation, the same shape as `infrastructure-auditor` on the platform
+  side.
+- Two routing cases, `security-audit-not-review` and `review-not-security-audit`, fix
+  the one real collision: a whole-service audit routes to the audit skill, a pre-merge
+  review of one change — even a security-sensitive one — routes to `reviewing-code`. The
+  split is scope, not subject.
+
 ## [0.10.0] - 2026-10-28
 
 ### Changed
