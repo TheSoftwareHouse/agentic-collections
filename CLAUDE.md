@@ -23,7 +23,7 @@ Route every contribution to the plugin that owns the work.
 
 | Plugin | Owns |
 | :-- | :-- |
-| `tsh-product-engineering` | Feature implementation, code review, refactoring, debugging, TDD workflows |
+| `tsh-product-engineering` | Feature implementation, code review (including the application-security baseline), refactoring, debugging, TDD workflows |
 | `tsh-product-testing` | E2E testing, accessibility testing, exploratory/manual QA, test-plan authoring |
 | `tsh-product-management` | Business analysis, requirements & user stories, discovery and scoping |
 | `tsh-product-design` | UI/UX design work, design systems, design review, Figma-driven flows |

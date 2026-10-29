@@ -31,6 +31,7 @@ first and use this process to fill what they leave unstated.
 | MUST | Actually execute the relevant test suites, linters, and build — never accept "tests pass" from the implementation report. |
 | MUST | Treat missing integration coverage as a substantive finding when correctness depends on a real database, transaction boundaries, SQL semantics, migrations, queues, or external services. Unit tests alone do not cover those. |
 | MUST | Check every change for the high-risk anti-patterns listed below and report each hit unless the context documents a justified tradeoff. |
+| MUST | Run the universal security baseline in [`references/security-review-checklist.md`](./references/security-review-checklist.md) on every review. It is a floor: a project's own security rules outrank it and apply first, and the installed stack skill's security rows run on top. Missing authorization on a new entry point and object-level authz (IDOR) are the highest-frequency, highest-severity misses — check them on every change that adds or reaches a data access path. |
 | MUST | When the change targets a framework or stack that has its own skill available in this session — a NestJS, Terraform, frontend, Python or similar stack skill — load that skill and apply its framework-specific review checklist. This skill owns the review that is the same for every stack; the stack skill owns what is specific to one, and a review of a framework change that skips it is incomplete. Load whichever such skills are present; name none that is absent. |
 | MUST | Give every finding a severity, evidence (file and line), the consequence, and the minimum correction. No redesigns. |
 | NEVER | Report cosmetic or wording-only notes as findings, pad a clean review with invented issues, or escalate severity because an issue repeats — consolidate instead. |
@@ -46,6 +47,12 @@ Always checked, always substantive when found:
   database or upstream service.
 - **Missing integration tests** for behavior that depends on a real database or an
   external service boundary.
+
+## Reference Loading
+
+| Reference | Load when | Covers |
+| --- | --- | --- |
+| [Security review checklist](./references/security-review-checklist.md) | Step 6, every review | The universal security baseline — framework-agnostic OWASP classes worth checking on any change, each with what to look for in the diff and the minimum correction, plus how project rules, stack skills and named standards layer on top |
 
 ## Review Procedure
 
@@ -92,9 +99,16 @@ this one — it carries the framework-specific risks (for a NestJS change: CQRS
 boundaries, TypeORM transaction and persistence semantics, DTO validation,
 testability) that a stack-agnostic review does not name.
 
-**Step 6 — Security.** Check for OWASP Top 10 classes relevant to the change —
-injection, broken auth/authz, sensitive-data exposure — and anything that would let
-one user act as another.
+**Step 6 — Security.** Load
+[`./references/security-review-checklist.md`](./references/security-review-checklist.md)
+and run its universal baseline against the change — broken access control and
+object-level authz (the most common and highest-severity classes), injection, unsafe
+deserialization, mass assignment, sensitive-data exposure, hardcoded secrets, crypto
+and auth weaknesses, SSRF, vulnerable dependencies, and security misconfiguration. The
+checklist is a floor: a project's own security rules outrank it and are applied first,
+and when a stack skill is available this session its security rows run on top of the
+baseline. A change that only needs the baseline still gets it; nothing here replaces a
+dedicated audit when the task is to audit a whole service rather than review a change.
 
 **Step 7 — Scalability.** Statefulness that blocks horizontal scaling, unbounded
 memory growth, and needlessly high computational complexity on hot paths.
