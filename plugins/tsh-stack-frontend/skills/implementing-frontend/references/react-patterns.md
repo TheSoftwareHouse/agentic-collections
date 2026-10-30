@@ -5,35 +5,35 @@ Load this reference before writing or reviewing React code.
 
 ## Imports
 
-Import every React API by name, types with `import type` or an inline `type`
-modifier — `verbatimModuleSyntax` requires it:
+The rule is in `SKILL.md`; this is how to apply and enforce it.
+
+| Severity | Rule |
+| --- | --- |
+| MUST | Mark type-only imports with `type`, inline or as `import type`. `verbatimModuleSyntax` rejects an unmarked type import. |
+| MUST | Enforce the import style with the ESLint rule below in a new project. In a codebase that uses the namespace style throughout, propose it as its own change. |
 
 ```tsx
 import { lazy, memo, useState, type ReactNode } from 'react';
 ```
 
-Not `import * as React from 'react'`, not `import React from 'react'`, and not
-`React.useState`, `React.memo` or `React.FC` in the code. With the automatic JSX
-runtime (`jsx: react-jsx`) nothing needs `React` in scope, so the namespace only adds
-a second way to write every call. Type a component's props on the parameter
-(`function Card({ title }: CardProps)`) rather than through `FC`.
-
-A rule the model can forget is a rule the linter should hold. Add this to the
-project's ESLint flat config — it assumes the `typescript-eslint` parser:
+The rule needs the `typescript-eslint` parser. Merge the entries into the project's
+existing `no-restricted-syntax` — a second declaration of the rule replaces the
+first instead of adding to it.
 
 ```js
-'no-restricted-syntax': ['error',
-  { selector: "ImportDeclaration[source.value='react'] > ImportNamespaceSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
-  { selector: "ImportDeclaration[source.value='react'] > ImportDefaultSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
-  { selector: "MemberExpression[object.name='React']", message: 'Use the named import instead of React.x.' },
-  { selector: "TSQualifiedName[left.name='React']", message: "Import the type by name: import { type ReactNode } from 'react'." },
-],
+// eslint.config.js
+{
+  files: ['**/*.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': ['error',
+      { selector: "ImportDeclaration[source.value='react'] > ImportNamespaceSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
+      { selector: "ImportDeclaration[source.value='react'] > ImportDefaultSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
+      { selector: "MemberExpression[object.name='React']", message: 'Use the named import instead of React.x.' },
+      { selector: "TSQualifiedName[left.name='React']", message: "Import the type by name: import { type ReactNode } from 'react'." },
+    ],
+  },
+},
 ```
-
-Merge it with any `no-restricted-syntax` entries the project already has — a second
-declaration of the rule replaces the first. In an existing codebase that uses the
-namespace style throughout, propose the switch as its own change rather than mixing
-styles.
 
 ## Component composition
 
