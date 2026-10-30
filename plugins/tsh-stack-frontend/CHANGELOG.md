@@ -28,8 +28,8 @@ alone reaches nobody.
   `React.useState` and `React.FC` were not covered anywhere, and the React reference
   itself used `React.memo` and `React.lazy`. The rule sits in `SKILL.md`, the
   reference shows the named form, and it carries an ESLint `no-restricted-syntax`
-  rule the agent proposes — and adds only once the team agrees — to enforce it. A codebase that already uses the namespace style consistently
-  keeps it.
+  rule the agent proposes — and adds only once the team agrees — to enforce it. A
+  codebase that already uses the namespace style consistently keeps it.
 - **No pass-through files after a module move.** The barrel rules moved from a
   reference into `SKILL.md`, because the reference loaded only "when adding a barrel
   file" and a module move never matched. A file left at the old path that only
