@@ -26,10 +26,12 @@ A repository has one cloud; an engineer works across several.
 
 Invoked as `/tsh-stack-azure:<skill>`.
 
-### Bundled MCP servers
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
-`context7` only, for Terraform `azurerm` provider documentation, VM sizes and pricing
-tiers. It is read-only.
+### MCP servers
+
+None bundled here. Terraform `azurerm` provider documentation, VM sizes and pricing
+tiers come from `context7`, which `tsh-core` bundles. It is read-only.
 
 **No Azure control-plane MCP server is bundled.** Microsoft's `@azure/mcp` is still
 pre-release and write-capable, so live subscription state is read through the `az` CLI —

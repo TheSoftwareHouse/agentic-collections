@@ -152,10 +152,11 @@ so `0 skills` is normal and doesn't mean anything failed.
 
 ## Step 4 — sign in to Jira and Figma, once per machine
 
-`tsh-core` bundles two MCP servers: the Atlassian one, so Claude reads and updates
-Jira work items and Confluence pages directly, and the Figma one, so it reads designs
-— layout, variables, components and a rendered export — instead of working from a
-description. Both need one interactive login each:
+`tsh-core` bundles three MCP servers. Two need one interactive login each: the
+Atlassian one, so Claude reads and updates Jira work items and Confluence pages
+directly, and the Figma one, so it reads designs — layout, variables, components and a
+rendered export — instead of working from a description. The third, Context7, serves
+library documentation and needs no sign-in.
 
 ```shell
 /mcp
@@ -276,7 +277,7 @@ Everyone, at **User** scope.
 
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
-| [`tsh-core`](plugins/tsh-core) | What holds regardless of role and stack — Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format, a one-command project setup, and the bundled Atlassian and Figma MCP servers | `/plugin install tsh-core@tsh-agentic-collections` |
+| [`tsh-core`](plugins/tsh-core) | What holds regardless of role and stack — Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format, a one-command project setup, and the bundled Atlassian, Figma and Context7 MCP servers | `/plugin install tsh-core@tsh-agentic-collections` |
 
 One plugin, not a family. Anything that would change if you switched job belongs in
 a discipline plugin; anything that would change if the repo switched language

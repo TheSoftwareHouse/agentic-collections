@@ -85,7 +85,7 @@ what routes the model to the right file; keep it filled in when adding reference
 
 ### The Atlassian connector
 
-**This plugin bundles two MCP servers** (`.mcp.json`). The first is Atlassian's official
+**This plugin bundles three MCP servers** (`.mcp.json`). The first is Atlassian's official
 [Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/),
 so Claude reads and updates Jira work items and Confluence pages directly instead of
 waiting for someone to paste a ticket into the conversation. It sits here rather than
@@ -148,7 +148,21 @@ remote server needs neither. Add it yourself if you want it:
 claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
 ```
 
-**Do not pin either server's tool names.** Not in an agent's `tools:`, not in a
+### The Context7 connector
+
+**The third is [Context7](https://github.com/upstash/context7)**, which serves current,
+version-specific library and framework documentation, so Claude checks an API against
+the version a project pins instead of recalling it. It sits here because three
+disciplines drive it in a normal month: testing looks up the Playwright API,
+platform engineering reads Terraform provider, Kubernetes and CI documentation, and
+product engineering checks framework APIs while implementing — the frontend stack's
+React version policy names it. Until this plugin took it over, five plugins each
+bundled their own copy.
+
+**No sign-in.** It runs locally through `npx`, read-only, and needs Node on the
+machine. Without an API key it works under Context7's anonymous rate limit.
+
+**Do not pin any server's tool names.** Not in an agent's `tools:`, not in a
 skill's `allowed-tools:`, not in a hook matcher. One home per server makes those
 names *safer*, not safe — a teammate with their own user-scope `figma` entry wins on
 precedence, and the namespace becomes `mcp__figma__*` rather than

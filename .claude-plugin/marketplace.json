@@ -10,7 +10,7 @@
       "name": "tsh-core",
       "source": "./plugins/tsh-core",
       "displayName": "TSH Core",
-      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and two bundled MCP servers: Atlassian for Jira and Confluence, and Figma for design context.",
+      "description": "What every TSH teammate needs regardless of discipline or stack: safe Git worktree lifecycle management, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, a one-command project setup that wires them all together, and three bundled MCP servers: Atlassian for Jira and Confluence, Figma for design context, and Context7 for library documentation.",
       "category": "tooling",
       "license": "MIT",
       "author": {
@@ -88,7 +88,7 @@
       "name": "tsh-stack-frontend",
       "source": "./plugins/tsh-stack-frontend",
       "displayName": "TSH Stack: Frontend",
-      "description": "TSH conventions for browser-targeted frontend code: TypeScript compiler configuration for bundler-resolved applications, component implementation patterns with a Figma-first workflow, and WCAG 2.1 AA accessibility implementation.",
+      "description": "TSH conventions for browser-targeted frontend code: TypeScript compiler configuration for bundler-resolved applications, implementation conventions for any change to frontend code — React imports, components and hooks, module boundaries, and a Figma-first workflow when a design exists — and WCAG 2.1 AA accessibility implementation.",
       "category": "engineering",
       "license": "MIT",
       "author": {

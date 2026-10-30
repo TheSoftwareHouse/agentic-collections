@@ -48,6 +48,11 @@ improvise a scope.
 - Minimum code that solves the problem. Nothing speculative, no dead code, no
   utilities "for later".
 - Touch only what your tasks require. Clean up only mess you made in this delegation.
+- Moving or renaming a module is finished when every importer points at the new path
+  and the old file is gone. A file left behind that only re-exports the new location
+  is not the minimal change — it is a second path to the same code. The exception is
+  a published package's public API: keep the old export, mark it `@deprecated`, and
+  say so in your report.
 - Follow the plan strictly. A deviation you believe necessary is a report, not a
   decision you make alone.
 - When researching an external library, read the project manifest for its exact

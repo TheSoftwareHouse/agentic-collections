@@ -4,6 +4,15 @@ All notable changes to `tsh-stack-aws` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-30
+
+### Changed
+
+- **`context7` moved to `tsh-core`.** This plugin no longer bundles its own copy;
+  `tsh-core`, which every plugin may assume is installed, now ships the one shared
+  definition. The skills still look documentation up with `context7` as before. If
+  you have not installed `tsh-core`, install it to keep the server.
+
 ## [0.1.0] - 2026-08-22
 
 Initial release. Carries the AWS-specific half of TSH's infrastructure guidance, split
