@@ -3,9 +3,12 @@
 
 Creates, under --parent (default: the current directory):
 
-    <slug>/                      the project catalog
-    <slug>/CLAUDE.md             pointer loaded in every session below
+    <slug>/                      a project folder
     <slug>/<slug>-context/       knowledge base + Claude Code marketplace
+
+or, with --catalog-dir DIR, just DIR/<slug>-context/. Where the folder sits is the
+person's choice, not a contract: code repositories reach the knowledge base by its
+git URL, and each person's clone can be anywhere.
 
 from the templates in ../templates. Every template path and file body has
 {{PROJECT_NAME}}, {{PROJECT_SLUG}}, {{OWNER}}, {{OWNER_NAME}}, {{OWNER_EMAIL}}
@@ -24,7 +27,10 @@ catalog itself, whatever it is called — the slug then only names the context
 repository inside it.
 
 The script never overwrites: an existing file is left alone and reported, so a
-second run converges to "nothing to do". It never runs git.
+second run converges to "nothing to do". It changes no repository; it only reads
+(`git remote get-url`, `claude plugin marketplace list`) to refuse a slug this
+machine already uses for another project — two projects of one name would share one
+Claude Code marketplace, one plugin and one registry entry.
 
 Usage:
     python3 scaffold.py --name "Acme Portal" --owner-name "Jane Doe" \
@@ -34,7 +40,8 @@ Usage:
     python3 scaffold.py --name "Acme Portal" --owner-tbd --catalog-dir . --slug acme
 
 Prints a report: created / skipped (already existed), then CONTEXT_DIR and SLUG.
-Exit 0 on success, 2 on bad arguments.
+Exit 0 on success, 2 on bad arguments, 3 when the slug is taken on this machine
+(nothing written; choose another name).
 """
 
 import argparse
@@ -45,6 +52,9 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parents[2] / "shared"))
+import locate_project_context as locator  # noqa: E402  the same plugin's own module
+
 TEMPLATES = HERE.parent / "templates"
 CATALOG_TEMPLATES = TEMPLATES / "catalog"
 LAYER_TEMPLATES = TEMPLATES / "layers"
@@ -192,6 +202,16 @@ def main():
     catalog = (Path(args.catalog_dir).resolve() if args.catalog_dir
                else Path(args.parent).resolve() / slug)
     context = catalog / f"{slug}-context"
+
+    taken = locator.names_in_use(slug, context)
+    if taken:
+        print(f"error: the name '{slug}' is already used on this machine by another project:",
+              file=sys.stderr)
+        for where in taken:
+            print(f"  {where}", file=sys.stderr)
+        print("Choose another name, unique in the company — client and project, e.g. "
+              "'acme-shop' rather than 'shop'. Nothing was written.", file=sys.stderr)
+        return 3
 
     created, skipped = [], []
     for src in sorted(CATALOG_TEMPLATES.rglob("*")):

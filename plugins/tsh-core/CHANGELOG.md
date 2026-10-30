@@ -14,6 +14,16 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.4] - 2026-10-28
+
+### Changed
+
+- `managing-claude-context` never removes, edits, moves or summarises a block fenced
+  by `<!-- tsh:<name> START` … `<!-- tsh:<name> END -->` in `CLAUDE.md` or
+  `CLAUDE.local.md` when trimming. A TSH tool owns that block — the
+  `tsh:project-context` pointer to a project's knowledge base is the first — and
+  rewrites it itself.
+
 ## [0.10.3] - 2026-10-28
 
 ### Fixed

@@ -1,0 +1,20 @@
+# Quality gate for {{PROJECT_SLUG}}-context, on every pull request.
+# Bitbucket builds a pull request merged with its destination branch, so two
+# branches that each took the next decision number fail here, before the merge.
+# On another git host, run the same four commands in its pipeline.
+image: python:3.12
+
+clone:
+  depth: full
+
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Knowledge-base gate
+          script:
+            - python3 scripts/check_links.py
+            - python3 scripts/check_tables.py
+            - python3 scripts/check_decisions.py
+            - git fetch origin "+refs/heads/$BITBUCKET_PR_DESTINATION_BRANCH:refs/remotes/origin/$BITBUCKET_PR_DESTINATION_BRANCH"
+            - python3 scripts/check_plugin.py --base "origin/$BITBUCKET_PR_DESTINATION_BRANCH"

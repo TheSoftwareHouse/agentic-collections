@@ -1,8 +1,9 @@
 # {{PROJECT_SLUG}}-context
 
-Knowledge base and Claude Code marketplace of the **{{PROJECT_NAME}}** project.
-Start at [docs/README.md](docs/README.md). Why it exists and how to use it:
-[GUIDE.md](GUIDE.md).
+Knowledge base and Claude Code marketplace of the **{{PROJECT_NAME}}** project — the
+single source of its project knowledge: nothing about scope, decisions, vocabulary or
+ownership is authoritative anywhere else. Start at [docs/README.md](docs/README.md). Why
+it exists and how to use it: [GUIDE.md](GUIDE.md).
 
 ## Rules
 
@@ -14,31 +15,43 @@ Start at [docs/README.md](docs/README.md). Why it exists and how to use it:
    **never in a code repository**. **Only `Accepted` binds.** Write one with
    `/tsh-core:managing-decision-records`, pointing it at `docs/decisions/` as the
    archive; that skill owns the format, the statuses and the index schema, and
-   [conventions/decisions.md](conventions/decisions.md) matches them.
+   [conventions/decisions.md](conventions/decisions.md) matches them. This holds from
+   every repository of the project: a decision discussed in a code repository is still
+   written here.
 3. **One space, one owner.** Every workspace under `docs/` has a `CLAUDE.md` naming its
    owner; read it before editing there, and the owner reviews the change. Standard:
    [conventions/ownership.md](conventions/ownership.md).
-4. **Only project-specific extensions in `plugins/`.** A skill, agent or hook lands in
-   `plugins/{{PROJECT_SLUG}}-shared/` only when it is specific to this project and more
-   than one role or repository needs it; anything repository-specific stays in that
-   repository's own `.claude/`, and anything every project needs the same way belongs
-   in the company marketplace — the skills over this knowledge base are there. Rule:
-   [plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md).
+4. **Only project-specific instructions in `plugins/`, Markdown only.** A skill or agent
+   lands in `plugins/{{PROJECT_SLUG}}-shared/` only when it is specific to this project
+   and more than one role or repository needs it — and never a hook, MCP server or
+   script: the whole team installs this plugin. Every change to it bumps `version`.
+   Rule: [plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md).
+5. **Every change goes through a branch and a pull request.** Nothing is pushed to the
+   default branch directly; the owner of the area reviews. The skills below write on
+   their own branch and push only after you say yes.
 
 ## Quality gate
 
 Every relative link must resolve and every markdown filename must be kebab-case; every
-markdown table must render. Both are checked by:
+markdown table must render; decision numbers must be unique; the plugin must stay
+Markdown-only and versioned. Checked by:
 
 ```shell
 python3 scripts/check_links.py
 python3 scripts/check_tables.py
+python3 scripts/check_decisions.py
+python3 scripts/check_plugin.py --base origin/<default branch>
 ```
 
-Run them before opening a pull request. Table defects in particular fail silently —
-the table renders, just wrongly — and these documents get exported for people outside
-the team. With the shared plugin installed,
-`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
+`bitbucket-pipelines.yml` runs all four on every pull request; on another git host, run
+them in its pipeline. Protect the default branch on the host — no direct pushes, one
+approval, and the pipeline as a required check — that, not a script, is what guarantees
+nothing lands unreviewed.
+
+Table defects in particular fail silently — the table renders, just wrongly — and these
+documents get exported for people outside the team.
+`/tsh-product-management:repairing-project-context-links` runs the link and table
+checkers and repairs what they find.
 
 ## Working here
 

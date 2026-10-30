@@ -9,10 +9,10 @@ people who work in the code repositories.* Repository owner: {{OWNER}}. {{DATE}}
 means to the client, who answers for what — usually lives in chats, slides and heads.
 Every newcomer, every hand-over and every AI assistant rediscovers it.
 `{{PROJECT_SLUG}}-context` is the one place where **{{PROJECT_NAME}}** keeps *what is true
-today*, kept current by named people. It is also what the team's AI assistants read
-before they act, so a developer, a tester and an analyst work from the same facts.
+today*, kept current by named people. Nothing about scope, decisions or vocabulary is
+authoritative anywhere else.
 
-**What is in it.** Two kinds of area, plus two supporting files.
+**What is in it.**
 
 | Area | Answers |
 | :-- | :-- |
@@ -31,112 +31,101 @@ before they act, so a developer, a tester and an analyst work from the same fact
    version control and decision records, not old copies. `DEPRECATED` at the top means
    history.
 2. *Decisions are recorded once, with reasons.* What was decided, the alternatives, why
-   they lost. They all live in one folder, so there is one place to look and one number
-   sequence. Only `Accepted` records bind. This stops the same debate every quarter.
-3. *One area, one owner.* The owner keeps the area true and reviews every change to
-   it. One person may own several areas; no area has two owners or none. This is what
-   stops someone changing an area they do not understand, and what makes owners care.
+   they lost — all in one folder. Only `Accepted` records bind. This stops the same
+   debate every quarter.
+3. *One area, one owner.* The owner keeps the area true and approves every change to
+   it. One person may own several areas; no area has two owners or none.
 
-**How to use it without writing code.** Open `docs/README.md`, pick the area, follow
-its README. To check a decision, open `docs/decisions/` and read the index: `Accepted`
-is in force, anything else is history, and the `Scope` column says which layer it
-concerns. To change something, contact the owner named in the area table. A PDF you
-receive is a snapshot; the repository is the source.
+**How the AI assistant uses it.** When a task needs a project fact — a decision, a
+term, an owner — the assistant reads this repository and names its source: the file,
+when it last changed, and who owns it. It does not read it before every task, so ask
+it directly when it matters ("what did we decide about payments?"). If it could not get
+the latest version, it says so first.
+
+**Your copy.** The assistant keeps a copy of this repository on your computer. The
+first time, it asks where — a suggested folder, a copy you already have, or a folder you
+pick. After that it refreshes the copy on its own, as long as you have access to the
+repository on the git host.
+
+**What happens on its own, and what never does.**
+
+| On its own | Never without your "yes" |
+| :-- | :-- |
+| Refreshing your copy when it is on the main version and you have not changed anything in it | Sending any change to the git host |
+| Telling you when it read a draft, an old copy or unsaved changes | Changing the main version — that only happens when the area owner approves a pull request |
+| Installing the team's shared instructions for the assistant, after you trust the project folder once | Removing or editing the project pointer in a repository's `CLAUDE.md` |
+
+**Changing something — no git needed.** Open the file in the git host's web page,
+click *Edit*, describe the change. The host turns it into a *pull request*: a proposed
+change the area's owner reviews and approves. Or ask the assistant ("write down that
+we moved the release to Friday"): it asks before it starts, prepares the change in a
+separate folder, shows it to you, and asks again before saving it and before sending
+it. Either way, the change reaches everyone once the owner approves it.
+
+**Messages you may see.**
+
+| The assistant says | It means | Do |
+| :-- | :-- | :-- |
+| "Read from your branch / your unsaved changes" | Your copy holds a draft, not the approved version | Fine for your own drafts; for facts, ask the owner or finish the change |
+| "Could not reach the server" | No network, VPN or access | Check access; the answer may be out of date |
+| "History on the server differs" | Someone rewrote the main version | Say yes when the assistant offers a fresh copy; your old copy stays as it is |
+| "A file blocks the update" | A file in your copy is in the way of the new version | Move that file away; the next question updates your copy |
+| "Exists only on this machine" | The project has no address on the git host yet | Ask the repository owner to publish it |
+| "The project knowledge base skill is unavailable" | The assistant's plugin is not installed | Ask your lead, or run the init skill's *Attach repository* |
 
 **What it is not.** Not the backlog tool, not the chat, not the design tool, not the
 code. It ties those together and points at them.
 
 ## Part 2 — For engineers
 
-**Layout on your machine.** Every repository sits in one project catalog, with the
-context repository beside them:
+**Where things are.** This repository lives on the git host like any code repository.
+Your clone of it can sit anywhere — beside the code repositories, in a project folder,
+or in `~/.tsh/context/{{PROJECT_SLUG}}/`. The skills find it on their own: each code
+repository carries the project's git URL in its settings, and the first skill run asks
+once where your clone is or should be, then remembers it for every repository of the
+project.
 
-```text
-{{PROJECT_SLUG}}/
-├── CLAUDE.md                  # loads in every session below; points at the context repo
-├── {{PROJECT_SLUG}}-context/  # knowledge base + marketplace
-├── <repo-a>/
-└── <repo-b>/
-```
+**Connecting a code repository.** Once per repository:
+`/tsh-product-management:initializing-project-context` → *Attach repository*. It asks
+whether the team may commit config to that repository:
 
-The layout is a contract: the shared plugin is served from `../{{PROJECT_SLUG}}-context`,
-and Claude Code loads the catalog's `CLAUDE.md` in any session started below it.
+| | A repository the team may commit to | A client's repository |
+| :-- | :-- | :-- |
+| Settings | `.claude/settings.json`, committed in a pull request | `.claude/settings.local.json`, never committed |
+| Project pointer | A `tsh:project-context` block in `CLAUDE.md` | The same block in `CLAUDE.local.md` |
+| Teammates | Get it with the next pull; accept the trust dialog once | Each runs *Attach repository* once |
 
-**One repository, two roles.** Plain markdown under `docs/` and `conventions/` is the
-knowledge base — edited by people, reviewed by owners, never compiled. The
-`.claude-plugin/marketplace.json` publishes `plugins/{{PROJECT_SLUG}}-shared/`, the one
-plugin for skills, agents and hooks **specific to this project**. It starts empty.
+Both files are kept out of git in the local case, so nothing reaches the client.
+The pointer block must stay as written: no agent removes or edits it, and a hook in
+`tsh-product-management` blocks attempts to.
 
-**The four skills.** Reading and maintaining a knowledge base works the same in every
-project, so those skills are not copied here: they ship in `tsh-product-management` from
-the company marketplace, find this repository on their own, and reach every project
-with one `/plugin update` when they improve.
+**Reading.** `/tsh-product-management:navigating-project-context` — from a connected
+repository, or anywhere with the URL as argument. Before reading it fetches at most
+every ten minutes, never prompts for a password, and fast-forwards your clone only when
+it is on the default branch with no uncommitted changes. On any other branch, or with
+changes in progress, it reads what is there and says so. It never merges, rebases,
+stashes, resets or switches branches.
 
-| Skill | Does |
-| :-- | :-- |
-| `/tsh-product-management:navigating-project-context` | Reads the knowledge base before work that depends on project facts |
-| `/tsh-product-management:writing-project-knowledge` | Adds or updates a document in the owning workspace, index and reviewer included |
-| `/tsh-product-management:repairing-project-context-links` | Repairs broken links, bad filenames and misrendering tables |
-| `/tsh-product-management:adding-project-context-workspace` | Creates a workspace: folder, README, `CLAUDE.md` with an owner, area-map row |
+**Writing.** `writing-project-knowledge`, `adding-project-context-workspace` and
+`repairing-project-context-links` write in a separate worktree, on a new branch from the
+approved version, beside your clone — never in your clone. Creating the branch,
+committing and pushing it each wait for their own yes, and the pull request is left to
+you. Nothing is ever pushed to the default branch. Decision records go to `docs/decisions/` here through
+`/tsh-core:managing-decision-records`, never into a code repository.
 
-Decision records are deliberately not among them: `/tsh-core:managing-decision-records`
-owns that format, and `conventions/decisions.md` matches it, so there is one standard
-instead of two drifting apart. **What matters is where the record lands.** Every record
-for this project goes to `{{PROJECT_SLUG}}-context/docs/decisions/`, never into a code
-repository — from a code repository that is `../{{PROJECT_SLUG}}-context/docs/decisions/`.
-Give that path to the skill as the archive location. The catalog's `CLAUDE.md` states
-this rule and loads in every session started below it, so an assistant working in a code
-repository already knows.
+**The shared plugin.** `.claude-plugin/marketplace.json` publishes
+`plugins/{{PROJECT_SLUG}}-shared/`: Markdown skills and agents specific to this project
+and needed by more than one role or repository — a release checklist, a domain review
+guide. No hooks, servers or scripts; every change bumps `version`. Rule and procedure:
+[plugins/{{PROJECT_SLUG}}-shared/README.md](plugins/{{PROJECT_SLUG}}-shared/README.md).
 
-**Enable the plugin in a code repository.** Commit to its `.claude/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "{{PROJECT_SLUG}}-context": {
-      "source": { "source": "directory", "path": "../{{PROJECT_SLUG}}-context" }
-    },
-    "tsh-agentic-collections": {
-      "source": { "source": "github", "repo": "TheSoftwareHouse/agentic-collections" }
-    }
-  },
-  "enabledPlugins": {
-    "{{PROJECT_SLUG}}-shared@{{PROJECT_SLUG}}-context": true,
-    "tsh-product-management@tsh-agentic-collections": true
-  }
-}
-```
-
-Start Claude Code there, accept the trust dialog once, check `/plugin list`. Two facts
-worth knowing: a `settings.json` in the catalog folder does **not** reach the
-repositories below it, which is why each repository carries its own; a `CLAUDE.md` in
-the catalog **does** load below it. Without the sibling checkout the plugin cannot
-load, and the skills say so instead of guessing.
-
-**The quality gate.** Two scripts, run before a pull request:
-
-```shell
-python3 scripts/check_links.py
-python3 scripts/check_tables.py
-```
-
-The first catches links that no longer resolve and filenames that are not kebab-case.
-The second catches tables that render wrongly — a row one cell short shifts every later
-cell into the wrong column, which nothing warns you about and readers see first.
-`/tsh-product-management:repairing-project-context-links` runs both and repairs what it finds.
+**The quality gate.** Four scripts in `scripts/`, run by `bitbucket-pipelines.yml` on
+every pull request: links and kebab-case names, tables that render, unique decision
+numbers, a Markdown-only and versioned plugin. On another host, run them in its
+pipeline. Protect the default branch on the host — no direct pushes, one approval, the
+pipeline as a required check.
 
 **Where a new skill goes.** Needed by every project the same way → the company
 marketplace, not here. Needed by more than one role or repository of this project → this
 plugin, named `{{PROJECT_SLUG}}-<what-it-does>`. One repository only → that repository's
 `.claude/`. Ties go to the repository.
-
-**A day with it.** You start Claude Code in a code repository. The catalog `CLAUDE.md`
-and the shared plugin are already there. The assistant reads the area map and the
-decision index and works from accepted facts. A document and the code disagree: it
-reports both, you raise it with the owner. Something is learned worth keeping: you run
-the knowledge skill and it lands in the right workspace with the right reviewer. A
-decision is made: you propose a record, the owner confirms its status.
-
-**Open point.** How and by whom this folder becomes a git repository is a pending
-decision. Until then the folder is plain files, the checker scripts are run by hand,
-and the side-by-side layout is the contract.

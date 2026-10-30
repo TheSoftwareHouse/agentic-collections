@@ -55,3 +55,28 @@ jobs:
         run: |
           claude plugin validate .
           for p in plugins/*/; do claude plugin validate "$p" || exit 1; done
+
+  project-context-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Require node
+        # The hook tests skip without node; fail here rather than pass with them skipped.
+        run: node --version
+      - name: Install Claude Code
+        run: |
+          # Pinned like the model: a CLI rollout must not look like a plugin regression.
+          # Raise it deliberately after re-running the suites locally on the new version.
+          curl -fsSL https://claude.ai/install.sh | bash -s 2.1.280
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      # Offline by construction: temporary HOME, a fake git identity, no credential helper,
+      # no SSH agent, and no clone, fetch, pull or push. See .claude/rules/project-context-contract.md.
+      - name: Project-context contract tests
+        run: python3 tests/project-context/test_project_context.py -v
+      - name: Init scaffold smoke test
+        # --with-claude also validates the generated marketplace with the pinned CLI.
+        run: python3 plugins/tsh-product-management/skills/initializing-project-context/tests/smoke_test.py --with-claude

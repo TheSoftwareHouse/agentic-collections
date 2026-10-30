@@ -6,7 +6,9 @@ A **Claude Code plugin marketplace** for The Software House. It is not an
 application: there is no build step and no runtime. The plugins are Markdown and JSON
 that Claude Code loads; the only code is repository tooling that checks them — a
 standard-library Python description lint in `scripts/` and a `claude plugin eval`
-routing suite in `evals/`.
+routing suite in `evals/` — and the project-context scripts in
+`tsh-product-management`, which run git on people's clones and carry their own test
+suite: `.claude/rules/project-context-contract.md`.
 
 It publishes three families: `tsh-<discipline>` for *how we work*,
 `tsh-stack-<stack-name>` for *what we work with*, and `tsh-core` — a single,

@@ -11,10 +11,13 @@ Repair needs judgment and that is the job here.
 
 ## Procedure
 
-**Step 1 — Locate the knowledge base.** Read
-`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md` and resolve **KB**.
+**Step 1 — Locate the knowledge base and open a branch.** Read
+`${CLAUDE_PLUGIN_ROOT}/shared/locating-project-context.md`, resolve and sync **KB**,
+then follow its §3 steps 1–2: `python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py
+start "<KB>" docs/fix-links`, created only after the person answers `Create`. Call it
+**W** and make every change under W, never in KB itself.
 
-**Step 2 — Detect.** From KB:
+**Step 2 — Detect.** From W:
 
 ```shell
 python3 scripts/check_links.py
@@ -44,9 +47,13 @@ that referred to the old name, in the same change.
 blank line inside the table, add the missing blank line after it, or escape a content
 pipe as `\|`. Never fix a ragged row by deleting a column from the header.
 
-**Step 6 — Verify and report.** Re-run both scripts until clean. Report per finding:
-what was broken, which of the three cases it was, and what you did. List anything left
-unresolved and why.
+**Step 6 — Verify, then commit and push only on a yes.** Re-run both scripts from W
+until clean. Then §3 steps 4–5 of the shared guide: show the change, ask `Commit`, and
+on yes run `python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py commit "<W>"
+--message "docs: repair links and tables" --yes`; then ask `Push`, and on yes run
+`python3 ${CLAUDE_PLUGIN_ROOT}/shared/write_worktree.py push "<W>" --yes`. Report per
+finding: what was broken, which of the three cases it was, and what you did. List
+anything left unresolved and why, and name the branch the fixes are on.
 
 ## Rules
 
