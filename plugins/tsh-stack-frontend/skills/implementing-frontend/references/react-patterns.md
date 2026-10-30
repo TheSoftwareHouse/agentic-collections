@@ -10,7 +10,7 @@ The rule is in `SKILL.md`; this is how to apply and enforce it.
 | Severity | Rule |
 | --- | --- |
 | MUST | Mark type-only imports with `type`, inline or as `import type`. `verbatimModuleSyntax` rejects an unmarked type import. |
-| MUST | Enforce the import style with the ESLint rule below in a new project. In a codebase that uses the namespace style throughout, propose it as its own change. |
+| PREFER | Propose the ESLint rule below when the project does not enforce the import style yet; add it only once the team agrees. A project on a shared ESLint config gets it there, not in its own file. |
 
 ```tsx
 import { lazy, memo, useState, type ReactNode } from 'react';
