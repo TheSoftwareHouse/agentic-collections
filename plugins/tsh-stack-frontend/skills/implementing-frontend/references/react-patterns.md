@@ -1,7 +1,39 @@
 # React implementation patterns
 
 React-specific implementations of the generic patterns in `implementing-frontend`.
-Load this reference when the project uses React.
+Load this reference before writing or reviewing React code.
+
+## Imports
+
+The rule is in `SKILL.md`; this is how to apply and enforce it.
+
+| Severity | Rule |
+| --- | --- |
+| MUST | Mark type-only imports with `type`, inline or as `import type`. `verbatimModuleSyntax` rejects an unmarked type import. |
+| PREFER | Propose the ESLint rule below when the project does not enforce the import style yet; add it only once the team agrees. A project on a shared ESLint config gets it there, not in its own file. |
+
+```tsx
+import { lazy, memo, useState, type ReactNode } from 'react';
+```
+
+The rule needs the `typescript-eslint` parser. Merge the entries into the project's
+existing `no-restricted-syntax` — a second declaration of the rule replaces the
+first instead of adding to it.
+
+```js
+// eslint.config.js
+{
+  files: ['**/*.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': ['error',
+      { selector: "ImportDeclaration[source.value='react'] > ImportNamespaceSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
+      { selector: "ImportDeclaration[source.value='react'] > ImportDefaultSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },
+      { selector: "MemberExpression[object.name='React']", message: 'Use the named import instead of React.x.' },
+      { selector: "TSQualifiedName[left.name='React']", message: "Import the type by name: import { type ReactNode } from 'react'." },
+    ],
+  },
+},
+```
 
 ## Component composition
 
@@ -42,12 +74,12 @@ React uses **error boundaries** — class components with `componentDidCatch` /
 
 | Technique | React API | When to use |
 | --- | --- | --- |
-| Component memoization | `React.memo(Component)` | Prevent re-render when props unchanged |
+| Component memoization | `memo(Component)` | Prevent re-render when props unchanged |
 | Expensive computation | `useMemo(() => compute(data), [data])` | Heavy calculations derived from state/props |
 | Stable callbacks | `useCallback(fn, [deps])` | Callbacks passed to memoized children |
-| Code splitting | `React.lazy(() => import('./Heavy'))` + `<Suspense>` | Route-level and heavy component splitting |
+| Code splitting | `lazy(() => import('./Heavy').then((m) => ({ default: m.Heavy })))` + `<Suspense>` — `lazy` wants a default export, and the `.then` keeps the module on named exports | Route-level and heavy component splitting |
 
-**Rule of thumb**: don't memoize by default. Measure first. `React.memo` only helps
+**Rule of thumb**: don't memoize by default. Measure first. `memo` only helps
 when re-renders are measurably expensive and props don't change often.
 
 ## Anti-patterns

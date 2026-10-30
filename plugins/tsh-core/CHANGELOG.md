@@ -14,6 +14,17 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.11.0] - 2026-10-30
+
+### Added
+
+- **A bundled `context7` MCP server** for current, version-specific library
+  documentation. Testing, platform engineering and product engineering all drive it,
+  and five plugins used to bundle their own identical copy; it now has one home here.
+  It needs no sign-in. `tsh-product-testing`, `tsh-platform-engineering`,
+  `tsh-stack-aws`, `tsh-stack-gcp` and `tsh-stack-azure` dropped their copies in the
+  same change.
+
 ## [0.10.4] - 2026-10-28
 
 ### Changed

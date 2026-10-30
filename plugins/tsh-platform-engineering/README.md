@@ -36,14 +36,14 @@ Invoked as `/tsh-platform-engineering:<skill>`.
 
 Invoked as `@tsh-platform-engineering:<agent>`.
 
-### Bundled MCP servers
+### MCP servers
 
-`context7` only, for provider, Kubernetes, Helm and CI platform documentation. It is
-read-only.
+None bundled here. Provider, Kubernetes, Helm and CI platform documentation comes
+from `context7`, which `tsh-core` bundles. It is read-only.
 
 **Cloud documentation and live-state servers ship with the cloud's own plugin** —
 `aws-documentation` in `tsh-stack-aws`, the three Google Cloud servers in
-`tsh-stack-gcp`, `context7` alone in `tsh-stack-azure`. A GCP repository therefore never
+`tsh-stack-gcp`, none in `tsh-stack-azure`. A GCP repository therefore never
 starts an AWS server, and no cloud server appears in a repository with no cloud plugin
 installed.
 

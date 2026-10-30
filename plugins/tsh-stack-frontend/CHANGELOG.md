@@ -14,6 +14,33 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.3.0] - 2026-10-30
+
+### Changed
+
+- **`implementing-frontend` now covers every change to frontend code, not only
+  Figma-backed components.** Its description used to name components, Figma and
+  design tokens, so a custom hook, a refactor or a module move never loaded it and
+  the agent fell back to its own habits. It now claims any frontend change, with or
+  without a design: the Figma gate applies only when the task has a design reference,
+  and the procedure has a path for work that has none.
+- **Named imports from `react` are a non-negotiable rule.** `import * as React`,
+  `React.useState` and `React.FC` were not covered anywhere, and the React reference
+  itself used `React.memo` and `React.lazy`. The rule sits in `SKILL.md`, the
+  reference shows the named form, and it carries an ESLint `no-restricted-syntax`
+  rule the agent proposes — and adds only once the team agrees — to enforce it. A
+  codebase that already uses the namespace style consistently keeps it.
+- **No pass-through files after a module move.** The barrel rules moved from a
+  reference into `SKILL.md`, because the reference loaded only "when adding a barrel
+  file" and a module move never matched. A file left at the old path that only
+  re-exports the new one is now named as a shim to delete, not a barrel to keep.
+- **A React version policy.** The skill follows the version `package.json` pins; a
+  greenfield app installs the latest stable React, and a major newer than 19 is
+  checked against the current documentation through `context7`, which `tsh-core`
+  bundles.
+- **The code-splitting example fits the named-exports rule.** `lazy` needs a default
+  export, so the example now maps the named export with `.then`.
+
 ## [0.2.2] - 2026-10-02
 
 ### Fixed

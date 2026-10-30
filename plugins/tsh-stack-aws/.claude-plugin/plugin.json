@@ -2,7 +2,7 @@
   "name": "tsh-stack-aws",
   "displayName": "TSH Stack: AWS",
   "description": "AWS-specific infrastructure guidance: Terraform module patterns for VPC, EKS, RDS and S3, Well-Architected defaults, and a full evidence-based AWS cost and tagging audit that reads infrastructure code then validates it against the live account.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

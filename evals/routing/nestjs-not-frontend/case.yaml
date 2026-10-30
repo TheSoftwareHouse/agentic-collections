@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: nestjs-not-frontend
+description: A NestJS endpoint request in a monorepo that also holds a React app must route to implementing-nestjs-api, not implementing-frontend, now that the frontend skill claims all frontend code.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-frontend", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Our monorepo has apps/web (React + Vite) and apps/api (NestJS with TypeORM and @nestjs/cqrs).
+    In apps/api, add GET /orders/:id: a query handler that loads the order through TypeORM and returns 404 when it doesn't exist.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: nestjs-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    arm: with-only
+  - name: frontend-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    min: 0
+    max: 0

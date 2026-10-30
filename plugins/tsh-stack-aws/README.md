@@ -35,11 +35,13 @@ brew install uv          # or: curl -LsSf https://astral.sh/uv/install.sh | sh
 
 Invoked as `/tsh-stack-aws:<skill>`.
 
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
+
 ### Bundled MCP servers
 
-`context7` for Terraform AWS provider documentation, and the AWS Labs
-`aws-documentation` server for current instance families, pricing tiers and regional
-availability. Both read-only.
+The AWS Labs `aws-documentation` server, for current instance families, pricing tiers
+and regional availability. It is read-only. Terraform AWS provider documentation comes
+from `context7`, which `tsh-core` bundles.
 
 **No write-capable AWS API server is bundled.** Live account state is read through the
 `aws` CLI with `describe`, `list` and `get` verbs only, so your own permission rules

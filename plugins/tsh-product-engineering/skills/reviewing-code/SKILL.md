@@ -92,8 +92,10 @@ exclusion in the report.
 
 **Step 5 — Best practices and anti-patterns.** Check against project standards first,
 then general practice (SOLID, DRY, KISS, low cognitive complexity — and no
-over-engineering: flag speculative abstraction as readily as duplication). Then the
-high-risk anti-pattern list above. When the change targets a framework or stack whose
+over-engineering: flag speculative abstraction as readily as duplication). A module
+the change moved or renamed must leave nothing behind: a file at the old path that
+only re-exports the new one is a finding unless it is a published package's public
+API, kept and marked deprecated. Then the high-risk anti-pattern list above. When the change targets a framework or stack whose
 skill is available this session, load it now and run its review checklist alongside
 this one — it carries the framework-specific risks (for a NestJS change: CQRS
 boundaries, TypeORM transaction and persistence semantics, DTO validation,

@@ -14,10 +14,14 @@ Framework-agnostic decision tables for the `implementing-frontend` process.
 
 ## Barrel file guidelines
 
+The two blocking rules — barrels only at a public API boundary, and no pass-through
+file after a move — sit in the skill's Non-negotiable Rules. The detail:
+
 | Rule | Description |
 | --- | --- |
 | Create barrel when | Folder exports are consumed by OTHER modules (public API boundary) |
 | Avoid barrel when | Internal utils serve a single parent component — import directly |
+| After a move | Rewrite every importer to the new path and delete the old file; a file that only re-exports the new location is a shim, not a barrel |
 | Re-export style | Named re-exports only: `export { Button } from './Button'` |
 | Never wildcard | Avoid `export * from` — breaks tree shaking, hides the API surface |
 | Keep flat | One level deep — no barrel importing another barrel |
@@ -35,3 +39,5 @@ Framework-agnostic decision tables for the `implementing-frontend` process.
 | `export default` | Named exports for consistency and refactoring |
 | `any` type for props | Explicit type definitions |
 | Barrel file for internal utils | Direct imports for single-consumer folders |
+| Re-export shim left at a module's old path "for compatibility" | Update the importers and delete the old file — inside one app there is no consumer to stay compatible with |
+| `import * as React` / `React.useState` | Named imports: `import { useState } from 'react'` |
