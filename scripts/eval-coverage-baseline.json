@@ -22,7 +22,6 @@
     "tsh-product-management:repairing-project-context-links",
     "tsh-product-management:reviewing-backlog-quality",
     "tsh-product-management:writing-project-knowledge",
-    "tsh-product-testing:writing-playwright-e2e-tests",
     "tsh-stack-azure:auditing-azure-cost",
     "tsh-stack-azure:implementing-azure-terraform",
     "tsh-stack-gcp:auditing-gcp-cost",
