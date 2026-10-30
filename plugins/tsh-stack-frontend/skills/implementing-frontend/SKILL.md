@@ -1,7 +1,7 @@
 ---
 name: implementing-frontend
-description: "TSH conventions for any change to frontend application code, React today, with or without a design: components and custom hooks, named imports from react, typed props, module boundaries and barrel files, the three UI states every data-dependent component handles, design tokens, and a mandatory Figma read before markup when a design exists. Use when writing or refactoring browser app code — a component, hook, context, .tsx or .jsx file, or a module move."
-when_to_use: "Trigger on: implementing or restructuring UI components or hooks, translating a Figma design into code, frontend work with no design such as a refactor, data wiring or a logic change, moving or splitting modules and barrel files, choosing where component state lives, wiring design tokens, or starting or upgrading a React app. Compiler setup is configuring-typescript-for-frontend; a11y implementation patterns are ensuring-accessibility."
+description: "TSH conventions for any change to frontend application code, React today, with or without a design: components, custom hooks and the non-UI modules around them, named imports from react, typed props, module boundaries and barrel files, the three UI states every data-dependent component handles, design tokens, and a mandatory Figma read before markup when a design exists. Use when writing or refactoring any browser app code — a component, hook, store, API client, utility or module move, in a .ts, .tsx or .jsx file."
+when_to_use: "Trigger on: writing or changing any code in a browser app — UI components, custom hooks, context providers, stores, API clients and utilities — translating a Figma design into code, frontend work with no design such as a refactor, data wiring or a logic change, moving or splitting modules and barrel files, choosing where state lives, wiring design tokens, or starting or upgrading a React app. Compiler setup is configuring-typescript-for-frontend; a11y implementation patterns are ensuring-accessibility."
 ---
 
 # Implementing Frontend
@@ -13,9 +13,11 @@ workflow that comes before any markup.
 ## Applicability and Precedence
 
 This skill covers **every** change to frontend application code, with or without a
-design: a new screen from Figma, a custom hook, a refactor that moves modules, a data
-or logic change that renders nothing new. The Figma gate below applies only when the
-task has a design reference; every other rule applies to all of it.
+design: a new screen from Figma, a custom hook, a store or API client, a refactor that
+moves modules, a data or logic change that renders nothing new. The rules scope
+themselves: the Figma gate applies only when the task has a design reference, the
+token and UI-state rules to code that renders, and the import, export, typing and
+module rules to all of it.
 
 Local repository rules outrank this skill: the project's existing component
 patterns, design system, and styling approach win over the defaults here. The design
