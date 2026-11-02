@@ -38,8 +38,10 @@ The React rules target **React 19** with the automatic JSX runtime
   react.dev — before applying this skill; where they disagree, the documentation
   wins.
 - **The project compiles JSX with the classic runtime** (`jsx: react`) → JSX needs
-  `React` in scope there, so the import rule below does not apply. Say so, and treat
-  the move to `react-jsx` as its own change (`configuring-typescript-for-frontend`).
+  `React` in scope there, so `import React from 'react'` stays in files with JSX;
+  the rest of the import rule below still holds — hooks and types come in by name,
+  never as `React.useState` or `React.FC`. Say so, and treat the move to `react-jsx`
+  as its own change (`configuring-typescript-for-frontend`).
 
 ## Non-negotiable Rules
 
@@ -51,9 +53,9 @@ The React rules target **React 19** with the automatic JSX runtime
 | NEVER | Use `export default`, untyped or `any` props, or a component with more than ~7 props where composition (children, slots, compound components) would do. |
 | MUST | Handle all three UI states in every data-dependent component: loading (progress indicator), error (meaningful message plus recovery action), empty (helpful message when no data). |
 | MUST | Declare what the UI looks like from state; never imperatively manipulate the DOM. Compose complex UIs from small, single-responsibility components. |
-| MUST | Import what you use from `react` by name: `import { useState, type ReactNode } from 'react'`. NEVER `import * as React`, `import React`, `React.useState`, `React.memo` or `React.FC`. A project that already uses the namespace style consistently keeps it — don't mix the two in one codebase. |
+| MUST | Import what you use from `react` by name: `import { useState, type ReactNode } from 'react'`. NEVER `import * as React`, `import React`, `React.useState`, `React.memo` or `React.FC`. A project that already uses the namespace style consistently keeps it; one that already mixes the two writes new code with named imports and converts a file only when it changes it anyway. |
 | MUST | Add a barrel `index.ts` only at a public API boundary — a folder other modules consume — with named re-exports. A folder serving one parent is imported directly. |
-| NEVER | Leave a pass-through file after moving or renaming a module. A file that only re-exports the new location is not a barrel: update every importer to the new path and delete the old file in the same change. |
+| NEVER | Leave a pass-through file after moving or renaming a module. A file that only re-exports the new location is not a barrel: update every importer to the new path and delete the old file in the same change. The exceptions are the public API of a package other code consumes — kept and marked `@deprecated` — and a re-export the plan explicitly stages as transitional. |
 
 ## Implementation Process
 

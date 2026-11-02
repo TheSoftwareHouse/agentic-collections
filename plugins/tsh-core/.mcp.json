@@ -9,8 +9,8 @@
       "url": "https://mcp.figma.com/mcp"
     },
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
     }
   }
 }

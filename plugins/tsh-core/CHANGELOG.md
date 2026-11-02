@@ -21,9 +21,10 @@ alone reaches nobody.
 - **A bundled `context7` MCP server** for current, version-specific library
   documentation. Testing, platform engineering and product engineering all drive it,
   and five plugins used to bundle their own identical copy; it now has one home here.
-  It needs no sign-in. `tsh-product-testing`, `tsh-platform-engineering`,
-  `tsh-stack-aws`, `tsh-stack-gcp` and `tsh-stack-azure` dropped their copies in the
-  same change.
+  It needs no sign-in and, unlike the `npx` copies it replaces, no Node on the
+  machine: this is Context7's hosted endpoint, so nothing is fetched from npm at
+  session start. `tsh-product-testing`, `tsh-platform-engineering`, `tsh-stack-aws`,
+  `tsh-stack-gcp` and `tsh-stack-azure` dropped their copies in the same change.
 
 ## [0.10.4] - 2026-10-28
 
