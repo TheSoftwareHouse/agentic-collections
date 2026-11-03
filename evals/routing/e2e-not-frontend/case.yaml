@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: e2e-not-frontend
+description: A Playwright E2E request in a React app must route to writing-playwright-e2e-tests, not implementing-frontend, whose triggers claim any code in a browser app.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-testing", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Our React + Vite storefront has no end-to-end coverage for checkout yet.
+    Write Playwright tests for it: a guest adds two products to the cart, goes through checkout, and sees the order confirmation; and a second test for the declined-card error.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: e2e-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-playwright-e2e-tests"'
+    arm: with-only
+  - name: frontend-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    min: 0
+    max: 0

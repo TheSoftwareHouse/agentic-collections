@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: frontend-module-move-not-nestjs
+description: Moving shared code between features of a React app, with no UI change, must route to implementing-frontend, not implementing-nestjs-api.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-frontend", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Our monorepo has apps/web (React + Vite) and apps/api (NestJS).
+    In apps/web the price-formatting helpers and the PriceTag component sit inside the cart feature, but checkout needs them now too. Move them into a shared pricing module that both features import from. Nothing on screen should change.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: frontend-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    arm: with-only
+  - name: nestjs-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    min: 0
+    max: 0

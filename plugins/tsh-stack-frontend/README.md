@@ -1,8 +1,9 @@
 # TSH Stack: Frontend
 
 TSH conventions for browser-targeted frontend code — TypeScript compiler
-configuration for bundler-resolved applications, component implementation patterns
-with a Figma-first workflow, and WCAG 2.1 AA accessibility implementation.
+configuration for bundler-resolved applications, implementation conventions for any
+change to frontend code with a Figma-first workflow when a design exists, and WCAG 2.1
+AA accessibility implementation.
 
 This is a **stack** plugin, not a discipline plugin. Install it into any project
 with a frontend, at `project` scope, so it travels with the repo. Your discipline
@@ -26,7 +27,7 @@ should be able to install this without a NestJS surface arriving with it.
 | Skill | Invoke | Covers |
 | :-- | :-- | :-- |
 | `configuring-typescript-for-frontend` | `/tsh-stack-frontend:configuring-typescript-for-frontend` | Which TypeScript version to pin, the `tsconfig.json` baseline for a bundler-resolved app, the React + Vite split-config layout, typing `import.meta.env` and asset imports, path aliases that resolve in both the checker and the bundler, upgrades, and staged adoption in an existing repo |
-| `implementing-frontend` | `/tsh-stack-frontend:implementing-frontend` | Component implementation: composition over prop sprawl, design tokens over hardcoded values, the Figma-first design read as a hard gate, typed props, barrel-file rules, the three UI states — plus a React reference |
+| `implementing-frontend` | `/tsh-stack-frontend:implementing-frontend` | Any change to frontend code, with or without a design: named `react` imports, components and custom hooks, typed props, barrels and no re-export shims after a module move, the three UI states, design tokens, the React version policy, and — when a design exists — the Figma-first design read as a hard gate. Plus a React reference with the ESLint rule that enforces the import style |
 | `ensuring-accessibility` | `/tsh-stack-frontend:ensuring-accessibility` | WCAG 2.1 AA while implementing: semantic HTML first, keyboard maps and focus management, ARIA only where HTML falls short, contrast minimums, axe-core verification, RTL |
 
 The skills are model-invocable — Claude loads them when the work matches their
@@ -62,6 +63,10 @@ it — it depends on nothing:
 
 Then run `/mcp` once per machine, pick `figma`, and finish the browser login. Every
 call runs under your own Figma account.
+
+The React version policy in `implementing-frontend` looks up the current React
+documentation through `context7`, which `tsh-core` also bundles. It needs no login;
+without it, the skill falls back to react.dev.
 
 The server deliberately lives there rather than here: this is a `project`-scope
 plugin, so a repository that does not install it would leave the UI verification gate

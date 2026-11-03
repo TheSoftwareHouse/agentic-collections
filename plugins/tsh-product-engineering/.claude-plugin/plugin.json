@@ -2,7 +2,7 @@
   "name": "tsh-product-engineering",
   "displayName": "TSH Product Engineering",
   "description": "Spec-driven feature implementation: committed plan files, delegated implementer subagents, a Figma-backed UI verification gate driven by Playwright-CLI capture, root-cause bug fixing guarded by a regression test, and TSH's structured pre-merge code review.",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

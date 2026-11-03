@@ -12,6 +12,22 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.10.1] - 2026-10-30
+
+### Changed
+
+- **A module move is finished only when the old path is gone.** `software-engineer`
+  read "minimum code" and "touch only what your tasks require" as licence to leave a
+  file at a moved module's old path that only re-exports the new one, rather than
+  update its importers. Its principles now say such a file is a second path to the
+  same code, not a minimal change. Two exceptions: the public API of a package other
+  code consumes — published or workspace — kept and marked deprecated, and a
+  re-export a plan explicitly stages as transitional, with the task that removes it
+  named. `reviewing-code` checks for the same thing in step 5.
+- **`software-engineer` names `context7` for library documentation.** The principle
+  already said to consult the documentation for the pinned version; it now names the
+  server, which `tsh-core` bundles, so the lookup goes there rather than to memory.
+
 ## [0.10.0] - 2026-10-28
 
 ### Changed

@@ -27,14 +27,18 @@ A repository has one cloud; an engineer works across several.
 
 Invoked as `/tsh-stack-gcp:<skill>`.
 
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
+
 ### Bundled MCP servers
 
 | Server | Purpose | Can mutate |
 | :-- | :-- | :-- |
-| `context7` | Terraform Google provider docs, machine types, pricing tiers | No |
 | `gcp-gcloud` | Live project state through `gcloud` | **Yes** |
 | `gcp-observability` | Monitoring and logging configuration | Read-oriented |
 | `gcp-storage` | Cloud Storage bucket inspection | Read-oriented |
+
+Terraform Google provider docs, machine types and pricing tiers come from `context7`,
+which `tsh-core` bundles.
 
 **`gcp-gcloud` can run mutating `gcloud` commands.** Nothing in this plugin does — both
 skills are restricted to `list`, `describe` and `get`. That restriction is an

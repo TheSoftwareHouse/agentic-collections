@@ -31,10 +31,11 @@ Invoked as `@tsh-product-testing:e2e-engineer`.
 
 Release notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
-### Bundled MCP servers
+### MCP servers
 
-`.mcp.json` ships `context7` for Playwright API documentation. For Playwright, query
-the library ID `/microsoft/playwright.dev` directly rather than resolving it.
+Playwright API documentation comes from `context7`, which `tsh-core` bundles; this
+plugin ships no `.mcp.json` of its own. For Playwright, query the library ID
+`/microsoft/playwright.dev` directly rather than resolving it.
 
 ### Prerequisite: Playwright CLI
 

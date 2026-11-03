@@ -72,9 +72,13 @@ instead of asking whose job it is:
 
 Atlassian is the first case: engineering, product management and testing all read
 Jira. So is Figma: product engineering judges UI against it, product design works in
-it, product management reads flows out of it during discovery. `context7` in
-`tsh-product-testing` is the second case: it exists for that plugin's Playwright API
-lookups and stays there. (Playwright MCP used to be this example — bundled by
+it, product management reads flows out of it during discovery. So is `context7`:
+testing looks up the Playwright API, platform engineering reads provider and
+Kubernetes documentation, and product engineering checks framework APIs while
+implementing. Five plugins bundled their own copy until the third discipline arrived
+and it moved to `tsh-core`. `aws-documentation` in `tsh-stack-aws` is the second
+case: it exists for that plugin's AWS lookups and stays there. (Playwright MCP was an
+earlier example — bundled by
 `tsh-product-engineering` until 0.7.0 and by `tsh-product-testing` until 0.3.0, when
 their agents moved to the Playwright CLI. No plugin bundles it now.)
 
