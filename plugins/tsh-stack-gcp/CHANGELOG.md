@@ -6,9 +6,9 @@ All notable changes to `tsh-stack-gcp` are documented here, following
 
 ## [0.1.2] - 2026-10-30
 
-### Changed
+### Removed
 
-- **`context7` moved to `tsh-core`.** This plugin no longer bundles its own copy;
+- **The bundled `context7` server — it moved to `tsh-core`.** This plugin no longer bundles its own copy;
   `tsh-core`, which every plugin may assume is installed, now ships the one shared
   definition. The skills still look documentation up with `context7` as before. If
   you have not installed `tsh-core`, install it to keep the server.

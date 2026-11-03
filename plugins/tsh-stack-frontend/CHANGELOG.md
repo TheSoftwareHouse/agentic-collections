@@ -29,11 +29,15 @@ alone reaches nobody.
   itself used `React.memo` and `React.lazy`. The rule sits in `SKILL.md`, the
   reference shows the named form, and it carries an ESLint `no-restricted-syntax`
   rule the agent proposes — and adds only once the team agrees — to enforce it. A
-  codebase that already uses the namespace style consistently keeps it.
+  codebase that already uses the namespace style consistently keeps it; a mixed one
+  writes new code with named imports. Under the classic JSX runtime only the default
+  import stays.
 - **No pass-through files after a module move.** The barrel rules moved from a
   reference into `SKILL.md`, because the reference loaded only "when adding a barrel
   file" and a module move never matched. A file left at the old path that only
-  re-exports the new one is now named as a shim to delete, not a barrel to keep.
+  re-exports the new one is now named as a shim to delete, not a barrel to keep. The
+  exceptions are a consumed package's public API and a re-export the plan stages as
+  transitional.
 - **A React version policy.** The skill follows the version `package.json` pins; a
   greenfield app installs the latest stable React, and a major newer than 19 is
   checked against the current documentation through `context7`, which `tsh-core`

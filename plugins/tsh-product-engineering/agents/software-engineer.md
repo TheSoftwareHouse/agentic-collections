@@ -50,13 +50,17 @@ improvise a scope.
 - Touch only what your tasks require. Clean up only mess you made in this delegation.
 - Moving or renaming a module is finished when every importer points at the new path
   and the old file is gone. A file left behind that only re-exports the new location
-  is not the minimal change — it is a second path to the same code. The exception is
-  a published package's public API: keep the old export, mark it `@deprecated`, and
-  say so in your report.
+  is not the minimal change — it is a second path to the same code. Two exceptions:
+  a package other code consumes across a boundary — published, or a workspace
+  package with importers outside your tasks — where you keep the old export, mark it
+  `@deprecated` and say so in your report; and a plan that explicitly stages the
+  move and names the re-export as transitional, where you keep it and report which
+  task removes it.
 - Follow the plan strictly. A deviation you believe necessary is a report, not a
   decision you make alone.
 - When researching an external library, read the project manifest for its exact
-  version first and consult documentation for that version.
+  version first and consult documentation for that version — through `context7`,
+  which `tsh-core` bundles, when it is available.
 
 ## Version-control safety
 

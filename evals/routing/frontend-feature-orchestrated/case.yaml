@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: frontend-feature-orchestrated
+description: A multi-file feature in a React app must route to orchestrating-feature-implementation, although implementing-frontend now claims any code in a browser app. implementing-frontend may load alongside it; it must not displace it.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    In our React + Vite storefront, build a wishlist: a heart button on every product card, a /wishlist page listing the saved products, and a header badge with the count.
+    Persist it through the existing /api/wishlist endpoints. There's no design yet; reuse the existing product card and header components.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: orchestration-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    arm: with-only
+  - name: debugging-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0

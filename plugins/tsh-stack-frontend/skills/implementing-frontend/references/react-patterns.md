@@ -16,14 +16,15 @@ The rule is in `SKILL.md`; this is how to apply and enforce it.
 import { lazy, memo, useState, type ReactNode } from 'react';
 ```
 
-The rule needs the `typescript-eslint` parser. Merge the entries into the project's
-existing `no-restricted-syntax` — a second declaration of the rule replaces the
-first instead of adding to it.
+The `TSQualifiedName` selector needs the `typescript-eslint` parser and matches only
+in TypeScript files; the other three work in `.js` and `.jsx` too, so the glob covers
+both. Merge the entries into the project's existing `no-restricted-syntax` — a second
+declaration of the rule replaces the first instead of adding to it.
 
 ```js
 // eslint.config.js
 {
-  files: ['**/*.{ts,tsx}'],
+  files: ['**/*.{js,jsx,ts,tsx}'],
   rules: {
     'no-restricted-syntax': ['error',
       { selector: "ImportDeclaration[source.value='react'] > ImportNamespaceSpecifier", message: "Import from 'react' by name: import { useState } from 'react'." },

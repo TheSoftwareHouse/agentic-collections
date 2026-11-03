@@ -159,8 +159,12 @@ product engineering checks framework APIs while implementing — the frontend st
 React version policy names it. Until this plugin took it over, five plugins each
 bundled their own copy.
 
-**No sign-in.** It runs locally through `npx`, read-only, and needs Node on the
-machine. Without an API key it works under Context7's anonymous rate limit.
+**No sign-in, no local process.** This is Context7's hosted server at
+`https://mcp.context7.com/mcp`, read-only, so it needs nothing on the machine —
+unlike the `npx` copy the five plugins used to bundle, which fetched the package
+from npm on every session start and needed Node. Without an API key it works under
+Context7's anonymous rate limit; a teammate who hits it can add their own key in a
+user-scope `context7` entry, which outranks this one.
 
 **Do not pin any server's tool names.** Not in an agent's `tools:`, not in a
 skill's `allowed-tools:`, not in a hook matcher. One home per server makes those
