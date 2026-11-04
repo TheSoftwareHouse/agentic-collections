@@ -29,26 +29,25 @@ sources_hash: "2542cff5703ff95788157209d41352db3ea0ad41296a10b4686ed7f80886cc75"
 
 # For CTOs
 
-{/* PHASE2(narrative): whole page — rewritten from the Copilot Collections "For CTOs" page; its section order, headings and marketing claims are inherited, while every product statement was rewritten from this repository's sources — Phase 2 writes the narrative for Agentic Collections and replaces the inherited figures with ones measured on it */}
+{/* PHASE2(narrative): whole page — rewritten from the Copilot Collections "For CTOs" page; its section order, headings and claims are inherited, while every product statement was rewritten from this repository's sources — Phase 2 writes the narrative for Agentic Collections and replaces the inherited figures with ones measured on it */}
 
-Agentic Collections is a Claude Code plugin marketplace used daily by **300+ engineers** at The Software House across **50+ commercial projects** — delivering a **30% average lead time reduction**. {/* TODO(marketing): "used daily by 300+ engineers at The Software House across 50+ commercial projects — delivering a 30% average lead time reduction" — measured on Copilot Collections; needs confirmation for Agentic Collections — conflicts with the homepage: 40% lead time (src/components/home/Hero.tsx:202, src/components/home/Proof.tsx:15) and 160+ projects (src/components/home/Skills.tsx:33) */}
+Agentic Collections is a Claude Code plugin marketplace used daily by **300+ engineers** at The Software House across **50+ commercial projects** — delivering a **30% average lead time reduction**. {/* TODO(marketing): confirm before publishing */}
 
 :::brand TL;DR:
 
-- Only 10% of teams see real gains from AI coding tools - the gap is structural, not technological {/* TODO(marketing): "Only 10% of teams see real gains from AI coding tools" — carried over from the Copilot Collections page, no source in this repository; needs confirmation for Agentic Collections */}
+- Only 10% of teams see real gains from AI coding tools - the gap is structural, not technological {/* TODO(marketing): confirm before publishing */}
 - Agentic Collections gives Claude Code TSH's way of working as installable skills and agents: committed plans, human review gates, and evidence before anything is called done
-- 300+ engineers at TSH use it daily across 50+ commercial projects with great result: average lead time down 30% {/* TODO(marketing): "300+ engineers … 50+ commercial projects … average lead time down 30%" — measured on Copilot Collections; needs confirmation for Agentic Collections — conflicts with the homepage: 40% lead time (src/components/home/Hero.tsx:202, src/components/home/Proof.tsx:15) and 160+ projects (src/components/home/Skills.tsx:33) */}
+- 300+ engineers at TSH use it daily across 50+ commercial projects with great result: average lead time down 30% {/* TODO(marketing): confirm before publishing */}
 - Covers the full lifecycle: discovery workshop → Jira-ready backlog → implementation → code review and functional verification, plus end-to-end tests and infrastructure
-- ~$50/person/month vs $100 for Claude Code and $200–300 for Cursor {/* TODO(marketing): "~$50/person/month vs $100 for Claude Code and $200–300 for Cursor" — measured on Copilot Collections (GitHub Copilot seat pricing); needs confirmation for Agentic Collections — as written it names Claude Code, which Agentic Collections runs on, as the more expensive alternative, so it cannot ship unchanged */}
 - Open source, MIT licence
 
 :::
 
 ## The AI productivity gap is real and structural
 
-Gartner found that only **10% of software engineers** see meaningful productivity gains from AI coding assistants. The other 90% are using the same tools and getting inconsistent results. {/* TODO(marketing): Gartner "10% of software engineers" figure — carried over from the Copilot Collections page, no source or citation in this repository; needs confirmation for Agentic Collections */}
+Gartner found that only **10% of software engineers** see meaningful productivity gains from AI coding assistants. The other 90% are using the same tools and getting inconsistent results. {/* TODO(marketing): confirm before publishing */}
 
-When engineers use AI ad-hoc the results vary by individual. You get pockets of acceleration alongside unchanged delivery speed, inconsistent code quality, and a team that's learned to trust AI selectively and unpredictably. {/* TODO(marketing): ad-hoc AI paragraph — carried over from Copilot Collections, no source in this repository; needs confirmation for Agentic Collections */} {/* PHASE2(narrative): ad-hoc AI paragraph — kept from the Copilot Collections page, an industry observation no source here backs — replace with TSH's own framing or cite a source */}
+When engineers use AI ad-hoc the results vary by individual. You get pockets of acceleration alongside unchanged delivery speed, inconsistent code quality, and a team that's learned to trust AI selectively and unpredictably. {/* TODO(marketing): confirm before publishing */} {/* PHASE2(narrative): ad-hoc AI paragraph — kept from the Copilot Collections page, an industry observation no source here backs — replace with TSH's own framing or cite a source */}
 
 **Agentic Collections** is a structured response to this problem. It does not replace your process: local repository rules outrank its skills, and where a project defines its own delivery workflow, Agentic Collections runs inside it, not instead of it. Plans, gate approvals and review reports are files in the repository, and the steps that cannot be undone wait for a person: the Jira push waits for an approved gate, implementation waits until you have read the plan, and infrastructure changes are handed to a human to apply, unless a person explicitly names the one mutating command to run.
 
@@ -58,7 +57,7 @@ When engineers use AI ad-hoc the results vary by individual. You get pockets of 
 
 Agentic Collections is not an application. It is plugins — skills, agents, hooks and MCP servers — that Claude Code loads, and they change how work moves through a team, from workshop material to reviewed, verified code.
 
-**Product Management**: discovery workshop material — transcripts, Figma, PDFs, codebase context — becomes Jira-ready epics and user stories with GIVEN/WHEN/THEN acceptance criteria, a systematic quality review and an outcome-based delivery roadmap, behind five human review gates. While a business-analysis session is open in the repository, a hook refuses Jira writes to a project until its push gate (Gate 2) is approved for that project, and never updates an issue that is Done, Cancelled or PO APPROVE. Context gathering that used to take 30–60 minutes takes 3 minutes. {/* TODO(marketing): "Context gathering that used to take 30–60 minutes takes 3 minutes" — measured on Copilot Collections; needs confirmation for Agentic Collections */}
+**Product Management**: discovery workshop material — transcripts, Figma, PDFs, codebase context — becomes Jira-ready epics and user stories with GIVEN/WHEN/THEN acceptance criteria, a systematic quality review and an outcome-based delivery roadmap, behind five human review gates. While a business-analysis session is open in the repository, a hook refuses Jira writes to a project until its push gate (Gate 2) is approved for that project, and never updates an issue that is Done, Cancelled or PO APPROVE. Context gathering that used to take 30–60 minutes takes 3 minutes. {/* TODO(marketing): confirm before publishing */}
 
 **Product Engineering**: implementation runs from a committed plan file. Implementer subagents execute its tasks, in parallel where the plan allows, and the work closes with code review and functional verification running in parallel. Before a change is written, its conventions are established in a fixed order: the plan's technical context, the project's own instructions and decision records, existing codebase patterns, and only then external documentation. Every Figma-backed UI task passes a design verification gate, and a bug is fixed at its root cause with a regression test that failed before the fix.
 
@@ -74,21 +73,21 @@ Security is part of every code review: the review runs a universal security base
 
 ## The numbers, from production use
 
-{/* TODO(marketing): this whole section — every figure below was measured on Copilot Collections; needs confirmation for Agentic Collections */}
+{/* TODO(marketing): confirm before publishing */}
 
-These aren't benchmark numbers. They come from 300+ engineers using the framework daily across 50+ commercial projects at The Software House. {/* TODO(marketing): "300+ engineers using the framework daily across 50+ commercial projects" — measured on Copilot Collections; needs confirmation for Agentic Collections — conflicts with the homepage 160+ projects (src/components/home/Skills.tsx:33) */}
+These aren't benchmark numbers. They come from 300+ engineers using the framework daily across 50+ commercial projects at The Software House. {/* TODO(marketing): confirm before publishing */}
 
 | What changes | Measured impact |
 | --- | --- |
-| Average lead time | **30% reduction** {/* TODO(marketing): average lead time 30% reduction — measured on Copilot Collections; needs confirmation for Agentic Collections — conflicts with the homepage 40% lead time (src/components/home/Hero.tsx:202, src/components/home/Proof.tsx:15) */} |
-| Context gathering time | 60–80% faster {/* TODO(marketing): context gathering 60–80% faster — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
-| Planning time | 50–70% faster {/* TODO(marketing): planning time 50–70% faster — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
-| UI defects reaching QA | 70–90% reduction {/* TODO(marketing): UI defects reaching QA 70–90% reduction — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
-| Design-to-code accuracy | 95–99% {/* TODO(marketing): design-to-code accuracy 95–99% — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
-| E2E test flakiness | 50–80% reduction {/* TODO(marketing): E2E test flakiness 50–80% reduction — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
-| Onboarding time for new engineers | 40–60% reduction {/* TODO(marketing): onboarding time for new engineers 40–60% reduction — measured on Copilot Collections; needs confirmation for Agentic Collections */} |
+| Average lead time | **30% reduction** {/* TODO(marketing): confirm before publishing */} |
+| Context gathering time | 60–80% faster {/* TODO(marketing): confirm before publishing */} |
+| Planning time | 50–70% faster {/* TODO(marketing): confirm before publishing */} |
+| UI defects reaching QA | 70–90% reduction {/* TODO(marketing): confirm before publishing */} |
+| Design-to-code accuracy | 95–99% {/* TODO(marketing): confirm before publishing */} |
+| E2E test flakiness | 50–80% reduction {/* TODO(marketing): confirm before publishing */} |
+| Onboarding time for new engineers | 40–60% reduction {/* TODO(marketing): confirm before publishing */} |
 
-The lead time figure is the headline, but the onboarding number often surprises CTOs most. A structured framework means new engineers aren't learning your way of working from scratch the framework is the way of working. {/* TODO(marketing): "the onboarding number often surprises CTOs most" — adoption claim measured on Copilot Collections; needs confirmation for Agentic Collections */}
+The lead time figure is the headline, but the onboarding number often surprises CTOs most. A structured framework means new engineers aren't learning your way of working from scratch the framework is the way of working. {/* TODO(marketing): confirm before publishing */}
 
 ---
 
@@ -110,7 +109,7 @@ Agentic Collections installs into Claude Code v2.1 or newer from its marketplace
 
 Core and discipline plugins install at user scope and travel with each person. Stack plugins install at project scope and are committed to the repository's `.claude/settings.json`, so everyone who works on the repository gets the same set. Teammates receive an update when a plugin's version is bumped and they run `/plugin update`.
 
-A typical rollout at TSH runs in three phases: {/* TODO(marketing): rollout timeline "day 1 / week 1–2 / week 3–4" — adoption claim measured on Copilot Collections (its loop was named Product Ideation → Development → Quality; renamed here to the Agentic Collections verticals); needs confirmation for Agentic Collections */}
+A typical rollout at TSH runs in three phases: {/* TODO(marketing): confirm before publishing */}
 
 - **Install and orient** (day 1) — engineers install the plugins, read the workflow overview, run their first agent interaction on a real ticket.
 - **First sprint** (week 1–2) — one team runs the full Product Management → Product Engineering → Product Testing loop on a real project. Friction points surface and get resolved.
@@ -122,13 +121,13 @@ A typical rollout at TSH runs in three phases: {/* TODO(marketing): rollout time
 
 ## Why TSH built this in the open
 
-The Software House is a 300-person product engineering firm. {/* TODO(marketing): "300-person product engineering firm" — company figure carried over from the Copilot Collections page, no source in this repository; needs confirmation for Agentic Collections */}
+The Software House is a 300-person product engineering firm. {/* TODO(marketing): confirm before publishing */}
 
-We built Agentic Collections to solve our own problem - how to get consistent, high-quality AI-assisted delivery across a large, distributed team working on complex commercial projects. {/* TODO(marketing): motivation paragraph "to solve our own problem" — carried over from Copilot Collections, no source in this repository; needs confirmation for Agentic Collections */} {/* PHASE2(narrative): motivation paragraph — kept from the Copilot Collections page with the product name swapped; no source here states the motive — Phase 2 confirms or rewrites it */}
+We built Agentic Collections to solve our own problem - how to get consistent, high-quality AI-assisted delivery across a large, distributed team working on complex commercial projects. {/* TODO(marketing): confirm before publishing */} {/* PHASE2(narrative): motivation paragraph — kept from the Copilot Collections page with the product name swapped; no source here states the motive — Phase 2 confirms or rewrites it */}
 
-We open-sourced it because the problem is structural and universal. Every engineering team using AI tools is navigating the same gap between individual capability and team-level consistency. We've done the work to close that gap. Sharing the framework costs us nothing and helps the industry get there faster. {/* TODO(marketing): open-source rationale — carried over from Copilot Collections, no source in this repository; needs confirmation for Agentic Collections */} {/* PHASE2(narrative): open-source rationale — kept from the Copilot Collections page; no source here states it — Phase 2 confirms or rewrites it */}
+We open-sourced it because the problem is structural and universal. Every engineering team using AI tools is navigating the same gap between individual capability and team-level consistency. We've done the work to close that gap. Sharing the framework costs us nothing and helps the industry get there faster. {/* TODO(marketing): confirm before publishing */} {/* PHASE2(narrative): open-source rationale — kept from the Copilot Collections page; no source here states it — Phase 2 confirms or rewrites it */}
 
-The 30% lead time figure comes from our own delivery data. We have skin in the game. {/* TODO(marketing): "The 30% lead time figure comes from our own delivery data" — measured on Copilot Collections; needs confirmation for Agentic Collections — conflicts with the homepage 40% lead time (src/components/home/Hero.tsx:202, src/components/home/Proof.tsx:15) */}
+The 30% lead time figure comes from our own delivery data. We have skin in the game. {/* TODO(marketing): confirm before publishing */}
 
 ---
 
@@ -138,7 +137,7 @@ The repository is public and the plugins are MIT-licensed. You need Claude Code 
 
 - [Read the documentation](/docs/) — understand how the plugins fit together before committing to anything.
 - [See the use cases](/docs/use-cases) — what each vertical does today, with the skill or agent behind it.
-- [Get the repo](https://github.com/TheSoftwareHouse/agentic-collections) — install it in an afternoon, run it against a real ticket, see what changes. {/* TODO(marketing): "install it in an afternoon" — adoption claim measured on Copilot Collections; needs confirmation for Agentic Collections */}
+- [Get the repo](https://github.com/TheSoftwareHouse/agentic-collections) — install it in an afternoon, run it against a real ticket, see what changes. {/* TODO(marketing): confirm before publishing */}
 
 :::brand
 

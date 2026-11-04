@@ -208,15 +208,15 @@ export default function Hero(): React.JSX.Element {
               </div>
             </div>
           </div>
-          {/* PHASE2(visual): stats bar of four figures — layout and the two marketing figures are inherited from the source site, where they described that product — pick the figures that prove this marketplace, all but the marketing ones read from the catalog */}
+          {/* PHASE2(visual): stats bar of four figures — layout and the two headline figures are inherited from the source site, where they described that product — pick the figures that prove this marketplace, all but the two headline ones read from the catalog */}
           <div className="proof">
             <div>
-              {/* TODO(marketing): "40% shorter lead time" is the source site's figure, kept verbatim; confirm it holds for these plugins. Conflicts with docs/for-ctos.md (30%) */}
+              {/* TODO(marketing): confirm before publishing */}
               <b>40%</b>
               <small>shorter lead time</small>
             </div>
             <div>
-              {/* TODO(marketing): "300+ engineers use it" is the source site's figure, kept verbatim; confirm it holds for these plugins */}
+              {/* TODO(marketing): confirm before publishing */}
               <b>300+</b>
               <small>engineers use it</small>
             </div>

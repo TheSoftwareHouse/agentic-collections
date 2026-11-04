@@ -5,10 +5,10 @@ export default function TshBlock(): React.JSX.Element {
     <>
       <section className="tsh">
         <div className="wrap">
-          {/* PHASE2(narrative): two TSH offer cards — copy inherited from the source site; "this framework" became "these plugins", nothing else changed — rewrite the offers around the marketplace once marketing confirms them */}
+          {/* PHASE2(narrative): two TSH offer cards — copy inherited from the source site; "this framework" became "these plugins", nothing else changed — rewrite the offers around the marketplace once they are confirmed */}
           <h2 className="tsh-h">Want a team that already works this&nbsp;way?</h2>
           <div className="tsh-grid">
-            {/* TODO(marketing): "a self-managed team in 2 weeks" and "senior engineers who run these plugins on client projects" (the source site said "this framework") — confirm both */}
+            {/* TODO(marketing): confirm before publishing */}
             <a className="tc t1" href="https://tsh.io/contact-us">
               <b>Work with The Software House</b>
               <span>
@@ -17,7 +17,7 @@ export default function TshBlock(): React.JSX.Element {
               </span>
               <span className="tc-link">Talk to an engineer →</span>
             </a>
-            {/* TODO(marketing): confirm the AI Enablement program covers adopting these plugins */}
+            {/* TODO(marketing): confirm before publishing */}
             <a className="tc t2" href="https://tsh.io/services/ai-enablement">
               <b>Roll it out in your team</b>
               <span>

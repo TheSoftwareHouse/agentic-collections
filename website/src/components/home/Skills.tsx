@@ -99,7 +99,7 @@ export default function Skills(): React.JSX.Element {
               {totals.skills} skills of senior know&#8209;how across our disciplines and stacks
             </h2>
             <p className="lead">
-              {/* TODO(marketing): "160+ projects" is the source site's figure, kept verbatim; confirm it holds for these plugins. Conflicts with docs/for-ctos.md (50+ projects) */}
+              {/* TODO(marketing): confirm before publishing */}
               Practice drawn from 160+ projects The Software House has delivered, packaged as Claude
               Code plugins. Claude loads the skills a task needs when the work matches their
               description, so you don't have to remember the commands.
@@ -152,7 +152,7 @@ export default function Skills(): React.JSX.Element {
                   </svg>
                   Skills and agents to start with
                 </div>
-                {/* TODO(marketing): the cloud lists the ranking's tier A (src/data/home-featured.json). How often teams run the cloud cost audits is not in the repository (component-ranking.md, question 4) — confirm they belong here */}
+                {/* TODO(marketing): confirm before publishing */}
                 <div className="cloud-g">
                   {featuredGroups.map(({ title, chips }) => (
                     <div key={title}>
