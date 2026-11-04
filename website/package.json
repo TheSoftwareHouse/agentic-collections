@@ -1,0 +1,59 @@
+{
+  "name": "agentic-collections-website",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "prestart": "node scripts/sync-catalog.mjs",
+    "start": "docusaurus start",
+    "prebuild": "node scripts/sync-catalog.mjs && node scripts/sync-catalog.mjs --check",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve",
+    "clear": "docusaurus clear",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test scripts/guards.test.mjs",
+    "docs:check": "node scripts/sync-catalog.mjs --check",
+    "docs:stamp": "node scripts/docs-stamp.mjs"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@easyops-cn/docusaurus-search-local": "0.55.3",
+    "clsx": "2.1.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
+    "js-yaml": "5.5.0",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "overrides": {
+    "fast-uri": "3.1.9",
+    "joi": "17.13.9",
+    "js-yaml@^4": "4.3.2",
+    "lodash": "4.18.1",
+    "picomatch": "2.3.2",
+    "undici": "7.30.1",
+    "serialize-javascript": "7.1.4",
+    "tinypool": "2.2.0"
+  }
+}

@@ -2,13 +2,15 @@
 
 ## What this repo is
 
-A **Claude Code plugin marketplace** for The Software House. It is not an
-application: there is no build step and no runtime. The plugins are Markdown and JSON
-that Claude Code loads; the only code is repository tooling that checks them — a
+A **Claude Code plugin marketplace** for The Software House. The plugins are not an
+application: no build step and no runtime — mostly Markdown and JSON that Claude Code
+loads, plus the few hook and helper scripts some skills run. The code beside them is repository tooling that checks them — a
 standard-library Python description lint in `scripts/` and a `claude plugin eval`
 routing suite in `evals/` — and the project-context scripts in
 `tsh-product-management`, which run git on people's clones and carry their own test
-suite: `.claude/rules/project-context-contract.md`.
+suite: `.claude/rules/project-context-contract.md`. The one part with a build step is
+the documentation site in `website/`, a Docusaurus app that describes the plugins and
+fails its build when a page falls out of step with them: `.claude/rules/website.md`.
 
 It publishes three families: `tsh-<discipline>` for *how we work*,
 `tsh-stack-<stack-name>` for *what we work with*, and `tsh-core` — a single,
@@ -100,6 +102,7 @@ and `tsh-core` with you, because it depends on nothing at all.
 | An MCP server one agent or discipline drives | `plugins/<plugin>/.mcp.json` — `aws-documentation` in `tsh-stack-aws` is the worked example | that file |
 | A routing eval case | `evals/routing/<case>/case.yaml` | an existing case in `evals/routing/` |
 | A behavioural eval suite for one plugin | `plugins/<plugin>/evals/<case>/case.yaml` — read `.claude/rules/plugin-evals.md` first | — |
+| A page on the documentation site | `website/docs/<section>/<page>.md` — read `.claude/rules/website.md` first | a sibling page in the same section |
 | To ship any of the above to teammates | invoke `/releasing-a-plugin-change` | — |
 
 **Before creating any of them, invoke `/contributing-a-plugin-component`** — it routes
@@ -213,6 +216,8 @@ When the lint flags a changed description, or you add or rename a model-invocabl
 also run the routing evals; they spend API budget on the signed-in account, about USD 0.12
 per case. `evals/README.md` is the one place that documents how to run these checks, what
 their output means, and what CI runs — keep commands there rather than copying them here.
+
+The website's install, build and docs-check commands live in `.claude/rules/website.md`.
 
 ## Where the rest lives
 

@@ -16,9 +16,10 @@ to explain why nothing arrived.
 ## When it does not apply
 
 Changes outside `plugins/` — this file, `README.md`, `.claude/rules/`,
-`.claude-plugin/marketplace.json` on its own, `templates/`, `spec/` and
+`.claude-plugin/marketplace.json` on its own, `templates/`, `website/`, `spec/` and
 `specifications/` — ship nothing to anyone and need no bump and no
-changelog entry.
+changelog entry. A `README.md`, `CLAUDE.md`, `LICENSE` or `marketplace.json` edit can
+still stale a website page that lists it: run `npm run docs:check` from `website/`.
 
 ## Procedure
 
@@ -85,7 +86,21 @@ deciding whether to update, not as a diff summary — read
 Nothing in Claude Code surfaces release notes. If that plugin's `README.md` does not
 already link `CHANGELOG.md`, add the link now.
 
-### 6. Announce with the right command
+### 6. Bring the website pages up to date
+
+Pages in `website/docs` hash the plugin files they describe — `plugin.json` included,
+so run this after the bump. From `website/`, once `npm ci` has run:
+
+```shell
+node scripts/sync-catalog.mjs --check
+```
+
+For every page it lists — stale, missing or orphaned — update the page to match its
+sources, then stamp it with `npm run docs:stamp -- <page>`. Stamp only a page you
+updated: the hash records that someone re-read it. Rerun until the check passes. CI
+runs the same check in the `website` job. Page rules: `.claude/rules/website.md`.
+
+### 7. Announce with the right command
 
 Which command teammates need depends on what changed:
 
@@ -108,6 +123,7 @@ refreshes. Attach the changelog link to the announcement.
 - [ ] `marketplace.json` gained no `version` field
 - [ ] A new plugin also has a `marketplace.json` entry, with matching directory name and `name`
 - [ ] `claude plugin validate ./plugins/<name>` passes for each one
-- [ ] The bump, the changelog entry and the change are all in the same commit
+- [ ] `node scripts/sync-catalog.mjs --check` passes from `website/`
+- [ ] The bump, the changelog entry, the updated website pages and the change are all in the same commit
 - [ ] The announcement names the right command — `/plugin update`, or the marketplace update for a new plugin
 ```

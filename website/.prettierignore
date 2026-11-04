@@ -1,0 +1,8 @@
+build
+.docusaurus
+node_modules
+package-lock.json
+docs
+static
+src/components/home/home.css
+src/data/*.generated.json

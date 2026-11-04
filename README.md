@@ -36,8 +36,8 @@ it; nothing is installed yet.
 /plugin marketplace add TheSoftwareHouse/agentic-collections
 ```
 
-This repo is private, so your git needs to be able to clone it — a working SSH key
-or `gh auth login` already set up. Alternatives if the `owner/repo` shorthand fails:
+The repo is public, so no GitHub authentication is needed. Alternatives if the
+`owner/repo` shorthand fails:
 
 ```shell
 /plugin marketplace add git@github.com:TheSoftwareHouse/agentic-collections.git

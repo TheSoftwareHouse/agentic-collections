@@ -1,0 +1,46 @@
+<!doctype html>
+<!--
+  Source of website/static/img/home/icon-terminal.png (64x64, transparent), the AI-coding-tool
+  row in the homepage Setup section. A neutral terminal glyph: no Claude or Anthropic mark, which
+  needs permission to use. Same treatment as its neighbours there (Jira, Figma, Confluence,
+  Playwright): one flat logo shape on a transparent canvas, 6px padding like Figma and Playwright,
+  filled with the ink colour of the icon it replaces, asset-07 (#3b3e3f).
+
+  playwright-cli blocks file: URLs, so serve website/ first. Render, from the repository root:
+    python3 -m http.server 4317 --bind 127.0.0.1 --directory website &
+    until curl -s -o /dev/null http://127.0.0.1:4317/; do sleep 0.2; done
+    playwright-cli open http://127.0.0.1:4317/scripts/og/icon-terminal.html
+    playwright-cli run-code "async page => { await page.locator('svg').screenshot({ path: '$PWD/website/static/img/home/icon-terminal.png', omitBackground: true }); }"
+    playwright-cli close
+    kill $!
+  Then check: file website/static/img/home/icon-terminal.png  ->  64 x 64, RGBA
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Terminal icon</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      svg {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="6" width="52" height="52" rx="12" fill="#3b3e3f" />
+      <path
+        d="M18 24 27 32 18 40M31 41h14"
+        fill="none"
+        stroke="#fff"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </body>
+</html>

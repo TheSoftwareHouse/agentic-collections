@@ -1,0 +1,446 @@
+<!doctype html>
+<!--
+  Source of website/static/img/opengraph.png (1200x630).
+  Layout, palette, typography, radii and shadows follow the original OG image of the site this
+  website was copied from; only the content is Agentic Collections. The session story follows
+  plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/SKILL.md.
+
+  playwright-cli blocks file: URLs, so serve website/ first. Render, from the repository root:
+    python3 -m http.server 4317 --bind 127.0.0.1 --directory website &
+    until curl -s -o /dev/null http://127.0.0.1:4317/; do sleep 0.2; done
+    playwright-cli open http://127.0.0.1:4317/scripts/og/og.html
+    playwright-cli resize 1200 630
+    playwright-cli screenshot --filename="$PWD/website/static/img/opengraph.png"
+    playwright-cli close
+    kill $!
+  Then check: file website/static/img/opengraph.png  ->  1200 x 630
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Agentic Collections — Open Graph image</title>
+    <style>
+      @font-face {
+        font-family: everett;
+        font-weight: 400;
+        src: url(../../static/fonts/everett-eb23ea1c.woff2) format('woff2');
+      }
+      @font-face {
+        font-family: 'Inter Tight';
+        font-weight: 500;
+        src: url(../../static/fonts/everett-39783e8c.woff2) format('woff2');
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: everett, 'Inter Tight', system-ui, sans-serif;
+        color: #3b3e3f;
+        /* Hero background from home.css (.home-hero), without the white fade at the bottom. */
+        background:
+          radial-gradient(60% 80% at 0% 10%, rgba(253, 226, 196, 0.95), rgba(253, 226, 196, 0) 70%),
+          radial-gradient(55% 75% at 55% 40%, rgba(226, 218, 250, 0.9), rgba(226, 218, 250, 0) 70%),
+          radial-gradient(
+            60% 90% at 100% 20%,
+            rgba(207, 233, 251, 0.95),
+            rgba(207, 233, 251, 0) 70%
+          ),
+          linear-gradient(110deg, #fbeee0, #efe8f8 50%, #e3effb);
+      }
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+      }
+
+      /* Left column */
+      .brand {
+        position: absolute;
+        left: 80px;
+        top: 65px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 20px;
+        color: #3b3e3f;
+      }
+      .brand img {
+        height: 24px;
+      }
+      h1 {
+        position: absolute;
+        left: 79px;
+        top: 193px;
+        font-weight: 400;
+        font-size: 58px;
+        line-height: 60px;
+        letter-spacing: -0.035em;
+        color: #3b3e3f;
+      }
+      h1 span {
+        color: #7d66d9;
+      }
+      .icons {
+        position: absolute;
+        left: 81px;
+        top: 478px;
+        display: flex;
+      }
+      .icons i {
+        width: 30px;
+        height: 30px;
+        margin-right: -2px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255, 255, 255, 0.55);
+        display: grid;
+        place-items: center;
+      }
+      .icons svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: #fff;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .o {
+        background: #ffc269;
+      }
+      .p {
+        background: #9d8cf3;
+      }
+      .b {
+        background: #8fcaf2;
+      }
+      .meta {
+        position: absolute;
+        left: 80px;
+        top: 523px;
+      }
+      .meta b {
+        display: block;
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 24px;
+        letter-spacing: -0.01em;
+      }
+      .meta small {
+        display: block;
+        font-size: 14px;
+        line-height: 20px;
+        color: #6b7173;
+      }
+
+      /* Right column: the Claude Code window, cut by the right and bottom edges */
+      .win {
+        position: absolute;
+        left: 630px;
+        top: 117px;
+        width: 620px;
+        height: 560px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #25272a;
+        box-shadow:
+          0 40px 100px rgba(49, 52, 53, 0.28),
+          0 0 0 1px rgba(0, 0, 0, 0.25);
+        color: #e6e8ea;
+      }
+      .tb {
+        height: 35px;
+        display: flex;
+        align-items: center;
+        padding-left: 13px;
+        background: #2b2d30;
+        border-bottom: 1px solid #393b40;
+        font-size: 12px;
+        color: #9aa0a6;
+      }
+      .tb i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+      .tb i:nth-child(1) {
+        background: #ff5f57;
+      }
+      .tb i:nth-child(2) {
+        background: #febc2e;
+      }
+      .tb i:nth-child(3) {
+        background: #28c840;
+        margin-right: 16px;
+      }
+      /* PHASE2(visual): the second bar shows a working directory where the original showed a
+         VS Code "CHAT" panel header; a real Claude Code terminal has no such bar. */
+      .sb {
+        height: 51px;
+        display: flex;
+        align-items: center;
+        padding-left: 23px;
+        border-bottom: 1px solid #393b40;
+        font-size: 14px;
+        color: #878d95;
+      }
+      .body {
+        position: relative;
+      }
+      .you {
+        position: absolute;
+        top: 21px;
+        left: 295px;
+        width: 400px;
+        height: 44px;
+        border-radius: 10px;
+        background: #3a3d42;
+        display: flex;
+        align-items: center;
+        padding-left: 18px;
+        font-size: 17px;
+        color: #fff;
+      }
+      .you em {
+        font-style: normal;
+        color: #c3a6ff;
+        margin-right: 10px;
+      }
+      .who {
+        position: absolute;
+        top: 84px;
+        left: 23px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 17px;
+      }
+      .who i {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        background: #9d8cf3;
+        display: grid;
+        place-items: center;
+        font-style: normal;
+        font-family: 'Inter Tight', everett, sans-serif;
+        font-weight: 500;
+        font-size: 12px;
+        color: #fff;
+      }
+      .who small {
+        font-size: 14px;
+        color: #8b9096;
+      }
+      .pill {
+        position: absolute;
+        top: 126px;
+        left: 23px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        padding: 0 9px;
+        border-radius: 4px;
+        background: #33304a;
+        border: 1px solid #4a4370;
+        font-size: 15px;
+        color: #cdbfff;
+      }
+      .steps {
+        position: absolute;
+        top: 165px;
+        left: 23px;
+        list-style: none;
+      }
+      .steps li {
+        height: 37.5px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 17px;
+        white-space: nowrap;
+      }
+      .steps li > i {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #2f9e6b;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .steps li > i svg {
+        width: 12px;
+        height: 12px;
+        fill: none;
+        stroke: #fff;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .steps li > i.next {
+        background: #3a3d42;
+      }
+      .steps small {
+        font-size: 14px;
+        color: #8b9096;
+        margin-left: -8px;
+      }
+      .prompt {
+        position: absolute;
+        top: 380px;
+        left: 22px;
+        width: 620px;
+        height: 120px;
+        border-radius: 8px;
+        background: #1e1f22;
+        border: 1px solid #3a3d42;
+        padding: 15px 20px;
+        font-size: 16px;
+        color: #8b9096;
+      }
+      .prompt em {
+        display: inline-block;
+        width: 9px;
+        height: 18px;
+        margin-left: 4px;
+        vertical-align: -3px;
+        background: #cfd3d6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <img src="../../static/img/home/asset-01-39ffbc18.png" alt="" />
+      Agentic Collections
+    </div>
+
+    <!-- PHASE2(narrative): the headline mirrors the original's "open-source framework for the
+         agentic SDLC" shape; revisit it together with the homepage hero wording. -->
+    <h1>
+      Open-source<br />plugins <span>for<br />Claude Code</span>
+    </h1>
+
+    <!-- PHASE2(visual): the circled icons are decorative, as in the original; they do not map one
+         to one onto plugins or components. -->
+    <div class="icons">
+      <i class="o"
+        ><svg viewBox="0 0 24 24">
+          <rect x="8" y="2" width="8" height="4" rx="1" />
+          <path
+            d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h6"
+          /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <path d="M12 2 2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5" /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <rect x="9" y="2" width="6" height="6" rx="1" />
+          <rect x="2" y="16" width="6" height="6" rx="1" />
+          <rect x="16" y="16" width="6" height="6" rx="1" />
+          <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8" /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z" /></svg
+      ></i>
+      <i class="b"
+        ><svg viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6" /></svg
+      ></i>
+      <i class="b"
+        ><svg viewBox="0 0 24 24"><path d="m4 17 6-6-6-6M12 19h8" /></svg
+      ></i>
+      <i class="b"
+        ><svg viewBox="0 0 24 24">
+          <path
+            d="M9 3h6M10 3v6.5L4.6 18.6A1.6 1.6 0 0 0 6 21h12a1.6 1.6 0 0 0 1.4-2.4L14 9.5V3"
+          /></svg
+      ></i>
+      <i class="o"
+        ><svg viewBox="0 0 24 24">
+          <circle cx="18" cy="18" r="3" />
+          <circle cx="6" cy="6" r="3" />
+          <path d="M13 6h3a2 2 0 0 1 2 2v7M6 9v12" /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" /></svg
+      ></i>
+      <i class="b"
+        ><svg viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /></svg
+      ></i>
+      <i class="p"
+        ><svg viewBox="0 0 24 24">
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7ZM3.3 7 12 12l8.7-5M12 22V12"
+          /></svg
+      ></i>
+    </div>
+
+    <!-- No component counts: a bitmap does not follow the catalog. -->
+    <div class="meta">
+      <b>Claude Code plugins · MIT licence</b>
+      <small>Built by The Software House</small>
+    </div>
+
+    <!-- PHASE2(visual): the window replays the Hero session; revisit both together. Every step
+         follows tsh-product-engineering:orchestrating-feature-implementation. -->
+    <div class="win">
+      <div class="tb"><i></i><i></i><i></i>Claude Code</div>
+      <div class="sb mono">~/payments-api</div>
+      <div class="body">
+        <div class="you mono"><em>&gt;</em>Implement PROJ-123</div>
+        <div class="who"><i>PE</i>tsh-product-engineering <small>skill loaded</small></div>
+        <div class="pill mono">orchestrating-feature-implementation</div>
+        <ul class="steps">
+          <li>
+            <i
+              ><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7" /></svg></i
+            >creating-implementation-plans
+            <small>plan written, you approved it</small>
+          </li>
+          <li>
+            <i
+              ><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7" /></svg></i
+            >software-engineer
+            <small>tasks done, Definition of Done passing</small>
+          </li>
+          <li>
+            <i
+              ><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7" /></svg></i
+            >code-reviewer
+            <small>in parallel · findings report</small>
+          </li>
+          <li>
+            <i
+              ><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7" /></svg></i
+            >feature-verifier
+            <small>in parallel · evidence per scenario</small>
+          </li>
+          <li>
+            <i class="next"
+              ><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg></i
+            >Report
+            <small>what shipped, review outcome, verification results</small>
+          </li>
+        </ul>
+        <div class="prompt mono">&gt;<em></em></div>
+      </div>
+    </div>
+  </body>
+</html>
