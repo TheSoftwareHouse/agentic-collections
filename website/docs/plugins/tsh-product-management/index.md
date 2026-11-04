@@ -93,4 +93,4 @@ These artifacts outlive the session, in `specifications/projects/<project-name>/
 
 ## Not covered here
 
-Implementation and code review are `tsh-product-engineering`, E2E and manual QA are `tsh-product-testing`, and design work is `tsh-product-design`. Those plugins may not be installed, so this one names the gap instead of linking into them.
+Implementation and code review are `tsh-product-engineering`, and E2E and manual QA are `tsh-product-testing`. Those plugins may not be installed, so this one names the gap instead of linking into them.

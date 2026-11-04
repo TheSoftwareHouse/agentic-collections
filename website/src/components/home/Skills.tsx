@@ -1,24 +1,92 @@
 import React from 'react';
 import catalog from '@site/src/data/catalog.generated.json';
+import featured from '@site/src/data/home-featured.json';
 
 const { totals } = catalog;
 const plugins = catalog.plugins.filter((p) => !p.empty);
 
+type Plugin = (typeof catalog.plugins)[number];
+
+/** "TSH Stack: Node.js" → "Node.js", "TSH Product Engineering" → "Product Engineering". */
+const shortName = (p: Plugin): string => p.displayName.replace(/^TSH (Stack: )?/, '');
+const skillCount = (list: Plugin[]): number => list.reduce((sum, p) => sum + p.skills.length, 0);
+const pluginWord = (n: number): string => `${n} ${n === 1 ? 'plugin' : 'plugins'}`;
+
+const disciplines = plugins.filter((p) => p.family === 'discipline');
+const stacks = plugins.filter((p) => p.family === 'stack');
+const core = plugins.filter((p) => p.family === 'core');
+// The marketplace files cloud providers under "platform" and runtime targets under "engineering".
+const cloudStacks = stacks.filter((p) => p.category === 'platform');
+const runtimeStacks = stacks.filter((p) => p.category !== 'platform');
+
 const FAMILIES = [
-  { family: 'core', label: 'Core' },
-  { family: 'discipline', label: 'Disciplines' },
-  { family: 'stack', label: 'Stacks' },
+  {
+    label: `Disciplines · ${pluginWord(disciplines.length)}`,
+    skills: skillCount(disciplines),
+    names: disciplines.map(shortName).join(' · '),
+  },
+  {
+    label: `Stacks · ${pluginWord(stacks.length)}`,
+    skills: skillCount(stacks),
+    names: `Runtime: ${runtimeStacks.map(shortName).join(', ')} · Cloud: ${cloudStacks.map(shortName).join(', ')}`,
+  },
+  {
+    label: 'Core · tsh-core',
+    skills: skillCount(core),
+    names: 'Needed regardless of discipline or stack',
+  },
 ];
 
-/** Skills you can type as a command, taken round-robin across plugins so every plugin shows. */
-const CLOUD_SIZE = 16;
-const commandSkills = plugins.map((p) => p.skills.filter((s) => s.userInvocable));
-const cloud: string[] = [];
-for (let round = 0; cloud.length < CLOUD_SIZE; round++) {
-  const picked = commandSkills.map((skills) => skills[round]).filter(Boolean);
-  if (picked.length === 0) break;
-  cloud.push(...picked.slice(0, CLOUD_SIZE - cloud.length).map((s) => s.name));
+/** The cloud shows the components the ranking put first, grouped by the plugin that ships them. */
+const featuredGroups: { title: string; chips: { text: string; href: string; label: string }[] }[] =
+  [];
+for (const { component, label } of featured.featured) {
+  const [pluginName, kind, name] = component.split('/');
+  const plugin = plugins.find((p) => p.name === pluginName);
+  if (!plugin) continue; // sync-catalog --check fails the build before this can happen
+  const title = plugin.family === 'stack' ? 'Stacks' : shortName(plugin);
+  let group = featuredGroups.find((g) => g.title === title);
+  if (!group) featuredGroups.push((group = { title, chips: [] }));
+  group.chips.push({
+    text: name, // the group names the plugin; the docs page shows the full /plugin:skill form
+    href: `/docs/plugins/${pluginName}/${kind}/${name}`,
+    label,
+  });
 }
+const featuredCount = featured.featured.length;
+
+/** One avatar per discipline, in the colour and icon its card uses. */
+const AVATARS: Record<string, { color: string; icon: React.JSX.Element }> = {
+  'tsh-product-management': {
+    color: '#ffc269',
+    icon: (
+      <>
+        <path d="M9 4h6v3H9z" />
+        <path d="M8 5H6v15h12V5h-2" />
+        <path d="M9 11h6M9 15h4" />
+      </>
+    ),
+  },
+  'tsh-product-testing': {
+    color: '#9d8cf3',
+    icon: <path d="M9 3h6M10 3v6l-5 10h14L14 9V3" />,
+  },
+  'tsh-product-engineering': {
+    color: '#9d8cf3',
+    icon: (
+      <>
+        <rect x="9" y="3" width="6" height="5" rx="1" />
+        <rect x="3" y="16" width="6" height="5" rx="1" />
+        <rect x="15" y="16" width="6" height="5" rx="1" />
+        <path d="M12 8v4M6 16v-4h12v4" />
+      </>
+    ),
+  },
+  'tsh-platform-engineering': {
+    color: '#8fcaf2',
+    icon: <path d="M4 6l5 5-5 5M12 18h8" />,
+  },
+};
 
 export default function Skills(): React.JSX.Element {
   return (
@@ -36,23 +104,25 @@ export default function Skills(): React.JSX.Element {
               Code plugins. Claude loads the skills a task needs when the work matches their
               description, so you don't have to remember the commands.
             </p>
-            {/* PHASE2(narrative): skill categories — the source site listed five hand-counted topic categories; here they are the three plugin families, counted from the catalog — decide whether families or topics are the better grouping for a reader */}
             <div className="cats">
-              {FAMILIES.map(({ family, label }) => {
-                const inFamily = plugins.filter((p) => p.family === family);
-                const skills = inFamily.reduce((sum, p) => sum + p.skills.length, 0);
-                return (
-                  <div key={family}>
+              {FAMILIES.map(({ label, skills, names }) => (
+                <div key={label}>
+                  <p>
                     {label}
-                    {inFamily.length > 1 && ` · ${inFamily.length} plugins`}
-                    <span>{skills} skills</span>
-                  </div>
-                );
-              })}
+                    <small>{names}</small>
+                  </p>
+                  <span>{skills} skills</span>
+                </div>
+              ))}
             </div>
             <p className="skl-foot">
               Wrote a skill your team relies on? Contribute it, and everyone who installs that
-              plugin gets it with the next release, on their next <code>/plugin update</code>.
+              plugin gets it with the next release, on their next <code>/plugin update</code>. To
+              write one, start with{' '}
+              <a className="inl" href="/docs/plugins/tsh-core/skills/authoring-claude-extensions">
+                authoring-claude-extensions
+              </a>
+              .
               <br />
               <a
                 className="contrib"
@@ -80,175 +150,51 @@ export default function Skills(): React.JSX.Element {
                     <path d="M12 3l9 5-9 5-9-5 9-5z" />
                     <path d="M3 13l9 5 9-5" />
                   </svg>
-                  Claude loads the skills each task needs
+                  Skills and agents to start with
                 </div>
-                <div className="cloud">
-                  {cloud.map((name) => (
-                    <span key={name}>{name}</span>
+                {/* TODO(marketing): the cloud lists the ranking's tier A (src/data/home-featured.json). How often teams run the cloud cost audits is not in the repository (component-ranking.md, question 4) — confirm they belong here */}
+                <div className="cloud-g">
+                  {featuredGroups.map(({ title, chips }) => (
+                    <div key={title}>
+                      <h4>{title}</h4>
+                      <div className="cloud">
+                        {chips.map(({ text, href, label }) => (
+                          <a key={href} href={href} title={label} aria-label={`${text}: ${label}`}>
+                            {text}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   ))}
-                  <span className="more">+{totals.skills - cloud.length} more</span>
+                  <div className="cloud">
+                    <a className="more" href="/docs/plugins/">
+                      +{totals.skills + totals.agents - featuredCount} more
+                    </a>
+                  </div>
                 </div>
-                {/* PHASE2(visual): row of twelve agent avatars — inherited from the source site, where each stood for one of its agents; here they are decorative and do not map to our agents — draw one avatar per discipline, or drop the row */}
                 <div className="ld">
                   <div className="ld-av">
-                    <span style={{ background: '#ffc269' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 4h6v3H9z" />
-                        <path d="M8 5H6v15h12V5h-2" />
-                        <path d="M9 11h6M9 15h4" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="11" cy="11" r="6" />
-                        <path d="M20 20l-4.5-4.5" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 3l9 5-9 5-9-5 9-5z" />
-                        <path d="M3 13l9 5 9-5" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="9" y="3" width="6" height="5" rx="1" />
-                        <rect x="3" y="16" width="6" height="5" rx="1" />
-                        <rect x="15" y="16" width="6" height="5" rx="1" />
-                        <path d="M12 8v4M6 16v-4h12v4" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M4 20c3 0 4-1.5 4-3.5S9.5 13 11 13s3 1.5 3 3.5" />
-                        <path d="M11 13l8-9 1 1-8 9" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M8 7l-5 5 5 5M16 7l5 5-5 5" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M4 6l5 5-5 5M12 18h8" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 3h6M10 3v6l-5 10h14L14 9V3" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#ffc269' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="6" cy="6" r="2.2" />
-                        <circle cx="6" cy="18" r="2.2" />
-                        <circle cx="18" cy="18" r="2.2" />
-                        <path d="M6 8.2v7.6M18 15.8V9a3 3 0 0 0-3-3h-4" />
-                        <path d="M13 4l-2 2 2 2" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" />
-                        <circle cx="12" cy="12" r="2.6" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M4 20l4-1 11-11-3-3L5 16z" />
-                      </svg>
-                    </span>
-                    <span style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    </span>
+                    {disciplines.map((p) => {
+                      const avatar = AVATARS[p.name];
+                      return (
+                        <span
+                          key={p.name}
+                          style={{ background: avatar?.color ?? '#9d8cf3' }}
+                          title={shortName(p)}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#fff"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            {avatar?.icon}
+                          </svg>
+                        </span>
+                      );
+                    })}
                   </div>
                   <b>{totals.agents} agents ship alongside them</b>
                 </div>

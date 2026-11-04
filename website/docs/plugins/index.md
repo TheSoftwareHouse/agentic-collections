@@ -40,8 +40,6 @@ Install the one that matches your job, at **User** scope. Your job doesn't chang
 
 When work spans two disciplines, it lives in the plugin that owns the _outcome_, not the one that owns the tooling: an accessibility audit belongs to `tsh-product-testing` even though it reads component code.
 
-One discipline plugin, `tsh-product-design`, is still an **empty scaffold**. It installs, but it contributes no components yet, so it is not listed above.
-
 ## Stacks — what we work with
 
 Install what the project is built on, at **Project** scope. The repo already knows what it is written in, so everyone working on it should get the same guidance, and nobody should carry another stack's skills around.

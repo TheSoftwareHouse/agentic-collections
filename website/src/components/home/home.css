@@ -503,9 +503,9 @@
 .cc-home .cats div{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid #e9edef;font-size:15px}
 .cc-home .cats div span{color:var(--muted);font-size:13.5px}
 .cc-home .skl-foot{margin-top:22px;font-size:14.5px;color:#4b5153;line-height:1.6}
-.cc-home .skl-foot a{color:var(--ink);font-weight:500;display:inline-flex;align-items:center;gap:8px;margin-top:12px;border:1px solid #d6dde0;border-radius:6px;padding:8px 14px;text-decoration:none;font-size:14px}
-.cc-home .skl-foot a img{width:16px;height:16px}
-.cc-home .skl-foot a:hover{border-color:#9d8cf3}
+.cc-home .skl-foot a.contrib{color:var(--ink);font-weight:500;display:inline-flex;align-items:center;gap:8px;margin-top:12px;border:1px solid #d6dde0;border-radius:6px;padding:8px 14px;text-decoration:none;font-size:14px}
+.cc-home .skl-foot a.contrib img{width:16px;height:16px}
+.cc-home .skl-foot a.contrib:hover{border-color:#9d8cf3}
 .cc-home .skl-vis{background:linear-gradient(135deg,#fdf0e1,#ece6fb 55%,#e0effb);border-radius:22px;padding:26px}
 .cc-home .lay{background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(49,52,53,.12);overflow:hidden}
 .cc-home .lay-h{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eef1f2}
@@ -515,9 +515,9 @@
 .cc-home .band .bt{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;margin-bottom:14px}
 .cc-home .band .bt small{margin-left:auto;font-weight:400;color:#5b47c9;font-size:12.5px}
 .cc-home .cloud{display:flex;flex-wrap:wrap;gap:9px 7px}
-.cc-home .cloud span{font-size:12.5px;background:#fff;border-radius:6px;padding:5px 10px;color:#4a3fb0;box-shadow:0 0 0 1px #d9d2ff}
-.cc-home .cloud span.more{background:rgba(255,255,255,.55);color:#4b5153;box-shadow:0 0 0 1px rgba(255,255,255,.9);border:1px dashed #b9b0ea}
-.cc-home .cloud span.on{background:#fff;color:#4a3fb0;box-shadow:0 0 0 1px #cfc6ff}
+.cc-home .cloud a{font-size:12.5px;background:#fff;border-radius:6px;padding:5px 10px;color:#4a3fb0;box-shadow:0 0 0 1px #d9d2ff}
+.cc-home .cloud a.more{background:rgba(255,255,255,.55);color:#4b5153;box-shadow:0 0 0 1px rgba(255,255,255,.9);border:1px dashed #b9b0ea}
+.cc-home .cloud a.on{background:#fff;color:#4a3fb0;box-shadow:0 0 0 1px #cfc6ff}
 .cc-home .wires2{height:22px;margin:0 16px;position:relative}
 .cc-home .wires2::before{content:"";position:absolute;left:16.6%;right:16.6%;top:0;bottom:0;border-left:1.5px dashed #c9c2f5;border-right:1.5px dashed #c9c2f5}
 .cc-home .wires2::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1.5px dashed #c9c2f5}
@@ -657,6 +657,7 @@
 @media (max-width:1000px){.cc-home .hb{height:300px}
 .cc-home .hbn{padding:8px 9px}
 .cc-home .hbn b{font-size:11px;white-space:normal;max-width:72px}
+.cc-home .hbn div span{display:block;white-space:normal;max-width:80px}
 .cc-home .hbn .v-logo{display:none}
 .cc-home .hbc{padding:12px 14px}}
 .cc-home .rvs{display:flex;flex-direction:column;gap:16px;margin:auto 0}
@@ -755,15 +756,15 @@
 .cc-home .skl-vis .cloud{margin-bottom:28px}
 .cc-home .band .bt{margin-bottom:20px!important;font-size:15px!important}
 .cc-home .cloud{gap:11px 8px!important}
-.cc-home .cloud span{font-size:13px!important;padding:7px 12px!important}
+.cc-home .cloud a{font-size:13px!important;padding:7px 12px!important}
 .cc-home .ld{margin-top:22px!important}
 .cc-home .skl-vis{background:none!important;border-radius:0}
 .cc-home .skl-vis{padding:0}
 .cc-home .lay{background:transparent;box-shadow:none;overflow:visible}
 .cc-home .band{margin:0;background:#fff;border-radius:16px;padding:30px 28px 32px;border:1px solid #e6ebed;box-shadow:none}
 .cc-home .band .bt{font-weight:500;color:#2d3031}
-.cc-home .cloud span{box-shadow:none;background:#f3f0ff;color:#4a3fb0}
-.cc-home .cloud span.more{background:transparent;border:1px dashed #c9c2f5;color:#6b7173}
+.cc-home .cloud a{box-shadow:none;background:#f3f0ff;color:#4a3fb0}
+.cc-home .cloud a.more{background:transparent;border:1px dashed #c9c2f5;color:#6b7173}
 .cc-home .wires2{margin:0 0}
 .cc-home .agrid{padding:0;gap:10px}
 .cc-home .agc{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);border-radius:10px;padding:10px 12px}
@@ -824,7 +825,7 @@
 .cc-home .tc{padding:28px!important;min-height:0!important}
 .cc-home .tc b{font-size:24px!important}
 .cc-home .tsh-grid{grid-template-columns:1fr!important}
-.cc-home .cloud span{white-space:normal}
+.cc-home .cloud a{white-space:normal}
 .cc-home .ld{flex-wrap:wrap}
 .cc-home .ld-av span{width:20px;height:20px;margin-left:-8px}
 .cc-home .skl-vis,.cc-home .skl-vis .lay{height:auto}
@@ -883,3 +884,25 @@
 .cc-home .term-side-h{height:34px;border-bottom:1px solid #393b40;display:flex;align-items:center;padding:0 14px;font-size:11px;color:#8b9096;white-space:nowrap;overflow:hidden}
 .cc-home .term-side .vs-code{padding:12px 0}
 .cc-home em:has(> .gh-stars:empty){display:none}
+.cc-home .cats div p{margin:0;display:flex;flex-direction:column;gap:3px}
+.cc-home .cats div small{color:var(--muted);font-size:13px;line-height:1.45}
+.cc-home .cats div span{flex:none;padding-left:16px}
+.cc-home .cloud-g{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+.cc-home .cloud-g h4{margin:0 0 8px;font-size:12px;font-weight:500;letter-spacing:.02em;color:#6b7173}
+.cc-home .skl-vis .cloud-g .cloud{margin-bottom:0}
+.cc-home .cloud a{text-decoration:none;overflow-wrap:anywhere}
+.cc-home .cloud a:hover{color:#2d2390;background:#e8e2ff}
+.cc-home .rvs-you code{margin-left:auto;font-size:12px;background:rgba(49,52,53,.06);border-radius:6px;padding:6px 10px;white-space:nowrap}
+.cc-home .pz-lk{display:inline-block;white-space:nowrap;font-size:14px;font-weight:500;color:#2d3031;text-decoration:none;position:relative;z-index:2}
+.cc-home .pz-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;margin-bottom:12px}
+.cc-home .pz-top .pz-ag{margin-bottom:0}
+.cc-home .pz-top .pz-lk{margin:0}
+.cc-home .pz-lk:hover{text-decoration:underline}
+.cc-home .skl-foot a.inl{color:#4a3fb0;text-decoration:underline;text-underline-offset:2px}
+.cc-home .pz-t{max-width:none}
+.cc-home .pz-t h3{max-width:460px}
+.cc-home .pz-bk .pz-t h3{max-width:720px}
+.cc-home .pz-pl .pz-t h3{max-width:none}
+.cc-home .rvs-you{flex-wrap:wrap}
+.cc-home .rvs-you b{flex:1 1 200px}
+@media (min-width:1001px) and (max-width:1279px){.cc-home .pz-grid{grid-template-rows:300px 300px 480px 480px}}

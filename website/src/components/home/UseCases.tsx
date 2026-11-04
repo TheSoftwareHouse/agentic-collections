@@ -20,38 +20,43 @@ export default function UseCases(): React.JSX.Element {
           <div className="pz-grid">
             <div className="pz pz-bk tint-o">
               <div className="pz-t">
-                <span className="pz-ag">
-                  <span className="agvs">
-                    <span className="agv sm" style={{ background: '#ffc269' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 4h6v3H9z" />
-                        <path d="M8 5H6v15h12V5h-2" />
-                        <path d="M9 11h6M9 15h4" />
-                      </svg>
+                <div className="pz-top">
+                  <span className="pz-ag">
+                    <span className="agvs">
+                      <span className="agv sm" style={{ background: '#ffc269' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 4h6v3H9z" />
+                          <path d="M8 5H6v15h12V5h-2" />
+                          <path d="M9 11h6M9 15h4" />
+                        </svg>
+                      </span>
+                      <span className="agv sm" style={{ background: '#ffc269' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="11" cy="11" r="6" />
+                          <path d="M20 20l-4.5-4.5" />
+                        </svg>
+                      </span>
                     </span>
-                    <span className="agv sm" style={{ background: '#ffc269' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="11" cy="11" r="6" />
-                        <path d="M20 20l-4.5-4.5" />
-                      </svg>
-                    </span>
+                    Product Management · {agentCount('tsh-product-management')}
                   </span>
-                  Product Management · {agentCount('tsh-product-management')}
-                </span>
+                  <a className="pz-lk" href="/docs/workflows/business-analysis">
+                    See the workflow →
+                  </a>
+                </div>
                 <h3>Turns workshop material into a Jira-ready backlog</h3>
               </div>
               <div className="feed">
@@ -207,23 +212,28 @@ export default function UseCases(): React.JSX.Element {
             </div>
             <div className="pz pz-pl tint-p">
               <div className="pz-t">
-                <span className="pz-ag">
-                  <span className="agvs">
-                    <span className="agv sm" style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 3h6M10 3v6l-5 10h14L14 9V3" />
-                      </svg>
+                <div className="pz-top">
+                  <span className="pz-ag">
+                    <span className="agvs">
+                      <span className="agv sm" style={{ background: '#9d8cf3' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 3h6M10 3v6l-5 10h14L14 9V3" />
+                        </svg>
+                      </span>
                     </span>
+                    Product Testing · {agentCount('tsh-product-testing')}
                   </span>
-                  Product Testing · {agentCount('tsh-product-testing')}
-                </span>
+                  <a className="pz-lk" href="/docs/plugins/tsh-product-testing/">
+                    See the plugin →
+                  </a>
+                </div>
                 <h3>Writes end-to-end tests and proves them stable before handing them over</h3>
               </div>
               <div className="pz-v">
@@ -296,26 +306,31 @@ export default function UseCases(): React.JSX.Element {
             </div>
             <div className="pz pz-dg tint-p">
               <div className="pz-t">
-                <span className="pz-ag">
-                  <span className="agvs">
-                    <span className="agv sm" style={{ background: '#9d8cf3' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="9" y="3" width="6" height="5" rx="1" />
-                        <rect x="3" y="16" width="6" height="5" rx="1" />
-                        <rect x="15" y="16" width="6" height="5" rx="1" />
-                        <path d="M12 8v4M6 16v-4h12v4" />
-                      </svg>
+                <div className="pz-top">
+                  <span className="pz-ag">
+                    <span className="agvs">
+                      <span className="agv sm" style={{ background: '#9d8cf3' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect x="9" y="3" width="6" height="5" rx="1" />
+                          <rect x="3" y="16" width="6" height="5" rx="1" />
+                          <rect x="15" y="16" width="6" height="5" rx="1" />
+                          <path d="M12 8v4M6 16v-4h12v4" />
+                        </svg>
+                      </span>
                     </span>
+                    Product Engineering · {agentCount('tsh-product-engineering')}
                   </span>
-                  Product Engineering · {agentCount('tsh-product-engineering')}
-                </span>
+                  <a className="pz-lk" href="/docs/workflows/feature-implementation">
+                    See the workflow →
+                  </a>
+                </div>
                 <h3>Plans the work, then hands it to specialised agents</h3>
               </div>
               <div className="pz-v">
@@ -349,7 +364,7 @@ export default function UseCases(): React.JSX.Element {
                     </span>
                     <div>
                       <b>ui-engineer</b>
-                      <span>✓ built from the design</span>
+                      <span>✓ Figma gate passed</span>
                     </div>
                   </div>
                   <div className="hbn" style={{ left: '81%', top: '12%' }}>
@@ -439,23 +454,28 @@ export default function UseCases(): React.JSX.Element {
             </div>
             <div className="pz pz-rv tint-b">
               <div className="pz-t">
-                <span className="pz-ag">
-                  <span className="agvs">
-                    <span className="agv sm" style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M4 6l5 5-5 5M12 18h8" />
-                      </svg>
+                <div className="pz-top">
+                  <span className="pz-ag">
+                    <span className="agvs">
+                      <span className="agv sm" style={{ background: '#8fcaf2' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M4 6l5 5-5 5M12 18h8" />
+                        </svg>
+                      </span>
                     </span>
+                    Platform Engineering · {agentCount('tsh-platform-engineering')}
                   </span>
-                  Platform Engineering · {agentCount('tsh-platform-engineering')}
-                </span>
+                  <a className="pz-lk" href="/docs/plugins/tsh-platform-engineering/">
+                    See the plugin →
+                  </a>
+                </div>
                 <h3>
                   Builds and audits infrastructure, and never applies it unless you name
                   the&nbsp;command
@@ -511,32 +531,37 @@ export default function UseCases(): React.JSX.Element {
                   </div>
                   <div className="rvs-you">
                     <span className="av">You</span>
-                    <b>devops-engineer: plan ready, the apply stays with you</b>
-                    <button>Apply</button>
+                    <b>devops-engineer: plan validated, cost impact reported</b>
+                    <code>terraform apply ← you run this</code>
                   </div>
                 </div>
               </div>
             </div>
             <div className="pz pz-ui tint-b">
               <div className="pz-t">
-                <span className="pz-ag">
-                  <span className="agvs">
-                    <span className="agv sm" style={{ background: '#8fcaf2' }}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M6 3h8l4 4v14H6z" />
-                        <path d="M14 3v4h4M9 13h6M9 17h4" />
-                      </svg>
+                <div className="pz-top">
+                  <span className="pz-ag">
+                    <span className="agvs">
+                      <span className="agv sm" style={{ background: '#8fcaf2' }}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M6 3h8l4 4v14H6z" />
+                          <path d="M14 3v4h4M9 13h6M9 17h4" />
+                        </svg>
+                      </span>
                     </span>
+                    Context management · tsh-core and tsh-product-management
                   </span>
-                  Context management · tsh-core and tsh-product-management
-                </span>
+                  <a className="pz-lk" href="/docs/workflows/project-context">
+                    See the workflow →
+                  </a>
+                </div>
                 <h3>Keeps what the project knows where Claude reads&nbsp;it</h3>
               </div>
               <div className="pz-v">

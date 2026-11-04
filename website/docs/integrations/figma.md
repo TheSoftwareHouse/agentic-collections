@@ -36,7 +36,7 @@ into the conversation.
 | Availability | All seats and plans |
 
 It sits in `tsh-core` because a Figma file is not one job's tool. Product engineering
-judges implemented UI against it, product design works in it, and product management
+judges implemented UI against it, and product management
 reads flows and annotations out of it during discovery. It is deliberately not in
 `tsh-stack-frontend`: stack plugins install at project scope, so a repository without
 that plugin would leave the UI verification gate with no server.

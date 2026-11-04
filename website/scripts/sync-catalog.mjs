@@ -7,6 +7,7 @@
 //   structure  every skill and agent has its docs page, and no page describes a missing one
 //   freshness  every hand-written page declares `sources` + `sources_hash` and the hash
 //              still matches those files (`npm run docs:stamp` records a reviewed page)
+// and checks that every component the homepage features (src/data/home-featured.json) exists.
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { dump as dumpYaml } from 'js-yaml';
@@ -21,6 +22,7 @@ import {
   websiteRoot,
 } from './lib/docs-sources.mjs';
 
+const featuredFile = path.join(websiteRoot, 'src/data/home-featured.json');
 const GITHUB_REPO = 'https://github.com/TheSoftwareHouse/agentic-collections';
 const INSTALL_FROM = '## Step 1';
 const INSTALL_UNTIL = '## Using what you installed';
@@ -113,6 +115,7 @@ function readPlugin(entry) {
     name: manifest.name,
     displayName: entry.displayName ?? manifest.displayName ?? manifest.name,
     family: familyOf(manifest.name),
+    category: entry.category ?? null,
     version: manifest.version,
     description: manifest.description,
     empty: skills.length === 0 && agents.length === 0,
@@ -344,8 +347,47 @@ function checkFreshness() {
   return problems;
 }
 
+/** Every featured entry names a skill or agent of a non-empty plugin, once, with a label. */
+function checkFeatured(catalog) {
+  if (!existsSync(featuredFile)) return [];
+  const label = websiteRelative(featuredFile);
+  let featured;
+  try {
+    featured = JSON.parse(readFileSync(featuredFile, 'utf8'))?.featured;
+  } catch (error) {
+    return [`${label}: ${error.message}`];
+  }
+  if (!Array.isArray(featured)) return [`${label}: "featured" must be an array`];
+  const problems = [];
+  const seen = new Set();
+  for (const entry of featured) {
+    const component = typeof entry?.component === 'string' ? entry.component : null;
+    if (component === null) {
+      problems.push(`${label}: every featured entry needs a "component" string`);
+      continue;
+    }
+    const segments = component.split('/');
+    const [pluginName, kind, name] = segments;
+    const plugin = catalog.plugins.find((p) => p.name === pluginName && !p.empty);
+    if (segments.length !== 3 || !['skills', 'agents'].includes(kind)) {
+      problems.push(`${label}: "${component}" is not <plugin>/skills|agents/<name>`);
+    } else if (!plugin) {
+      problems.push(`${label}: featured plugin is empty or unknown: ${component}`);
+    } else if (!plugin[kind].some((c) => c.name === name)) {
+      problems.push(`${label}: featured component does not exist: ${component}`);
+    }
+    if (seen.has(component)) problems.push(`${label}: featured twice: ${component}`);
+    seen.add(component);
+    if (typeof entry.label !== 'string' || entry.label.trim() === '') {
+      problems.push(`${label}: featured component has no label: ${component}`);
+    }
+  }
+  return problems;
+}
+
 function check() {
-  const problems = [...checkStructure(buildCatalog()), ...checkFreshness()];
+  const catalog = buildCatalog();
+  const problems = [...checkStructure(catalog), ...checkFreshness(), ...checkFeatured(catalog)];
   if (problems.length === 0) {
     console.log('docs check: every component has a page and every page is fresh');
     return;

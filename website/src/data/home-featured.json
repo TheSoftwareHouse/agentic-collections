@@ -1,0 +1,60 @@
+{
+  "featured": [
+    {
+      "component": "tsh-product-engineering/skills/orchestrating-feature-implementation",
+      "label": "Builds a feature from a plan you have read, then reviews and verifies it"
+    },
+    {
+      "component": "tsh-product-engineering/skills/creating-implementation-plans",
+      "label": "Writes the implementation plan as a file you approve before coding"
+    },
+    {
+      "component": "tsh-product-engineering/skills/reviewing-code",
+      "label": "Reviews a change against its plan and runs the tests itself"
+    },
+    {
+      "component": "tsh-product-engineering/skills/reviewing-ui",
+      "label": "Checks the running UI against its Figma design"
+    },
+    {
+      "component": "tsh-product-management/skills/analyze-materials",
+      "label": "Turns workshop material into a Jira-ready backlog"
+    },
+    {
+      "component": "tsh-product-management/skills/reviewing-backlog-quality",
+      "label": "Finds gaps in a backlog before it reaches Jira"
+    },
+    {
+      "component": "tsh-product-management/skills/initializing-project-context",
+      "label": "Sets up a project knowledge base with named owners per project and delivery layer"
+    },
+    {
+      "component": "tsh-product-management/skills/navigating-project-context",
+      "label": "Answers project questions with the file, date and owner behind each fact"
+    },
+    {
+      "component": "tsh-product-testing/skills/writing-playwright-e2e-tests",
+      "label": "Writes E2E tests and proves them in three or more consecutive headless runs"
+    },
+    {
+      "component": "tsh-platform-engineering/agents/infrastructure-auditor",
+      "label": "Audits infrastructure for security gaps, cost waste and drift"
+    },
+    {
+      "component": "tsh-platform-engineering/agents/devops-engineer",
+      "label": "Builds infrastructure changes and validates them without applying them"
+    },
+    {
+      "component": "tsh-stack-aws/skills/auditing-aws-cost",
+      "label": "Audits cost and tagging from your Terraform and, with credentials, the live AWS account"
+    },
+    {
+      "component": "tsh-stack-gcp/skills/auditing-gcp-cost",
+      "label": "Audits cost and labelling from your Terraform and, with credentials, the live GCP project"
+    },
+    {
+      "component": "tsh-stack-azure/skills/auditing-azure-cost",
+      "label": "Audits cost and tagging from your Terraform or Bicep and, with credentials, the live Azure subscription"
+    }
+  ]
+}

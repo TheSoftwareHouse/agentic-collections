@@ -59,7 +59,7 @@ For sign-in steps and server details see [Connecting tools](/docs/getting-starte
 Each server is here because several disciplines use it and none of that changes with the language a repository is written in. According to the plugin README:
 
 - **Atlassian:** engineering, product management and testing all read from Jira.
-- **Figma:** product engineering judges implemented UI against it, product design works in it, and product management reads flows and annotations out of it during discovery.
+- **Figma:** product engineering judges implemented UI against it, and product management reads flows and annotations out of it during discovery.
 - **Context7:** testing looks up the Playwright API, platform engineering reads Terraform provider, Kubernetes and CI documentation, and product engineering checks framework APIs while implementing.
 
 ## What belongs in tsh-core

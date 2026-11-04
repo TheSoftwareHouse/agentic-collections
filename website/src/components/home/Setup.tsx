@@ -3,9 +3,9 @@ import catalog from '@site/src/data/catalog.generated.json';
 import GhStars from './GhStars';
 import CopyButton from './CopyButton';
 
-/** Plugins the catalog registers per family, empty scaffolds included, as the marketplace lists them. */
+/** Plugins per family that ship something; empty scaffolds are left out, as everywhere on the page. */
 const pluginCount = (family: string): string => {
-  const n = catalog.plugins.filter((p) => p.family === family).length;
+  const n = catalog.plugins.filter((p) => p.family === family && !p.empty).length;
   return `${n} ${n === 1 ? 'plugin' : 'plugins'}`;
 };
 

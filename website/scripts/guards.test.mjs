@@ -163,6 +163,35 @@ test('a symbolic link inside a source directory is rejected by name', () =>
     assert.match(output(result), /link\.md" is a symbolic link/);
   }));
 
+const featured = (root, entries) =>
+  write(root, 'website/src/data/home-featured.json', JSON.stringify({ featured: entries }));
+
+test('featured components must exist, once, with a label', () =>
+  withFixture((root) => {
+    const demo = { component: 'tsh-core/skills/demo', label: 'Does a demo' };
+    featured(root, [demo]);
+    assert.equal(check(root).status, 0, output(check(root)));
+    for (const [entries, problem] of [
+      [
+        [{ ...demo, component: 'tsh-core/skills/ghost' }],
+        /does not exist: tsh-core\/skills\/ghost/,
+      ],
+      [
+        [{ ...demo, component: 'tsh-core/skills/demo/x' }],
+        /is not <plugin>\/skills\|agents\/<name>/,
+      ],
+      [[{ ...demo, component: 'tsh-other/skills/demo' }], /plugin is empty or unknown/],
+      [[demo, demo], /featured twice/],
+      [[{ component: demo.component }], /has no label/],
+      [[null, null], /needs a "component" string/],
+    ]) {
+      featured(root, entries);
+      const result = check(root);
+      assert.notEqual(result.status, 0);
+      assert.match(output(result), problem);
+    }
+  }));
+
 const guard = (env) =>
   spawnSync(process.execPath, [path.join(scriptsDir, 'vercel-guard.mjs')], {
     encoding: 'utf8',
