@@ -69,6 +69,10 @@ jobs:
       - name: Install website dependencies
         working-directory: website
         run: npm ci
+      # The components import catalog.generated.json, which is gitignored; tsc needs it first.
+      - name: Generate the plugin catalog
+        working-directory: website
+        run: node scripts/sync-catalog.mjs
       # The build only strips types; tsc is the one place they are checked.
       - name: Typecheck
         working-directory: website
