@@ -14,10 +14,12 @@ Run once, before the first exploration:
 
 ```bash
 playwright-cli --version                    # global install?
-npx --no-install playwright-cli --version   # project-local install?
+npx --no-install playwright cli --version   # project-local install?
 ```
 
-When only the local install answers, prefix every command below with `npx `. When
+When only the local install answers, write every command below as `npx playwright cli …`
+instead of `playwright-cli …` — never `npx playwright-cli`, which fetches a deprecated
+package. When
 neither answers, what happens next depends on where you are running:
 
 - **In the main conversation**, ask the user (AskUserQuestion) whether to install it

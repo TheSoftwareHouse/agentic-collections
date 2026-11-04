@@ -24,7 +24,7 @@ sources:
   - plugins/tsh-core/skills/init/SKILL.md
   - plugins/tsh-core/skills/managing-decision-records/SKILL.md
   - plugins/tsh-product-management/skills/navigating-project-context/SKILL.md
-sources_hash: "3e0fceee943aa3ad5a20c48f79374371f5837eb37d35c103b707b7f4151ac971"
+sources_hash: "2542cff5703ff95788157209d41352db3ea0ad41296a10b4686ed7f80886cc75"
 ---
 
 # For CTOs
@@ -58,7 +58,7 @@ When engineers use AI ad-hoc the results vary by individual. You get pockets of 
 
 Agentic Collections is not an application. It is plugins — skills, agents, hooks and MCP servers — that Claude Code loads, and they change how work moves through a team, from workshop material to reviewed, verified code.
 
-**Product Management**: discovery workshop material — transcripts, Figma, PDFs, codebase context — becomes Jira-ready epics and user stories with GIVEN/WHEN/THEN acceptance criteria, a systematic quality review and an outcome-based delivery roadmap, behind five human review gates. A hook blocks any Jira write before the push gate is approved. Context gathering that used to take 30–60 minutes takes 3 minutes. {/* TODO(marketing): "Context gathering that used to take 30–60 minutes takes 3 minutes" — measured on Copilot Collections; needs confirmation for Agentic Collections */}
+**Product Management**: discovery workshop material — transcripts, Figma, PDFs, codebase context — becomes Jira-ready epics and user stories with GIVEN/WHEN/THEN acceptance criteria, a systematic quality review and an outcome-based delivery roadmap, behind five human review gates. While a business-analysis session is open in the repository, a hook refuses Jira writes to a project until its push gate (Gate 2) is approved for that project, and never updates an issue that is Done, Cancelled or PO APPROVE. Context gathering that used to take 30–60 minutes takes 3 minutes. {/* TODO(marketing): "Context gathering that used to take 30–60 minutes takes 3 minutes" — measured on Copilot Collections; needs confirmation for Agentic Collections */}
 
 **Product Engineering**: implementation runs from a committed plan file. Implementer subagents execute its tasks, in parallel where the plan allows, and the work closes with code review and functional verification running in parallel. Before a change is written, its conventions are established in a fixed order: the plan's technical context, the project's own instructions and decision records, existing codebase patterns, and only then external documentation. Every Figma-backed UI task passes a design verification gate, and a bug is fixed at its root cause with a regression test that failed before the fix.
 
@@ -142,6 +142,6 @@ The repository is public and the plugins are MIT-licensed. You need Claude Code 
 
 :::brand
 
-If you want to talk through fit for your team's specific context, reach out to us at [hello@tsh.io](mailto:hello@tsh.io). I'd love to hear from you. {/* PHASE2(narrative): first-person "I'd love to hear from you" — voice of the Copilot Collections page, no named speaker here — Phase 2 names who speaks or switches to "we" */}
+If you want to talk through fit for your team's specific context, reach out to us at [hello@tsh.io](mailto:hello@tsh.io). We'd love to hear from you.
 
 :::

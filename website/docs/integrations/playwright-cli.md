@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/SKILL.md
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/references/playwright-cli-exploration.md
-sources_hash: "1b06e588a4666e63602865218f6902b1ed028eeebee2ff4b9c446e2fc72861b4"
+sources_hash: "c5fa41624269c34b5bf6e021737554d593162097871b0691f19ba8a8b2c4a79a"
 ---
 
 # Playwright CLI
@@ -41,9 +41,8 @@ npm install -g @playwright/cli@latest
 Alternatively, use a project-local install reached through `npx playwright cli` (the
 `playwright` package's `cli` subcommand). This is the form the
 [Playwright CLI README](https://github.com/microsoft/playwright-cli#readme) documents and the
-one `tsh-product-engineering` uses. Never use `npx playwright-cli`, which fetches a deprecated
-package. `tsh-product-testing` still writes the local form as `npx playwright-cli` in its
-README and exploration reference; use `npx playwright cli` there too.
+one both `tsh-product-engineering` and `tsh-product-testing` use. Never use
+`npx playwright-cli`, which fetches a deprecated package.
 
 You do not have to remember this. Before the first capture or exploration, the
 workflow runs `playwright-cli --version`, with an `npx` fallback, and when neither

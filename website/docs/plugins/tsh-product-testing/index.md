@@ -7,7 +7,7 @@ sources:
   - plugins/tsh-product-testing/.claude-plugin/plugin.json
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-product-engineering/skills/capturing-ui-evidence/SKILL.md
-sources_hash: "62b07c2667bb51185e11c982ca1994d7a59f7d48d0d1b6e82af4e987df025479"
+sources_hash: "094df34ee77038b8f11293cadac2139b55b17075a981f7c4d8fd452dedaef0ff"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
@@ -42,7 +42,7 @@ Verifying that implemented UI matches its design is a separate concern and does 
 
 ## Prerequisites and dependencies
 
-- **Playwright CLI.** Live-page exploration runs on the [Playwright CLI](/docs/integrations/playwright-cli). Its `snapshot` is the accessibility tree that `getByRole` resolves against, so it is how a locator is confirmed before it is committed to a test. Have `playwright-cli` on the machine: `npm install -g @playwright/cli@latest`, or a project-local install reached via `npx playwright-cli`, as this plugin's README puts it. The skill's own preflight checks the local install with `npx --no-install playwright-cli --version`. That form is out of step with the [Playwright CLI README](https://github.com/microsoft/playwright-cli#readme), which documents the local install as `npx playwright cli` (the `playwright` package's `cli` subcommand), the form `tsh-product-engineering` uses; `npx playwright-cli` fetches a deprecated package. Use `npx playwright cli`. See the [Playwright CLI integration page](/docs/integrations/playwright-cli) for the tool. The workflow checks availability before its first exploration and, when the CLI is missing, asks whether to install it or wait. A subagent, which cannot ask, reports the missing prerequisite instead.
+- **Playwright CLI.** Live-page exploration runs on the [Playwright CLI](/docs/integrations/playwright-cli). Its `snapshot` is the accessibility tree that `getByRole` resolves against, so it is how a locator is confirmed before it is committed to a test. Have `playwright-cli` on the machine: `npm install -g @playwright/cli@latest`, or a project-local install reached via `npx playwright cli` — never `npx playwright-cli`, which fetches a deprecated package. The skill's own preflight checks the local install with `npx --no-install playwright cli --version`. See the [Playwright CLI integration page](/docs/integrations/playwright-cli) for the tool. The workflow checks availability before its first exploration and, when the CLI is missing, asks whether to install it or wait. A subagent, which cannot ask, reports the missing prerequisite instead.
 - **MCP servers.** The plugin ships no `.mcp.json` and no `hooks/hooks.json`. Playwright API documentation comes from `context7`, which [`tsh-core`](/docs/plugins/tsh-core/) bundles; for Playwright, query the library ID `/microsoft/playwright.dev` directly.
 - **`tsh-core`.** `e2e-engineer` reads acceptance criteria from a Jira issue key using the Atlassian MCP tools that `tsh-core` bundles, and reports written for people outside the team go through `/tsh-core:writing-technical-documents`. Without `tsh-core`, supply acceptance criteria directly instead of by issue key.
 

@@ -6,7 +6,7 @@ description: TSH's standard for Playwright end-to-end tests, from mapping accept
 sources:
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/SKILL.md
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/references/
-sources_hash: "d49985e33700cd34acdf7107cca6713106c561bc11254306d38f4b8a07593c73"
+sources_hash: "35911081db896299feae5bff6f6e6afdafce8abebe594b4736e0be3db01ab391"
 ---
 
 # Writing Playwright E2E Tests
