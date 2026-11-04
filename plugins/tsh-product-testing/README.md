@@ -1,7 +1,7 @@
 # TSH Product Testing
 
-Quality assurance: Playwright end-to-end tests that do not flake, and WCAG 2.1 AA
-accessibility audits that report the success criterion behind every finding.
+Quality assurance: Playwright end-to-end tests proven stable by repeated headless
+runs, and WCAG 2.1 AA accessibility audits that report the success criterion behind every finding.
 
 ## Install
 
@@ -45,7 +45,8 @@ the accessibility tree `getByRole` resolves against, so it is how a locator gets
 confirmed before it is committed to a test, and it executes a candidate locator
 string against the live page. Have `playwright-cli` on the machine:
 `npm install -g @playwright/cli@latest`, or a project-local install reached via
-`npx playwright-cli` (Node.js required either way). The workflow checks availability
+`npx playwright cli` — never `npx playwright-cli`, which fetches a deprecated
+package (Node.js required either way). The workflow checks availability
 before its first exploration and, when the CLI is missing, asks whether to install it
 for you or wait while you do it yourself — a subagent, which cannot ask, reports the
 missing prerequisite instead. Neither ever guesses locators blind. This matches `tsh-product-engineering`, whose UI evidence

@@ -36,8 +36,8 @@ it; nothing is installed yet.
 /plugin marketplace add TheSoftwareHouse/agentic-collections
 ```
 
-This repo is private, so your git needs to be able to clone it — a working SSH key
-or `gh auth login` already set up. Alternatives if the `owner/repo` shorthand fails:
+The repo is public, so no GitHub authentication is needed. Alternatives if the
+`owner/repo` shorthand fails:
 
 ```shell
 /plugin marketplace add git@github.com:TheSoftwareHouse/agentic-collections.git
@@ -293,7 +293,7 @@ Install the one that matches your job, at **User** scope.
 | :-- | :-- | :-- |
 | [`tsh-product-engineering`](plugins/tsh-product-engineering) | Feature implementation, code review, refactoring, debugging, TDD workflows | `/plugin install tsh-product-engineering@tsh-agentic-collections` |
 | [`tsh-product-testing`](plugins/tsh-product-testing) | E2E testing, accessibility testing, exploratory/manual QA, test-plan authoring | `/plugin install tsh-product-testing@tsh-agentic-collections` |
-| [`tsh-product-management`](plugins/tsh-product-management) | Workshop materials to a Jira-ready backlog: intent brief, epics and user stories, an eleven-pass quality review, and an outcome-based delivery roadmap — five review gates, with the Jira push enforced by a hook | `/plugin install tsh-product-management@tsh-agentic-collections` |
+| [`tsh-product-management`](plugins/tsh-product-management) | Workshop materials to a Jira-ready backlog: intent brief, epics and user stories, a quality review of up to twelve passes, and an outcome-based delivery roadmap — five review gates, with the Jira push enforced by a hook | `/plugin install tsh-product-management@tsh-agentic-collections` |
 | [`tsh-product-design`](plugins/tsh-product-design) | UI/UX design work, design systems, design review, Figma-driven flows | `/plugin install tsh-product-design@tsh-agentic-collections` |
 | [`tsh-platform-engineering`](plugins/tsh-platform-engineering) | Infrastructure, CI/CD, IaC, containers, observability, deployment | `/plugin install tsh-platform-engineering@tsh-agentic-collections` |
 

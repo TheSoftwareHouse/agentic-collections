@@ -56,6 +56,39 @@ jobs:
           claude plugin validate .
           for p in plugins/*/; do claude plugin validate "$p" || exit 1; done
 
+  website:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install website dependencies
+        working-directory: website
+        run: npm ci
+      # The components import catalog.generated.json, which is gitignored; tsc needs it first.
+      - name: Generate the plugin catalog
+        working-directory: website
+        run: node scripts/sync-catalog.mjs
+      # The build only strips types; tsc is the one place they are checked.
+      - name: Typecheck
+        working-directory: website
+        run: npx tsc --noEmit
+      - name: Check formatting
+        working-directory: website
+        run: npm run format:check
+      - name: Test the docs and deploy guards
+        working-directory: website
+        run: npm test
+      # prebuild runs sync-catalog.mjs --check: a plugin change whose docs page was not
+      # updated and re-stamped fails here. See .claude/rules/website.md.
+      - name: Build the website
+        working-directory: website
+        run: npm run build
+
   project-context-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10

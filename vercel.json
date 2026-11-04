@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd website && node scripts/vercel-guard.mjs && npm ci && npm run build",
+  "outputDirectory": "website/build"
+}

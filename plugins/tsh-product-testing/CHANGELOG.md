@@ -4,6 +4,20 @@ All notable changes to `tsh-product-testing` are documented here, following
 [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-11-04
+
+### Fixed
+
+- **The local Playwright CLI command is now the documented one.** The README and the
+  exploration preflight wrote the project-local form as `npx playwright-cli`, which
+  fetches a deprecated npm package. Use `npx playwright cli` — the `playwright`
+  package's `cli` subcommand, as the Playwright CLI README documents and as
+  `tsh-product-engineering` already does.
+- **The description no longer promises tests that "do not flake".** `e2e-engineer`
+  proves stability with three or more consecutive headless passes and reports a test
+  it could not stabilise as `FLAKY`; the plugin, README and marketplace descriptions
+  now say that instead.
+
 ## [0.3.1] - 2026-10-30
 
 ### Removed

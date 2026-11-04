@@ -5,3 +5,15 @@ specifications/
 evals/results/
 plugins/*/evals/results/
 __pycache__/
+
+# Website (Docusaurus)
+.vercel
+website/node_modules/
+website/build/
+website/.docusaurus/
+website/.cache-loader/
+website/src/data/*.generated.*
+website/docs/**/*.generated.*
+website/docs/changelog/
+.playwright-cli/
+.playwright-mcp/

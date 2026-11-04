@@ -12,6 +12,17 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.5.1] - 2026-11-04
+
+### Fixed
+
+- **The plugin description no longer overstates the Jira hook.** It said the hook
+  "blocks any Jira write before the push gate is approved". The hook does less, by
+  design: in a repository with no business-analysis session it stands down, so
+  ordinary Jira work elsewhere is never blocked, and approval is scoped to the project
+  named in the Gate 2 row. The description, in `plugin.json` and the marketplace
+  listing, now says that. The hook itself is unchanged.
+
 ## [0.5.0] - 2026-10-29
 
 ### Added
