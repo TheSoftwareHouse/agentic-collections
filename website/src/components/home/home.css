@@ -424,7 +424,7 @@
 .cc-home .iter span.okk{background:var(--green-bg);border-color:#bfe6d2;color:#1f7a50;font-weight:500}
 .cc-home .iter i{font-style:normal;color:#a0a7ab}
 .cc-home .pzs{background:#f6f8f9}
-.cc-home .pz-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:285px 285px 450px 450px;gap:16px;margin-top:48px;
+.cc-home .pz-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:minmax(285px,auto) minmax(285px,auto) minmax(450px,auto) minmax(450px,auto);gap:16px;margin-top:48px;
  grid-template-areas:"bk bk bk bk pl pl" "bk bk bk bk pl pl" "dg dg dg rv rv rv" "ui ui ui rv rv rv"}
 .cc-home .pz{position:relative;border-radius:18px;overflow:hidden;padding:26px 28px}
 .cc-home .pz-bk{grid-area:bk}
@@ -905,4 +905,3 @@
 .cc-home .pz-pl .pz-t h3{max-width:none}
 .cc-home .rvs-you{flex-wrap:wrap}
 .cc-home .rvs-you b{flex:1 1 200px}
-@media (min-width:1001px) and (max-width:1279px){.cc-home .pz-grid{grid-template-rows:300px 300px 480px 480px}}
