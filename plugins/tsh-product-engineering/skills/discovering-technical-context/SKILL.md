@@ -55,7 +55,11 @@ for aspects it does not cover.
 nested ones near the touched files; path-scoped rules under `.claude/rules/`;
 decision records (`docs/decisions/` or similar); `CONTRIBUTING.md` or equivalent.
 These are the primary source for coding standards, architecture and layering,
-stack versions, testing strategy, and naming.
+stack versions, testing strategy, and naming. When the project ships its own
+verification or security-invariant skill — named in `CLAUDE.md`'s
+`tsh:project-checks` block, or a project skill whose description covers them — read
+it too: it is the source for the verification commands, their boundaries and the
+project's security rules.
 
 **Step 2 — Existing codebase patterns.** For whatever the instructions leave
 unstated, find the nearest similar implementation and replicate its approach:

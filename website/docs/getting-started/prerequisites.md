@@ -10,7 +10,7 @@ sources:
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-stack-aws/README.md
   - plugins/tsh-stack-gcp/.mcp.json
-sources_hash: "6a1f6a8923624a4443241558901943d1e07367cc1891cdb8c05f880d1ea66597"
+sources_hash: "f768c5b41594dd2ff68288ab157094618629a4823142bbcc471de3dd5d7bbd00"
 ---
 
 # Prerequisites

@@ -84,7 +84,9 @@ table.
 
 **Step 4 — Run tests, linters, and build.** Unit, integration, and e2e suites as they
 exist in the project, then static analysis, formatting, and the build. Use the
-project's own commands (the plan's Technical Context lists them). Record failures
+project's own commands: the plan's Technical Context lists them, and the project's
+verification skill, when `CLAUDE.md` or the skill listing names one, supplies what no
+plan states — its boundaries apply either way. Record failures
 verbatim. Run the suites within the scope the caller set: a standalone review with no
 stated scope runs everything, e2e included; when the delegation assigns functional
 and e2e verification to a parallel verifier, exclude those suites and record the
@@ -109,8 +111,9 @@ and run its universal baseline against the change — broken access control and
 object-level authz (the most common and highest-severity classes), injection, unsafe
 deserialization, mass assignment, sensitive-data exposure, hardcoded secrets, crypto
 and auth weaknesses, SSRF, vulnerable dependencies, and security misconfiguration. The
-checklist is a floor: a project's own security rules outrank it and are applied first,
-and when a stack skill is available this session its security rows run on top of the
+checklist is a floor: a project's own security rules outrank it and are applied first
+— its security-invariant skill, when `CLAUDE.md` or the skill listing names one — and
+when a stack skill is available this session its security rows run on top of the
 baseline. A change that only needs the baseline still gets it; nothing here replaces a
 dedicated audit when the task is to audit a whole service rather than review a change.
 

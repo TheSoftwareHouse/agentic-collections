@@ -28,6 +28,7 @@ sources:
   - plugins/tsh-product-engineering/skills/reviewing-code/SKILL.md
   - plugins/tsh-product-engineering/skills/auditing-application-security/SKILL.md
   - plugins/tsh-product-engineering/skills/discovering-technical-context/SKILL.md
+  - plugins/tsh-product-engineering/skills/capturing-project-checks/SKILL.md
   - plugins/tsh-product-engineering/agents/software-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/security-auditor.md
@@ -58,7 +59,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "ea325d5645f8f9d4444b0619771b0d0c07aafc058037cf9cc6163c334f968ab6"
+sources_hash: "5fedf5b3b88e97b3ac86835692663d92b1f9c948b94dd2498020a2f76ec88954"
 ---
 
 # Use cases
@@ -154,6 +155,12 @@ A review reads one change; [`auditing-application-security`](/docs/plugins/tsh-p
 [`discovering-technical-context`](/docs/plugins/tsh-product-engineering/skills/discovering-technical-context) establishes which conventions a change must follow before it is written, in priority order: the plan's persisted technical context, then project instructions (`CLAUDE.md`, `.claude/rules`, decision records), then existing codebase patterns, then external documentation.
 
 **Start:** ask "how does this project do X?", or run `/tsh-product-engineering:discovering-technical-context`
+
+### Verify every change the way the project does
+
+Without a plan, a review or a fix has to work out the project's checks from scratch, and the project's security rules reach a review only when the right person reviews it. [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks) writes two project skills into `.claude/skills/`: one with the checks each kind of change needs, the full gate as CI runs it and the boundaries a check must respect, and one with the project's own security invariants, each citing its source. A short block in `CLAUDE.md` names both, and the plugin's review, planning, debugging and audit skills read them from then on. Every command is read, then run, before it is written down, and never against production, a paid service or a shared environment; a rule seen only in code is written only after the team confirms it; nothing is committed.
+
+**Start:** ask to "write down how changes in this repo get verified", or run `/tsh-product-engineering:capturing-project-checks`
 
 ## Product Testing
 

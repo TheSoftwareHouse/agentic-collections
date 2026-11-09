@@ -40,5 +40,5 @@
     "plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md",
     "plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md"
   ],
-  "sources_hash": "dcda3c1a2ce2c3cffb585b9b7a5e733eabfe8a03e4020445c3d5d1add5b5e48a"
+  "sources_hash": "d6b399f8906b8fab0163ec2428273187af49a3fad867a5a152bfe6bc885aabdc"
 }

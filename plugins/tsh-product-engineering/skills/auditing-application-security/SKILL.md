@@ -18,8 +18,9 @@ codebase or a named part of it, not one diff. Report findings; never fix code.
   — broken access control, injection, sensitive-data exposure and the rest. This skill
   applies those classes across a whole surface instead of a single change.
 - **The project's own security rules outrank this skill.** A client ruleset, a
-  `SECURITY.md`, a `.claude/` security skill, or a stated conformance target is applied
-  first; this audit fills what it leaves unstated.
+  `SECURITY.md`, a project security-invariant skill (named in `CLAUDE.md`'s
+  `tsh:project-checks` block or in the skill listing), or a stated conformance target
+  is applied first; this audit fills what it leaves unstated.
 - **A named standard extends the baseline on request.** When the ask names a bar —
   OWASP Top 10 in full, ASVS L1/L2, pen-test preparation — apply it and say which. With
   nothing named, the baseline is the bar.
