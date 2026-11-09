@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "fe60f11e18e085da7af90997581230a6aa027da7fc8cf891daf3fa6bdb2daef8"
+sources_hash: "2585ec9e5a872d27ddf2629a8024c07060b99bbe6a3b810451b1bc5bf497bb2c"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';
@@ -83,6 +83,7 @@ Stack plugins carry what would change if the repo switched language, framework o
 | Judge whether a change is ready to merge | [`/tsh-product-engineering:reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) |
 | Check whether a page matches its Figma design | [`/tsh-product-engineering:reviewing-ui`](/docs/plugins/tsh-product-engineering/skills/reviewing-ui) |
 | Write or de-flake Playwright end-to-end tests | [`@tsh-product-testing:e2e-engineer`](/docs/plugins/tsh-product-testing/agents/e2e-engineer) |
+| Audit a service's code and dependencies for security | [`/tsh-product-engineering:auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security) |
 | Audit infrastructure for security, cost and practice gaps | [`@tsh-platform-engineering:infrastructure-auditor`](/docs/plugins/tsh-platform-engineering/agents/infrastructure-auditor) |
 | Set up Claude Code's context in a repository | [`/tsh-core:init`](/docs/plugins/tsh-core/skills/init) |
 

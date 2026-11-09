@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/SKILL.md
   - plugins/tsh-product-testing/skills/writing-playwright-e2e-tests/references/playwright-cli-exploration.md
-sources_hash: "c5fa41624269c34b5bf6e021737554d593162097871b0691f19ba8a8b2c4a79a"
+sources_hash: "f9422c44fc3f65382b9914e7399ca99cffda072d20ffa76577e4e53e2859396f"
 ---
 
 # Playwright CLI

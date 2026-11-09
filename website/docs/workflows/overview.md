@@ -18,7 +18,7 @@ sources:
   - plugins/tsh-product-management/skills/navigating-project-context/SKILL.md
   - plugins/tsh-core/skills/init/SKILL.md
   - plugins/tsh-core/skills/managing-claude-context/SKILL.md
-sources_hash: "ffa036af707856d12ad0c39784d57a67e91ae3efff791bb7c58b542996213c1d"
+sources_hash: "7fb1ccc0a11aa085412241db9979e64c82dfc0d97b81a8e062f947668938ae73"
 ---
 
 # Workflows overview

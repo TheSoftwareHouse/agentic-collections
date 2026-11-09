@@ -12,7 +12,7 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-capture-worker.md
   - plugins/tsh-product-engineering/agents/ui-reviewer.md
   - plugins/tsh-product-engineering/agents/ui-engineer.md
-sources_hash: "27c558ef7eeb8991ae9cb056994edd20ab8a3038cef5b9108293224405a9cee9"
+sources_hash: "a39eadcfcc25d5ae97dc08efa85fa1a90b73fd0a4a41a43884a1a55b03d04a1a"
 ---
 
 # UI verification

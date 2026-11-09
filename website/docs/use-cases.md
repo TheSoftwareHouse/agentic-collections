@@ -26,9 +26,11 @@ sources:
   - plugins/tsh-product-engineering/skills/reviewing-ui/SKILL.md
   - plugins/tsh-product-engineering/skills/debugging-code/SKILL.md
   - plugins/tsh-product-engineering/skills/reviewing-code/SKILL.md
+  - plugins/tsh-product-engineering/skills/auditing-application-security/SKILL.md
   - plugins/tsh-product-engineering/skills/discovering-technical-context/SKILL.md
   - plugins/tsh-product-engineering/agents/software-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
+  - plugins/tsh-product-engineering/agents/security-auditor.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
   - plugins/tsh-product-engineering/agents/ui-capture-worker.md
   - plugins/tsh-product-engineering/agents/ui-reviewer.md
@@ -56,7 +58,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "8e2d009e6238c26cb071cbb5d15442f85846a37c100cbe99aaded04cc2105169"
+sources_hash: "ea325d5645f8f9d4444b0619771b0d0c07aafc058037cf9cc6163c334f968ab6"
 ---
 
 # Use cases
@@ -140,6 +142,12 @@ During feature implementation, every Figma-backed UI task goes through this gate
 [`reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) reads the plan and requirements before the diff. It executes the project's tests, linters and build itself, and never accepts "tests pass" from an implementation report. Every review runs a universal security baseline of framework-agnostic OWASP classes on top of the project's own rules, and checks for high-risk anti-patterns such as N+1 access and in-memory pagination. When a stack skill for the change's framework is installed, the review loads it and applies its checklist too. Every finding carries a severity, the file and line, the consequence and the minimum correction. The [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer) agent runs the same review read-only.
 
 **Start:** ask "is this ready to merge?", or run `/tsh-product-engineering:reviewing-code`
+
+### A security audit of a whole service
+
+A review reads one change; [`auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security) reads a whole service or a named surface. It maps the attack surface entry point by entry point, runs only the security scanners the project already has and never installs one, and applies the same baseline classes as the code review, with OWASP Top 10, ASVS or pen-test preparation on top when you name one. Dependency advisories are triaged by reachability and exploitability before they get a severity, so an advisory in code the service never reaches does not crowd out a real finding. The report ends with what was not checked. The [`security-auditor`](/docs/plugins/tsh-product-engineering/agents/security-auditor) agent runs the same audit read-only.
+
+**Start:** ask for a security audit or "which of these advisories actually affect us?", or run `/tsh-product-engineering:auditing-application-security`
 
 ### Follow the project's conventions, not generic ones
 

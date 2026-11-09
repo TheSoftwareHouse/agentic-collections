@@ -34,7 +34,7 @@ Use it when a delivered change set (feature, fix or refactor) needs review befor
 
 ## Security baseline
 
-The reference `security-review-checklist.md` is loaded in step 6 of every review. It is a floor, not a ceiling: a project's own security rules outrank it and apply first, and the installed stack skill's security rows run on top. A full audit is a different task. The baseline maps to OWASP Top 10 classes and each row names what to look for in the diff, a typical severity and the minimum correction:
+The reference `security-review-checklist.md` is loaded in step 6 of every review. It is a floor, not a ceiling: a project's own security rules outrank it and apply first, and the installed stack skill's security rows run on top. A full audit is a different task, owned by [`auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security). The baseline maps to OWASP Top 10 classes and each row names what to look for in the diff, a typical severity and the minimum correction:
 
 - broken access control, and object-level access control (IDOR)
 - mass assignment and over-posting
