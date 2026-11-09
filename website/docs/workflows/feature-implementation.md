@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
-sources_hash: "33f5321d615962d3d6d37bd7ac40632019fbd9497bc3a652276db08034e8dfbd"
+sources_hash: "8e7dcb1aefc30dfe8fa8306abe4c3f9169edf92e8cab1e6ef392c1bde4723415"
 ---
 
 # Feature implementation

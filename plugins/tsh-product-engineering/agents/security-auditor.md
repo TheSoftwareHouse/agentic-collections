@@ -27,7 +27,8 @@ ASVS L1/L2, or pen-test preparation. Defaults when unspecified:
 - **Depth** — exhaustive rather than sampled.
 
 If the project ships its own security rules — a `SECURITY.md`, a client ruleset, a
-`.claude/` security skill, a stated conformance target — they outrank the baseline;
+project security-invariant skill (named in `CLAUDE.md`'s `tsh:project-checks` block or
+in the skill listing), a stated conformance target — they outrank the baseline;
 apply them first and say you did.
 
 ## Read-only, absolutely

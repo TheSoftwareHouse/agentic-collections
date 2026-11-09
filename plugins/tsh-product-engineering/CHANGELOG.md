@@ -12,6 +12,35 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.0] - 2026-11-13
+
+### Added
+
+- **`capturing-project-checks` — the project's own checks, written down where every
+  session finds them.** Every skill here defers to "the project's own commands" and
+  "the project's own security rules", but only a plan's Technical Context carried the
+  commands, and the security rules had no home at all. A review, a fix or an audit
+  without a plan re-derived the checks every time. This skill reads the repository —
+  CI workflows first, then task runners, hooks, test configuration, `CLAUDE.md`,
+  `Accepted` decision records, `SECURITY.md` — and writes two **project skills** into
+  `.claude/skills/`: a verification skill (which checks each kind of change needs, the
+  full gate as CI runs it, and the boundaries a check must respect) and a security
+  invariants skill (the project's non-negotiables, each citing its source; a rule seen
+  only in code is written only after the team confirms it). A short
+  `tsh:project-checks` block in `CLAUDE.md` names both and says when to re-run. It
+  reads every command before running it and runs it before writing it down, never
+  against production, a paid service or a shared environment, revises existing project
+  skills in place, and commits nothing.
+
+### Changed
+
+- **The plugin's skills read those project skills.** `discovering-technical-context`
+  treats them as project instructions, so plans carry their commands and debugging
+  finds them. `reviewing-code` and `code-reviewer` take checks the plan does not state
+  from the verification skill, and apply the security invariants before the baseline.
+  `auditing-application-security` and `security-auditor` apply the invariants as the
+  project rules that outrank the baseline.
+
 ## [0.11.1] - 2026-11-12
 
 ### Added

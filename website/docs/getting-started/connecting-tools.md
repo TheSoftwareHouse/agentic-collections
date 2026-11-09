@@ -9,7 +9,7 @@ sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-management/README.md
-sources_hash: "c332c93d9a61ece7207c6f849ee04315685e8da0bfc30d9de5a8a46a120cc80a"
+sources_hash: "d9a7cc6813ab04f64d464c242d6b9a6cb8222ee18820a1f2561ebd801aa15d0d"
 ---
 
 # Connecting tools

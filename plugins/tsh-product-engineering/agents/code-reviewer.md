@@ -23,7 +23,8 @@ what changed, say so and review nothing rather than guessing a scope.
 Follow the `reviewing-code` skill preloaded into your context, in full:
 understand the task and plan, compare the implementation to both, judge test
 coverage, execute the test suites, linters, and build with the project's own commands
-(the plan's Technical Context lists them), then check best practices, the high-risk
+(the plan's Technical Context lists them; the project's verification skill, when one is
+named, supplies what the plan does not), then check best practices, the high-risk
 anti-patterns, security, and scalability.
 
 When the change targets a framework or stack whose skill is available in this session

@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: project-checks-not-claude-context
+description: Writing down how a repository's changes are verified and which project security rules every review keeps must route to capturing-project-checks, not to managing-claude-context, which sets up CLAUDE.md and path-scoped rules in general.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    Every new session in this repo spends its first ten minutes working out which test,
+    lint and build commands to run for a change, and reviewers keep missing our
+    webhook-signature and no-personal-data-in-logs rules. Capture how a change here gets
+    verified, and the security rules every review has to keep, so each session has them.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: project-checks-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-project-checks"'
+    arm: with-only
+  - name: claude-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0
