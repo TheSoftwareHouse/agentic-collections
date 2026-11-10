@@ -14,6 +14,19 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.0] - 2026-11-10
+
+### Changed
+
+- **`init` has the project's checks captured.** A repository set up with `init` got its
+  `CLAUDE.md`, rules and decision index, but nothing recorded how a change there is
+  verified or which project security rules a review must keep, so each later session
+  worked that out again. `init` now has a fourth step: with `tsh-product-engineering`
+  installed, it invokes `/tsh-product-engineering:capturing-project-checks`, which writes
+  the project's verification and security-invariant skills under its own rules; without
+  that plugin, the report says so and names the command. `init` still writes none of
+  those skills itself.
+
 ## [0.11.0] - 2026-10-30
 
 ### Added

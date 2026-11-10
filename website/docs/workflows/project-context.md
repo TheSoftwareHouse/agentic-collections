@@ -19,7 +19,7 @@ sources:
   - plugins/tsh-product-management/hooks/hooks.json
   - plugins/tsh-product-management/hooks/guard-project-context-block.mjs
   - .claude/rules/project-context-contract.md
-sources_hash: "fd3586612e9c285b5835ef9e43939f4d44f269067c91ff3efc84d634caad9bbf"
+sources_hash: "73947272b8bd4a44949815ff9b5ff443c425876e554eab14c03d4df0673f9e0e"
 ---
 
 # Project context
@@ -32,7 +32,7 @@ Two related jobs share this page. **Repository context** is what Claude Code loa
 
 | Component | Owns |
 | :-- | :-- |
-| [`init`](/docs/plugins/tsh-core/skills/init) | The sequence and the wiring: runs the two skills below in order and adds a maintenance section to root `CLAUDE.md`. A command only — it never loads by description match |
+| [`init`](/docs/plugins/tsh-core/skills/init) | The sequence and the wiring: runs the two skills below in order, adds a maintenance section to root `CLAUDE.md`, and, with `tsh-product-engineering` installed, has the project's checks captured by [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks). A command only — it never loads by description match |
 | [`managing-claude-context`](/docs/plugins/tsh-core/skills/managing-claude-context) | The memory layer: root and nested `CLAUDE.md`, `.claude/rules/` with `paths:` globs, and the decision index |
 | [`managing-decision-records`](/docs/plugins/tsh-core/skills/managing-decision-records) | What a decision record is: the four sections, the status vocabulary, numbering, superseding, and the index row |
 

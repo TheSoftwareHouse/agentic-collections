@@ -59,7 +59,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "5fedf5b3b88e97b3ac86835692663d92b1f9c948b94dd2498020a2f76ec88954"
+sources_hash: "2c0ce67513ad6f2e7aa237bfd2ceffe1cf2a4fb64c067fa58fee242c0f470e1f"
 ---
 
 # Use cases
@@ -213,6 +213,8 @@ Without a plan, a review or a fix has to work out the project's checks from scra
 ### Set up Claude Code's context in a repository
 
 [`/tsh-core:init`](/docs/plugins/tsh-core/skills/init) takes a repository from any starting state to a complete set of context files: a root `CLAUDE.md` (nested ones where ownership demands), path-scoped rules in `.claude/rules/`, a decision-record archive with its index, and a maintenance section in `CLAUDE.md` naming the skill that keeps each artifact current. It is safe to re-run: the second pass is a repair. It works by running [`managing-claude-context`](/docs/plugins/tsh-core/skills/managing-claude-context) and its neighbours in order. `managing-claude-context` records conventions the team already holds and asks rather than inventing one when the codebase is ambiguous.
+
+With `tsh-product-engineering` installed, `init` also invokes [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks), so the repository leaves setup with its verification and security-invariant skills written too.
 
 **Start:** `/tsh-core:init` inside the repository · Afterwards, ask when Claude keeps ignoring a convention, or the memory files have drifted from the code
 

@@ -61,7 +61,42 @@ this project has: ingress and authentication, authorization, personal and sensit
 data, secrets, permissions and infrastructure, external calls and cost, storage and
 retention, open decisions.
 
-## 6. Template
+## 6. A repository attached to a project knowledge base
+
+A `tsh:project-context` block in `CLAUDE.md` or `CLAUDE.local.md` means the
+repository belongs to a project with a `<slug>-context` knowledge base. Two things
+change.
+
+**Decision records live there, not in the repository.** Read them through
+`/tsh-product-management:navigating-project-context`, which every attached
+repository enables and which finds the person's clone itself. Only `Accepted` records
+bind; a record kept in the code repository is one about that repository's own
+internals.
+
+**Shared invariants go to the project's own plugin.** The knowledge base ships
+`plugins/<slug>-shared`, and its README states the sharing rule: a skill needed by
+more than one role or repository of the project lives there; one needed by a single
+repository stays in that repository's `.claude/`; ties go to the code repository. So:
+
+- Draft every invariant first. Then ask, in one batch, which of them hold for every
+  repository of the project. With no answer available, keep all of them in the
+  repository and say so in the report.
+- Invariants that hold project-wide become `<slug>-security-invariants`, at
+  `plugins/<slug>-shared/skills/<slug>-security-invariants/SKILL.md`, from the same
+  template with the project as its subject. Markdown only: no `allowed-tools`, hooks
+  or scripts, which that plugin's `scripts/check_plugin.py` refuses. Bump `version` in
+  `plugins/<slug>-shared/.claude-plugin/plugin.json` and add a line to its
+  `CHANGELOG.md` in the same change; without the bump no teammate receives it.
+- Nothing is written into the person's own clone of the knowledge base: its sync
+  needs a clean default branch. The change goes through the attached plugin's write
+  flow — propose, create a branch and worktree, write and check there, commit, push,
+  each step after the person's own yes — which `navigating-project-context` loads.
+  Run the knowledge base's own checks from that worktree before the commit step.
+- The repository's own skill keeps the repository-specific invariants and opens with
+  one line naming the shared skill, so a review in this repository applies both. The
+  `tsh:project-checks` block names both too.
+
+## 7. Template
 
 Fill every `<…>`, keep each invariant to one or two sentences, and keep the result
 under ~100 lines.

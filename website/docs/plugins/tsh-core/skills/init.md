@@ -5,7 +5,7 @@ sidebar_position: 2
 description: One-shot setup of a repository's Claude Code context that runs the owning tsh-core skills in order and wires maintenance pointers into CLAUDE.md.
 sources:
   - plugins/tsh-core/skills/init/
-sources_hash: "682cae721b5706412de962f147a37a0ea730f0b1d1458bf3b421e738f79edfb6"
+sources_hash: "7eb8ea486a7e8e1b7aa55575ad392a6601b4aa8871dd1760eeefb4bfa0876c2f"
 ---
 
 # Init
@@ -27,6 +27,7 @@ Takes a repository from any starting state (nothing, a partial setup, or a drift
 | **Maintenance section** | Adds a "Keeping context and decisions current" section to the root `CLAUDE.md`: update the memory files in the same change as the project change, and propose recording important decisions |
 | **Conditional phrasing** | The section names the `/tsh-core:` skills only as "with the `tsh-core` plugin installed", and gives a manual fallback, because `tsh-core` installs per teammate while `CLAUDE.md` is read by every contributor |
 | **Domain dictionary** | A third bullet joins the section only where the repository already has a domain dictionary (`docs/domain-dictionary.md` or its chosen path) |
+| **Project checks** | With `tsh-product-engineering` installed, invokes `/tsh-product-engineering:capturing-project-checks`, which writes the project's verification and security-invariant skills under its own rules; without it, the report says so and names the command. `init` never writes those skills itself |
 | **Report** | Ends with three lists (created, repaired, left alone), any decision-record candidates, and a flag that the setup is a proposal for human review |
 
 ## How It Works
@@ -34,7 +35,8 @@ Takes a repository from any starting state (nothing, a partial setup, or a drift
 1. **Establish the memory layer.** Execute `managing-claude-context` in full, even when the repository looks set up: repair is as much this command's job as creation.
 2. **Ensure the decision archive exists.** If step 1 left no index, create it with the binding note and an empty four-column table. Do not backfill records: undocumented decisions the codebase clearly embodies are listed as candidates in the report, and writing them is handed to `managing-decision-records`.
 3. **Wire the maintenance section.** Add the section to root `CLAUDE.md`, or repair an existing variant in place. It counts against the 200-line budget like every other line.
-4. **Verify and report.** Run `/context`, confirm everything written or repaired loads (or is scoped to load on read), and report created, repaired and left alone.
+4. **Capture the project's checks.** With `tsh-product-engineering` installed, invoke [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks); without it, say so and name the command. A repository with no CI yet gets a thin result, and the block that skill writes says when to re-run it.
+5. **Verify and report.** Run `/context`, confirm everything written or repaired loads (or is scoped to load on read), and report created, repaired and left alone.
 
 ## Rules It Enforces
 

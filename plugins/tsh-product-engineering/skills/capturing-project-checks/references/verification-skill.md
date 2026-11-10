@@ -78,7 +78,10 @@ where they resolve on this machine (`.env`, exported variables, CI secrets), and
 whether anything it touches is shared, paid or external. A suite whose connection
 string comes from `.env` may point at a shared database on a developer's clone; a
 "test" script may call a paid sandbox. Such a command is written with what it needs
-and marked not run, never executed to see what happens.
+and marked not run, never executed to see what happens. An external system here is
+one of the project's own: its providers, clouds, sandboxes and shared environments. A
+read of a public package registry — an install, a dependency audit — is not, and runs
+like any other check.
 
 Then run each remaining command, cheapest first. A command that fails on a clean
 checkout is a finding for the report, not a line for the skill. Do not start services
