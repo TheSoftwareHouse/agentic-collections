@@ -5,7 +5,7 @@ sidebar_position: 2
 description: One-shot setup of a repository's Claude Code context that runs the owning tsh-core skills in order and wires maintenance pointers into CLAUDE.md.
 sources:
   - plugins/tsh-core/skills/init/
-sources_hash: "7eb8ea486a7e8e1b7aa55575ad392a6601b4aa8871dd1760eeefb4bfa0876c2f"
+sources_hash: "bbee2b8247287620dbed124b61c1c319553c2c1d791460fe8fb902bee38ac7f6"
 ---
 
 # Init
@@ -35,8 +35,8 @@ Takes a repository from any starting state (nothing, a partial setup, or a drift
 1. **Establish the memory layer.** Execute `managing-claude-context` in full, even when the repository looks set up: repair is as much this command's job as creation.
 2. **Ensure the decision archive exists.** If step 1 left no index, create it with the binding note and an empty four-column table. Do not backfill records: undocumented decisions the codebase clearly embodies are listed as candidates in the report, and writing them is handed to `managing-decision-records`.
 3. **Wire the maintenance section.** Add the section to root `CLAUDE.md`, or repair an existing variant in place. It counts against the 200-line budget like every other line.
-4. **Capture the project's checks.** With `tsh-product-engineering` installed, invoke [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks); without it, say so and name the command. A repository with no CI yet gets a thin result, and the block that skill writes says when to re-run it.
-5. **Verify and report.** Run `/context`, confirm everything written or repaired loads (or is scoped to load on read), and report created, repaired and left alone.
+4. **Capture the project's checks.** With `tsh-product-engineering` installed, invoke [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks); without it, say so and name the command. That skill runs the project's check commands to prove them, within its own safety rules; `init` itself runs none. A repository with no CI yet gets a thin result, and the block that skill writes says when to re-run it.
+5. **Verify and report.** Run `/context`, confirm everything written or repaired loads (or is scoped to load on read), and report created, repaired and left alone, together with step 4's own report or the line saying the capturing skill is not installed.
 
 ## Rules It Enforces
 
