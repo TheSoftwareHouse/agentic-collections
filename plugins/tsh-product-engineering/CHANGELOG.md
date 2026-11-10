@@ -30,7 +30,13 @@ alone reaches nobody.
   `tsh:project-checks` block in `CLAUDE.md` names both and says when to re-run. It
   reads every command before running it and runs it before writing it down, never
   against production, a paid service or a shared environment, revises existing project
-  skills in place, and commits nothing.
+  skills in place, and commits nothing. In a repository attached to a project knowledge
+  base (`tsh-product-management`'s `<slug>-context`), it reads the decision records
+  there and routes the invariants that hold across the project's repositories to the
+  project's own `<slug>-shared` plugin, under that plugin's sharing rule and through
+  the knowledge base's own write flow; verification stays per repository, because CI
+  is. `/tsh-core:init` now invokes it as its fourth step where this plugin is
+  installed.
 
 ### Changed
 

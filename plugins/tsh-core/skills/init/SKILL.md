@@ -1,6 +1,6 @@
 ---
 name: init
-description: "One-shot setup of a project's Claude Code context. Audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules, and the decision-record archive with its index by running the owning tsh-core skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Run /tsh-core:init inside the repository to set up."
+description: "One-shot setup of a project's Claude Code context. Audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules, and the decision-record archive with its index by running the owning tsh-core skills in order, wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current, and, where tsh-product-engineering is installed, has the project's verification and security-invariant skills captured. Run /tsh-core:init inside the repository to set up."
 disable-model-invocation: true
 ---
 
@@ -100,7 +100,15 @@ writing them.
 the section to root `CLAUDE.md` — or repair the existing variant in place. It
 counts against the 200-line budget like every other line.
 
-**Step 4 — Verify and report.** Run `/context` and confirm everything written or
+**Step 4 — Capture the project's checks.** With `tsh-product-engineering`
+installed, invoke `/tsh-product-engineering:capturing-project-checks`: it writes the
+project's own verification and security-invariant skills into `.claude/skills/` and
+its own fenced block into root `CLAUDE.md`, under its rules, not this skill's. Without
+it, say so in the report and name that command; never write those skills by hand
+here. A repository with no CI yet gets a thin result, and the block that skill writes
+says when to re-run it.
+
+**Step 5 — Verify and report.** Run `/context` and confirm everything written or
 repaired loads, or is scoped to load on read. Report three lists — created,
 repaired, left alone — plus any decision candidates from Step 2, and close by
 flagging the setup as a proposal for the team to review, not a finished artifact.
@@ -114,6 +122,7 @@ flagging the setup as a proposal for the team to review, not a finished artifact
 - [ ] A decision index exists, at the default or the repository's own location
 - [ ] No decision record was invented; candidates are listed for a human
 - [ ] The maintenance section is in root CLAUDE.md — conditional, backticked, no bare @
+- [ ] The project's checks were captured, or the report says the capturing skill was absent
 - [ ] /context confirms the result loads
 - [ ] The report lists created / repaired / left alone and calls the result a proposal
 ```
