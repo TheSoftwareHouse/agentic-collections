@@ -5,7 +5,7 @@ sidebar_position: 0.5
 description: Writes a repository's own verification and security-invariant skills into .claude/skills/ and names them in CLAUDE.md, so reviews, plans, fixes and audits apply the project's own bar even without a plan.
 sources:
   - plugins/tsh-product-engineering/skills/capturing-project-checks/
-sources_hash: "d273cc151bf58d80a0d5ca919d64c87149e65103d03afaa4188f27b349932bbb"
+sources_hash: "babfc209f2f5b0522957c230b0c46f53f593d795a1422195b3c628f409287f2c"
 ---
 
 # Capturing Project Checks
@@ -26,7 +26,9 @@ Use it when checks are re-discovered every session, nobody has written down how 
 | **Security invariants skill** | `.claude/skills/reviewing-security-invariants/SKILL.md` | The project's non-negotiable security rules, each citing its source, plus the open decisions a change must not settle silently |
 | **`tsh:project-checks` block** | root `CLAUDE.md`, near the end | A short pointer naming both skills by their actual names and paths, and saying to re-run this skill when CI, task runners or security rules change |
 
-In a repository attached to a project knowledge base (a `tsh:project-context` block, from `tsh-product-management`'s `initializing-project-context`), the decision records are read from the knowledge base through `navigating-project-context`, and the invariants that hold for every repository of the project go to the project's own `<slug>-shared` plugin as `<slug>-security-invariants`, under that plugin's sharing rule: Markdown only, a version bump and a changelog line, written through the knowledge base's own write flow with each git step after the person's yes, never into the person's own clone. Verification stays in the code repository, because CI is per repository. The repository's own invariants skill names the shared one.
+In a repository attached to a project knowledge base (a `tsh:project-context` block, from `tsh-product-management`'s `initializing-project-context`), the skill reads the decision records there through `navigating-project-context` and writes nothing in the knowledge base. When that skill is not in the session, it says so and reports the records as not read. Every invariant stays in the repository's skill, so a review never applies fewer than before; the ones the team confirms as holding for more than one repository are marked `(project-wide)`, and the report carries a draft of `<slug>-security-invariants` for the project's own `<slug>-shared` plugin, with the steps from that plugin's README for a person to add it: Markdown only, a version bump and a changelog line in the same pull request. Once that shared skill appears in a session's skill listing, a later run may replace the marked invariants with one line naming it.
+
+In a repository the team may not commit to (the block is in `CLAUDE.local.md`: a client's repository), the skill writes no tracked file. It asks whether the files may be committed; on "keep local" it writes the skills, puts its pointer block in `CLAUDE.local.md` and lists every path in `.git/info/exclude`; with no answer it writes nothing and puts both drafts in the report.
 
 An existing project skill that already covers verification or security is revised in place under its own name. When no source yields a security invariant and the team confirms none, no invariants skill is written. When there is no `CLAUDE.md`, one is created holding only the block, and the user is told that `managing-claude-context` writes the rest.
 
@@ -39,7 +41,7 @@ An existing project skill that already covers verification or security is revise
 | **Safe boundaries** | Nothing runs against production, a real third-party service or a shared environment, and no long-running server is started to prove a command. A database or emulator counts as local only when the project's own tooling starts it |
 | **Sourced invariants** | Each invariant traces to a file: written client requirements, `CLAUDE.md` hard rules, `Accepted` decision records, `SECURITY.md`, guard scripts in CI, or past pen-test remediations. A rule seen only in code is proposed to the team and written only on a yes, with that confirmation as its source; a later run keeps it as it stands |
 | **No baseline copy** | Generic OWASP advice stays out. The universal baseline already runs in every review, so the invariants skill holds only what is specific to the project |
-| **Nothing committed** | Files are written for the team to review. Nothing is staged, committed or pushed |
+| **Nothing committed** | Files are written for the team to review. Nothing is staged, committed or pushed, and nothing is written in a project knowledge base |
 
 A skill is applied when a session loads it: the `CLAUDE.md` block makes every session aware of it, and the plugin's review, planning, debugging and audit skills load it by rule. A guarantee that holds whatever the session decides is a hook's job, and the verification skill is what such a hook would run; no hook ships here.
 
@@ -47,11 +49,11 @@ Every generated verification skill carries four boundaries: never run a check ag
 
 ## How it works
 
-1. **Inventory** `.claude/skills/`, root `CLAUDE.md`, CI workflows, task runners, test configuration, decision records and `SECURITY.md`. A project skill found for verification or security switches its step to repair mode.
+1. **Read the instruction and settings files from disk,** because the block markers are HTML comments that are stripped from the copy already in context; a `tsh:project-context` block or an enabled `<slug>-shared@<slug>-context` plugin marks an attached repository, and one found only in the `.local` files marks a repository the team may not commit to. Then **inventory** `.claude/skills/`, root `CLAUDE.md`, CI workflows, task runners, test configuration, decision records and `SECURITY.md`. A project skill found for verification or security switches its step to repair mode.
 2. **Verification skill:** checks from CI workflows first, then task runners, git hooks, test configuration and the project's written instructions, mapped to the kinds of change the repository actually has.
 3. **Security invariants skill:** invariants from their sources, grouped by boundary, with code-only candidates confirmed in one batch.
 4. **`CLAUDE.md` block:** added near the end or rewritten whole on every run.
-5. **Verify and report:** each file is confirmed to be where the block says; skills load at session start, so the user confirms with `/context` in a fresh session. The report lists what was created, repaired and left alone; commands run and not run; and invariants confirmed, declined and still open. A second run on an unchanged repository finds nothing to change.
+5. **Verify and report:** each file is confirmed to be where the block says; skills load at session start, so the user confirms with `/context` in a fresh session. The report lists what was created, repaired and left alone; commands run and not run; and invariants confirmed, declined and still open. A second run on an unchanged repository finds nothing to change and asks nothing again: unchanged commands are not re-run, and declined candidates and project-wide marks are read back from the skill.
 
 ## Reference Loading
 

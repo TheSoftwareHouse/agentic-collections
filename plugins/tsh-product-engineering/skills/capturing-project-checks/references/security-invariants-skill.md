@@ -46,7 +46,9 @@ propose it, with where you saw it:
 Ask in one batch, not one question at a time. Write a candidate only on a yes, with
 the source "confirmed with the team during capture, <date>". That source is final: a
 later run keeps the invariant as it stands and never re-proposes or removes it for
-lacking a file. A declined candidate goes in the report and nowhere else.
+lacking a file. A declined candidate goes in the report and in one HTML comment at
+the end of the generated skill (`<!-- declined during capture: … -->`), so a later
+run does not ask again.
 
 ## 4. Open decisions
 
@@ -63,38 +65,47 @@ retention, open decisions.
 
 ## 6. A repository attached to a project knowledge base
 
-A `tsh:project-context` block in `CLAUDE.md` or `CLAUDE.local.md` means the
-repository belongs to a project with a `<slug>-context` knowledge base. Two things
-change.
+A `tsh:project-context` block in `CLAUDE.md` or `CLAUDE.local.md`, read from disk,
+or an enabled `<slug>-shared@<slug>-context` plugin in the repository's settings,
+means the repository belongs to a project with a `<slug>-context` knowledge base. This skill
+only reads that knowledge base. It writes nothing there and runs no git there: the
+knowledge base has its own write process and owners, and its sync needs a clean
+clone.
 
 **Decision records live there, not in the repository.** Read them through
-`/tsh-product-management:navigating-project-context`, which every attached
-repository enables and which finds the person's clone itself. Only `Accepted` records
-bind; a record kept in the code repository is one about that repository's own
-internals.
+`/tsh-product-management:navigating-project-context`, which finds the person's clone
+itself. When that skill is not in this session — disabled, an untrusted folder, a
+non-interactive run — say so, report the decision records as not read, and write no
+invariant that would have needed one. Only `Accepted` records bind. Cite a record by
+number and title, prefixed "knowledge base:", never by a path: the path does not
+exist in this repository.
 
-**Shared invariants go to the project's own plugin.** The knowledge base ships
-`plugins/<slug>-shared`, and its README states the sharing rule: a skill needed by
-more than one role or repository of the project lives there; one needed by a single
-repository stays in that repository's `.claude/`; ties go to the code repository. So:
+**Every invariant stays in the repository's skill.** Nothing is moved out, so a
+review never applies fewer invariants than before the run.
 
-- Draft every invariant first. Then ask, in one batch, which of them hold for every
-  repository of the project. With no answer available, keep all of them in the
-  repository and say so in the report.
-- Invariants that hold project-wide become `<slug>-security-invariants`, at
-  `plugins/<slug>-shared/skills/<slug>-security-invariants/SKILL.md`, from the same
-  template with the project as its subject. Markdown only: no `allowed-tools`, hooks
-  or scripts, which that plugin's `scripts/check_plugin.py` refuses. Bump `version` in
-  `plugins/<slug>-shared/.claude-plugin/plugin.json` and add a line to its
-  `CHANGELOG.md` in the same change; without the bump no teammate receives it.
-- Nothing is written into the person's own clone of the knowledge base: its sync
-  needs a clean default branch. The change goes through the attached plugin's write
-  flow — propose, create a branch and worktree, write and check there, commit, push,
-  each step after the person's own yes — which `navigating-project-context` loads.
-  Run the knowledge base's own checks from that worktree before the commit step.
-- The repository's own skill keeps the repository-specific invariants and opens with
-  one line naming the shared skill, so a review in this repository applies both. The
-  `tsh:project-checks` block names both too.
+**Project-wide invariants are marked, and drafted for the shared plugin.** The
+knowledge base ships `plugins/<slug>-shared`, whose README states the sharing rule: a
+skill needed by more than one role or repository of the project lives there; one
+needed by a single repository stays in that repository's `.claude/`; ties go to the
+code repository.
+
+- Ask, in one batch, which invariants hold for more than one repository of the
+  project. Mark each confirmed one `(project-wide)` after its name; the mark is how a
+  later run knows the answer. With no answer, mark none.
+- Put a draft of `<slug>-security-invariants` in the report, from the template below
+  with the project as its subject and only the marked invariants. Cite each source by
+  repository name and rule, or by record number and title: the plugin installs
+  without the knowledge base's documents, so a path there resolves to nothing.
+- With the draft, give the person the steps from that plugin's README, "Adding a
+  component": the file is
+  `plugins/<slug>-shared/skills/<slug>-security-invariants/SKILL.md`, Markdown only;
+  `version` in `plugins/<slug>-shared/.claude-plugin/plugin.json` is bumped and
+  `CHANGELOG.md` gets a line in the same pull request; the knowledge base's own
+  `scripts/check_plugin.py`, at its root, checks all three in the pipeline. The
+  person, or the knowledge base's owners, make that change.
+- Once `<slug>-security-invariants` appears in a session's skill listing, a later run
+  may replace the marked invariants in the repository's skill with one line naming
+  it. Never before.
 
 ## 7. Template
 

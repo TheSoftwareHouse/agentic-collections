@@ -32,11 +32,12 @@ alone reaches nobody.
   against production, a paid service or a shared environment, revises existing project
   skills in place, and commits nothing. In a repository attached to a project knowledge
   base (`tsh-product-management`'s `<slug>-context`), it reads the decision records
-  there and routes the invariants that hold across the project's repositories to the
-  project's own `<slug>-shared` plugin, under that plugin's sharing rule and through
-  the knowledge base's own write flow; verification stays per repository, because CI
-  is. `/tsh-core:init` now invokes it as its fourth step where this plugin is
-  installed.
+  there and writes nothing in the knowledge base: every invariant stays in the
+  repository's skill, the ones the team confirms as project-wide are marked, and a
+  draft for the project's own `<slug>-shared` plugin goes in the report with the
+  steps for a person to add it. In a client's repository (attached in local mode) it
+  writes no tracked file. `/tsh-core:init` now invokes it as its fourth step where this
+  plugin is installed.
 
 ### Changed
 
