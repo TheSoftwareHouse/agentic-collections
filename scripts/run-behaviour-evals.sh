@@ -4,11 +4,17 @@
 # They build a scratch repository with each case's scaffold script and let Claude
 # write files and run commands in it, so they need --scaffold and --allow-tools,
 # which the pull-request workflow must never pass (.claude/rules/plugin-evals.md,
-# "Security"). Every run bills the signed-in account; the cap below bounds it.
+# "Security"). Every run bills the signed-in account.
 #
-#   scripts/run-behaviour-evals.sh                     every plugin that has a suite
-#   scripts/run-behaviour-evals.sh tsh-product-testing one plugin
+#   scripts/run-behaviour-evals.sh                         every plugin that has a suite
+#   scripts/run-behaviour-evals.sh tsh-product-management  one plugin
 #   RUNS=3 MAX_COST_USD=10 scripts/run-behaviour-evals.sh
+#
+# MAX_COST_USD caps each plugin's run separately, not the total.
+#
+# Isolation comes from the harness, not from this script: each run gets its own
+# temporary HOME and working directory, and a variable exported here does not
+# reach the session (only an allowlist and EVAL_* do).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -16,14 +22,17 @@ RUNS="${RUNS:-1}"
 MAX_COST_USD="${MAX_COST_USD:-5}"
 MODEL="${MODEL:-claude-sonnet-5-5}"
 
-# The project-context scripts read a per-person registry and ask the claude CLI for
-# its marketplaces. Point both away from this machine's real state, so a case sees
-# only what its scaffold built (the same isolation tests/project-context uses).
-export TSH_CONTEXT_HOME="${TSH_CONTEXT_HOME:-/nonexistent/tsh-context-home}"
-export TSH_CONTEXT_CLAUDE=""
-
-if [ $# -gt 0 ]; then plugins=("$@"); else
-  plugins=(); for d in plugins/*/evals; do [ -d "$d" ] && plugins+=("$(basename "$(dirname "$d")")"); done
+plugins=()
+if [ $# -gt 0 ]; then
+  plugins=("$@")
+else
+  for d in plugins/*/evals; do
+    if grep -rqs '^tags:.*\bbehaviour\b' "$d"; then plugins+=("$(basename "$(dirname "$d")")"); fi
+  done
+fi
+if [ ${#plugins[@]} -eq 0 ]; then
+  echo "No behavioural suites found under plugins/*/evals/ (cases tagged 'behaviour')." >&2
+  exit 1
 fi
 
 status=0

@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: plan-written-not-implemented
-description: Asked for a plan, creating-implementation-plans writes it as a file under specifications/<task-id>/, uses the verification commands the project really has, and changes no source file.
+description: Asked for a plan, creating-implementation-plans writes it as a file under specifications/<task-id>/, names a verification command the project has (a package.json script, or the command it runs) and none from another toolchain or a script it lacks, and leaves the project as it found it — no new file outside specifications/, every scaffolded file byte-identical.
 tags: [behaviour]
 runs: 1
 context:
@@ -21,29 +21,50 @@ graders:
   - name: plan-file-created
     type: file_exists
     path: "specifications/ORD-17/*.plan.md"
-  - name: plan-uses-a-real-project-command
+  - name: plan-names-a-real-project-command
     type: tool_used
     tool: Write
-    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:npm test|npm run (?:lint|typecheck)))'
-  - name: plan-invents-no-package-manager
+    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:(?<![\w-])npm (?:test\b|run (?:test|lint|typecheck)\b)|\bnode --test\b|\beslint\b|\btsc --noEmit\b))'
+  - name: plan-names-no-foreign-toolchain
     type: tool_used
     tool: Write
-    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:pnpm|yarn|npx jest|npm run test:))'
+    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:\bpnpm\b|\byarn\b|\bbun\b|\bvitest\b|\bjest\b|\bmocha\b|\bmake test\b|\bnpx (?!(?:eslint|tsc)\b)[\w@/-]+|(?<![\w-])npm run (?!(?:test|lint|typecheck)\b)[\w:-]+))'
     min: 0
     max: 0
-  - name: no-source-written
+  - name: no-new-file-in-src
+    type: file_exists
+    path: "src/**"
+    exists: false
+  - name: no-new-file-in-test
+    type: file_exists
+    path: "test/**"
+    exists: false
+  - name: no-new-file-at-root
+    type: file_exists
+    path: "*.*"
+    exists: false
+  - name: no-notebook-edit
     type: tool_used
-    tool: Write
-    input_match: '"file_path"\s*:\s*"[^"]*/(?:src|test)/'
+    tool: NotebookEdit
     min: 0
     max: 0
-  - name: no-source-edited
-    type: tool_used
-    tool: Edit
-    input_match: '"file_path"\s*:\s*"[^"]*/(?:src|test)/'
-    min: 0
-    max: 0
-  - name: routes-file-unchanged
+  - name: unchanged-package-json
+    type: regex
+    target: { source: file, path: package.json }
+    pattern: '^\{\n  "name": "orders-service",\n  "private": true,\n  "type": "module",\n  "scripts": \{\n    "test": "node --test test\/",\n    "lint": "eslint src test",\n    "typecheck": "tsc --noEmit"\n  \}\n\}\n$'
+  - name: unchanged-claude-md
+    type: regex
+    target: { source: file, path: CLAUDE.md }
+    pattern: '^# orders-service\n\nHTTP service for customer orders\. Node 24, TypeScript, node:test\.\n\n- Run the tests with `npm test`, lint with `npm run lint`, typecheck with `npm run typecheck`\.\n- Routes live in `src\/routes\.ts`, persistence in `src\/orders\.ts`\.\n$'
+  - name: unchanged-src-orders-ts
+    type: regex
+    target: { source: file, path: src/orders.ts }
+    pattern: '^export type OrderStatus = "placed" \| "shipped" \| "delivered";\nexport interface Order \{ id: string; customerId: string; status: OrderStatus; placedAt: Date \}\nconst orders = new Map<string, Order>\(\);\nexport function findOrder\(id: string\): Order \| undefined \{ return orders\.get\(id\); \}\nexport function saveOrder\(order: Order\): void \{ orders\.set\(order\.id, order\); \}\n$'
+  - name: unchanged-src-routes-ts
     type: regex
     target: { source: file, path: src/routes.ts }
-    pattern: 'return order \? \{ status: 200, body: order \} : \{ status: 404 \};'
+    pattern: '^import \{ findOrder \} from "\.\/orders\.js";\nexport function getOrder\(id: string\) \{\n  const order = findOrder\(id\);\n  return order \? \{ status: 200, body: order \} : \{ status: 404 \};\n\}\n$'
+  - name: unchanged-test-orders-test-ts
+    type: regex
+    target: { source: file, path: test/orders.test.ts }
+    pattern: '^import \{ test \} from "node:test";\nimport assert from "node:assert\/strict";\nimport \{ saveOrder, findOrder \} from "\.\.\/src\/orders\.js";\ntest\("finds a saved order", \(\) => \{\n  saveOrder\(\{ id: "o1", customerId: "c1", status: "placed", placedAt: new Date\(\) \}\);\n  assert\.equal\(findOrder\("o1"\)\?\.status, "placed"\);\n\}\);\n$'

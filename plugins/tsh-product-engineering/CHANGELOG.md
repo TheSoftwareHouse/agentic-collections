@@ -16,7 +16,7 @@ alone reaches nobody.
 
 ### Added
 
-- **Behavioural eval cases** in `evals/`: `plan-written-not-implemented` checks that a plan lands under `specifications/<task-id>/`, uses only commands the project has, and touches no source file; `audit-finds-idor-read-only` checks that a security audit finds a planted IDOR and stays read-only. They are repository tooling, run
+- **Behavioural eval cases** in `evals/`: `plan-written-not-implemented` checks that a plan lands under `specifications/<task-id>/`, names only commands the project has, and leaves every other file as it was; `audit-finds-idor-read-only` checks that a security audit finds a planted IDOR and stays read-only. They are repository tooling, run
   locally with `scripts/run-behaviour-evals.sh`; nothing an installer uses changes.
 
 ## [0.11.0] - 2026-11-09

@@ -16,7 +16,7 @@ alone reaches nobody.
 
 ### Added
 
-- **Behavioural eval cases** in `evals/`: `knowledge-write-waits-for-yes` checks that a knowledge-base write writes nothing into the person's clone and takes no git step without its own yes. They are repository tooling, run
+- **Behavioural eval cases** in `evals/`: `knowledge-write-no-fallback-when-flow-fails` checks that when the write flow cannot start, a knowledge-base write stops instead of writing into the person's clone. They are repository tooling, run
   locally with `scripts/run-behaviour-evals.sh`; nothing an installer uses changes.
 
 ## [0.5.1] - 2026-11-04

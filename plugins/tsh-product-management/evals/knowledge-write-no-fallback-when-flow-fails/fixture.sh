@@ -15,7 +15,4 @@ python3 "$SCRIPTS/scaffold.py" --name "Acme" --slug acme \
 git -C acme-context init -q -b main
 git -C acme-context add -A
 git -C acme-context commit -q -m "Initial project context"
-git init -q --bare -b main acme-context.git
-git -C acme-context remote add origin "$PWD/acme-context.git"
-git -C acme-context push -q -u origin main
-git -C acme-context remote set-head origin main
+git -C acme-context remote add origin "$PWD/acme-context-remote-that-does-not-exist.git"
