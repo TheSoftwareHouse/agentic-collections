@@ -934,3 +934,14 @@
 @media (max-width:359px){.cc-home .ul-pair{flex-direction:column;align-items:center;gap:6px;width:100%}
 .cc-home .ul-s{width:100%;max-width:220px;height:auto}
 .cc-home .ul-eq{transform:rotate(90deg)}}
+/* Narrow desktop: three equal columns, the visuals share one row and grow to the tallest. */
+@media (min-width:1001px){.cc-home .su-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1001px) and (max-width:1279px){.cc-home .su-grid{grid-template-rows:auto auto}
+.cc-home .su-c{display:grid;grid-row:span 2;grid-template-rows:subgrid;grid-template-columns:minmax(0,1fr)}
+.cc-home .su-v{height:auto;min-height:306px;margin-top:0}
+.cc-home .su-t .cp{float:none;display:table;margin:0 0 10px auto}
+.cc-home .cn-r{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:11px;row-gap:4px}
+.cc-home .cn-r .ok{grid-column:2;justify-self:start;margin-left:0}
+.cc-home .su-run .su-s{flex-wrap:wrap;row-gap:2px}
+.cc-home .su-run .su-s em{flex-basis:100%;margin-left:27px}
+.cc-home .su-run .ap{white-space:normal}}
