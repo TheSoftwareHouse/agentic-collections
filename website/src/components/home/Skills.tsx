@@ -156,7 +156,7 @@ export default function Skills(): React.JSX.Element {
                 <div className="cloud-g">
                   {featuredGroups.map(({ title, chips }) => (
                     <div key={title}>
-                      <h4>{title}</h4>
+                      <h3>{title}</h3>
                       <div className="cloud">
                         {chips.map(({ text, href, label }) => (
                           <a key={href} href={href} title={label} aria-label={`${text}: ${label}`}>
