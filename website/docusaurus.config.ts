@@ -168,7 +168,7 @@ const config: Config = {
     },
     footer: {
       style: 'light',
-      copyright: `agentic-collections · Built by <a href="https://tsh.io" target="_blank" rel="noopener noreferrer">The Software House</a> · MIT licence · Free`,
+      copyright: `agentic-collections · Built by <a href="https://tsh.io" target="_blank" rel="noopener noreferrer">The Software House</a> · MIT license · Free`,
       links: [
         {
           title: ' ',
