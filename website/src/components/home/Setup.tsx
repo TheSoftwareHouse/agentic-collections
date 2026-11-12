@@ -66,9 +66,14 @@ export default function Setup(): React.JSX.Element {
                 <span className="n">02</span>
                 <h3>Install, then sign in</h3>
                 <p>
-                  <code>/plugin install tsh-core@tsh-agentic-collections</code>, plus your
-                  discipline and the repo's stacks; run <code>/reload-plugins</code> if the install
-                  asks. Then <code>/mcp</code> signs you in to Jira and Figma, once per machine.
+                  <code>
+                    /plugin install <span className="nw">tsh-core@</span>
+                    <wbr />
+                    <span className="nw">tsh-agentic-collections</span>
+                  </code>
+                  , plus your discipline and the repo's stacks; run <code>/reload-plugins</code> if
+                  the install asks. Then <code>/mcp</code> signs you in to Jira and Figma, once per
+                  machine.
                 </p>
               </div>
               <div className="su-v su-cn">

@@ -905,3 +905,32 @@
 .cc-home .pz-pl .pz-t h3{max-width:none}
 .cc-home .rvs-you{flex-wrap:wrap}
 .cc-home .rvs-you b{flex:1 1 200px}
+.cc-home .nw{white-space:nowrap}
+/* Below the desktop layout: sections keep the desktop's 110px only above 1000px. */
+@media (max-width:1000px){.cc-home .sec,.cc-home .skl,.cc-home .su{padding:72px 0}
+.cc-home .tsh{padding:56px 0}
+.cc-home .final{padding:72px 0}
+.cc-home .rvs-code{overflow-x:auto;display:grid;grid-template-columns:minmax(100%,max-content)}}
+@media (max-width:600px){.cc-home .sec,.cc-home .skl,.cc-home .su{padding:56px 0}
+.cc-home .tsh{padding:48px 0}
+.cc-home .final{padding:56px 0}}
+/* Phones: the agent diagram becomes a tree under the main conversation. */
+@media (max-width:480px){.cc-home .hb{height:auto;display:flex;flex-direction:column;gap:8px}
+.cc-home .hbl{display:none}
+.cc-home .hbc{order:-1;position:static;transform:none;white-space:normal}
+.cc-home .hbn{position:relative;transform:none;left:auto!important;top:auto!important;margin-left:30px}
+.cc-home .hbn b,.cc-home .hbn div span{max-width:none;white-space:nowrap}
+.cc-home .hbn::before{content:"";position:absolute;left:-18px;top:50%;width:18px;border-top:1.5px dashed #a99cf0}
+.cc-home .hbn::after{content:"";position:absolute;left:-18px;top:-8px;bottom:0;border-left:1.5px dashed #a99cf0}
+.cc-home .hbn:nth-last-child(2)::after{bottom:50%}}
+@media (max-width:400px){.cc-home .cn-r{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:11px;row-gap:4px}
+.cc-home .cn-r .ok{grid-column:2;justify-self:start;margin-left:0}
+.cc-home .pled-h{flex-wrap:wrap}
+.cc-home .pled-h small{white-space:nowrap}
+.cc-home .rvs-you code{white-space:normal}
+.cc-home .su-run .su-s{flex-wrap:wrap;row-gap:2px}
+.cc-home .rvs-h span{white-space:nowrap}
+.cc-home .su-run .su-s em{flex-basis:100%;margin-left:27px}}
+@media (max-width:359px){.cc-home .ul-pair{flex-direction:column;align-items:center;gap:6px;width:100%}
+.cc-home .ul-s{width:100%;max-width:220px;height:auto}
+.cc-home .ul-eq{transform:rotate(90deg)}}
