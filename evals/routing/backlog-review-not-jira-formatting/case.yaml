@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: backlog-review-not-jira-formatting
+description: Poking holes in an agreed story list before it goes to Jira must route to reviewing-backlog-quality, not to Jira formatting or the end-to-end orchestrator; reviewing-code is loaded because 'review' is its word.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    These are the onboarding stories we agreed with the client:
+
+    1. As a new customer I can sign up with my email and a password.
+    2. As a new customer I receive a confirmation email and activate my account.
+    3. As a customer I can log in and see my dashboard.
+
+    Before we send them to Jira, poke holes in them. What did we forget?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-backlog-quality"'
+    arm: with-only
+  - name: formatting-jira-issues-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?formatting-jira-issues"'
+    min: 0
+    max: 0
+  - name: orchestrating-business-analysis-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: reviewing-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0

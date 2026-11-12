@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: domain-dictionary-not-claude-context
-description: Building a business-term glossary reconciled against the code must route to managing-domain-dictionaries, not to tsh-core's managing-claude-context, which only wires an adopted dictionary into context.
-tags: [routing]
+description: Building a business-term glossary reconciled against the code must route to managing-domain-dictionaries, not to Claude-context setup, knowledge-base writing or discovery research.
+tags: [routing, cross-plugin]
 plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-core"]
 runs: 1
 execution:
@@ -17,9 +17,21 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-domain-dictionaries"'
     arm: with-only
-  - name: sibling-not-fired
+  - name: managing-claude-context-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0
+  - name: writing-project-knowledge-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
+    min: 0
+    max: 0
+  - name: analyzing-discovery-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-discovery-context"'
     min: 0
     max: 0

@@ -1,14 +1,14 @@
 schema_version: "1.1"
 name: discovery-context-not-orchestration
-description: Gathering what is known about one thin ticket and its gaps must route to analyzing-discovery-context, not to the end-to-end orchestrating-business-analysis.
+description: Researching one thin ticket before estimation must route to analyzing-discovery-context, not to the orchestrator, backlog extraction, or reading a project knowledge base.
 tags: [routing]
 plugins: ["../../../plugins/tsh-product-management"]
 runs: 1
 execution:
   prompt: |
-    Ticket SHOP-412 just says "support partial refunds" and nothing else. Before anyone
-    estimates it, work out what we actually know about refunds on this project, what is
-    missing, and write that up so we can close the gaps with the client.
+    Ticket SHOP-412 just says "support partial refunds". Before anyone estimates it,
+    dig up everything we have on refunds — tickets, docs, designs — and tell me what's
+    still unclear.
   max_turns: 1
   allowed_tools: [Skill]
 graders:
@@ -17,9 +17,21 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-discovery-context"'
     arm: with-only
-  - name: sibling-not-fired
+  - name: orchestrating-business-analysis-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: extracting-epics-and-stories-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    min: 0
+    max: 0
+  - name: navigating-project-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?navigating-project-context"'
     min: 0
     max: 0

@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: project-knowledge-write-not-tech-doc
-description: Recording a client decision in the project knowledge base must route to writing-project-knowledge, not to tsh-core's general writing-technical-documents.
-tags: [routing]
+description: Recording a client requirement in the project knowledge base must route to writing-project-knowledge, not to tsh-core's general writing standard or its decision-record format.
+tags: [routing, cross-plugin]
 plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-core"]
 runs: 1
 execution:
@@ -17,9 +17,15 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
     arm: with-only
-  - name: sibling-not-fired
+  - name: writing-technical-documents-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    min: 0
+    max: 0
+  - name: managing-decision-records-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
     min: 0
     max: 0

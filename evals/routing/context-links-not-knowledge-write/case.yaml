@@ -1,14 +1,13 @@
 schema_version: "1.1"
 name: context-links-not-knowledge-write
-description: Fixing a failing link and table check in the knowledge base must route to repairing-project-context-links, not to writing-project-knowledge.
+description: Fixing a knowledge base whose pipeline broke after documents moved must route to repairing-project-context-links, not to writing or workspace creation.
 tags: [routing]
 plugins: ["../../../plugins/tsh-product-management"]
 runs: 1
 execution:
   prompt: |
-    In our acme-context knowledge base, check_links.py fails since I moved the
-    integration docs around, and one table renders with shifted columns. Fix it so the
-    quality gate passes.
+    I reorganised the integration docs in our acme-context repo and now its pipeline
+    fails on broken links, and one table looks garbled. Can you sort it out?
   max_turns: 1
   allowed_tools: [Skill]
 graders:
@@ -17,9 +16,15 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?repairing-project-context-links"'
     arm: with-only
-  - name: sibling-not-fired
+  - name: writing-project-knowledge-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
+    min: 0
+    max: 0
+  - name: adding-project-context-workspace-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?adding-project-context-workspace"'
     min: 0
     max: 0

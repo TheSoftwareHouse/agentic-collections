@@ -1,14 +1,14 @@
 schema_version: "1.1"
 name: project-knowledge-not-technical-context
-description: A question about a project decision and its owner, in a repository attached to a knowledge base, must route to navigating-project-context, not to discovering-technical-context, which finds code conventions.
-tags: [routing]
-plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-product-engineering"]
+description: A question about a project rule and who to ask, in a repository attached to a knowledge base, must route to navigating-project-context, not to code-convention discovery, decision-record authoring or Claude-context setup.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-product-engineering", "../../../plugins/tsh-core"]
 runs: 1
 execution:
   prompt: |
-    This repo belongs to the Acme project and its CLAUDE.md points at the acme-context
-    knowledge base. What did we decide about how long we keep customer documents, and who
-    owns that area?
+    This repo is part of the Acme project; its CLAUDE.md points at the acme-context
+    knowledge base. How long are we supposed to keep customer documents, and who should
+    I ask about it?
   max_turns: 1
   allowed_tools: [Skill]
 graders:
@@ -17,9 +17,21 @@ graders:
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?navigating-project-context"'
     arm: with-only
-  - name: sibling-not-fired
+  - name: discovering-technical-context-not-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?discovering-technical-context"'
+    min: 0
+    max: 0
+  - name: managing-decision-records-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
+    min: 0
+    max: 0
+  - name: managing-claude-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
     min: 0
     max: 0
