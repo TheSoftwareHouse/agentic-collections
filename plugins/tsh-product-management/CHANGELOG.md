@@ -12,6 +12,13 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.5.2] - 2026-11-12
+
+### Added
+
+- **Behavioural eval cases** in `evals/`: `knowledge-write-waits-for-yes` checks that a knowledge-base write writes nothing into the person's clone and takes no git step without its own yes. They are repository tooling, run
+  locally with `scripts/run-behaviour-evals.sh`; nothing an installer uses changes.
+
 ## [0.5.1] - 2026-11-04
 
 ### Fixed

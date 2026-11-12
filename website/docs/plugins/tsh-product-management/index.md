@@ -11,7 +11,7 @@ sources:
   - plugins/tsh-product-management/skills/writing-project-knowledge/SKILL.md
   - plugins/tsh-product-management/shared/locating-project-context.md
   - plugins/tsh-product-management/skills/initializing-project-context/scripts/wire_repos.py
-sources_hash: "a4fadcefe28f25fa3dd2e7df12de346ed7d1762f11208ec6652da53b0f7b6f94"
+sources_hash: "d37961d8ae755a280b8cf5e895ba560d664165aefc2d8282b3fd4f800b79ee08"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';

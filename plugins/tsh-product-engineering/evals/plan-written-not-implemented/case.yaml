@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: plan-written-not-implemented
+description: Asked for a plan, creating-implementation-plans writes it as a file under specifications/<task-id>/, uses the verification commands the project really has, and changes no source file.
+tags: [behaviour]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    Plan ticket ORD-17: a customer can cancel an order that has not shipped yet, and a
+    cancelled order records when it was cancelled. Write the implementation plan for it.
+    Don't implement anything yet.
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: planning-skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+  - name: plan-file-created
+    type: file_exists
+    path: "specifications/ORD-17/*.plan.md"
+  - name: plan-uses-a-real-project-command
+    type: tool_used
+    tool: Write
+    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:npm test|npm run (?:lint|typecheck)))'
+  - name: plan-invents-no-package-manager
+    type: tool_used
+    tool: Write
+    input_match: '(?=.*specifications/ORD-17/)(?=.*(?:pnpm|yarn|npx jest|npm run test:))'
+    min: 0
+    max: 0
+  - name: no-source-written
+    type: tool_used
+    tool: Write
+    input_match: '"file_path"\s*:\s*"[^"]*/(?:src|test)/'
+    min: 0
+    max: 0
+  - name: no-source-edited
+    type: tool_used
+    tool: Edit
+    input_match: '"file_path"\s*:\s*"[^"]*/(?:src|test)/'
+    min: 0
+    max: 0
+  - name: routes-file-unchanged
+    type: regex
+    target: { source: file, path: src/routes.ts }
+    pattern: 'return order \? \{ status: 200, body: order \} : \{ status: 404 \};'

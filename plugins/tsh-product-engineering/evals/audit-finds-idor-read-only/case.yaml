@@ -1,0 +1,54 @@
+schema_version: "1.1"
+name: audit-finds-idor-read-only
+description: A whole-service security audit finds the planted object-level authorization flaw in src/routes/invoices.js and stays read-only — no file written or edited, nothing installed, no shell write.
+tags: [behaviour]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    Do a security audit of this service and give me a ranked report of what you find.
+    Don't change anything.
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Agent, TodoWrite]
+graders:
+  - name: audit-skill-or-agent-fired
+    type: regex
+    target: trace
+    pattern: '(?:\\?"skill\\?"\s*:\s*\\?"(?:[\w-]+:)?auditing-application-security\\?")|(?:\\?"subagent_type\\?"\s*:\s*\\?"(?:[\w-]+:)?security-auditor\\?")'
+  - name: report-names-the-flawed-route
+    type: regex
+    target: last_message
+    pattern: 'invoices\.js'
+  - name: report-names-the-flaw
+    type: regex
+    target: last_message
+    pattern: 'IDOR|object[- ]level|ownership|another (?:user|customer)|any (?:user|customer)'
+    flags: i
+  - name: nothing-written
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: nothing-edited
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: nothing-installed
+    type: tool_used
+    tool: Bash
+    input_match: '\b(?:npm|pnpm|yarn)\s+(?:i|install|add|ci)\b|\bpip3?\s+install\b|\bbrew\s+install\b|\bnpx\s+(?:-y\s+)?(?:semgrep|snyk)'
+    min: 0
+    max: 0
+  - name: no-shell-writes
+    type: tool_used
+    tool: Bash
+    input_match: '\bsed\s+-i\b|\btee\b|\brm\s|>\s*(?:src|package)'
+    min: 0
+    max: 0
+  - name: vulnerable-route-unchanged
+    type: regex
+    target: { source: file, path: src/routes/invoices.js }
+    pattern: 'if \(!invoice\) return res\.status\(404\)\.end\(\);'

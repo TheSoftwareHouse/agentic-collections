@@ -383,6 +383,51 @@ blocker-level finding. Measured 6 of 6 on 2026-10-28, `tsh-product-engineering` 
 about USD 0.08 per run. A run that fires the review but does not report the IDOR is a
 regression in the Step 6 baseline or the checklist reference.
 
+## Behavioural suites: what a skill does after it fires
+
+A routing case proves the right skill loads. A behavioural case proves what it then
+does, on a scratch repository built for the case: that a plan lands where implementers
+read it, that an audit stays read-only, that a knowledge-base write waits for each yes.
+They live beside the plugin they test, in `plugins/<plugin>/evals/<case>/`, as a
+`case.yaml` and the `fixture.sh` its `context.scaffold_script` names.
+
+| Case | Asserts |
+| :-- | :-- |
+| `tsh-product-engineering/plan-written-not-implemented` | The plan lands at `specifications/ORD-17/*.plan.md`, uses a command `package.json` really has and none it lacks, and no file under `src/` or `test/` is written or edited |
+| `tsh-product-engineering/audit-finds-idor-read-only` | The audit (the skill, or the agent that runs it) names the planted IDOR in `src/routes/invoices.js`; nothing is written, edited or installed, and no shell command writes |
+| `tsh-product-management/knowledge-write-waits-for-yes` | The knowledge base is located and the write flow started; nothing is written into the person's clone and no step that needs a yes is taken, because the session cannot ask |
+
+**They run locally, never in the pull-request workflow.** They need `--scaffold` and
+`--allow-tools Bash Write Edit`, and a pull request supplies its own case files
+(`.claude/rules/plugin-evals.md`, "Security"). The CI eval step runs `--tag routing`
+from the root `evals/` only, so it never picks them up. Run them with:
+
+```shell
+scripts/run-behaviour-evals.sh                         # every plugin with a suite, 1 run each
+RUNS=3 MAX_COST_USD=10 scripts/run-behaviour-evals.sh  # measure stability
+scripts/run-behaviour-evals.sh tsh-product-management  # one plugin
+```
+
+The script points `TSH_CONTEXT_HOME` and `TSH_CONTEXT_CLAUDE` away from this machine's
+real project-context state; a case may set only `EVAL_*` variables itself.
+
+What the harness allows, measured with Claude Code 2.1.287:
+
+- Paths in `file_exists` and in a `{ source: file, path }` target are relative to the
+  run's working directory, which is where the scaffold ran.
+- No grader runs a command after the session. Assert writes through `tool_used` on
+  `Write`, `Edit` and `Bash` with an `input_match` on the JSON-encoded input, and file
+  contents through a `regex` with a `{ source: file, path }` target.
+- A `max: 0` grader passes when its pattern matches nothing, so test every pattern
+  against a violating and a clean input before relying on it. Each case above was.
+- On macOS the run sandbox blocks the `xcrun` shim behind `/usr/bin/git`, and the
+  session's `PATH` cannot be changed from the case. A case that needs git inside the
+  session takes a different path there than on Linux; write its contract so it holds
+  on both, as `knowledge-write-waits-for-yes` does.
+
+Measured on `claude-sonnet-5-5`, 3 runs each, on 2026-11-12: all three 3 of 3, USD 0.11
+to 0.23 per run.
+
 ## Known failures
 
 A case that exposes a real routing bug, whose fix belongs in a plugin change, is
