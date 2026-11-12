@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: backlog-review-not-code-review
+description: Reviewing a story list for gaps before Jira must route to reviewing-backlog-quality, not to reviewing-code, which reviews a change set.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Here's the story list we agreed with the client for the onboarding epic. Before it
+    goes to Jira, go through it for gaps — missing edge cases, unhappy paths, anything
+    that isn't delivery-ready — and give me suggestions I can accept or reject one by one.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-backlog-quality"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0

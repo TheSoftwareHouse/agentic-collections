@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: project-knowledge-not-technical-context
+description: A question about a project decision and its owner, in a repository attached to a knowledge base, must route to navigating-project-context, not to discovering-technical-context, which finds code conventions.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    This repo belongs to the Acme project and its CLAUDE.md points at the acme-context
+    knowledge base. What did we decide about how long we keep customer documents, and who
+    owns that area?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?navigating-project-context"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?discovering-technical-context"'
+    min: 0
+    max: 0

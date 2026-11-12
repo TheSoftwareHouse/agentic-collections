@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: context-links-not-knowledge-write
+description: Fixing a failing link and table check in the knowledge base must route to repairing-project-context-links, not to writing-project-knowledge.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    In our acme-context knowledge base, check_links.py fails since I moved the
+    integration docs around, and one table renders with shifted columns. Fix it so the
+    quality gate passes.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?repairing-project-context-links"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
+    min: 0
+    max: 0

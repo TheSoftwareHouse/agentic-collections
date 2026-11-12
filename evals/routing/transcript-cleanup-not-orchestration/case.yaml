@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: transcript-cleanup-not-orchestration
+description: Cleaning one raw transcript must route to processing-workshop-transcripts, not to the end-to-end orchestrator.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    I've got the raw transcript from yesterday's two-hour workshop with the client, full
+    of small talk and tangents. Clean it up into something structured: grouped by topic,
+    with the decisions, action items and open questions pulled out.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?processing-workshop-transcripts"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0

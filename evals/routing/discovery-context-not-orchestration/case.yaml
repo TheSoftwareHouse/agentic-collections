@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: discovery-context-not-orchestration
+description: Gathering what is known about one thin ticket and its gaps must route to analyzing-discovery-context, not to the end-to-end orchestrating-business-analysis.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    Ticket SHOP-412 just says "support partial refunds" and nothing else. Before anyone
+    estimates it, work out what we actually know about refunds on this project, what is
+    missing, and write that up so we can close the gaps with the client.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-discovery-context"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0

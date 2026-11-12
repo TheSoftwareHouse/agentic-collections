@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: roadmap-not-orchestration
+description: Ordering confirmed epics into delivery waves must route to planning-delivery-roadmaps, not to the end-to-end orchestrator.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    The epics for the new booking flow are confirmed. Work out the order we build them
+    in: delivery waves the client can follow, and which epics can run in parallel across
+    our two teams.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?planning-delivery-roadmaps"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0

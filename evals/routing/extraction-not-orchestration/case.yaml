@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: extraction-not-orchestration
+description: Drafting epics and stories from already-processed workshop material must route to extracting-epics-and-stories, not to the end-to-end orchestrator.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    The workshop transcripts are already cleaned up and grouped by topic. Draft the
+    backlog from them: an intent brief first, then epics as vertical slices and user
+    stories with GIVEN/WHEN/THEN acceptance criteria. Don't touch Jira yet.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0

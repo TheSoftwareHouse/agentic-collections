@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: domain-dictionary-not-claude-context
+description: Building a business-term glossary reconciled against the code must route to managing-domain-dictionaries, not to tsh-core's managing-claude-context, which only wires an adopted dictionary into context.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    The client says "mandate", "order" and "instruction" for the same thing, and our code
+    calls it PaymentRequest. Build us a glossary of the canonical business terms from the
+    workshop material and reconcile it against the codebase.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-domain-dictionaries"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0
