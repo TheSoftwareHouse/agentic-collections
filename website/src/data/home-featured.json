@@ -50,7 +50,7 @@
     },
     {
       "component": "tsh-stack-gcp/skills/auditing-gcp-cost",
-      "label": "Audits cost and labelling from your Terraform and, with credentials, the live GCP project"
+      "label": "Audits cost and labeling from your Terraform and, with credentials, the live GCP project"
     },
     {
       "component": "tsh-stack-azure/skills/auditing-azure-cost",

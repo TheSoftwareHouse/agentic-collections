@@ -331,7 +331,7 @@ export default function UseCases(): React.JSX.Element {
                     See the workflow →
                   </a>
                 </div>
-                <h3>Plans the work, then hands it to specialised agents</h3>
+                <h3>Plans the work, then hands it to specialized agents</h3>
               </div>
               <div className="pz-v">
                 <div className="hb">

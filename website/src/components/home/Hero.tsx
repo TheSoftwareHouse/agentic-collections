@@ -222,11 +222,11 @@ export default function Hero(): React.JSX.Element {
             </div>
             <div>
               <b>{totals.agents}</b>
-              <small>specialised AI agents</small>
+              <small>specialized AI agents</small>
             </div>
             <div>
               <b>Free</b>
-              <small>open source, MIT licence</small>
+              <small>open source, MIT license</small>
             </div>
           </div>
         </div>

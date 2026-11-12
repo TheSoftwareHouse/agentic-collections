@@ -17,7 +17,7 @@ const { totals } = catalog;
 // PHASE2(narrative): page meta "Claude Code plugins for the agentic SDLC" — adapted from the source site's "open-source framework for the agentic SDLC"; this repo is a plugin marketplace, not a framework — rewrite together with the Hero headline
 const TITLE = 'Agentic Collections | Claude Code plugins for the agentic SDLC';
 // TODO(marketing): confirm before publishing
-const DESCRIPTION = `Open-source Claude Code plugins from The Software House: ${totals.skills} skills and ${totals.agents} agents for product management, engineering, testing and platform work. 40% shorter lead time. MIT licence.`;
+const DESCRIPTION = `Open-source Claude Code plugins from The Software House: ${totals.skills} skills and ${totals.agents} agents for product management, engineering, testing and platform work. 40% shorter lead time. MIT license.`;
 const SOCIAL_TITLE = 'Agentic Collections: Claude Code plugins for the agentic SDLC';
 const SOCIAL_DESCRIPTION = `${totals.skills} skills and ${totals.agents} agents take work from workshop notes to a Jira backlog, and from a ticket to a reviewed change. Every non-trivial change starts from a plan you have approved.`;
 
