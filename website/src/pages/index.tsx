@@ -40,12 +40,14 @@ export default function Home(): React.JSX.Element {
       </Head>
       <div className="cc-home">
         <HomeNav />
-        <Hero />
-        <UseCases />
-        <Skills />
-        <Proof />
-        <Setup />
-        <TshBlock />
+        <main>
+          <Hero />
+          <UseCases />
+          <Skills />
+          <Proof />
+          <Setup />
+          <TshBlock />
+        </main>
         <HomeFooter />
       </div>
     </Layout>

@@ -249,55 +249,55 @@ export default function UseCases(): React.JSX.Element {
                   </div>
                   <div className="pled-b">
                     <div>
-                      <em>1</em>
+                      <em data-n="1" aria-hidden="true" />
                       <span className="m">{'// PROJ-201 · criterion 1'}</span>
                     </div>
                     <div>
-                      <em>2</em>
+                      <em data-n="2" aria-hidden="true" />
                       <span className="s">{"test('retries a payout',"}</span>
                     </div>
                     <div>
-                      <em>3</em>
+                      <em data-n="3" aria-hidden="true" />
                       <span className="s">{'async ({ page }) => {'}</span>
                     </div>
                     <div>
-                      <em>4</em>
+                      <em data-n="4" aria-hidden="true" />
                       <span className="s">{'  const po ='}</span>
                     </div>
                     <div>
-                      <em>5</em>
+                      <em data-n="5" aria-hidden="true" />
                       <span className="s">{'    new PayoutsPage(page);'}</span>
                     </div>
                     <div>
-                      <em>6</em>
+                      <em data-n="6" aria-hidden="true" />
                       <span className="s">{"  await po.open('PO-1042');"}</span>
                     </div>
                     <div>
-                      <em>7</em>
+                      <em data-n="7" aria-hidden="true" />
                       <span className="s">{'  await po.retry();'}</span>
                     </div>
                     <div>
-                      <em>8</em>
+                      <em data-n="8" aria-hidden="true" />
                       <span className="s">{'  await expect(po.status)'}</span>
                     </div>
                     <div>
-                      <em>9</em>
+                      <em data-n="9" aria-hidden="true" />
                       <span className="s">{"    .toHaveText('Paid');"}</span>
                     </div>
                     <div>
-                      <em>10</em>
+                      <em data-n="10" aria-hidden="true" />
                       <span className="s">{'});'}</span>
                     </div>
                     <div>
-                      <em>11</em>
+                      <em data-n="11" aria-hidden="true" />
                       <span className="h">{'// ✓ user-visible locators'}</span>
                     </div>
                     <div>
-                      <em>12</em>
+                      <em data-n="12" aria-hidden="true" />
                       <span className="h">{'// ✓ no waitForTimeout'}</span>
                     </div>
                     <div className="cur">
-                      <em>13</em>
+                      <em data-n="13" aria-hidden="true" />
                       <span className="cursor"></span>
                     </div>
                   </div>
@@ -491,35 +491,39 @@ export default function UseCases(): React.JSX.Element {
                     <div className="rvs-code">
                       <div className="fn">infra/iam.tf</div>
                       <div className="">
-                        <em>12</em>data "aws_iam_policy_document" "worker" &#123;
+                        <em data-n="12" aria-hidden="true" />
+                        data "aws_iam_policy_document" "worker" &#123;
                       </div>
                       <div className="">
-                        <em>13</em>
+                        <em data-n="13" aria-hidden="true" />
                         {'  statement {'}
                       </div>
                       <div className="bad">
-                        <em>14</em>
+                        <em data-n="14" aria-hidden="true" />
                         {'    actions   = ["s3:*"]'}
                       </div>
                       <div className="bad">
-                        <em>15</em>
+                        <em data-n="15" aria-hidden="true" />
                         {'    resources = ["*"]'}
                       </div>
                       <div className="">
-                        <em>16</em>
+                        <em data-n="16" aria-hidden="true" />
                         {'  }'}
                       </div>
                       <div className="">
-                        <em>17</em>&#125;
+                        <em data-n="17" aria-hidden="true" />
+                        &#125;
                       </div>
                       <div className="">
-                        <em>18</em>
+                        <em data-n="18" aria-hidden="true" />
                       </div>
                       <div className="">
-                        <em>19</em>resource "aws_iam_role_policy" "worker" &#123;
+                        <em data-n="19" aria-hidden="true" />
+                        resource "aws_iam_role_policy" "worker" &#123;
                       </div>
                       <div className="">
-                        <em>20</em>&#125;
+                        <em data-n="20" aria-hidden="true" />
+                        &#125;
                       </div>
                     </div>
                     <div className="rvs-note">
