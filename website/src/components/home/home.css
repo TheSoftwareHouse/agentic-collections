@@ -914,14 +914,15 @@
 @media (max-width:600px){.cc-home .sec,.cc-home .skl,.cc-home .su{padding:56px 0}
 .cc-home .tsh{padding:48px 0}
 .cc-home .final{padding:56px 0}}
-/* Phones: the agent diagram becomes a tree under the main conversation. */
+/* Phones: the agent diagram becomes a tree under the main conversation. The dashes are
+   gradients: Safari draws a 1.5px dashed border as sparse dots. */
 @media (max-width:480px){.cc-home .hb{height:auto;display:flex;flex-direction:column;gap:8px}
 .cc-home .hbl{display:none}
 .cc-home .hbc{order:-1;position:static;transform:none;white-space:normal}
 .cc-home .hbn{position:relative;transform:none;left:auto!important;top:auto!important;margin-left:30px}
 .cc-home .hbn b,.cc-home .hbn div span{max-width:none;white-space:nowrap}
-.cc-home .hbn::before{content:"";position:absolute;left:-18px;top:50%;width:18px;border-top:1.5px dashed #a99cf0}
-.cc-home .hbn::after{content:"";position:absolute;left:-18px;top:-8px;bottom:0;border-left:1.5px dashed #a99cf0}
+.cc-home .hbn::before{content:"";position:absolute;left:-18px;top:50%;width:18px;height:1.5px;background:repeating-linear-gradient(to right,#a99cf0 0 4px,transparent 4px 8px)}
+.cc-home .hbn::after{content:"";position:absolute;left:-18px;top:-8px;bottom:0;width:1.5px;background:repeating-linear-gradient(to bottom,#a99cf0 0 4px,transparent 4px 8px)}
 .cc-home .hbn:nth-last-child(2)::after{bottom:50%}}
 @media (max-width:400px){.cc-home .cn-r{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:11px;row-gap:4px}
 .cc-home .cn-r .ok{grid-column:2;justify-self:start;margin-left:0}
