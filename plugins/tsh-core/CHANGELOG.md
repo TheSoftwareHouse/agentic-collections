@@ -14,6 +14,48 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.0] - 2026-11-13
+
+### Added
+
+- **`managing-git-worktrees` can adopt a branch that already exists on `origin`**, such
+  as a pull request's head branch, into its own sibling worktree that tracks
+  `origin/<branch>`. It never pushes. Until now the skill refused such a branch, so an
+  agent asked to work on a pull request fell back to raw `git worktree add` and skipped
+  the checks. Adopt fetches only that branch, pins the commit, shows one confirmation
+  that names `origin/<branch>@<commit>`, the path, the upstream and what happens to any
+  local branch of the same name, rechecks after your yes, and verifies the result.
+  A local branch behind origin is fast-forwarded to the confirmed commit and nothing
+  else; one ahead keeps its unpushed commits, which the confirmation lists.
+- **Adopt stops before creating anything** when:
+  - the branch is checked out in any worktree, including one whose directory was
+    deleted but is still registered;
+  - the pull request comes from a fork, even when origin has a branch of the same name;
+  - the local branch has diverged from origin, or its upstream is anything but
+    `origin/<branch>` or unset, or it differs from origin in a shallow clone;
+  - the branch does not exist locally but upstream settings for it are left in the
+    config, which adopt would otherwise overwrite;
+  - the clone's fetch refspecs cannot track the branch unambiguously — a single-branch
+    clone, a negative refspec, or a second remote mapping into `origin`'s namespace.
+- **A pull request given by number or URL is resolved to its head branch and head
+  repository, read-only, with what the session already has:** the project's
+  instructions, origin's host, an installed skill, MCP tool or CLI. The skill asks for
+  the branch only when that fails. It ships no forge client and never installs,
+  configures or signs in to anything. The confirmation says whether each value was
+  resolved, and by what, or supplied by you.
+
+### Changed
+
+- **The rule against taking an existing remote branch now binds create only.** Create
+  behaves as before: it rejects a branch that already exists on `origin`. Its
+  rejection now says that adopting the branch is a separate operation you can ask for;
+  create never switches to it on its own. Nothing in an existing create workflow needs
+  to change.
+- **The skill's routing footprint grew from 761 to 1,060 characters**, and `tsh-core`'s
+  from 4,254 to 4,553 across six skills. The skill's `description` and `when_to_use`
+  together are 1,038 of the 1,536 the listing allows. The extra text routes
+  "check out an existing remote branch" and pull-request requests to this skill.
+
 ## [0.11.0] - 2026-10-30
 
 ### Added
