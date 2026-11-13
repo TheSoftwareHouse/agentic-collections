@@ -5,7 +5,7 @@ sidebar_position: 6
 description: Applies TSH's writing standard to any technical document so it leads with the conclusion, states only verified facts and is short enough to be read.
 sources:
   - plugins/tsh-core/skills/writing-technical-documents/
-sources_hash: "5c68a8700914d13d9c0e3bd5fe7d992168076fc2e23c92a3ceef2dcbea53f8bd"
+sources_hash: "50094350d26cad0966b3931526ad1686f1e7f164274711f9f84859f63a72b147"
 ---
 
 # Writing Technical Documents

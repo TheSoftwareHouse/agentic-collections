@@ -459,6 +459,4 @@ control that asserts the plugin's skills stay out, and give the skill a must-fir
 case around a request it does own. `claude-hook-neither-on-settings` and
 `claude-extension-not-context` are the worked pair.
 
-| Case | Observed | Fix lives in |
-| :-- | :-- | :-- |
-| `tech-writing-tighten-paragraph` | A request to shorten one pasted runbook paragraph loads `writing-technical-documents` in 2 of 6 runs; in the other four Claude rewrites the paragraph and loads no skill | `tsh-core`: the `writing-technical-documents` description, which claims "any request to shorten, tighten, clarify" prose. Either make it win short edits or stop claiming them |
+**No cases are quarantined right now.**

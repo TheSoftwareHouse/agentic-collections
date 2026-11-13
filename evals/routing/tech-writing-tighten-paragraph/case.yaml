@@ -1,11 +1,7 @@
 schema_version: "1.1"
 name: tech-writing-tighten-paragraph
 description: A request to shorten one pasted runbook paragraph must load writing-technical-documents, whose description claims any request to tighten or shorten prose.
-# Quarantined 2026-11-13: measured 2 of 6. In the other four runs Claude rewrote the
-# paragraph directly and loaded no skill. The description claims "any request to shorten,
-# tighten, clarify" prose, so either it over-claims short edits or it fails to win them.
-# Restore the routing tag once the tsh-core description is fixed and this measures 6 of 6.
-tags: [known-failure]
+tags: [routing]
 plugins: ["../../../plugins/tsh-core"]
 runs: 1
 execution:

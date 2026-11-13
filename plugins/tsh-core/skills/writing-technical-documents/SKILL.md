@@ -1,6 +1,6 @@
 ---
 name: writing-technical-documents
-description: "Applies TSH's writing standard to any technical document — README, CHANGELOG, ADR, RFC, runbook, PR description, ticket, user story, bug report or test plan — so it leads with the conclusion, states only verified facts, and is short enough to be read. Use when writing or revising a document meant for other people, or when asked to tighten, shorten or clarify prose."
+description: "Applies TSH's writing standard to any technical document — README, CHANGELOG, ADR, RFC, runbook, PR description, ticket, user story, bug report or test plan — so it leads with the conclusion, states only verified facts, and is short enough to be read. Use when writing or revising a document meant for other people, or when asked to tighten, shorten or clarify prose — load it before rewriting, even for one pasted paragraph, because the standard decides what to cut."
 when_to_use: "Trigger on: writing or updating a README, CHANGELOG entry, /docs page, runbook, ADR, RFC, technical proposal, PR description, release note, migration guide, ticket, user story, acceptance criteria, bug report, test plan or incident report; or any request to shorten, tighten, clarify, de-bloat or improve the readability of written text."
 ---
 
