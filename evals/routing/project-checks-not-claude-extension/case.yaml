@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: project-checks-not-claude-extension
+description: Asking for a project skill that captures the repository's own checks must route to capturing-project-checks, not to authoring-claude-extensions, which writes skills, hooks and subagents in general.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    Write us a skill for this repo that knows which of our checks to run for a given
+    change — the right specs, typecheck, lint, and when to run the whole CI gate — and
+    the rules every check has to respect here, like never hitting the real payment
+    sandbox. Read it off our CI config and package scripts rather than guessing.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: project-checks-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-project-checks"'
+    arm: with-only
+  - name: claude-extension-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?authoring-claude-extensions"'
+    min: 0
+    max: 0

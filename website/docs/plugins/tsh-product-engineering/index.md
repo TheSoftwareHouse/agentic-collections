@@ -6,7 +6,7 @@ description: Spec-driven feature implementation with committed plan files, deleg
 sources:
   - plugins/tsh-product-engineering/.claude-plugin/plugin.json
   - plugins/tsh-product-engineering/README.md
-sources_hash: "425ed2e6331c75a2e7e02024c61c6ca1db6631540936887021f9257982f54050"
+sources_hash: "0bb89eebbc7068a1829a46bfd0b41545bd407d844b1385d0d2be1206b3a8e29a"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
@@ -38,6 +38,7 @@ Every skill except `verifying-ui` is model-invocable, and the descriptions are w
 | Verify UI | [`reviewing-ui`](/docs/plugins/tsh-product-engineering/skills/reviewing-ui) runs one capture-and-judge pass, repeated by the gate in the orchestrator | [`ui-capture-worker`](/docs/plugins/tsh-product-engineering/agents/ui-capture-worker), [`ui-reviewer`](/docs/plugins/tsh-product-engineering/agents/ui-reviewer) |
 | Final verification | the orchestrator's final phase | [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer) and [`feature-verifier`](/docs/plugins/tsh-product-engineering/agents/feature-verifier), in parallel |
 | Fix a bug | [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code) | loaded by `software-engineer` |
+| Record the project's checks | [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks) writes the project's verification and security-invariant skills, which the stages above then read | none |
 | Audit security | [`auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security) audits a whole service or a named surface, not one change | [`security-auditor`](/docs/plugins/tsh-product-engineering/agents/security-auditor), read-only |
 
 For the end-to-end flows see [feature implementation](/docs/workflows/feature-implementation), [UI verification](/docs/workflows/ui-verification) and [debugging](/docs/workflows/debugging).

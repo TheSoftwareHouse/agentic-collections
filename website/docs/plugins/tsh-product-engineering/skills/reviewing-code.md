@@ -5,7 +5,7 @@ sidebar_position: 6
 description: TSH's evidence-based pre-merge review of a delivered change set, comparing it with the plan, running the project's checks and applying anti-pattern, security and scalability checks.
 sources:
   - plugins/tsh-product-engineering/skills/reviewing-code/
-sources_hash: "c316c76db2fa4654f111972443deee74b6701830dd697612d0a06f33ca4263dc"
+sources_hash: "d85ac229a79e15f9faa9b2760f6343fd6469bb86fd9ae929125e5484a3917c19"
 ---
 
 # Reviewing Code
@@ -34,7 +34,7 @@ Use it when a delivered change set (feature, fix or refactor) needs review befor
 
 ## Security baseline
 
-The reference `security-review-checklist.md` is loaded in step 6 of every review. It is a floor, not a ceiling: a project's own security rules outrank it and apply first, and the installed stack skill's security rows run on top. A full audit is a different task, owned by [`auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security). The baseline maps to OWASP Top 10 classes and each row names what to look for in the diff, a typical severity and the minimum correction:
+The reference `security-review-checklist.md` is loaded in step 6 of every review. It is a floor, not a ceiling: a project's own security rules, including its security-invariant skill when one is named, outrank it and apply first, and the installed stack skill's security rows run on top. A full audit is a different task, owned by [`auditing-application-security`](/docs/plugins/tsh-product-engineering/skills/auditing-application-security). The baseline maps to OWASP Top 10 classes and each row names what to look for in the diff, a typical severity and the minimum correction:
 
 - broken access control, and object-level access control (IDOR)
 - mass assignment and over-posting
@@ -56,7 +56,7 @@ Missing authorization on a new entry point and object-level authorization are ca
 1. **Understand the task and the plan,** including the project's instructions for the touched area.
 2. **Compare the implementation to both.** Walk the change set against the plan's tasks, and verify that things marked `reuse` or "already implemented" exist and behave as claimed.
 3. **Judge test coverage** per layer.
-4. **Run tests, linters and build** with the project's own commands, recording failures verbatim. A standalone review with no stated scope runs everything, E2E included. When the delegation assigns functional and E2E verification to a parallel verifier, those suites are excluded and the exclusion is recorded.
+4. **Run tests, linters and build** with the project's own commands, recording failures verbatim. The plan's Technical Context lists them; the project's verification skill, when `CLAUDE.md` or the skill listing names one, supplies what no plan states, and its boundaries apply either way. A standalone review with no stated scope runs everything, E2E included. When the delegation assigns functional and E2E verification to a parallel verifier, those suites are excluded and the exclusion is recorded.
 5. **Check best practices and anti-patterns,** loading the stack skill when one is available.
 6. **Security,** with the baseline checklist.
 7. **Scalability:** statefulness that blocks horizontal scaling, unbounded memory growth and needlessly high computational complexity on hot paths.

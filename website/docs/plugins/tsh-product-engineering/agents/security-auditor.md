@@ -5,7 +5,7 @@ sidebar_position: 2.5
 description: Audits an application's code and dependencies for security across a whole service or a named surface, read-only, and returns a severity-ranked findings report.
 sources:
   - plugins/tsh-product-engineering/agents/security-auditor.md
-sources_hash: "e7f69f44d021c15e25fc81789293b52daa386c1dc03b9ffdbc51ebf012ec9116"
+sources_hash: "affeedfa7f9c49d62e4c4d17e258f67154a6da2b2539db7e01a0a31b622f14bd"
 ---
 
 # Security Auditor
@@ -26,7 +26,7 @@ The delegation should name the scope (the whole service or a named surface) and 
 - **Bar:** the universal baseline, plus the installed stack skill's security rows.
 - **Depth:** exhaustive rather than sampled.
 
-A project's own security rules, such as a `SECURITY.md`, a client ruleset, a `.claude/` security skill or a stated conformance target, outrank the baseline. It applies them first and says it did.
+A project's own security rules, such as a `SECURITY.md`, a client ruleset, a project security-invariant skill (named in `CLAUDE.md`'s `tsh:project-checks` block or in the skill listing) or a stated conformance target, outrank the baseline. It applies them first and says it did.
 
 ## Responsibilities
 

@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Reviews a delivered change set against its plan and requirements by executing the checks itself, and returns a structured findings report without fixing code.
 sources:
   - plugins/tsh-product-engineering/agents/code-reviewer.md
-sources_hash: "8ac023bcc3d316753b68da6709b015fe707357924f6a77fe896d6aee7aae3719"
+sources_hash: "9c8456c981dac514d9d5c0bc3712fd795d54e7754e7f7a76f082afcf5983dbca"
 ---
 
 # Code Reviewer
@@ -24,7 +24,7 @@ The delegation should name the plan file path (or the ticket and requirements) a
 
 ## Responsibilities
 
-- Follows the `reviewing-code` skill in full: understands the task and plan, compares the implementation to both, judges test coverage, executes test suites, linters and the build with the project's own commands, then checks best practices, high-risk anti-patterns, security and scalability.
+- Follows the `reviewing-code` skill in full: understands the task and plan, compares the implementation to both, judges test coverage, executes test suites, linters and the build with the project's own commands (the plan's Technical Context, and the project's verification skill for what the plan does not state), then checks best practices, high-risk anti-patterns, security and scalability.
 - When the change targets a framework or stack whose skill is available in the session, loads it and applies its framework-specific review checklist alongside `reviewing-code`'s. It loads whichever are present and never names one that is absent.
 - Treats the plan as comparison context, never as a review target. Plan wording, structure and checkboxes are out of scope.
 - Runs every check itself. An implementation report claiming that tests pass is a claim, not evidence.

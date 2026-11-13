@@ -6,7 +6,7 @@ description: A security audit of a whole service or a named surface — maps the
 sources:
   - plugins/tsh-product-engineering/skills/auditing-application-security/
   - plugins/tsh-product-engineering/agents/security-auditor.md
-sources_hash: "9c7ac1c1dab8763e202b0748ed37c5173d33dace73ca77109d5d34d8ccd13fef"
+sources_hash: "29501615eede36d7428d5f855bd4c43f98d74a1a6f1749a38cefc6613b4e090d"
 ---
 
 # Auditing Application Security
@@ -24,7 +24,7 @@ Use it for a security audit, a security posture review, an OWASP Top 10 or ASVS 
 | Layer | Role |
 | :-- | :-- |
 | **Universal baseline** | The floor. The class catalog is `reviewing-code`'s security-review checklist, applied here across a whole surface instead of a single change |
-| **Project rules** | A client ruleset, a `SECURITY.md`, a `.claude/` security skill or a stated conformance target outranks the skill and is applied first |
+| **Project rules** | A client ruleset, a `SECURITY.md`, a project security-invariant skill (named in `CLAUDE.md`'s `tsh:project-checks` block or in the skill listing), or a stated conformance target outranks the skill and is applied first |
 | **Named standard** | On request, OWASP Top 10 in full, ASVS L1/L2 or pen-test preparation extends the baseline, and the report says which. With nothing named, the baseline is the bar |
 | **Stack depth** | Where a stack skill is available in the session, its security rows apply on top |
 

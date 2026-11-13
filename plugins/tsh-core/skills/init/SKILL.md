@@ -1,6 +1,6 @@
 ---
 name: init
-description: "One-shot setup of a project's Claude Code context. Audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules, and the decision-record archive with its index by running the owning tsh-core skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Run /tsh-core:init inside the repository to set up."
+description: "One-shot setup of a project's Claude Code context. Audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules, and the decision-record archive with its index by running the owning tsh-core skills in order, wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current, and, where tsh-product-engineering is installed, has the project's verification and security-invariant skills captured. Run /tsh-core:init inside the repository to set up."
 disable-model-invocation: true
 ---
 
@@ -23,7 +23,8 @@ quietly stops paying off.
 > [`managing-claude-context`](../managing-claude-context/SKILL.md) for the memory
 > layer, [`managing-decision-records`](../managing-decision-records/SKILL.md) for
 > record format and lifecycle. This skill loads their rules; it never restates
-> them.
+> them. Step 4 hands off to a skill of another plugin when it is installed, and
+> that skill's rules, not this one's, govern what it runs and writes.
 
 ## When to Use
 
@@ -67,6 +68,7 @@ This skill does not:
 | MUST | Leave the repository with a decision index — `docs/decisions/README.md`, or the existing archive location — even when no decision has been recorded yet. An empty indexed archive is the correct starting state. (Init's own rule, not the owner's: `managing-claude-context` wires an index only where records exist or are wanted; a bootstrap counts as wanting one.) |
 | NEVER | Invent a decision record to fill an empty archive. Propose candidates in the report; a human confirms and `managing-decision-records` governs the writing. |
 | MUST | Wire the maintenance section into root `CLAUDE.md` exactly per `./references/wiring-tsh-core-skills.md` — conditional phrasing, every path in backticks, never a leading `@`. |
+| MUST | In Step 4, invoke the capturing skill when it is installed and never do its work by hand; when it is absent, say so in the report. |
 | MUST | End with a report of what was created, what was repaired and what was left alone, and flag the result as a proposal for human review. |
 
 ## Reference Loading
@@ -100,9 +102,21 @@ writing them.
 the section to root `CLAUDE.md` — or repair the existing variant in place. It
 counts against the 200-line budget like every other line.
 
-**Step 4 — Verify and report.** Run `/context` and confirm everything written or
+**Step 4 — Capture the project's checks.** With `tsh-product-engineering`
+installed, invoke `/tsh-product-engineering:capturing-project-checks`: it writes the
+project's own verification and security-invariant skills into `.claude/skills/` and
+its own fenced block into root `CLAUDE.md`, under its rules, not this skill's. Without
+it, say so in the report and name that command; never write those skills by hand
+here. That skill runs the project's check commands to prove them, within its own
+safety rules; init itself still runs none. A repository with no CI yet gets a thin
+result, and the block that skill writes says when to re-run it. On a re-run it
+converges like the rest of init: unchanged commands are not run again and nothing
+already answered is asked again.
+
+**Step 5 — Verify and report.** Run `/context` and confirm everything written or
 repaired loads, or is scoped to load on read. Report three lists — created,
-repaired, left alone — plus any decision candidates from Step 2, and close by
+repaired, left alone — plus any decision candidates from Step 2 and Step 4's own
+report (or the line saying the capturing skill is not installed), and close by
 flagging the setup as a proposal for the team to review, not a finished artifact.
 
 ## Self-check Before Handoff
@@ -114,6 +128,7 @@ flagging the setup as a proposal for the team to review, not a finished artifact
 - [ ] A decision index exists, at the default or the repository's own location
 - [ ] No decision record was invented; candidates are listed for a human
 - [ ] The maintenance section is in root CLAUDE.md — conditional, backticked, no bare @
+- [ ] The project's checks were captured, or the report says the capturing skill was absent
 - [ ] /context confirms the result loads
 - [ ] The report lists created / repaired / left alone and calls the result a proposal
 ```

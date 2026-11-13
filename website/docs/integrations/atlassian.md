@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/references/working-with-jira.md
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-engineering/README.md
-sources_hash: "f6c8773db945fe9c2f4b0961a88d26897f764078cb44a5313a56768a01ebc6a8"
+sources_hash: "2acef0bfcaa5bbc9cca5dc52846f76eb74dc12e71dee4f1f3a1eaddc7b953064"
 ---
 
 # Atlassian
