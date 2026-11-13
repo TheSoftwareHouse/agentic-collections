@@ -21,7 +21,11 @@ to run both checks, read their output, and lift a quarantine: `evals/README.md`.
   file reference in the sense of hard rule 7: nothing inside a plugin points at another
   plugin, and `evals/` is repository tooling like `templates/`, never installed.
 - **Behavioural suites: `plugins/<plugin>/evals/<case>/case.yaml`.** They load their own
-  plugin only and test what the skill makes Claude do after it fires. None exist yet.
+  plugin only and test what the skill makes Claude do after it fires: each builds a
+  scratch repository with a `context.scaffold_script` beside its `case.yaml`, lets Claude
+  write files and run commands in it, and asserts the result with deterministic graders.
+  Tag them `behaviour`. They run locally only, through `scripts/run-behaviour-evals.sh`;
+  see "Security" below and `evals/README.md`.
 
 ## Case shape
 

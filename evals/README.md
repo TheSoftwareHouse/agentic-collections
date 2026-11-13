@@ -383,6 +383,63 @@ blocker-level finding. Measured 6 of 6 on 2026-10-28, `tsh-product-engineering` 
 about USD 0.08 per run. A run that fires the review but does not report the IDOR is a
 regression in the Step 6 baseline or the checklist reference.
 
+## Behavioural suites: what a skill does after it fires
+
+A routing case proves the right skill loads. A behavioural case proves what it then
+does, on a scratch repository built for the case. They live beside the plugin they
+test, in `plugins/<plugin>/evals/<case>/`, as a `case.yaml` and the `fixture.sh` its
+`context.scaffold_script` names, and are tagged `behaviour`.
+
+| Case | Asserts |
+| :-- | :-- |
+| `tsh-product-engineering/plan-written-not-implemented` | The plan lands at `specifications/ORD-17/*.plan.md` and names a command the project has — a `package.json` script or the command it runs — and none from another toolchain or a script it lacks. No new file appears in `src/`, `test/` or the root, and every scaffolded file is byte-identical |
+| `tsh-product-engineering/audit-finds-idor-read-only` | The audit (the skill, or the agent that runs it) ties the flaw to `src/routes/invoices.js` within one passage. No file is created, every scaffolded file is byte-identical, and no package is installed or fixed |
+| `tsh-product-management/knowledge-write-no-fallback-when-flow-fails` | The knowledge base is located and the write flow tried; its remote does not exist, so the flow cannot start on any machine. The skill must stop rather than write in the person's clone: no step that needs a yes, no worktree, no new file, and none of the clone's Markdown files gains the requirement |
+
+**Assert the end state, not the commands.** A pattern over a tool call misses a write
+made through another channel — a heredoc, `python3 -c`, `npm audit fix`. So each case
+pins every file its fixture created with a whole-file `regex` over `{ source: file,
+path }`, forbids new files with `file_exists … exists: false`, and checks commands only
+where the end state cannot show the harm, such as an install. The pins are generated
+from a real run of the fixture, and every pattern was tested against a clean input
+and several violating ones — including commands with quoted paths, which is how the
+plugins write them — before it was relied on. One known blind spot: the install check
+would also match a `grep` for the string "npm install".
+
+**They run locally, never in the pull-request workflow.** They need `--scaffold` and
+`--allow-tools Bash Write Edit`, and a pull request supplies its own case files
+(`.claude/rules/plugin-evals.md`, "Security"). The CI eval step runs `--tag routing`
+from the root `evals/` only, so it never picks them up. Run them with:
+
+```shell
+scripts/run-behaviour-evals.sh                         # every plugin with a suite, 1 run each
+RUNS=3 MAX_COST_USD=10 scripts/run-behaviour-evals.sh  # measure stability
+scripts/run-behaviour-evals.sh tsh-product-management  # one plugin
+```
+
+`MAX_COST_USD` caps each plugin's run, not the total.
+
+What the harness does, measured with Claude Code 2.1.287 on macOS:
+
+- Each run gets its own temporary `HOME`, with the working directory inside it. That is
+  what isolates a case from this machine's real state. A variable exported in the
+  operator's shell does **not** reach the session; a case may set only `EVAL_*`.
+- The Write tool cannot write outside the run directory: a probe was refused.
+- Paths in `file_exists` and in a `{ source: file, path }` target are relative to the
+  run's working directory. `file_exists` sees only files created during the run, which
+  includes files a command created, such as git's `.git/FETCH_HEAD` — so scope a
+  "nothing created" glob to the content you mean.
+- No grader runs a command after the session.
+- On macOS, git commands that only read work inside the run sandbox, but a fetch from a
+  local remote fails: the transport helpers it spawns go through the `xcrun` shim, which
+  the sandbox blocks, even with `remote.<name>.uploadpack` set to an absolute path. So a
+  case cannot reach the knowledge-base write flow's proposal on macOS. The case that
+  would assert "the proposal is reached, then the skill waits for a yes" needs a Linux
+  machine to be measured, and is not in this suite yet.
+
+Measured on `claude-sonnet-5-5`, 3 runs each, on 2026-11-12: all three 3 of 3, USD 0.12
+to 0.23 per run.
+
 ## Known failures
 
 A case that exposes a real routing bug, whose fix belongs in a plugin change, is

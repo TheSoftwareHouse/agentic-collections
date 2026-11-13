@@ -12,6 +12,13 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.11.1] - 2026-11-12
+
+### Added
+
+- **Behavioural eval cases** in `evals/`: `plan-written-not-implemented` checks that a plan lands under `specifications/<task-id>/`, names only commands the project has, and leaves every other file as it was; `audit-finds-idor-read-only` checks that a security audit finds a planted IDOR and stays read-only. They are repository tooling, run
+  locally with `scripts/run-behaviour-evals.sh`; nothing an installer uses changes.
+
 ## [0.11.0] - 2026-11-09
 
 ### Added
