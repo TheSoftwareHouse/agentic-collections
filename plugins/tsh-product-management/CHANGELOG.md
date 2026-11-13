@@ -12,6 +12,38 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.6.0] - 2026-11-13
+
+### Changed
+
+- **The Jira write guard understands Atlassian's v2 tool surface.** The Atlassian
+  server bundled in `tsh-core` 0.12.0 no longer has one tool per operation: most calls
+  go through `discover` and the `executeRead` / `executeWrite` / `executeDestructive`
+  runners, which name the real operation in an argument. The guard used to look only at
+  the tool name, so every runner call looked unrecognisable. It now reads the operation
+  name. Update this plugin together with `tsh-core` 0.12.0: on the old guard, v2
+  reads are held for confirmation. Outside a business-analysis session the guard still
+  stands down, as before.
+- **Reads are never held.** `discover` and read operations through `executeRead` run
+  without a prompt. A write-verb operation sent through `executeRead` is not trusted
+  as a read and is still gated.
+- **Jira writes through `executeWrite` and `executeDestructive` are denied** before
+  Gate 2 is approved, outside the approved project, and on a protected issue — the
+  same as a primary `createJiraIssue`.
+- **Confluence and Bitbucket operations go to the normal permission prompt**, as
+  Confluence tools already did; neither policy is about them.
+- **A runner call without a usable operation name is held for confirmation** rather
+  than waved through, so a call the guard cannot read is not a way past it.
+
+### Fixed
+
+- **A Jira issue link could touch a protected issue or an unapproved project without
+  being stopped.** The guard did not read a link's `inwardIssue` and `outwardIssue`
+  fields, so once Gate 2 was approved, a link between a protected issue and another
+  one, or into a project the Gate 2 row does not name, went through unchecked. Both
+  fields are now checked like any other issue key. This applies to the v1
+  `createIssueLink` tool as well, so it matters even before you move to v2.
+
 ## [0.5.2] - 2026-11-12
 
 ### Added

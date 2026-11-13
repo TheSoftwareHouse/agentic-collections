@@ -94,8 +94,11 @@ function classify(bareName) {
   return "unknown";
 }
 
+const PRODUCT_PREFIX_PATTERN = /^(jira|confluence)_/i;
+
 /**
- * The bare tool name is everything after the LAST `__`.
+ * The tool name as the server sent it: everything after the LAST `__`, the whole
+ * name when there is none.
  *
  * A plugin-provided server is named `mcp__plugin_<plugin>_<server>__<tool>`, and
  * that is the default case here because tsh-core bundles Atlassian. Stripping
@@ -103,16 +106,137 @@ function classify(bareName) {
  * name — harmless today only because no server key happens to contain a listed
  * verb, and silently wrong the moment one does.
  */
-function bareToolName(toolName) {
+function rawToolName(toolName) {
   const lastSeparator = toolName.lastIndexOf("__");
-  const bare = lastSeparator === -1 ? toolName : toolName.slice(lastSeparator + 2);
+  return lastSeparator === -1 ? toolName : toolName.slice(lastSeparator + 2);
+}
+
+/** The raw tool name without a community server's product prefix; feeds `classify` only. */
+function bareToolName(toolName) {
   // Community servers name every tool `jira_<verb>_…` / `confluence_<verb>_…`;
   // strip that product prefix so the verb classification below still applies
   // and reads are not held at the gate.
-  return bare.replace(/^(jira|confluence)_/i, "");
+  return rawToolName(toolName).replace(PRODUCT_PREFIX_PATTERN, "");
 }
 
-const KEY_FIELD_PATTERN = /(^|_)(issueIdOrKey|issueKey|issueid|key|issues|issueKeys)($|_)/i;
+/**
+ * Atlassian's v2 server exposes a few primary tools (`getJiraIssue`,
+ * `editJiraIssue`, …) plus `discover` and three runners — `executeRead`,
+ * `executeWrite`, `executeDestructive` — each called with
+ * `{ name, cloudId, inputs }`. The runner's own name says nothing about what it
+ * does: the operation is `tool_input.name` and its fields sit in
+ * `tool_input.inputs`. So a runner call is classified by its tier and its
+ * operation name, not by the tool name. `discover` and the runners are matched
+ * on the tool name exactly as sent (case aside), never with a `jira_` /
+ * `confluence_` prefix stripped: `jira_discover` and `jira_executeRead` are not
+ * v2's tools and fall to the verb classification like any other name.
+ *
+ *   - `discover` is a catalogue lookup that runs nothing: never gated.
+ *   - `executeRead` with a read operation is never gated. A write-verb name sent
+ *     through it is not trusted as a read; it is handled like `executeWrite`.
+ *   - `executeWrite` / `executeDestructive` are classified by the operation
+ *     name, Jira first: a name carrying `jira` is a write whatever its verb,
+ *     because the tier already says it writes. A name carrying `confluence` or
+ *     `bitbucket` is exempt, like a Confluence tool: neither policy is about
+ *     them. Anything else (Compass, Jira Service Management, a name nobody
+ *     recognises) is `unknown`, so it is held with `ask`.
+ *   - A missing, empty or non-string name is `unknown` on every runner,
+ *     `executeRead` included. It is never an early allow: a name the guard cannot
+ *     read must not be the way past it.
+ *
+ * Products match the trimmed name AS SENT, never the name with its `jira_` /
+ * `confluence_` prefix stripped (`verbName`, which only feeds `classify`).
+ * Stripping first would erase the very word that says an operation is Jira's:
+ * `jira_edit_bitbucket_issue` would read as a Bitbucket operation and be
+ * exempted. Jira wins whenever its name appears, in any case.
+ *
+ * The target visitors stop at a fixed depth from the object they are handed.
+ * Handing them the whole `tool_input` would put the operation's fields one level
+ * deeper than on a primary call, so a nested reference a primary call catches
+ * would slip past. A runner call therefore runs them on `inputs` — the same
+ * depth as a primary call — and also on the whole `tool_input`, which still
+ * catches a key the model put beside `inputs`; the results are unioned.
+ */
+const RUNNER_TOOLS = new Set(["executeread", "executewrite", "executedestructive"]);
+const BITBUCKET_OPERATION_PATTERN = /bitbucket/i;
+const ALLOWED = Object.freeze({ kind: "allow" });
+
+function isPlainObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/**
+ * The operation a runner call names, normalised once: `op` is the trimmed name
+ * as sent ("" when absent or not a string), `verbName` is `op` without its
+ * product prefix, and `label` is what an `ask` reason shows.
+ */
+function normaliseOperation(runner, toolInput) {
+  const name = isPlainObject(toolInput) ? toolInput.name : undefined;
+  const op = typeof name === "string" ? name.trim() : "";
+  return {
+    op,
+    verbName: op.replace(PRODUCT_PREFIX_PATTERN, ""),
+    label: `${runner} → ${op || "(no operation name)"}`,
+  };
+}
+
+/** The objects the target visitors run on for a runner call. */
+function runnerPolicyInputs(toolInput) {
+  return isPlainObject(toolInput) && isPlainObject(toolInput.inputs)
+    ? [toolInput.inputs, toolInput]
+    : [toolInput];
+}
+
+/** @returns {{kind: "allow"} | {kind: "write"|"unknown", label: string, policyInputs: object[]}} */
+function resolveRunnerCall(runner, toolInput) {
+  const { op, verbName, label } = normaliseOperation(runner, toolInput);
+  const policyInputs = runnerPolicyInputs(toolInput);
+  const gated = (kind) => ({ kind, label, policyInputs });
+
+  // A name the guard cannot read is never an early allow, whichever runner.
+  if (op === "") return gated("unknown");
+  // A valid read through the read runner. A write verb falls through to the
+  // product rules below, exactly as `executeWrite` would.
+  if (runner.toLowerCase() === "executeread" && classify(verbName) !== "write") return ALLOWED;
+  if (JIRA_TOOL_PATTERN.test(op)) return gated("write");
+  if (CONFLUENCE_TOOL_PATTERN.test(op) || BITBUCKET_OPERATION_PATTERN.test(op)) return ALLOWED;
+  return gated("unknown");
+}
+
+/**
+ * Decides what a call is before any filesystem work, so that fetching issues and
+ * searching boards stays fast and never prompts.
+ * @returns {{kind: "allow"} | {kind: "write"|"unknown", label: string, policyInputs: object[]}}
+ */
+function resolveCall(toolName, toolInput) {
+  // `discover` and the runners are matched on the name as sent, not on the name
+  // `bareToolName` strips: `jira_discover` or `jira_executeRead` is some other
+  // server's tool, and treating it as v2's would silently allow it.
+  const raw = rawToolName(toolName);
+  const tool = raw.toLowerCase();
+
+  if (tool === "discover") return ALLOWED;
+  if (RUNNER_TOOLS.has(tool)) return resolveRunnerCall(raw, toolInput);
+
+  const bare = bareToolName(toolName);
+
+  // A Confluence tool. Neither policy applies to Confluence; let the normal
+  // permission rules decide. A name carrying both products is still gated.
+  if (CONFLUENCE_TOOL_PATTERN.test(toolName) && !JIRA_TOOL_PATTERN.test(toolName)) return ALLOWED;
+
+  // Read-only Atlassian call.
+  const kind = classify(bare);
+  if (kind === "read") return ALLOWED;
+  return { kind, label: bare, policyInputs: [toolInput] };
+}
+
+/** Union of what `visitor` finds in each of the call's policy inputs. */
+function unionOf(policyInputs, visitor) {
+  return [...new Set(policyInputs.flatMap((input) => visitor(input)))];
+}
+
+const KEY_FIELD_PATTERN =
+  /(^|_)(issueIdOrKey|issueKey|issueid|key|issues|issueKeys|inwardIssue|outwardIssue)($|_)/i;
 const PROJECT_FIELD_PATTERN = /(^|_)(projectKey|projectKeyOrId|projectIdOrKey|project)($|_)/i;
 const ISSUE_KEY_PATTERN = /\b([A-Z][A-Z0-9_]{1,19}-\d+)\b/g;
 const PROJECT_KEY_VALUE_PATTERN = /^[A-Z][A-Z0-9_]{1,19}$/;
@@ -369,14 +493,14 @@ function main() {
   // 1. Not an Atlassian/Jira tool at all.
   if (!ATLASSIAN_TOOL_PATTERN.test(toolName)) allow();
 
-  // 1b. A Confluence tool. Neither policy applies to Confluence; let the normal
-  //     permission rules decide. A name carrying both products is still gated.
-  if (CONFLUENCE_TOOL_PATTERN.test(toolName) && !JIRA_TOOL_PATTERN.test(toolName)) allow();
-
-  // 2. Read-only Atlassian call. Checked before any filesystem work so that
-  //    fetching issues and searching boards stays fast and never prompts.
-  const kind = classify(bareToolName(toolName));
-  if (kind === "read") allow();
+  // 2. What the call is. `discover`, a read and a Confluence/Bitbucket operation
+  //    are allowed here, before any filesystem work, so that fetching issues and
+  //    searching boards stays fast and never prompts. What is left is a write or
+  //    an unknown, with the label and the objects its policy targets come from.
+  const toolInput = payload.tool_input || payload.toolInput || {};
+  const call = resolveCall(toolName, toolInput);
+  if (call.kind === "allow") allow();
+  const { kind, label, policyInputs } = call;
 
   const cwd = payload.cwd || process.cwd();
   if (!existsSync(cwd) || !statSync(cwd).isDirectory()) {
@@ -391,8 +515,6 @@ function main() {
   const artifacts = scanForArtifacts(cwd, BA_ARTIFACTS);
   if (BA_ARTIFACTS.every((name) => artifacts.get(name).length === 0)) allow();
 
-  const toolInput = payload.tool_input || payload.toolInput || {};
-
   // A recognized write that fails a policy is denied. An unrecognized tool is
   // held for the user with `ask` instead: the guard is reporting that it could
   // not classify the call, which is a question, not a policy violation. Either
@@ -401,13 +523,16 @@ function main() {
   const unclassified =
     kind === "write"
       ? ""
-      : `BA guard could not classify "${bareToolName(toolName)}" as a read or a write, ` +
+      : `BA guard could not classify "${label}" as a read or a write, ` +
         "so it is being treated as a potential write. ";
 
   // Policy 2 first: a protected issue is never writable, gate or no gate.
   // Only live jira-tasks.md files count — an archived copy marking a key 🔒
   // must not block an issue whose status was legitimately reopened since.
-  const blocked = protectedKeys(artifacts.get("jira-tasks.md"), targetIssueKeys(toolInput));
+  const blocked = protectedKeys(
+    artifacts.get("jira-tasks.md"),
+    unionOf(policyInputs, targetIssueKeys)
+  );
   if (blocked.length > 0) {
     decide(
       verdict,
@@ -444,7 +569,7 @@ function main() {
     );
   }
 
-  const projects = targetProjectKeys(toolInput);
+  const projects = unionOf(policyInputs, targetProjectKeys);
   const uncovered = projects.filter((key) => !approvedForProject(approvedRows, key));
   if (uncovered.length > 0) {
     decide(

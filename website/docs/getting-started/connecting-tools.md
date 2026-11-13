@@ -9,7 +9,7 @@ sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-management/README.md
-sources_hash: "c332c93d9a61ece7207c6f849ee04315685e8da0bfc30d9de5a8a46a120cc80a"
+sources_hash: "8983836bee8aecae2912772ec2cb70f45d44c4ae12150d7befc1568ec5bc5348"
 ---
 
 # Connecting tools
@@ -19,7 +19,7 @@ once per machine; the third needs nothing.
 
 | Server | Gives Claude | Sign-in |
 | :-- | :-- | :-- |
-| [Atlassian](/docs/integrations/atlassian) | Jira work items and Confluence pages, read and updated directly | Browser login via `/mcp` |
+| [Atlassian](/docs/integrations/atlassian) | Jira work items, Confluence pages and Bitbucket Cloud, read and updated directly | Browser login via `/mcp` |
 | [Figma](/docs/integrations/figma) | Designs: layout, variables, components and a rendered export | Browser login via `/mcp` |
 | [Context7](/docs/integrations/context7) | Current, version-specific library documentation | None |
 
@@ -50,12 +50,14 @@ Nothing else breaks. The server simply shows as needing authentication.
 
 ## What is deliberately left out
 
-Two connections are not bundled, because each would fail for most people. Both are
+One connection is not bundled, because it would fail for most people. It is
 documented, with an opt-in command, in the
 [`tsh-core` README](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md).
 
-- **Bitbucket.** The Atlassian server exposes Bitbucket Cloud only under API-token authentication, never OAuth. That needs an Atlassian org admin to enable it first, the Bitbucket workspace linked to the organisation, and a scoped token per person. See [The Atlassian connector](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md#the-atlassian-connector).
 - **Figma's desktop server.** It is a separate local endpoint, served by the desktop app with Dev Mode enabled. It shows as a failed connection for anyone not running the desktop app, and it needs a Dev or Full seat on a paid plan, where the remote server needs neither. See [The Figma connector](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md#the-figma-connector).
+
+Bitbucket Cloud needs nothing extra: it comes with the Atlassian sign-in when the
+Bitbucket workspace is linked to your Atlassian organization.
 
 ## Other servers and tools
 

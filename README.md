@@ -170,12 +170,12 @@ simply shows as needing authentication; nothing else breaks, though the UI
 verification gate in `tsh-product-engineering` will report `VERIFICATION NOT RUN`
 rather than judging a design it cannot read.
 
-Two things deliberately left out, both documented in
+One thing deliberately left out, documented in
 [`plugins/tsh-core/README.md`](plugins/tsh-core/README.md) with an opt-in command:
-**Bitbucket**, because the Atlassian server covers it only under API-token
-authentication that needs an org admin to enable first, and **Figma's desktop
-server**, because it is a separate local endpoint that fails for anyone not running
-the desktop app and needs a Dev or Full seat on a paid plan.
+**Figma's desktop server**, because it is a separate local endpoint that fails for
+anyone not running the desktop app and needs a Dev or Full seat on a paid plan.
+Bitbucket Cloud needs nothing extra: it comes with the same Atlassian sign-in when
+the workspace is linked to your Atlassian organisation.
 
 ## Using what you installed
 

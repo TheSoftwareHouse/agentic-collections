@@ -87,13 +87,15 @@ what routes the model to the right file; keep it filled in when adding reference
 
 **This plugin bundles three MCP servers** (`.mcp.json`). The first is Atlassian's official
 [Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/),
-so Claude reads and updates Jira work items and Confluence pages directly instead of
-waiting for someone to paste a ticket into the conversation. It sits here rather than
-in a discipline plugin because Jira is not one job's tool — engineering, product
-management and testing all read from it, and none of that changes with the language a
-repo is written in.
+so Claude reads and updates Jira work items, Confluence pages and Bitbucket Cloud
+directly instead of waiting for someone to paste a ticket into the conversation. It
+sits here rather than in a discipline plugin because Jira is not one job's tool —
+engineering, product management and testing all read from it, and none of that changes
+with the language a repo is written in.
 
-**One step per machine.** Run `/mcp`, pick `atlassian`, finish the browser login. The
+**One step per machine.** Run `/mcp`, pick `atlassian`, finish the browser login. If you
+signed in before 0.12.0, do it once more: the server moved to Atlassian's v2 endpoint
+there, which is a new OAuth resource, so the old sign-in does not carry over. The
 server is remote and OAuth-authenticated, so every call runs as you — it grants
 nothing you could not already open in Jira yourself. Atlassian Cloud only. It appears
 in `/mcp` as plugin-provided; disable it per project from the same panel. The cost is
@@ -101,20 +103,12 @@ not routing budget: an MCP server adds nothing to the skill listing, and Claude 
 defers tool schemas until a tool is used, so a session that never touches Jira pays
 only for the tool names.
 
-**Bitbucket is possible, but not bundled.** The same server does expose Bitbucket
-Cloud (and Jira Service Management) — but only under API-token authentication, never
-OAuth. That path needs an Atlassian org admin to enable API-token auth under **Admin
-Hub → Rovo → Rovo MCP server**, the Bitbucket workspace linked to the organisation,
-and a scoped token per person, so bundling it would ship a server that fails for most
-installs. If you want it, add your own alongside:
-
-```shell
-claude mcp add --transport http atlassian-bitbucket https://mcp.atlassian.com/v1/mcp \
-  --header "Authorization: Basic $(printf '%s' 'you@tsh.io:YOUR_SCOPED_TOKEN' | base64)"
-```
-
-That one covers Jira as well, so disable the bundled `atlassian` entry in `/mcp` if
-you go this route — otherwise both sets of tools sit in the session.
+**Bitbucket Cloud needs nothing extra.** It comes through the same OAuth sign-in
+when the Bitbucket workspace is linked to your Atlassian organisation. Jira Service
+Management is the one surface still limited to API-token authentication, which an
+Atlassian org admin enables under **Admin Hub → Rovo → Rovo MCP server**. It is not
+bundled: a static token header disables the OAuth sign-in for everyone who installs
+the plugin, so a JSM server entry belongs in your own project or user config.
 
 ### The Figma connector
 

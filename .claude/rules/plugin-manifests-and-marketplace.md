@@ -111,18 +111,20 @@ A remote server the teammate authenticates once through `/mcp` is fine — that 
 Atlassian case and the Figma case, and the credential never touches the repo. A server
 needing a token in `headers` is not: a static `headers.Authorization` also disables
 Claude Code's OAuth fallback, so it fails outright for anyone who hasn't set the value.
-Leave those to the consuming project. Atlassian's Bitbucket surface is the worked
-example: the same endpoint exposes it only under API-token authentication, so bundling
-it would ship a server that fails for most installs, and `plugins/tsh-core/README.md`
-carries an opt-in `claude mcp add` command instead.
+Leave those to the consuming project. Atlassian's Jira Service Management surface is
+the worked example: the same endpoint exposes it only under API-token authentication,
+so bundling it would ship a server that fails for most installs. It stays a
+consuming-project or personal entry.
 
 **Check the server's current auth before applying that test to it.** Figma was this
 rule's don't-bundle example until 0.10.0, on the strength of a `FIGMA_API_KEY` in
 `headers` — and by then Figma's official remote server had replaced that with plain
 OAuth at `https://mcp.figma.com/mcp`, which made it an instance of the bundle-this
-case rather than the counter-example. The rule did not change; the server did. A
-vendor moving from tokens to OAuth is normal, so re-read the vendor's setup docs
-rather than inheriting a verdict from this file.
+case rather than the counter-example. Bitbucket Cloud is the second instance: it was
+the don't-bundle example until Atlassian shipped OAuth for it with the v2 server in
+2026, which turned it into a bundle-this case, the same thing Figma did. The rule did
+not change; the server did. A vendor moving from tokens to OAuth is normal, so re-read
+the vendor's setup docs rather than inheriting a verdict from this file.
 
 An `.mcp.json` change is a `plugins/` change, so hard rule 3 applies in full: version
 bump and `CHANGELOG.md` entry in the same commit.

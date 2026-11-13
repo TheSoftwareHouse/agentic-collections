@@ -19,7 +19,7 @@ sources:
   - plugins/tsh-product-management/agents/
   - plugins/tsh-product-management/hooks/hooks.json
   - plugins/tsh-product-management/hooks/guard-jira-write.mjs
-sources_hash: "0c3b724d6a1f3c0de192bb754ae9ff83ae76e9c119e831977ed736c375dc8270"
+sources_hash: "fdda5af4aee10a3a5df1163dd8ded787a45f2d644a46d227212a281cc4333d43"
 ---
 
 # Business analysis
@@ -104,7 +104,7 @@ Every approval is written to `.gates.md` **before** the action it unlocks; the l
 
 ### The hook behind Gate 2
 
-The plugin ships a `PreToolUse` hook that runs on Atlassian MCP tools. It denies a recognised Jira write while no live ledger has an approved Gate 2 row, or when the write targets a project that row does not name. It also refuses to update an issue marked protected in `jira-tasks.md`. Reads are never gated, Confluence tools are left to the normal permission prompt, and a tool it cannot classify is held with `ask`. Ledgers archived under `sessions/` unlock nothing, so one workshop's approval never carries into the next. The hook is active whichever way the workflow is entered, including a direct `/tsh-product-management:formatting-jira-issues`, and stands down in a repository with no BA artifacts on disk.
+The plugin ships a `PreToolUse` hook that runs on Atlassian MCP tools. It denies a recognised Jira write while no live ledger has an approved Gate 2 row, or when the write targets a project that row does not name. It also refuses to update an issue marked protected in `jira-tasks.md`. Reads are never gated, Confluence and Bitbucket operations are left to the normal permission prompt, and a tool or operation it cannot classify is held with `ask`. Ledgers archived under `sessions/` unlock nothing, so one workshop's approval never carries into the next. The hook is active whichever way the workflow is entered, including a direct `/tsh-product-management:formatting-jira-issues`, and stands down in a repository with no BA artifacts on disk.
 
 That is why the Jira gate stays numbered `2`, and Roadmap Review is `1.75`: the hook matches the row by number.
 
