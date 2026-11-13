@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: tech-proposal-not-decision-record
+description: Drafting a proposal that is not yet a decision must route to writing-technical-documents, not to managing-decision-records, which owns the record written once the decision is made.
+tags: [routing]
+plugins: ["../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    We might move the order events from RabbitMQ to SQS, but nothing is agreed yet. Draft the proposal
+    I'll send to the architecture group for comments before Thursday. What I have: RabbitMQ needs its own
+    cluster and on-call, we are on AWS anyway, the events are at-least-once already, and the open
+    question is ordering per customer.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    arm: with-only
+  - name: managing-decision-records-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
+    min: 0
+    max: 0
+  - name: managing-claude-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0

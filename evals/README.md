@@ -183,10 +183,11 @@ exits 1 when:
   is not listed in `scripts/eval-coverage-baseline.json`
 - that baseline lists a skill that now has such a case, or that no longer exists
 
-The baseline holds the skills that predate the rule and have no case yet. It only
-shrinks: a new skill fails the check until it has a case, and a skill that gains
-one must leave the baseline in the same pull request. A quarantined case does not
-count, so a skill whose only case is quarantined stays in the baseline.
+The baseline held the skills that predated the rule and had no case. It is now
+empty: every model-invocable skill has a must-fire case. It only shrinks, so a
+new skill fails the check until it has a case. A quarantined case does not count
+as coverage, and the baseline cannot take the skill back. Before you quarantine
+a skill's only must-fire case, give the skill a second one that passes.
 
 The run prints how many model-invocable skills have a must-fire case.
 `--coverage` lists the ones that have none; `--github` emits annotations on the
@@ -458,4 +459,6 @@ control that asserts the plugin's skills stay out, and give the skill a must-fir
 case around a request it does own. `claude-hook-neither-on-settings` and
 `claude-extension-not-context` are the worked pair.
 
-**No cases are quarantined right now.**
+| Case | Observed | Fix lives in |
+| :-- | :-- | :-- |
+| `tech-writing-tighten-paragraph` | A request to shorten one pasted runbook paragraph loads `writing-technical-documents` in 2 of 6 runs; in the other four Claude rewrites the paragraph and loads no skill | `tsh-core`: the `writing-technical-documents` description, which claims "any request to shorten, tighten, clarify" prose. Either make it win short edits or stop claiming them |

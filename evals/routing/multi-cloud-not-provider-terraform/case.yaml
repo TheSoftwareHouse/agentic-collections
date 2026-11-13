@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: multi-cloud-not-provider-terraform
+description: Weighing disaster recovery in a second cloud must route to designing-multi-cloud-architecture, not to either provider's Terraform patterns or the cost framework.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-azure", "../../../plugins/tsh-stack-gcp"]
+runs: 1
+execution:
+  prompt: |
+    The client runs everything on Azure (AKS, PostgreSQL Flexible Server, Service Bus) and their board
+    now wants disaster recovery in GCP. Is that a sensible setup, which GCP services would stand in for
+    each piece, and what would we be signing up for?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-multi-cloud-architecture"'
+    arm: with-only
+  - name: implementing-azure-terraform-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-azure-terraform"'
+    min: 0
+    max: 0
+  - name: implementing-gcp-terraform-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-gcp-terraform"'
+    min: 0
+    max: 0
+  - name: optimizing-cloud-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    min: 0
+    max: 0

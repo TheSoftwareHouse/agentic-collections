@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: lambda-handler-not-nestjs
+description: Adding an endpoint to a service on the serverless stack must route to implementing-lambda-functions, not to the NestJS API skill, which claims REST endpoints in the same vocabulary.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-serverless", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Add POST /orders to the orders service: validate the body, create the order, and answer 404 and 409
+    for our NotFound and Conflict errors. It runs behind API Gateway on our serverless stack.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-lambda-functions"'
+    arm: with-only
+  - name: implementing-nestjs-api-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    min: 0
+    max: 0

@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: kubernetes-not-debugging
+description: Hardening a Deployment against OOM kills and node drains must route to deploying-to-kubernetes, not to debugging-code, although it reads like a production failure to fix, and not to observability.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Our api pods get OOMKilled under load, and every node drain takes the whole service down for a minute.
+    The Deployment runs one replica with no resources block and no probes. Fix it so it survives both.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    arm: with-only
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
+  - name: implementing-observability-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-observability"'
+    min: 0
+    max: 0

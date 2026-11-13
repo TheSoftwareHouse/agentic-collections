@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: pipeline-cloud-auth-either-owner
+description: Removing stored cloud keys from a deploy workflow is claimed by both implementing-ci-cd-pipelines and managing-secrets, which link each other, so either must load, and deploying-to-kubernetes must not, although the workflow deploys to a cluster.
+tags: [routing]
+plugins: ["../../../plugins/tsh-platform-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Our deploy workflow signs in to AWS with an access key pair saved in the repository's Actions secrets,
+    then deploys to EKS. Security wants those keys gone by the end of the month. What do we change?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  # A regex over the trace, because either skill is a right answer: both claim OIDC for
+  # pipelines and each links the other. tool_used checks one pattern only.
+  - name: pipeline-or-secrets-fired
+    type: regex
+    target: trace
+    pattern: '(?:\\?"skill\\?"\s*:\s*\\?"(?:[\w-]+:)?implementing-ci-cd-pipelines\\?")|(?:\\?"skill\\?"\s*:\s*\\?"(?:[\w-]+:)?managing-secrets\\?")'
+  - name: deploying-to-kubernetes-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    min: 0
+    max: 0
