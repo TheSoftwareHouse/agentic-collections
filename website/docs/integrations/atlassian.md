@@ -2,7 +2,7 @@
 title: Atlassian
 sidebar_label: Atlassian
 sidebar_position: 2
-description: The Atlassian Rovo MCP server bundled with tsh-core — Jira and Confluence access under your own account, who uses it, and why Bitbucket is not bundled.
+description: The Atlassian Rovo MCP server bundled with tsh-core — Jira, Confluence and Bitbucket Cloud access under your own account, who uses it, and what still needs an API token.
 sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-core/README.md
@@ -16,22 +16,22 @@ sources:
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/references/working-with-jira.md
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-engineering/README.md
-sources_hash: "f6c8773db945fe9c2f4b0961a88d26897f764078cb44a5313a56768a01ebc6a8"
+sources_hash: "e7288d8775a342ad57cebf71c108a52450924265738ea00d81c76d8ef77351ff"
 ---
 
 # Atlassian
 
 Atlassian's official
 [Rovo MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/),
-so Claude reads and updates Jira work items and Confluence pages directly instead of
-waiting for someone to paste a ticket into the conversation.
+so Claude reads and updates Jira work items, Confluence pages and Bitbucket Cloud
+directly instead of waiting for someone to paste a ticket into the conversation.
 
 | | |
 | :-- | :-- |
 | Server name | `atlassian` |
 | Bundled by | [`tsh-core`](/docs/plugins/tsh-core/) |
 | Transport | `http` |
-| URL | `https://mcp.atlassian.com/v1/mcp/authv2` |
+| URL | `https://mcp.atlassian.com/v2/mcp` |
 | Sign-in | OAuth in the browser, once per machine |
 | Scope | Atlassian Cloud only |
 
@@ -45,6 +45,10 @@ Run `/mcp`, pick `atlassian` and finish the browser login. Every call then runs 
 you, so the server grants nothing you could not already open in Jira yourself. It
 appears in `/mcp` as plugin-provided, and you can disable it per project from the same
 panel. See [Connecting tools](/docs/getting-started/connecting-tools).
+
+If you signed in before `tsh-core` 0.12.0, do it once more. The server moved to
+Atlassian's v2 endpoint in that version, which is a new OAuth resource, so the old
+sign-in does not carry over.
 
 ## What uses it
 
@@ -62,20 +66,19 @@ The worker agents of `tsh-product-management` deliberately have no Atlassian acc
 Any Jira context they need reaches them inline in the delegation. `tsh-product-management`
 also ships a `PreToolUse` hook that denies Atlassian write calls until the Gate 2
 approval is recorded, and refuses to update an issue whose status is Done, Cancelled
-or PO APPROVE. Confluence tools are never gated.
+or PO APPROVE. It leaves Confluence and Bitbucket operations to the normal permission
+prompt.
 
 Tool names vary by Atlassian server version, so the workflow discovers what is
 available before the first push, and nothing pins an `mcp__atlassian__*` name in a
 tool allowlist. Jira writes go through the normal permission prompt, with the hook
 behind it.
 
-## Bitbucket is not bundled
+## Bitbucket Cloud and Jira Service Management
 
-The same server exposes Bitbucket Cloud and Jira Service Management, but only under
-API-token authentication, never OAuth. That needs an Atlassian org admin to enable
-API-token authentication under **Admin Hub → Rovo → Rovo MCP server**, the Bitbucket
-workspace linked to the organisation, and a scoped token per person, so bundling it
-would ship a server that fails for most installs. The opt-in command is in
-[the `tsh-core` README](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md#the-atlassian-connector).
-That variant covers Jira as well, so disable the bundled `atlassian` entry in `/mcp`
-if you add it, or both sets of tools sit in the session.
+Bitbucket Cloud needs nothing extra. It comes through the same OAuth sign-in when the
+Bitbucket workspace is linked to your Atlassian organization. Jira Service Management
+is the one surface still limited to API-token authentication, which an Atlassian org
+admin enables under **Admin Hub → Rovo → Rovo MCP server**. It is not bundled: a static
+token header disables the OAuth sign-in for everyone who installs the plugin, so a
+Jira Service Management server entry belongs in your own project or user config.

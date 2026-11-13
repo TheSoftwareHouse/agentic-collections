@@ -7,7 +7,7 @@ sources:
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/
   - plugins/tsh-product-management/skills/analyze-materials/SKILL.md
   - plugins/tsh-product-management/skills/explore-materials/SKILL.md
-sources_hash: "f8f83ff2b729178b088a288091ea0c65fe72076bd1ed72f5a13ae9c65471cdc2"
+sources_hash: "12402c507b43e01a0da6e1f98734fb42ce8abf585a91b8275ab211d29da20635"
 ---
 
 # Orchestrating Business Analysis
