@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: tech-writing-tighten-paragraph
+description: A request to shorten one pasted runbook paragraph must load writing-technical-documents, whose description claims any request to tighten or shorten prose.
+# Quarantined 2026-11-13: measured 2 of 6. In the other four runs Claude rewrote the
+# paragraph directly and loaded no skill. The description claims "any request to shorten,
+# tighten, clarify" prose, so either it over-claims short edits or it fails to win them.
+# Restore the routing tag once the tsh-core description is fixed and this measures 6 of 6.
+tags: [known-failure]
+plugins: ["../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    This is a section of our on-call runbook. People skim past it during incidents. Make it shorter and clearer:
+
+    "In the event that the payments queue should become backed up, which may happen from time
+    to time for a variety of reasons, it is generally recommended that the on-call engineer
+    first take some time to consider checking the consumer dashboard, and then, if it seems
+    appropriate, possibly restart the consumer pods, although scaling them might also be an
+    option worth thinking about depending on the situation."
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    arm: with-only
+  - name: managing-decision-records-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
+    min: 0
+    max: 0

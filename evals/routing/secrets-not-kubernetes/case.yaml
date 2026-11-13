@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: secrets-not-kubernetes
+description: Moving database passwords out of a ConfigMap into a proper store with rotation must route to managing-secrets, not to Kubernetes workload configuration, although the request is about pods and redeploys.
+tags: [routing]
+plugins: ["../../../plugins/tsh-platform-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Our database passwords sit in a plain ConfigMap on EKS and in a .env file committed to the repo.
+    Where should they live instead, how do the pods get them, and how do we rotate them without a redeploy?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-secrets"'
+    arm: with-only
+  - name: deploying-to-kubernetes-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    min: 0
+    max: 0
+  - name: implementing-ci-cd-pipelines-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ci-cd-pipelines"'
+    min: 0
+    max: 0

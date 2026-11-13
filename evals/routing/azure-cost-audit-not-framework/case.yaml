@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: azure-cost-audit-not-framework
+description: A cost review of a live Azure subscription must route to auditing-azure-cost, not to the cloud-agnostic framework or Azure Terraform.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-azure"]
+runs: 1
+execution:
+  prompt: |
+    Our Azure bill for the production subscription jumped 40% in two months.
+    Go through it: what is eating the money, what is idle or left over, and what has no owner tag.
+    I need something I can put in front of the client.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-azure-cost"'
+    arm: with-only
+  - name: optimizing-cloud-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    min: 0
+    max: 0
+  - name: implementing-azure-terraform-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-azure-terraform"'
+    min: 0
+    max: 0

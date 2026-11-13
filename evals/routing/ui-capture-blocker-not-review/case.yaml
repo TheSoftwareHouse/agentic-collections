@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: ui-capture-blocker-not-review
+description: A capture that keeps landing on the sign-in form is a question about the capture procedure, so it must load capturing-ui-evidence, not the reviewing-ui compare pass or debugging-code.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Every time we collect the screenshots for the /account page, the browser ends up on the sign-in
+    form, so the evidence is of the wrong page. The app itself is fine, and there is a seeded demo user
+    in the dev database. How is the capture step supposed to get past the login?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-ui-evidence"'
+    arm: with-only
+  - name: reviewing-ui-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-ui"'
+    min: 0
+    max: 0
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
