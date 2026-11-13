@@ -11,7 +11,7 @@ sources:
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "8b808ce343aa8b528e34952201d6b18d924ba0ba67b6a26a358a911f3a6436f8"
+sources_hash: "3a2dccea05b0d7f2cde50006f924f69bd77172ed9897a2600184c0b25b9713a6"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';
@@ -46,7 +46,7 @@ Install what the project is built on, at **Project** scope. The repo already kno
 
 <PluginList family="stack" />
 
-A stack here is a **runtime target** or a **cloud provider**, not a language. A repository has exactly one cloud provider but may have more than one runtime target. The frontend, Node and serverless plugins all carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle need different compiler configuration. Every stack gets its own plugin, named `tsh-stack-<stack-name>`, once it has real content to ship.
+A stack here is a **runtime target**, a **cloud provider** or a **database engine**, not a language. A repository has exactly one cloud provider but may have more than one runtime target and more than one database. The frontend, Node and serverless plugins all carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle need different compiler configuration. Every stack gets its own plugin, named `tsh-stack-<stack-name>`, once it has real content to ship.
 
 ## Scopes
 

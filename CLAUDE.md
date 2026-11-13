@@ -49,12 +49,14 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | `tsh-stack-aws` | AWS — Terraform resource patterns, Well-Architected defaults, account cost and tagging audits |
 | `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |
 | `tsh-stack-azure` | Azure — Terraform resource patterns, Well-Architected defaults, subscription cost and tagging audits |
+| `tsh-stack-postgresql` | PostgreSQL — live-table schema migrations, query plans and indexing, and table design with types and constraints, beneath whatever ORM a project uses |
 
 Every technology stack gets its own plugin, created when it has real content to ship,
-not before. The family has two shapes: **runtime targets for application code**, and
-**cloud providers** — a repository has exactly one cloud provider but may have more than
-one runtime target (a frontend, a Node service and a Lambda bundle can share a repo),
-which is why both belong here rather than in a discipline plugin. Read
+not before. The family has three shapes: **runtime targets for application code**,
+**cloud providers** and **database engines** — a repository has exactly one cloud
+provider but may have more than one runtime target (a frontend, a Node service and a
+Lambda bundle can share a repo) and more than one database, which is why all three
+belong here rather than in a discipline plugin. Read
 `.claude/rules/stack-plugin-conventions.md` before adding a stack plugin or moving
 guidance between two of them; it carries why a stack is a runtime target rather than
 a language, the split trigger, and the rules for deliberate duplication between stack
@@ -74,7 +76,8 @@ installs it pays listing budget for every entry.
 
 Ask in order and stop at the first yes:
 
-1. *Would this guidance change if the repo switched language, framework or cloud?*
+1. *Would this guidance change if the repo switched language, framework, cloud or
+   database engine?*
    → `tsh-stack-<stack-name>`. "What to look for in a NestJS pull request." "Which
    EKS settings we always set."
 2. *Would it change if the reader switched job?* → the `tsh-<discipline>` that owns

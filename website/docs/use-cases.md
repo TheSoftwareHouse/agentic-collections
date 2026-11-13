@@ -55,10 +55,11 @@ sources:
   - plugins/tsh-stack-php/agents/php-code-reviewer.md
   - plugins/tsh-stack-serverless/skills/configuring-serverless-service/SKILL.md
   - plugins/tsh-stack-python/skills/writing-data-models/SKILL.md
+  - plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas/SKILL.md
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "ea325d5645f8f9d4444b0619771b0d0c07aafc058037cf9cc6163c334f968ab6"
+sources_hash: "dc1c9f648cab7e47eac4486cba800fd67587bdadfa27310537676e9186cb986f"
 ---
 
 # Use cases
@@ -225,13 +226,14 @@ From then on, [`navigating-project-context`](/docs/plugins/tsh-product-managemen
 
 ## Stacks
 
-Stack plugins add what changes with the language, framework or cloud, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
+Stack plugins add what changes with the language, framework, cloud or database engine, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
 
 - **Frontend:** [`implementing-frontend`](/docs/plugins/tsh-stack-frontend/skills/implementing-frontend) covers any change to frontend application code, React today, with or without a design, and requires a Figma read before markup when a design exists.
 - **Node.js:** [`implementing-nestjs-api`](/docs/plugins/tsh-stack-nodejs/skills/implementing-nestjs-api) guides implementation and review of NestJS 11 REST APIs with `@nestjs/cqrs` and TypeORM 0.3.
 - **PHP:** [`@tsh-stack-php:php-code-reviewer`](/docs/plugins/tsh-stack-php/agents/php-code-reviewer) reviews PHP and Symfony changes against the project's own PHP and Symfony versions, runs the project's linters and static analysis, and returns a structured findings report.
 - **Serverless:** [`configuring-serverless-service`](/docs/plugins/tsh-stack-serverless/skills/configuring-serverless-service) defines an AWS Lambda service on OSLS with least-privilege IAM without wildcard resources, per-function reserved concurrency, secrets resolved at runtime, and assertions over the packaged CloudFormation template.
 - **Python:** [`writing-data-models`](/docs/plugins/tsh-stack-python/skills/writing-data-models) governs data modelling with Pydantic v2, dataclasses, SQLModel and SQLAlchemy 2.0.
+- **PostgreSQL:** [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) writes and reviews migrations that run against a live table: it names the lock each statement takes, sets `lock_timeout` so a migration fails and retries instead of blocking traffic, and replaces unsafe statements with zero-downtime recipes such as indexes built concurrently and constraints added `NOT VALID` and validated separately.
 - **Cloud cost audits:** [`auditing-aws-cost`](/docs/plugins/tsh-stack-aws/skills/auditing-aws-cost), [`auditing-gcp-cost`](/docs/plugins/tsh-stack-gcp/skills/auditing-gcp-cost) and [`auditing-azure-cost`](/docs/plugins/tsh-stack-azure/skills/auditing-azure-cost) read the infrastructure code first, validate it against the live account, project or subscription with read-only calls, find drift and shadow resources, check tag or label compliance, attribute measured spend, and produce a saved report.
 
 ## Foundation: `tsh-core`

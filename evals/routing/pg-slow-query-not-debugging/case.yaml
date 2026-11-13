@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: pg-slow-query-not-debugging
+description: A list endpoint that slows down page by page, with the SQL pasted, must route to optimizing-postgresql-queries, not to debugging-code, although it is reported as something that got worse, and not to migrations.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Our admin order list got slow. Page 1 is instant, page 2000 takes about 9 seconds. The query is:
+
+    SELECT * FROM orders WHERE status = 'paid' ORDER BY created_at DESC LIMIT 50 OFFSET 99950;
+
+    There's an index on created_at. Why is it slow and what do we change?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    arm: with-only
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0

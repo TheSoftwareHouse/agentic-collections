@@ -36,7 +36,8 @@ Then, depending on where it lands:
   which three of the five disciplines would invoke it in a normal month, and report
   the plugin's routing footprint before and after. **Ties go to a discipline plugin.**
 - **`tsh-stack-*`** → read `.claude/rules/stack-plugin-conventions.md`. A stack is a
-  runtime target, not a language, and duplication between stack plugins is deliberate.
+  runtime target, a cloud provider or a database engine, not a language, and
+  duplication between stack plugins is deliberate.
 - **A discipline plugin** → no extra gate. This is the default, and it is meant to be.
 - **A new plugin** → it also needs an entry in `.claude-plugin/marketplace.json`, or
   nobody can install it. See `.claude/rules/plugin-manifests-and-marketplace.md`.

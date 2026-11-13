@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "2585ec9e5a872d27ddf2629a8024c07060b99bbe6a3b810451b1bc5bf497bb2c"
+sources_hash: "4cc68cdedf346ed152c8eb343626b81b11d7bea6395a85faf99be5831c511902"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';
@@ -50,7 +50,7 @@ The discipline plugins and the context tooling cover five verticals. Each one li
 
 ### Stacks
 
-Stack plugins carry what would change if the repo switched language, framework or cloud. A stack is a **runtime target** or a **cloud provider**, not a language: a repository has exactly one cloud provider but may have more than one runtime target, such as a frontend, a Node service and a Lambda bundle in one repo. Install the ones the repo is built on. See [Stacks](/docs/use-cases#stacks) for what they add to the work above.
+Stack plugins carry what would change if the repo switched language, framework, cloud or database engine. A stack is a **runtime target**, a **cloud provider** or a **database engine**, not a language: a repository has exactly one cloud provider but may have more than one runtime target, such as a frontend, a Node service and a Lambda bundle in one repo, and more than one database. Install the ones the repo is built on. See [Stacks](/docs/use-cases#stacks) for what they add to the work above.
 
 ### `tsh-core`, the foundation
 

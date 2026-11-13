@@ -77,6 +77,7 @@ Copy just the lines you need:
 /plugin install tsh-stack-serverless@tsh-agentic-collections
 /plugin install tsh-stack-python@tsh-agentic-collections
 /plugin install tsh-stack-php@tsh-agentic-collections
+/plugin install tsh-stack-postgresql@tsh-agentic-collections
 /plugin install tsh-stack-aws@tsh-agentic-collections
 /plugin install tsh-stack-gcp@tsh-agentic-collections
 /plugin install tsh-stack-azure@tsh-agentic-collections
@@ -308,12 +309,14 @@ Install what the project is built on, at **Project** scope.
 | [`tsh-stack-serverless`](plugins/tsh-stack-serverless) | AWS Lambda on OSLS: which libraries we use and which we avoid, how a serverless project is structured, least-privilege IAM, reserved concurrency, secrets at runtime, Step Functions task rules, and checks that execute the packaged artifact | `/plugin install tsh-stack-serverless@tsh-agentic-collections` |
 | [`tsh-stack-python`](plugins/tsh-stack-python) | Modern Python 3.12+: implementation and review practices, and Pydantic v2 / dataclass / SQLModel / SQLAlchemy 2.0 data modelling | `/plugin install tsh-stack-python@tsh-agentic-collections` |
 | [`tsh-stack-php`](plugins/tsh-stack-php) | PHP 7.4–8.5 and Symfony 5.4–8.x: detects the project's versions and uses only what they support, YAGNI and KISS first, patterns only when justified, refactoring, PSR-12, Symfony features and their version differences, and a PHP code reviewer agent | `/plugin install tsh-stack-php@tsh-agentic-collections` |
+| [`tsh-stack-postgresql`](plugins/tsh-stack-postgresql) | PostgreSQL 14–18 beneath any ORM: migrations that run against a live table without blocking it, slow queries found from `pg_stat_statements` and `EXPLAIN` and fixed, and table design with types and constraints that keep bad data out | `/plugin install tsh-stack-postgresql@tsh-agentic-collections` |
 | [`tsh-stack-aws`](plugins/tsh-stack-aws) | AWS: Terraform patterns for VPC, EKS, RDS and S3, Well-Architected defaults, and an evidence-based cost and tagging audit of a live account | `/plugin install tsh-stack-aws@tsh-agentic-collections` |
 | [`tsh-stack-gcp`](plugins/tsh-stack-gcp) | GCP: Terraform patterns for VPC, GKE, Cloud SQL, Cloud Storage and Cloud Run, Workload Identity and CMEK defaults, and a cost and labelling audit of a live project | `/plugin install tsh-stack-gcp@tsh-agentic-collections` |
 | [`tsh-stack-azure`](plugins/tsh-stack-azure) | Azure: Terraform patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity defaults, and a cost and tagging audit via Resource Graph | `/plugin install tsh-stack-azure@tsh-agentic-collections` |
 
-A stack here is a **runtime target** or a **cloud provider**, not a language — a
-repository has one cloud and one or more runtime targets. The frontend, Node and serverless plugins all
+A stack here is a **runtime target**, a **cloud provider** or a **database engine**,
+not a language — a repository has one cloud, one or more runtime targets and one or
+more databases. The frontend, Node and serverless plugins all
 carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle
 genuinely need different compiler configuration — and because most projects have a
 frontend whatever their backend is written in. Install the ones the repo is built on.

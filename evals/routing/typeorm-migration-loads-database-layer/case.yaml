@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: typeorm-migration-loads-database-layer
+description: A TypeORM migration that indexes a large live table must load migrating-postgresql-schemas on turn one, not feature orchestration, although it is phrased as an implementation request. implementing-nestjs-api is not asserted, because turn one names one dominant owner (measured 0 of 6 co-fires) and a MUST rule in the skill loads the ORM skill on a later turn (6 of 6 in a four-turn probe).
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    In our NestJS service, add a TypeORM migration that indexes payments.merchant_id. The payments table has
+    about 40 million rows and takes writes all day, so the deploy must not block it.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+  - name: orchestrating-feature-implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0
