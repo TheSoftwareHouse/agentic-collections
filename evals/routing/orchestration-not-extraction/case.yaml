@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: orchestration-not-extraction
+description: Taking several kinds of discovery material all the way to a Jira backlog and roadmap must route to orchestrating-business-analysis, not to the single extraction stage.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    We had three discovery workshops with the client last week: transcripts, a Figma
+    file and a PDF brief. Take it all the way to a Jira backlog with a delivery roadmap. I
+    want to review it at each step.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    min: 0
+    max: 0

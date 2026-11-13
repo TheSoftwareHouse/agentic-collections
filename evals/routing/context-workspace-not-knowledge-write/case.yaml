@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: context-workspace-not-knowledge-write
+description: Creating a new owned area in the knowledge base must route to adding-project-context-workspace, not to writing-project-knowledge.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    The Acme project is adding a mobile app next quarter. Set up a place for it in the
+    acme-context knowledge base, with its own owner: Ola will own it.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?adding-project-context-workspace"'
+    arm: with-only
+  - name: sibling-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
+    min: 0
+    max: 0

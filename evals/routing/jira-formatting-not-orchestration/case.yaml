@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: jira-formatting-not-orchestration
+description: Getting an approved story list into shape for a Jira project must route to formatting-jira-issues, not to the end-to-end orchestrator or story extraction.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    The client signed off on the checkout stories. Get them into shape for our Jira
+    project so I can push them tomorrow morning.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?formatting-jira-issues"'
+    arm: with-only
+  - name: orchestrating-business-analysis-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: extracting-epics-and-stories-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    min: 0
+    max: 0

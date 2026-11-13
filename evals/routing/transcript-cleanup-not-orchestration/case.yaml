@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: transcript-cleanup-not-orchestration
+description: Tidying one raw workshop recording export must route to processing-workshop-transcripts, not to the end-to-end orchestrator, backlog extraction or discovery research.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    Yesterday's workshop recording export is a mess: two hours of people talking over
+    each other, jokes, half-finished sentences. Can you turn it into something the team
+    can actually read?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?processing-workshop-transcripts"'
+    arm: with-only
+  - name: orchestrating-business-analysis-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: extracting-epics-and-stories-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    min: 0
+    max: 0
+  - name: analyzing-discovery-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-discovery-context"'
+    min: 0
+    max: 0

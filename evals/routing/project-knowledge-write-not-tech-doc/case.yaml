@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: project-knowledge-write-not-tech-doc
+description: Recording a client requirement in the project knowledge base must route to writing-project-knowledge, not to tsh-core's general writing standard or its decision-record format.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-management", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    In today's call the client confirmed that refunds over 500 EUR need a second
+    approver. Write that down in the acme-context knowledge base so the whole team has
+    it.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-project-knowledge"'
+    arm: with-only
+  - name: writing-technical-documents-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    min: 0
+    max: 0
+  - name: managing-decision-records-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
+    min: 0
+    max: 0

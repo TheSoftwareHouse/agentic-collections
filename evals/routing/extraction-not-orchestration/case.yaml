@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: extraction-not-orchestration
+description: Turning already-processed workshop notes into a backlog, with no Jira step, must route to extracting-epics-and-stories, not to the end-to-end orchestrator or Jira formatting.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    The cleaned-up notes from our three onboarding workshops are ready. Turn them into
+    a backlog we can walk the client through on Friday. Nothing goes into Jira yet.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    arm: with-only
+  - name: orchestrating-business-analysis-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: formatting-jira-issues-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?formatting-jira-issues"'
+    min: 0
+    max: 0

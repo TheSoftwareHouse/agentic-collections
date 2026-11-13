@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: discovery-context-not-orchestration
+description: Researching one thin ticket before estimation must route to analyzing-discovery-context, not to the orchestrator, backlog extraction, or reading a project knowledge base.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-management"]
+runs: 1
+execution:
+  prompt: |
+    Ticket SHOP-412 just says "support partial refunds". Before anyone estimates it,
+    dig up everything we have on refunds — tickets, docs, designs — and tell me what's
+    still unclear.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?analyzing-discovery-context"'
+    arm: with-only
+  - name: orchestrating-business-analysis-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-business-analysis"'
+    min: 0
+    max: 0
+  - name: extracting-epics-and-stories-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?extracting-epics-and-stories"'
+    min: 0
+    max: 0
+  - name: navigating-project-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?navigating-project-context"'
+    min: 0
+    max: 0
