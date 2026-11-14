@@ -2,7 +2,7 @@
 title: Atlassian
 sidebar_label: Atlassian
 sidebar_position: 2
-description: The Atlassian Rovo MCP server bundled with tsh-core — Jira, Confluence and Bitbucket Cloud access under your own account, who uses it, and what still needs an API token.
+description: The Atlassian Rovo MCP server bundled with tsh-core — Jira, Confluence and Bitbucket Cloud access under your own account, who uses it, and what Bitbucket Cloud and Jira Service Management need.
 sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-core/README.md
@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/references/working-with-jira.md
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-engineering/README.md
-sources_hash: "e7288d8775a342ad57cebf71c108a52450924265738ea00d81c76d8ef77351ff"
+sources_hash: "16e7978b1de1cf1c29bd8fb12937946d9d5f662ab5fc9b4ba772931c62ceb0c5"
 ---
 
 # Atlassian
@@ -76,9 +76,9 @@ behind it.
 
 ## Bitbucket Cloud and Jira Service Management
 
-Bitbucket Cloud needs nothing extra. It comes through the same OAuth sign-in when the
-Bitbucket workspace is linked to your Atlassian organization. Jira Service Management
-is the one surface still limited to API-token authentication, which an Atlassian org
-admin enables under **Admin Hub → Rovo → Rovo MCP server**. It is not bundled: a static
-token header disables the OAuth sign-in for everyone who installs the plugin, so a
-Jira Service Management server entry belongs in your own project or user config.
+Both need nothing extra: they come through the same OAuth sign-in. Bitbucket Cloud
+needs the Bitbucket workspace to be linked to your Atlassian organization. In Jira
+Service Management, searching requests works over that sign-in; what you can open
+still depends on your permissions on each service desk. Atlassian's authentication
+guide still calls Jira Service Management API-token-only, but the v2 server answers
+its searches over OAuth.

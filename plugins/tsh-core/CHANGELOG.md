@@ -33,15 +33,20 @@ alone reaches nobody.
 - **Update `tsh-product-management` to 0.6.0 in the same sitting.** Its Jira guard
   before that version does not know the v2 tools, so in a business-analysis session
   it holds v2 reads for confirmation.
+- **The plugin description names Bitbucket Cloud.** It said the bundled Atlassian
+  server was for Jira and Confluence; it now says Jira, Confluence and Bitbucket
+  Cloud, which the same sign-in reaches when the Bitbucket workspace is linked to
+  your Atlassian organisation.
 
 ### Fixed
 
-- **The README no longer says Bitbucket needs API tokens.** It said Bitbucket Cloud
-  was reachable only under API-token authentication, which is why no Bitbucket server
-  was bundled. It works over the bundled OAuth sign-in as long as the Bitbucket
-  workspace is linked to your Atlassian organisation, with no extra server and no
-  token. Jira Service Management is the surface that still needs API-token auth, and
-  its server entry still belongs in your own project or user config, not in the plugin.
+- **The README no longer says Bitbucket and Jira Service Management need API
+  tokens.** It said both were reachable only under API-token authentication, which is
+  why no server was bundled for them. Bitbucket Cloud works over the bundled OAuth
+  sign-in as long as the Bitbucket workspace is linked to your Atlassian organisation,
+  with no extra server and no token. In Jira Service Management, searching requests
+  works over the same sign-in; what you can open still depends on your permissions on
+  each service desk.
 
 ## [0.11.0] - 2026-10-30
 

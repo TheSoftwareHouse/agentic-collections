@@ -25,11 +25,15 @@ alone reaches nobody.
   reads are held for confirmation. Outside a business-analysis session the guard still
   stands down, as before.
 - **Reads are never held.** `discover` and read operations through `executeRead` run
-  without a prompt. A write-verb operation sent through `executeRead` is not trusted
-  as a read and is still gated.
+  without a prompt. `executeRead` passes only an operation the guard recognises as a
+  read: a write-verb operation sent through it is gated like a write, and one with a
+  verb the guard does not recognise is held for confirmation, the same as any
+  unrecognised call.
 - **Jira writes through `executeWrite` and `executeDestructive` are denied** before
   Gate 2 is approved, outside the approved project, and on a protected issue — the
-  same as a primary `createJiraIssue`.
+  same as a primary `createJiraIssue`. An operation whose name carries `issue` counts
+  as a Jira write as well, because the server accepts v1 names such as
+  `createIssueLink` as aliases of the v2 Jira operations.
 - **Confluence and Bitbucket operations go to the normal permission prompt**, as
   Confluence tools already did; neither policy is about them.
 - **A runner call without a usable operation name is held for confirmation** rather

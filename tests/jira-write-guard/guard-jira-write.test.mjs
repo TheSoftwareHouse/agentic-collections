@@ -297,3 +297,20 @@ row(
   exec("doSomething", readInputs),
   ask("could not classify"),
 );
+
+// PR 35 review. `executeRead` passes recognised reads only: an unrecognised verb is
+// held like any other unknown, and a Confluence or Bitbucket name stays exempt.
+row(72, "B", "executeRead → bulkEditJiraIssues", atlassian("executeRead"), exec("bulkEditJiraIssues", readInputs), ask("could not classify", "bulkEditJiraIssues", GATE2));
+row(73, "U", "executeRead → bulkEditJiraIssues", atlassian("executeRead"), exec("bulkEditJiraIssues", readInputs), ask("could not classify", "none records Gate 2 as approved"));
+row(74, "D", "executeRead → bulkEditJiraIssues ACME-441", atlassian("executeRead"), exec("bulkEditJiraIssues", { issueIdOrKey: "ACME-441" }), ask("could not classify", PROTECTED("ACME-441")));
+row(75, "C", "executeRead → bulkEditJiraIssues ACME-5", atlassian("executeRead"), exec("bulkEditJiraIssues", { issueIdOrKey: "ACME-5" }), silent);
+row(76, "B", "executeRead → manageJiraSprint", atlassian("executeRead"), exec("manageJiraSprint", { sprintId: 1, action: "start" }), ask("could not classify", "manageJiraSprint"));
+row(77, "B", "executeRead → diffConfluenceContentVersions", atlassian("executeRead"), exec("diffConfluenceContentVersions", { contentId: "123" }), silent);
+
+// `issue` in a runner operation name is Jira's, after the Confluence/Bitbucket exemption:
+// the server runs v1's `createIssueLink` as `createJiraIssueLink`.
+row(78, "D", "executeWrite → createIssueLink ACME-441", atlassian("executeWrite"), exec("createIssueLink", { inwardIssue: "ACME-441", outwardIssue: "ACME-5" }), deny(PROTECTED("ACME-441")));
+row(79, "D", "executeWrite → createIssueLink OTHER-1", atlassian("executeWrite"), exec("createIssueLink", { inwardIssue: "OTHER-1", outwardIssue: "ACME-5" }), deny(OTHER));
+row(80, "B", "executeRead → createIssueLink", atlassian("executeRead"), exec("createIssueLink", { inwardIssue: "ACME-1", outwardIssue: "ACME-5" }), deny(GATE2));
+row(81, "C", "executeWrite → createIssueLink ACME-5", atlassian("executeWrite"), exec("createIssueLink", { inwardIssue: "ACME-5", outwardIssue: "ACME-6" }), silent);
+row(82, "B", "executeWrite → createBitbucketRepoIssue", atlassian("executeWrite"), exec("createBitbucketRepoIssue", { workspace: "w", repoSlug: "r" }), silent);

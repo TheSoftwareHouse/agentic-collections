@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "81c4ee1308ac55a2832b5339b517d43d63bd6bbf8233ee1aefaaf7c451604ac5"
+sources_hash: "1fb3507697fec5b22394b3dfc2d0049d099cd5cb1c0517e9a2000d300a433557"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';
@@ -54,7 +54,7 @@ Stack plugins carry what would change if the repo switched language, framework o
 
 ### `tsh-core`, the foundation
 
-`tsh-core` holds what stays true regardless of discipline and stack: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format, and a one-command project setup. It also bundles three MCP servers: Atlassian for Jira and Confluence, Figma for design context, and Context7 for library documentation. Other plugins rely on those servers instead of shipping their own copies, so install `tsh-core` alongside whatever else you pick.
+`tsh-core` holds what stays true regardless of discipline and stack: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format, and a one-command project setup. It also bundles three MCP servers: Atlassian for Jira, Confluence and Bitbucket Cloud, Figma for design context, and Context7 for library documentation. Other plugins rely on those servers instead of shipping their own copies, so install `tsh-core` alongside whatever else you pick.
 
 ## What's in the marketplace
 

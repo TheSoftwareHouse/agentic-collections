@@ -16,8 +16,9 @@ leading verb, and a call through one of the v2 runners (`executeRead`,
 it carries. So `discover` and read operations — through a primary tool or
 `executeRead` — run without a prompt at any point in the workflow: fetching an
 issue, searching by JQL, listing transitions and reading comments, including the
-status check that must precede an update. An operation whose name is a write verb
-is still gated when it is sent through `executeRead`. Only recognized writes are
+status check that must precede an update. `executeRead` passes only an operation
+the hook recognizes as a read: a write-verb name sent through it is still gated, and
+a name it cannot place is held like any other unknown. Only recognized writes are
 denied before Gate 2, and a Jira operation sent through `executeWrite` or
 `executeDestructive` is gated like any other recognized write. Confluence and
 Bitbucket operations are not Jira writes, so the hook leaves them to the normal

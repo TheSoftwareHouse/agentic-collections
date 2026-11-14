@@ -19,7 +19,7 @@ sources:
   - plugins/tsh-product-management/agents/
   - plugins/tsh-product-management/hooks/hooks.json
   - plugins/tsh-product-management/hooks/guard-jira-write.mjs
-sources_hash: "fdda5af4aee10a3a5df1163dd8ded787a45f2d644a46d227212a281cc4333d43"
+sources_hash: "703b6dbefb0022e00243825f6ff5c47c04e41e96287353a7ab2a331b1fc824f7"
 ---
 
 # Business analysis

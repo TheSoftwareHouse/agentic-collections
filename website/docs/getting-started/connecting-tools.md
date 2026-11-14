@@ -9,7 +9,7 @@ sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-management/README.md
-sources_hash: "8983836bee8aecae2912772ec2cb70f45d44c4ae12150d7befc1568ec5bc5348"
+sources_hash: "d6b92db8740fe72017d868ba9f85d18d717d06bc510ca241462e0081b4f2aa37"
 ---
 
 # Connecting tools
@@ -46,7 +46,7 @@ project from the same panel.
 Nothing else breaks. The server simply shows as needing authentication.
 
 - **Figma:** agents that need a design report what is missing rather than guessing at one. The UI verification gate in `tsh-product-engineering` reports `VERIFICATION NOT RUN` instead of judging a design it cannot read.
-- **Atlassian:** Jira and Confluence access is unavailable. For example, `e2e-engineer` reads acceptance criteria from a Jira issue key through this server, and without it you supply the criteria directly.
+- **Atlassian:** Jira, Confluence and Bitbucket Cloud access is unavailable. For example, `e2e-engineer` reads acceptance criteria from a Jira issue key through this server, and without it you supply the criteria directly.
 
 ## What is deliberately left out
 

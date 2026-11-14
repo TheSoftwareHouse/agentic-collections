@@ -132,14 +132,20 @@ function bareToolName(toolName) {
  * v2's tools and fall to the verb classification like any other name.
  *
  *   - `discover` is a catalogue lookup that runs nothing: never gated.
- *   - `executeRead` with a read operation is never gated. A write-verb name sent
- *     through it is not trusted as a read; it is handled like `executeWrite`.
+ *   - `executeRead` passes only an operation `classify` recognises as a read.
+ *     The server refuses a write operation sent through `executeRead` today, but
+ *     the guard does not rely on a check it cannot see: a name whose verb it does
+ *     not recognise is `unknown` like anywhere else (a Confluence or Bitbucket
+ *     name aside), and a write-verb name is handled like `executeWrite`.
  *   - `executeWrite` / `executeDestructive` are classified by the operation
  *     name, Jira first: a name carrying `jira` is a write whatever its verb,
  *     because the tier already says it writes. A name carrying `confluence` or
  *     `bitbucket` is exempt, like a Confluence tool: neither policy is about
- *     them. Anything else (Compass, Jira Service Management, a name nobody
- *     recognises) is `unknown`, so it is held with `ask`.
+ *     them. After that exemption, a name carrying `issue` is a Jira write too:
+ *     the server accepts v1 names as aliases, and v1's `createIssueLink` runs as
+ *     `createJiraIssueLink` (confirmed against the live v2 server, 2026-11-14).
+ *     Anything else (Compass, Jira Service Management, a name nobody recognises)
+ *     is `unknown`, so it is held with `ask`.
  *   - A missing, empty or non-string name is `unknown` on every runner,
  *     `executeRead` included. It is never an early allow: a name the guard cannot
  *     read must not be the way past it.
@@ -159,6 +165,7 @@ function bareToolName(toolName) {
  */
 const RUNNER_TOOLS = new Set(["executeread", "executewrite", "executedestructive"]);
 const BITBUCKET_OPERATION_PATTERN = /bitbucket/i;
+const ISSUE_OPERATION_PATTERN = /issue/i;
 const ALLOWED = Object.freeze({ kind: "allow" });
 
 function isPlainObject(value) {
@@ -195,11 +202,19 @@ function resolveRunnerCall(runner, toolInput) {
 
   // A name the guard cannot read is never an early allow, whichever runner.
   if (op === "") return gated("unknown");
-  // A valid read through the read runner. A write verb falls through to the
-  // product rules below, exactly as `executeWrite` would.
-  if (runner.toLowerCase() === "executeread" && classify(verbName) !== "write") return ALLOWED;
-  if (JIRA_TOOL_PATTERN.test(op)) return gated("write");
-  if (CONFLUENCE_TOOL_PATTERN.test(op) || BITBUCKET_OPERATION_PATTERN.test(op)) return ALLOWED;
+  const jira = JIRA_TOOL_PATTERN.test(op);
+  const exempt = !jira && (CONFLUENCE_TOOL_PATTERN.test(op) || BITBUCKET_OPERATION_PATTERN.test(op));
+  // The read runner passes a recognised read only. An unrecognised verb is held
+  // like any other unknown; a write verb falls through to the product rules
+  // below, exactly as `executeWrite` would.
+  if (runner.toLowerCase() === "executeread") {
+    const verb = classify(verbName);
+    if (verb === "read") return ALLOWED;
+    if (verb === "unknown") return exempt ? ALLOWED : gated("unknown");
+  }
+  if (jira) return gated("write");
+  if (exempt) return ALLOWED;
+  if (ISSUE_OPERATION_PATTERN.test(op)) return gated("write");
   return gated("unknown");
 }
 

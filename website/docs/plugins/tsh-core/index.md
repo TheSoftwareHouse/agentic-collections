@@ -7,14 +7,14 @@ sources:
   - plugins/tsh-core/.claude-plugin/plugin.json
   - plugins/tsh-core/README.md
   - plugins/tsh-core/.mcp.json
-sources_hash: "77c45cbecaa471b9177c267fa38fafc3182362db5f33ff09c8baa268c001a18c"
+sources_hash: "323a0fcc59f8ca4ae6e86b99cda17e658917b6f0784929fa81e0c3d08577b0bd"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
 
 # TSH Core
 
-`tsh-core` holds what is neither a discipline's practice nor a stack's convention: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, and a one-command project setup that wires them together. It also bundles three MCP servers: Atlassian for Jira and Confluence, Figma for design context, and Context7 for library documentation.
+`tsh-core` holds what is neither a discipline's practice nor a stack's convention: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, and a one-command project setup that wires them together. It also bundles three MCP servers: Atlassian for Jira, Confluence and Bitbucket Cloud, Figma for design context, and Context7 for library documentation.
 
 It is the only plugin in the marketplace defined by a negation (neither a discipline nor a stack), so it is deliberately small and has the highest admission bar in the repository.
 

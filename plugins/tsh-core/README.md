@@ -103,12 +103,12 @@ not routing budget: an MCP server adds nothing to the skill listing, and Claude 
 defers tool schemas until a tool is used, so a session that never touches Jira pays
 only for the tool names.
 
-**Bitbucket Cloud needs nothing extra.** It comes through the same OAuth sign-in
-when the Bitbucket workspace is linked to your Atlassian organisation. Jira Service
-Management is the one surface still limited to API-token authentication, which an
-Atlassian org admin enables under **Admin Hub → Rovo → Rovo MCP server**. It is not
-bundled: a static token header disables the OAuth sign-in for everyone who installs
-the plugin, so a JSM server entry belongs in your own project or user config.
+**Bitbucket Cloud and Jira Service Management need nothing extra.** Both come
+through the same OAuth sign-in. Bitbucket needs the workspace to be linked to your
+Atlassian organisation. In Jira Service Management, searching requests works over
+that sign-in; what you can open still depends on your permissions on each service
+desk. Atlassian's authentication guide still calls JSM API-token-only, but the v2
+server answers JSM searches over OAuth.
 
 ### The Figma connector
 
