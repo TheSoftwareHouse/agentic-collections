@@ -17,11 +17,11 @@ alone reaches nobody.
 ### Changed
 
 - **The Jira write guard understands Atlassian's v2 tool surface.** The Atlassian
-  server bundled in `tsh-core` 0.12.0 no longer has one tool per operation: most calls
+  server bundled in `tsh-core` 0.13.0 no longer has one tool per operation: most calls
   go through `discover` and the `executeRead` / `executeWrite` / `executeDestructive`
   runners, which name the real operation in an argument. The guard used to look only at
   the tool name, so every runner call looked unrecognisable. It now reads the operation
-  name. Update this plugin together with `tsh-core` 0.12.0: on the old guard, v2
+  name. Update this plugin together with `tsh-core` 0.13.0: on the old guard, v2
   reads are held for confirmation. Outside a business-analysis session the guard still
   stands down, as before.
 - **Reads are never held.** `discover` and read operations through `executeRead` run

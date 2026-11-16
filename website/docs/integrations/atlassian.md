@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/references/working-with-jira.md
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-engineering/README.md
-sources_hash: "16e7978b1de1cf1c29bd8fb12937946d9d5f662ab5fc9b4ba772931c62ceb0c5"
+sources_hash: "ae8ae39a2dedf07c1e53b92b387f411a13cb6794d87f7ea3c3ddc2b3f15a7dde"
 ---
 
 # Atlassian
@@ -46,7 +46,7 @@ you, so the server grants nothing you could not already open in Jira yourself. I
 appears in `/mcp` as plugin-provided, and you can disable it per project from the same
 panel. See [Connecting tools](/docs/getting-started/connecting-tools).
 
-If you signed in before `tsh-core` 0.12.0, do it once more. The server moved to
+If you signed in before `tsh-core` 0.13.0, do it once more. The server moved to
 Atlassian's v2 endpoint in that version, which is a new OAuth resource, so the old
 sign-in does not carry over.
 

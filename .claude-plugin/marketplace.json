@@ -111,6 +111,19 @@
       "keywords": ["tsh", "stack", "nodejs", "typescript", "nestjs", "cqrs", "typeorm"]
     },
     {
+      "name": "tsh-stack-postgresql",
+      "source": "./plugins/tsh-stack-postgresql",
+      "displayName": "TSH Stack: PostgreSQL",
+      "description": "TSH practices for PostgreSQL 14–18, whatever ORM sits on top: schema migrations that run against live traffic without blocking it, finding and fixing slow queries from pg_stat_statements and EXPLAIN plans, and table design with types and constraints that keep bad data out.",
+      "category": "database",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "postgresql", "postgres", "database", "migrations", "sql", "indexes", "explain"]
+    },
+    {
       "name": "tsh-stack-aws",
       "source": "./plugins/tsh-stack-aws",
       "displayName": "TSH Stack: AWS",

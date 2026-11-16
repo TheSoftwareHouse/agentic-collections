@@ -58,7 +58,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "bc961417524536f9702283190528278766084eb4450ef0776ae83c4ca3fb183c"
+sources_hash: "364a8a1d1316323a303594dc25f353c615a6f9edfa42a07f0bc2ba30c80838f3"
 ---
 
 # Use cases
@@ -238,6 +238,6 @@ Stack plugins add what changes with the language, framework or cloud, and instal
 
 Some work is the same whatever your role and stack, and lives in [`tsh-core`](/docs/plugins/tsh-core/):
 
-- **Parallel checkouts:** [`managing-git-worktrees`](/docs/plugins/tsh-core/skills/managing-git-worktrees) creates a worktree from a freshly fetched base branch on `origin`, lists worktrees, and removes one precisely identified worktree, each with explicit confirmation and verification after the change.
+- **Parallel checkouts:** [`managing-git-worktrees`](/docs/plugins/tsh-core/skills/managing-git-worktrees) creates a worktree from a freshly fetched base branch on `origin`, adopts a branch that already exists on `origin`, such as a pull request's head, into its own worktree without pushing, lists worktrees, and removes one precisely identified worktree, each with explicit confirmation and verification after the change.
 - **Documents people read:** [`writing-technical-documents`](/docs/plugins/tsh-core/skills/writing-technical-documents) applies TSH's writing standard to a README, CHANGELOG, ADR, PR description, runbook, ticket, bug report or test plan: lead with the conclusion, verify every claim against the source, and cut what does not change the reader's decision.
 - **Your own extensions:** [`authoring-claude-extensions`](/docs/plugins/tsh-core/skills/authoring-claude-extensions) decides whether a need calls for a skill, a subagent, a hook or a plugin, and then writes it.
