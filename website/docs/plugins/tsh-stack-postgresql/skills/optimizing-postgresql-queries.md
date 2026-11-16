@@ -12,7 +12,7 @@ sources_hash: "47f69a8766f1908eb4addc2c500426db94472b807774d855e055466e36463134"
 
 **Plugin:** [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)  
 **Invoke:** `/tsh-stack-postgresql:optimizing-postgresql-queries`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) point slow-query work at it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
+**Used by:** [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) point slow-query work at it. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent are told to load the database engine's skill that covers a change under review, which for a new query shape is this one; that path has not been measured.
 
 A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and stops; below version 14 it stops and says the version is unsupported.
 

@@ -32,7 +32,7 @@ first and use this process to fill what they leave unstated.
 | MUST | Treat missing integration coverage as a substantive finding when correctness depends on a real database, transaction boundaries, SQL semantics, migrations, queues, or external services. Unit tests alone do not cover those. |
 | MUST | Check every change for the high-risk anti-patterns listed below and report each hit unless the context documents a justified tradeoff. |
 | MUST | Run the universal security baseline in [`references/security-review-checklist.md`](./references/security-review-checklist.md) on every review. It is a floor: a project's own security rules outrank it and apply first, and the installed stack skill's security rows run on top. Missing authorization on a new entry point and object-level authz (IDOR) are the highest-frequency, highest-severity misses — check them on every change that adds or reaches a data access path. |
-| MUST | When the change targets a framework or stack that has its own skill available in this session — a NestJS, Terraform, frontend, Python or similar stack skill — load that skill and apply its framework-specific review checklist. This skill owns the review that is the same for every stack; the stack skill owns what is specific to one, and a review of a framework change that skips it is incomplete. The database engine counts as a stack: when the change includes a schema migration or a new query shape and a skill for that engine is available (a PostgreSQL skill, for example), load it too, whichever ORM wrote the SQL. Load whichever such skills are present; name none that is absent. |
+| MUST | When the change targets a framework or stack that has its own skill available in this session — a NestJS, Terraform, frontend, Python or similar stack skill — load that skill and apply its framework-specific review checklist. This skill owns the review that is the same for every stack; the stack skill owns what is specific to one, and a review of a framework change that skips it is incomplete. The database engine counts as a stack: when the change includes a schema migration or a new query shape and that engine has skills available (PostgreSQL ones, for example), load the one that covers it — the migration skill for a migration, the query skill for a query — whichever ORM wrote the SQL. Load whichever such skills are present; name none that is absent. |
 | MUST | Give every finding a severity, evidence (file and line), the consequence, and the minimum correction. No redesigns. |
 | NEVER | Report cosmetic or wording-only notes as findings, pad a clean review with invented issues, or escalate severity because an issue repeats — consolidate instead. |
 
@@ -104,7 +104,7 @@ skill is available this session, load it now and run its review checklist alongs
 this one — it carries the framework-specific risks (for a NestJS change: CQRS
 boundaries, TypeORM transaction and persistence semantics, DTO validation,
 testability) that a stack-agnostic review does not name. A schema migration or a new
-query shape loads the database engine's skill the same way.
+query shape loads the database engine's skill that covers it, the same way.
 
 **Step 6 — Security.** Load
 [`./references/security-review-checklist.md`](./references/security-review-checklist.md)

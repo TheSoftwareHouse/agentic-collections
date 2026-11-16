@@ -389,13 +389,11 @@ regression in the Step 6 baseline or the checklist reference.
 A review of a pull request that includes a PostgreSQL migration should load both
 `reviewing-code` and `migrating-postgresql-schemas`, whichever loads first: each
 carries a rule that loads the other on a later turn. A question about the migration
-alone should load only the migration skill. Both need more than one turn, so they are
-manual checks, not routing cases. Run them before changing either rule. Measured on
-2026-11-16 (Sonnet, six runs each): 6 of 6 for both; the review probe was 3 of 6
-before the rules named the database engine.
+alone should not load `reviewing-code`. Both need more than one turn, so they are
+manual checks, not routing cases. Run them before changing either rule.
 
-Save each as `evals/routing/<name>/case.yaml`, run it with `--runs 6` and
-`--max-cost-usd` set (about USD 0.10 per run), then **delete the directories**:
+Save each as `evals/routing/<name>/case.yaml` and **delete both directories when
+done**, because `check-eval-cases.py` rejects their `max_turns: 4`:
 
 ```yaml
 schema_version: "1.1"
@@ -434,10 +432,12 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
   - name: migrating-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
 ```
 
 ```yaml
@@ -477,6 +477,7 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
   - name: reviewing-code-not-fired
     type: tool_used
     tool: Skill
@@ -484,6 +485,26 @@ graders:
     min: 0
     max: 0
 ```
+
+Then:
+
+```shell
+for c in _probe-review-migration _probe-migration-only; do
+  claude plugin eval . --eval-dir evals --case "$c" \
+    --runs 6 -j 3 --trust-plugin --no-publish --ablation none \
+    --model claude-sonnet-5-5 --max-cost-usd 1.5
+done
+rm -rf evals/routing/_probe-review-migration evals/routing/_probe-migration-only
+```
+
+Expected: in `_probe-review-migration`, `reviewing-code` and
+`migrating-postgresql-schemas` each fire in all 6 runs; in `_probe-migration-only`,
+`migrating-postgresql-schemas` fires in all 6 and `reviewing-code` in none (both
+measured 6 of 6 on 2026-11-16, `tsh-product-engineering` 0.12.1 and
+`tsh-stack-postgresql` 0.1.1, about USD 0.10 per run; the review probe was 3 of 6
+before the rules named the database engine). Other skills, such as the NestJS one,
+may load and are not graded. Not covered: a change with a new query but no migration,
+a plain "review this migration" with no opt-out, and the `code-reviewer` subagent.
 
 ## Behavioural suites: what a skill does after it fires
 

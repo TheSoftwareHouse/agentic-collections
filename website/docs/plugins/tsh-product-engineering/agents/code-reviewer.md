@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Reviews a delivered change set against its plan and requirements by executing the checks itself, and returns a structured findings report without fixing code.
 sources:
   - plugins/tsh-product-engineering/agents/code-reviewer.md
-sources_hash: "5bbc8c7c8ce81854baee07a64e260f490559aaf77d68f99319c8c07917605ffa"
+sources_hash: "a799a88dcb5ab6541559b2461f955205571b5f970366ef34f3852fe87991e9b3"
 ---
 
 # Code Reviewer
@@ -25,7 +25,7 @@ The delegation should name the plan file path (or the ticket and requirements) a
 ## Responsibilities
 
 - Follows the `reviewing-code` skill in full: understands the task and plan, compares the implementation to both, judges test coverage, executes test suites, linters and the build with the project's own commands (the plan's Technical Context, and the project's verification skill for what the plan does not state), then checks best practices, high-risk anti-patterns, security and scalability.
-- When the change targets a framework or stack whose skill is available in the session, loads it and applies its framework-specific review checklist alongside `reviewing-code`'s. The database engine counts as a stack: a change with a schema migration or a new query shape also loads that engine's skill when one is available. It loads whichever are present and never names one that is absent.
+- When the change targets a framework or stack whose skill is available in the session, loads it and applies its framework-specific review checklist alongside `reviewing-code`'s. The database engine counts as a stack: a change with a schema migration or a new query shape also loads the engine's skill that covers it when one is available. It loads whichever are present and never names one that is absent.
 - Treats the plan as comparison context, never as a review target. Plan wording, structure and checkboxes are out of scope.
 - Runs every check itself. An implementation report claiming that tests pass is a claim, not evidence.
 - Takes suite scope from the delegation. When the delegation states that a parallel verifier covers functional and E2E verification, it runs static checks, unit and integration suites and the build only, and names the exclusion under Checks executed. With no stated scope it runs everything.
