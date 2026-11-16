@@ -16,7 +16,7 @@ goes in the report.
 | Task runners (`package.json` scripts, `Makefile`, `justfile`, `Taskfile.yml`, `composer.json` scripts, `pyproject.toml`, `tox.ini`, `noxfile.py`) | The local commands, including an aggregate such as `verify` or `check` that mirrors CI |
 | Git hooks (`.husky/`, `lefthook.yml`, `.pre-commit-config.yaml`) | The fast checks the team already runs on every commit |
 | Test configuration (Jest, Vitest, Mocha, pytest, PHPUnit and similar) | How suites are split — unit, integration, e2e — and which need a database, a container or an emulator |
-| `CLAUDE.md`, `CONTRIBUTING.md`, the README's development section | Stated prerequisites, "before opening a pull request" steps, and known traps |
+| `CLAUDE.md` or `AGENTS.md` (whichever holds the instructions), `CONTRIBUTING.md`, the README's development section | Stated prerequisites, "before opening a pull request" steps, and known traps |
 
 The project's `CLAUDE.md` may already state some of this as facts. The skill holds the
 *procedure*; it may cite `CLAUDE.md`, never contradict it.
@@ -86,8 +86,9 @@ any other check.
 A command that writes is not run during capture either, however local it is: a fixer
 or format script, a snapshot update, a regenerate step, a migration, a seed or a
 suite that resets tables. Run its read-only variant when the project has one
-(`--check`, `--dry-run`, `git diff --exit-code` after a generator writing to a
-temporary directory); otherwise record it and mark it not run. Install dependencies
+(`--check`, `--dry-run`, or a generator writing to a temporary directory, then
+`git diff --no-index --exit-code <generated dir> <temp dir>`); otherwise record it
+and mark it not run. Install dependencies
 only when they are missing, and only with the lockfile frozen (`npm ci`,
 `pnpm install --frozen-lockfile`, `composer install`, `uv sync --locked`).
 

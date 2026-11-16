@@ -19,7 +19,7 @@ sources:
   - plugins/tsh-product-management/hooks/hooks.json
   - plugins/tsh-product-management/hooks/guard-project-context-block.mjs
   - .claude/rules/project-context-contract.md
-sources_hash: "8e0fc221c1721c9efb45d3311a3666632b23cb52efa5780b0046983334b2d0fe"
+sources_hash: "7aedb4053afcf137d4c521e181695377abac02f39f431c23792d3bf543f90846"
 ---
 
 # Project context

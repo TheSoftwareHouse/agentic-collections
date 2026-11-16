@@ -105,9 +105,9 @@ counts against the 200-line budget like every other line.
 **Step 4 — Capture the project's checks.** With `tsh-product-engineering`
 installed, invoke `/tsh-product-engineering:capturing-project-checks`: it writes the
 project's own verification and security-invariant skills into `.claude/skills/` and
-its own fenced block into root `CLAUDE.md`, under its rules, not this skill's. Without
-it, say so in the report and name that command; never write those skills by hand
-here. That skill runs the project's check commands to prove them, within its own
+its own fenced block into root `CLAUDE.md` (`CLAUDE.local.md` in a repository
+attached in local mode), under its rules, not this skill's. Without it, say so in the
+report and name that command; never write those skills by hand here. That skill runs the project's check commands to prove them, within its own
 safety rules; init itself still runs none. A repository with no CI yet gets a thin
 result, and the block that skill writes says when to re-run it. On a re-run it
 converges like the rest of init: unchanged commands are not run again and nothing

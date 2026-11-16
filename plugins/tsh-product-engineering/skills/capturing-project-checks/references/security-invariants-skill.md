@@ -28,7 +28,7 @@ Every invariant cites one. In order of authority:
 | Source | Note |
 | --- | --- |
 | Written client or contractual requirements in the repository | A security annex, a compliance target, a data-residency requirement |
-| `CLAUDE.md` hard rules | Already binding; the skill turns them into review checks and cites their numbers |
+| `CLAUDE.md` or `AGENTS.md` hard rules | Already binding; the skill turns them into review checks and cites their numbers |
 | Decision records with status `Accepted` | Only `Accepted` binds. Cite the record; never cite a `Proposed`, `Rejected` or `Superseded` one as a rule |
 | `SECURITY.md` or a security policy | Disclosure process is out of scope; technical rules are in |
 | Guard scripts and CI checks that enforce a rule | A script that fails the build on a wildcard IAM action is the team writing the rule down |
@@ -48,7 +48,9 @@ the source "confirmed with the team during capture, <date>". That source is fina
 later run keeps the invariant as it stands and never re-proposes or removes it for
 lacking a file. A declined candidate goes in the report and in the record line of the
 `tsh:project-checks` block (SKILL.md, Step 4), which exists even when no invariants
-skill is written, so a later run does not ask again.
+skill is written, so a later run does not ask again. So does a confirmed candidate
+whose skill could only be drafted
+([`local-mode-and-reruns.md`](./local-mode-and-reruns.md) §2).
 
 ## 4. Open decisions
 

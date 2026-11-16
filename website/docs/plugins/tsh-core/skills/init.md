@@ -5,7 +5,7 @@ sidebar_position: 2
 description: One-shot setup of a repository's Claude Code context that runs the owning tsh-core skills in order and wires maintenance pointers into CLAUDE.md.
 sources:
   - plugins/tsh-core/skills/init/
-sources_hash: "bbee2b8247287620dbed124b61c1c319553c2c1d791460fe8fb902bee38ac7f6"
+sources_hash: "0cd6be3ffa7dba736381b33b53d867d93f8a9cee88c928887206b0aa3f3b69a0"
 ---
 
 # Init
