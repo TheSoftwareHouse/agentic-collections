@@ -124,7 +124,9 @@ what makes the operation safe.
   is the only acceptable absence/no-matching-head result. Exit status `0` means the
   remote branch exists and must cause rejection; any other exit status is
   indeterminate/fatal and must stop the workflow. Never adopt an existing remote
-  branch, and stop on any failure.
+  branch, and stop on any failure. The rejection says the branch already exists on
+  origin and that adopting it is a separate operation the user can ask for; create
+  never switches to it by itself.
 - Reject the path if a registered worktree already uses that path.
 - Reject any path that already exists or is inside the active worktree.
 - Do not create anything until all checks pass.

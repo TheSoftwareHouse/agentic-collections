@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: pr-review-not-worktree-adopt
+description: A pre-merge review of the change on an existing pull-request branch must route to reviewing-code and must not pull in tsh-core's managing-git-worktrees, which now adopts pull-request branches. The pull request is named only by its branch, because a prompt naming a pull request sends the first turn searching.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    A colleague's pull request is up on the branch feat/pay-412-retry-webhooks. Review the change
+    before it merges: check the error handling and that the tests cover it, and tell me whether
+    it's ready to merge.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: worktrees-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-git-worktrees"'
+    min: 0
+    max: 0

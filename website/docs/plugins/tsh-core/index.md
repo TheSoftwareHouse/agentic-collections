@@ -7,7 +7,7 @@ sources:
   - plugins/tsh-core/.claude-plugin/plugin.json
   - plugins/tsh-core/README.md
   - plugins/tsh-core/.mcp.json
-sources_hash: "9509ae9b138a0a869e150606a96a06b4736b4132a0cb595430d9433db1a6983b"
+sources_hash: "999aad66d372353ca72d89c6550d96dc8444d7682dfdc367fb75c09525a65861"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';

@@ -55,11 +55,10 @@ sources:
   - plugins/tsh-stack-php/agents/php-code-reviewer.md
   - plugins/tsh-stack-serverless/skills/configuring-serverless-service/SKILL.md
   - plugins/tsh-stack-python/skills/writing-data-models/SKILL.md
-  - plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas/SKILL.md
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "dc1c9f648cab7e47eac4486cba800fd67587bdadfa27310537676e9186cb986f"
+sources_hash: "b8f04a5a2eea82c673a89bb3a38b2c0dfa3fb77de697fc39d13a83c562ddb9c4"
 ---
 
 # Use cases
@@ -226,20 +225,19 @@ From then on, [`navigating-project-context`](/docs/plugins/tsh-product-managemen
 
 ## Stacks
 
-Stack plugins add what changes with the language, framework, cloud or database engine, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
+Stack plugins add what changes with the language, framework or cloud, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
 
 - **Frontend:** [`implementing-frontend`](/docs/plugins/tsh-stack-frontend/skills/implementing-frontend) covers any change to frontend application code, React today, with or without a design, and requires a Figma read before markup when a design exists.
 - **Node.js:** [`implementing-nestjs-api`](/docs/plugins/tsh-stack-nodejs/skills/implementing-nestjs-api) guides implementation and review of NestJS 11 REST APIs with `@nestjs/cqrs` and TypeORM 0.3.
 - **PHP:** [`@tsh-stack-php:php-code-reviewer`](/docs/plugins/tsh-stack-php/agents/php-code-reviewer) reviews PHP and Symfony changes against the project's own PHP and Symfony versions, runs the project's linters and static analysis, and returns a structured findings report.
 - **Serverless:** [`configuring-serverless-service`](/docs/plugins/tsh-stack-serverless/skills/configuring-serverless-service) defines an AWS Lambda service on OSLS with least-privilege IAM without wildcard resources, per-function reserved concurrency, secrets resolved at runtime, and assertions over the packaged CloudFormation template.
 - **Python:** [`writing-data-models`](/docs/plugins/tsh-stack-python/skills/writing-data-models) governs data modelling with Pydantic v2, dataclasses, SQLModel and SQLAlchemy 2.0.
-- **PostgreSQL:** [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) writes and reviews migrations that run against a live table: it names the lock each statement takes, sets `lock_timeout` so a migration fails and retries instead of blocking traffic, and replaces unsafe statements with zero-downtime recipes such as indexes built concurrently and constraints added `NOT VALID` and validated separately.
 - **Cloud cost audits:** [`auditing-aws-cost`](/docs/plugins/tsh-stack-aws/skills/auditing-aws-cost), [`auditing-gcp-cost`](/docs/plugins/tsh-stack-gcp/skills/auditing-gcp-cost) and [`auditing-azure-cost`](/docs/plugins/tsh-stack-azure/skills/auditing-azure-cost) read the infrastructure code first, validate it against the live account, project or subscription with read-only calls, find drift and shadow resources, check tag or label compliance, attribute measured spend, and produce a saved report.
 
 ## Foundation: `tsh-core`
 
 Some work is the same whatever your role and stack, and lives in [`tsh-core`](/docs/plugins/tsh-core/):
 
-- **Parallel checkouts:** [`managing-git-worktrees`](/docs/plugins/tsh-core/skills/managing-git-worktrees) creates a worktree from a freshly fetched base branch on `origin`, lists worktrees, and removes one precisely identified worktree, each with explicit confirmation and verification after the change.
+- **Parallel checkouts:** [`managing-git-worktrees`](/docs/plugins/tsh-core/skills/managing-git-worktrees) creates a worktree from a freshly fetched base branch on `origin`, adopts a branch that already exists on `origin`, such as a pull request's head, into its own worktree without pushing, lists worktrees, and removes one precisely identified worktree, each with explicit confirmation and verification after the change.
 - **Documents people read:** [`writing-technical-documents`](/docs/plugins/tsh-core/skills/writing-technical-documents) applies TSH's writing standard to a README, CHANGELOG, ADR, PR description, runbook, ticket, bug report or test plan: lead with the conclusion, verify every claim against the source, and cut what does not change the reader's decision.
 - **Your own extensions:** [`authoring-claude-extensions`](/docs/plugins/tsh-core/skills/authoring-claude-extensions) decides whether a need calls for a skill, a subagent, a hook or a plugin, and then writes it.
