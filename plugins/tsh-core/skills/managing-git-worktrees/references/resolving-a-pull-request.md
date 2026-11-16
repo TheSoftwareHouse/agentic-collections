@@ -81,9 +81,10 @@ as section 4 apply to the answer: a fork stops, and so does a user who cannot co
 
 ## 6. Hand back to adopt
 
-Return the branch name to step 2 of `adopting-a-branch.md`, which validates it exactly as
-it would a typed name — a resolved name gets no shortcut. Return the verdict and the means
-too: step 8 of that reference ends its confirmation with this clause.
+Return the branch name to step 2 of `adopting-a-branch.md`, which takes it as given, with
+no prefix stripped, and validates it as it would a typed name: a resolved name gets no
+shortcut. Return the verdict and the means too: step 8 of that reference ends its
+confirmation with this clause.
 
 ```text
 ; pull request <ref>: branch <resolved via <means> | supplied by you>, head repository <name> <is origin's, resolved via <means> | confirmed by you as origin's>
