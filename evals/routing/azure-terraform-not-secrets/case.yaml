@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: azure-terraform-not-secrets
+description: Provisioning an AKS cluster and a private PostgreSQL server in Terraform must route to implementing-azure-terraform, not to managing-secrets or deploying-to-kubernetes, although the request is about a cluster whose pods read Key Vault without client secrets.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-azure"]
+runs: 1
+execution:
+  prompt: |
+    Our Azure resource group and VNet are already in Terraform. Add an AKS cluster whose pods
+    reach Key Vault without client secrets, and a PostgreSQL Flexible Server that is only reachable inside the VNet.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-azure-terraform"'
+    arm: with-only
+  - name: managing-secrets-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-secrets"'
+    min: 0
+    max: 0
+  - name: deploying-to-kubernetes-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    min: 0
+    max: 0
+  - name: auditing-azure-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-azure-cost"'
+    min: 0
+    max: 0

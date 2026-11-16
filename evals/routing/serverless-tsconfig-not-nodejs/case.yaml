@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: serverless-tsconfig-not-nodejs
+description: A Lambda bundle that compiles but fails at runtime on module syntax must route to configuring-typescript-for-serverless, not to the Node.js server tsconfig.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-serverless", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    Our Lambda service compiles cleanly, but after packaging with esbuild the function dies on invoke with
+    "Cannot use import statement outside a module". Here is our tsconfig: module commonjs, target es2019. What should it be?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-serverless"'
+    arm: with-only
+  - name: configuring-typescript-for-nodejs-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-nodejs"'
+    min: 0
+    max: 0

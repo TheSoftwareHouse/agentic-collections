@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: serverless-config-not-terraform
+description: Wiring an SQS-triggered function into a serverless service with scoped IAM must route to configuring-serverless-service, not to AWS Terraform or the serverless tsconfig.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-serverless", "../../../plugins/tsh-stack-aws"]
+runs: 1
+execution:
+  prompt: |
+    The handler for processing refunds is already written. Wire it into the service: triggered by
+    the refunds SQS queue, allowed to touch only that queue, and never more than five copies running at once.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-serverless-service"'
+    arm: with-only
+  - name: implementing-aws-terraform-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-aws-terraform"'
+    min: 0
+    max: 0
+  - name: configuring-typescript-for-serverless-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-typescript-for-serverless"'
+    min: 0
+    max: 0

@@ -48,6 +48,16 @@ alone reaches nobody.
   works over the same sign-in; what you can open still depends on your permissions on
   each service desk.
 
+## [0.11.1] - 2026-11-13
+
+### Fixed
+
+- **`writing-technical-documents` now loads for short edits.** Asked to shorten a
+  single pasted paragraph, Claude loaded the skill in 2 of 6 measured runs and
+  otherwise rewrote the text without the standard, although the description claimed
+  any request to tighten prose. The description now says to load it before
+  rewriting, even for one paragraph. The same request measures 6 of 6.
+
 ## [0.11.0] - 2026-10-30
 
 ### Added

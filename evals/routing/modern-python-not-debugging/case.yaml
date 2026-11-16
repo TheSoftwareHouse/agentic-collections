@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: modern-python-not-debugging
+description: Rewriting asyncio.gather code with structured concurrency must route to writing-modern-python, not to debugging-code, although the request describes a symptom, and not to writing-data-models.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-python", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    This fetcher fires asyncio.gather(*[fetch(u) for u in urls], return_exceptions=True) and then
+    loops over the results checking isinstance(r, Exception). When one call hangs the others keep running
+    after we've given up. We're on Python 3.12; rewrite it the way it should be written today.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-modern-python"'
+    arm: with-only
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
+  - name: writing-data-models-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-data-models"'
+    min: 0
+    max: 0

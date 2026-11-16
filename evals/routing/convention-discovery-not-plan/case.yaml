@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: convention-discovery-not-plan
+description: Asking which of two competing in-repo patterns new code should follow must route to discovering-technical-context, not to planning, implementation or Claude-context setup.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    I'm about to add a refunds endpoint. The orders module returns errors as { error: { code, message } }
+    and the payments module throws HttpExceptions with plain strings. Which way is this repo
+    actually meant to do it, so my endpoint matches?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?discovering-technical-context"'
+    arm: with-only
+  - name: creating-implementation-plans-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    min: 0
+    max: 0
+  - name: orchestrating-feature-implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+  - name: managing-claude-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0

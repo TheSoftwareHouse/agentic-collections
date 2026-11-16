@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: ci-pipeline-not-kubernetes
+description: Changing how a deploy workflow rolls a release out must route to implementing-ci-cd-pipelines, not to Kubernetes workload configuration or observability, although the target is a cluster and the trigger is an error rate.
+tags: [routing]
+plugins: ["../../../plugins/tsh-platform-engineering"]
+runs: 1
+execution:
+  prompt: |
+    The deploy job in our GitHub Actions workflow is a single step: after the image is built it runs
+    kubectl set image on the api Deployment in EKS, so every merge reaches everyone at once. Last week
+    a bad build took the API down that way. Change the release so a new version reaches a small share
+    of traffic first and goes no further if errors climb.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ci-cd-pipelines"'
+    arm: with-only
+  - name: deploying-to-kubernetes-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    min: 0
+    max: 0
+  - name: implementing-observability-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-observability"'
+    min: 0
+    max: 0

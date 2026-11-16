@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: observability-not-kubernetes
+description: Replacing noisy CPU alerts on pods with user-facing ones and an SLO must route to implementing-observability, not to Kubernetes scaling, although the alerts are about pods and the team's reflex is to add replicas.
+tags: [routing]
+plugins: ["../../../plugins/tsh-platform-engineering"]
+runs: 1
+execution:
+  prompt: |
+    On-call gets woken up most nights by "CPU above 80%" alerts on the checkout pods. Nobody does anything
+    about them except wonder whether to add replicas. Meanwhile the one real outage last month didn't page anyone.
+    Rework what we alert on, and give checkout a target we can actually hold it to.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-observability"'
+    arm: with-only
+  - name: deploying-to-kubernetes-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?deploying-to-kubernetes"'
+    min: 0
+    max: 0
+  - name: optimizing-cloud-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    min: 0
+    max: 0

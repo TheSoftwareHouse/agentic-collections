@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: gcp-terraform-not-secrets
+description: Provisioning a Cloud Run service that reaches Cloud SQL privately in Terraform must route to implementing-gcp-terraform, not to managing-secrets, although the request names where the database password comes from.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-gcp"]
+runs: 1
+execution:
+  prompt: |
+    Our GCP setup is already in Terraform. Add a Cloud Run service for the reports API
+    that talks to our Cloud SQL Postgres over its private IP, with the DB password coming from Secret Manager.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-gcp-terraform"'
+    arm: with-only
+  - name: managing-secrets-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-secrets"'
+    min: 0
+    max: 0
+  - name: auditing-gcp-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-gcp-cost"'
+    min: 0
+    max: 0

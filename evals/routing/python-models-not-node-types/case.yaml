@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: python-models-not-node-types
+description: Shaping a DTO in a Python service must route to writing-data-models, not to the Node.js type-modelling or NestJS skills, which share the DTO vocabulary.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-python", "../../../plugins/tsh-stack-nodejs"]
+runs: 1
+execution:
+  prompt: |
+    In our Python service the Invoice DTO has amount: float and a mutable list of lines, and we copy it
+    field by field from the database row. Amounts are drifting by a cent and someone mutated a cached invoice.
+    How should this DTO be defined?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-data-models"'
+    arm: with-only
+  - name: modelling-types-for-nodejs-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?modelling-types-for-nodejs"'
+    min: 0
+    max: 0
+  - name: implementing-nestjs-api-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-nestjs-api"'
+    min: 0
+    max: 0
+  - name: writing-modern-python-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-modern-python"'
+    min: 0
+    max: 0

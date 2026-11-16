@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: gcp-cost-audit-not-framework
+description: A cost review of a live GCP project must route to auditing-gcp-cost, not to the cloud-agnostic framework or GCP Terraform.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-gcp"]
+runs: 1
+execution:
+  prompt: |
+    Spend on our production GCP project doubled after we moved to GKE, and finance wants to know why.
+    Go through the project: where the money goes, what's idle or orphaned, and which resources nobody owns.
+    Give me a report I can share.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?auditing-gcp-cost"'
+    arm: with-only
+  - name: optimizing-cloud-cost-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-cloud-cost"'
+    min: 0
+    max: 0
+  - name: implementing-gcp-terraform-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-gcp-terraform"'
+    min: 0
+    max: 0

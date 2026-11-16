@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: worktree-not-implementation
+description: Asking for a second checkout for a hotfix must route to managing-git-worktrees, not to feature implementation or debugging.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    I'm halfway through a feature on my branch and don't want to stash anything.
+    Set me up a separate checkout of a new branch hotfix/payment-timeout based on release/2.4,
+    so I can work on the hotfix next to what I have open now.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-git-worktrees"'
+    arm: with-only
+  - name: orchestrating-feature-implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0

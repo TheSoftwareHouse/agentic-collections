@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: decision-record-not-claude-context
+description: Recording a decision that replaces an earlier one must route to managing-decision-records, not to Claude-context maintenance or convention discovery.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    We agreed in today's architecture sync to move the order events from RabbitMQ to SQS.
+    That replaces our decision 0004, which picked RabbitMQ. Put it on record and mark 0004 accordingly.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-decision-records"'
+    arm: with-only
+  - name: managing-claude-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    min: 0
+    max: 0
+  - name: discovering-technical-context-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?discovering-technical-context"'
+    min: 0
+    max: 0
+  - name: writing-technical-documents-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?writing-technical-documents"'
+    min: 0
+    max: 0
