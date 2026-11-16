@@ -159,8 +159,9 @@ Read every ref by its full name or by a commit ID.
 1. **Occupied.** Any record with the line `branch refs/heads/${branch}` — the main clone,
    a linked worktree, the active one, or one marked `prunable` (a deleted directory keeps
    its record). Stop and name that record's path; when it is the active worktree, say the
-   user is already on it. A record marked `detached` never holds the branch, whatever
-   commit it sits on.
+   user is already on it. A `detached` record does not count here, but git still holds
+   the branch for a worktree mid-rebase or mid-bisect on it; step 10 reports that refusal
+   as Occupied.
 2. **Absent.** `git -C "$canonical_root" show-ref --verify --quiet "refs/heads/${branch}"`
    exits `1` → a new branch, subject to item 3. Exit `0` → it exists; any other status is fatal.
 3. **Upstream identity**, absent branch included. Read `branch.${branch}.remote` with
@@ -261,7 +262,9 @@ shell, so set the recorded values in that same command, and it stops when one is
 A non-zero exit does not say which command failed: run
 `git -C "$canonical_root" worktree list --porcelain`. If it lists `$worktree_path`,
 `worktree add` failed after creating it (a `post-checkout` hook can do that): step 11's
-controlled failure. If not, nothing was created; report the output and, if a ref differs
+controlled failure. If not, nothing was created. If `worktree add` says the branch is
+already used by a worktree or checked out at a path, stop as Occupied and name that path.
+Otherwise report the output and, if a ref differs
 from the record, return to step 7 as step 9 says.
 
 ## 11. Verify the result
