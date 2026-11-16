@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: worktree-adopt-pr-branch-not-review
+description: Asking for a separate checkout of a colleague's existing pull-request branch, to push fixes to it, must route to managing-git-worktrees, not to code review or debugging. The pull request is named only by its branch, because a prompt naming a pull request sends the first turn searching.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-core", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    A colleague's pull request is on origin as feat/pay-412-retry-webhooks, and I need to push fixes
+    for the review comments on it. I have my own feature branch open and don't want to disturb it,
+    so give me a separate checkout of that existing branch next to what I have now.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-git-worktrees"'
+    arm: with-only
+  - name: reviewing-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
