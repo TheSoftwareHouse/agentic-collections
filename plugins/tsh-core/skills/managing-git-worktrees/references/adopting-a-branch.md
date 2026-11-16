@@ -262,13 +262,14 @@ shell, so set the recorded values in that same command, and it stops when one is
 A non-zero exit does not say which command failed: run
 `git -C "$canonical_root" worktree list --porcelain`. If it lists `$worktree_path`,
 `worktree add` failed after creating it (a `post-checkout` hook can do that): step 11's
-controlled failure. If not, no worktree was created. In the absent-branch form, check
-`refs/heads/${branch}` with `show-ref --verify`: `-b` creates the branch before the
-directory, so a failure there leaves it behind. Report it as left at `adopt_commit` with
-no upstream; a rerun of adopt shows it as `existing, equal`. Adopt never deletes it. If
-`worktree add` says the branch is already used by a worktree or checked out at a path,
-stop as Occupied and name that path. Otherwise report the output and, if a ref differs
-from the record, return to step 7 as step 9 says.
+controlled failure. If not, no worktree was created. In the absent-branch form, read
+`refs/heads/${branch}` with `show-ref --verify` and its two upstream keys. `-b` creates
+the branch before the directory, so a branch at `adopt_commit` with neither key set was
+left by the failure: report it so, with no upstream; a rerun of adopt shows it as
+`existing, equal`. Adopt never deletes it. A branch in any other state differs from the
+record. If `worktree add` says the branch is already used by a worktree or checked out at
+a path, stop as Occupied and name that path. Otherwise report the output and, if a ref
+differs from the record, return to step 7 as step 9 says.
 
 ## 11. Verify the result
 
