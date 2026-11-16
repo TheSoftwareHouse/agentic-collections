@@ -13,10 +13,11 @@ whatever the session already has; do not go looking for one particular tool.
 
 - The pull request's **head branch name**.
 - Its **base repository**, the one the pull request belongs to. Resolve a bare number
-  against origin's repository by name, for example `gh pr view <n> --repo <owner/name>`:
-  without it, `gh` in a clone with an `upstream` remote reads the upstream's pull request.
+  against origin's repository by name, with host, owner and name from origin's filtered
+  URL (section 2), for example `gh pr view <n> --repo <host>/<owner>/<name>`: without
+  it, `gh` in a clone with an `upstream` remote reads the upstream's pull request.
 - A **head-repository verdict**: origin's, a fork or another repository, or unknown.
-- For each of the two, the **means** that produced it — the project's instructions, a CLI,
+- For the branch and the verdict, the **means** that produced it — the project's instructions, a CLI,
   an MCP tool — kept for the confirmation (section 6).
 
 ## 2. Find it with what is already there

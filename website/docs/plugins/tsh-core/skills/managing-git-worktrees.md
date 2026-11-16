@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Creates a Git worktree for a new branch from a freshly fetched base branch on origin, adopts a branch that already exists on origin, such as a pull request's head, into its own worktree without pushing, lists registered worktrees read-only, and removes one precisely identified worktree.
 sources:
   - plugins/tsh-core/skills/managing-git-worktrees/
-sources_hash: "d2e1cc7fd0e2089283f14fac095a15ab1b3837d0fbb626dba889cb28890144a6"
+sources_hash: "5da533fc5881e23e6d58062797a64966445ef3a810f96b9aa0fb1818c26b11d3"
 ---
 
 # Managing Git Worktrees
