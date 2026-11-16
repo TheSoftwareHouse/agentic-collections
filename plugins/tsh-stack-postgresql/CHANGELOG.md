@@ -18,8 +18,11 @@ describes.
   Asked to review a pull request that includes a migration, Claude sometimes loaded
   only this skill and judged the migration without the rest of the change. A new rule
   loads the general code-review skill too (`reviewing-code`, when installed) when the
-  migration is one part of a change under review. With the matching rule in
-  `tsh-product-engineering` 0.12.1, both load in 6 of 6 measured runs, up from 3 of 6.
+  whole change or its merge readiness is under review, not only the migration. With
+  the matching rule in `tsh-product-engineering` 0.12.1, a four-turn probe on Sonnet
+  loaded both in 6 of 6 runs, up from 3 of 6, and a question about the migration
+  alone did not load `reviewing-code` (6 of 6). Six runs is a small sample; both
+  probes are manual checks in the repository's `evals/README.md`.
 
 ## [0.1.0] - 2026-11-13
 

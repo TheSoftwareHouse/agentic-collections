@@ -103,7 +103,8 @@ high-risk anti-pattern list above. When the change targets a framework or stack 
 skill is available this session, load it now and run its review checklist alongside
 this one — it carries the framework-specific risks (for a NestJS change: CQRS
 boundaries, TypeORM transaction and persistence semantics, DTO validation,
-testability) that a stack-agnostic review does not name.
+testability) that a stack-agnostic review does not name. A schema migration or a new
+query shape loads the database engine's skill the same way.
 
 **Step 6 — Security.** Load
 [`./references/security-review-checklist.md`](./references/security-review-checklist.md)

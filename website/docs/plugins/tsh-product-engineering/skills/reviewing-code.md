@@ -5,7 +5,7 @@ sidebar_position: 6
 description: TSH's evidence-based pre-merge review of a delivered change set, comparing it with the plan, running the project's checks and applying anti-pattern, security and scalability checks.
 sources:
   - plugins/tsh-product-engineering/skills/reviewing-code/
-sources_hash: "8b53db892d1a4524f384170ce311c405f809c047750c6e32da4d847889e1badb"
+sources_hash: "118d2b21134f8ecac55d8e31ca16548c5b77617d9db174644873a86ba8ecae0f"
 ---
 
 # Reviewing Code

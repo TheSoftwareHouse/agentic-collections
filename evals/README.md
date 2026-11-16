@@ -384,6 +384,107 @@ blocker-level finding. Measured 6 of 6 on 2026-10-28, `tsh-product-engineering` 
 about USD 0.08 per run. A run that fires the review but does not report the IDOR is a
 regression in the Step 6 baseline or the checklist reference.
 
+## A manual check that is not a routing case: the database skill in a review
+
+A review of a pull request that includes a PostgreSQL migration should load both
+`reviewing-code` and `migrating-postgresql-schemas`, whichever loads first: each
+carries a rule that loads the other on a later turn. A question about the migration
+alone should load only the migration skill. Both need more than one turn, so they are
+manual checks, not routing cases. Run them before changing either rule. Measured on
+2026-11-16 (Sonnet, six runs each): 6 of 6 for both; the review probe was 3 of 6
+before the rules named the database engine.
+
+Save each as `evals/routing/<name>/case.yaml`, run it with `--runs 6` and
+`--max-cost-usd` set (about USD 0.10 per run), then **delete the directories**:
+
+```yaml
+schema_version: "1.1"
+name: _probe-review-migration
+description: Manual probe (not committed) — a whole-PR review with a migration must load reviewing-code and migrating-postgresql-schemas within four turns.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Review this PR before we merge it. It adds a "last seen" feature to our NestJS API on PostgreSQL 16.
+
+    ```diff
+    +++ b/src/users/user.entity.ts
+    +  @Column({ type: 'timestamptz', nullable: true })
+    +  lastSeenAt: Date | null;
+    +++ b/src/users/users.service.ts
+    +  async touch(id: string) {
+    +    await this.repo.update({ id }, { lastSeenAt: new Date() });
+    +  }
+    +++ b/src/migrations/1731700000000-AddLastSeen.ts
+    +export class AddLastSeen1731700000000 implements MigrationInterface {
+    +  async up(q: QueryRunner) {
+    +    await q.query('ALTER TABLE users ADD COLUMN last_seen_at timestamptz');
+    +    await q.query('UPDATE users SET last_seen_at = updated_at');
+    +    await q.query('CREATE INDEX users_last_seen_at_idx ON users (last_seen_at)');
+    +  }
+    +}
+    ```
+
+    The users table has about 12 million rows.
+  max_turns: 4
+  allowed_tools: [Skill]
+graders:
+  - name: reviewing-code-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+  - name: migrating-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+```
+
+```yaml
+schema_version: "1.1"
+name: _probe-migration-only
+description: Manual probe (not committed) — asking only about a migration must load migrating-postgresql-schemas and not reviewing-code.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    In this PR, only check the migration: will it lock the users table? I do not need a review of the rest. Our NestJS API runs on PostgreSQL 16.
+
+    ```diff
+    +++ b/src/users/user.entity.ts
+    +  @Column({ type: 'timestamptz', nullable: true })
+    +  lastSeenAt: Date | null;
+    +++ b/src/users/users.service.ts
+    +  async touch(id: string) {
+    +    await this.repo.update({ id }, { lastSeenAt: new Date() });
+    +  }
+    +++ b/src/migrations/1731700000000-AddLastSeen.ts
+    +export class AddLastSeen1731700000000 implements MigrationInterface {
+    +  async up(q: QueryRunner) {
+    +    await q.query('ALTER TABLE users ADD COLUMN last_seen_at timestamptz');
+    +    await q.query('UPDATE users SET last_seen_at = updated_at');
+    +    await q.query('CREATE INDEX users_last_seen_at_idx ON users (last_seen_at)');
+    +  }
+    +}
+    ```
+
+    The users table has about 12 million rows.
+  max_turns: 4
+  allowed_tools: [Skill]
+graders:
+  - name: migrating-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+  - name: reviewing-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0
+```
+
 ## Behavioural suites: what a skill does after it fires
 
 A routing case proves the right skill loads. A behavioural case proves what it then

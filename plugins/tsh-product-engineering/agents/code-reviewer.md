@@ -32,7 +32,8 @@ When the change targets a framework or stack whose skill is available in this se
 framework-specific review checklist alongside `reviewing-code`'s. The discipline skill
 owns the review that is the same for every stack; the stack skill owns what is
 specific to one. The database engine counts as a stack: a change with a schema
-migration or a new query shape also loads that engine's skill when one is available.
+migration or a new query shape also loads that engine's skill when one is available,
+whichever ORM wrote the SQL.
 Load whichever are present; never name one that is absent.
 
 Two boundaries specific to your role:

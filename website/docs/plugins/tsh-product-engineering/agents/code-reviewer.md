@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Reviews a delivered change set against its plan and requirements by executing the checks itself, and returns a structured findings report without fixing code.
 sources:
   - plugins/tsh-product-engineering/agents/code-reviewer.md
-sources_hash: "8f47d4b6c65855f36382cbad70257e1fa179b91da3639a2857e64493e76d7dbd"
+sources_hash: "5bbc8c7c8ce81854baee07a64e260f490559aaf77d68f99319c8c07917605ffa"
 ---
 
 # Code Reviewer
