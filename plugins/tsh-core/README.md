@@ -28,7 +28,7 @@ it costs. Read [Scope](#scope) before adding anything.
 | `authoring-claude-extensions` | `/tsh-core:authoring-claude-extensions` | Which Claude Code extension a need calls for — skill, subagent, hook or plugin — and how to write it. Routes on *when* the guidance is needed, not just what it is about, because that is the distinction that decides whether an extension ever loads |
 | `managing-claude-context` | `/tsh-core:managing-claude-context` | The project-context files Claude Code loads — root and nested `CLAUDE.md`, path-scoped rules in `.claude/rules/`, and a decision-record index: put each convention in the layer that actually loads it, keep every memory file thin and true, and audit the ones that have drifted |
 | `managing-decision-records` | `/tsh-core:managing-decision-records` | The shape and lifecycle of an ADR — the four-section format, the status vocabulary, numbering, superseding, and keeping the index in step. Only `Accepted` records bind; every other status is history you read but never obey |
-| `init` | `/tsh-core:init` | One-shot project setup: audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules and the decision-record index by running the owning skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current. Safe to re-run — the second pass is a repair |
+| `init` | `/tsh-core:init` | One-shot project setup: audits what already loads, then creates or repairs root and nested `CLAUDE.md`, path-scoped rules and the decision-record index by running the owning skills in order, and wires maintenance pointers into `CLAUDE.md` so future sessions keep it all current, and, with `tsh-product-engineering` installed, has the project's verification and security-invariant skills captured. Safe to re-run — the second pass is a repair |
 
 `authoring-claude-extensions` and `managing-claude-context` split cleanly:
 **"I want to build something"** goes to the first, **"I want this repo's memory files
@@ -94,7 +94,7 @@ engineering, product management and testing all read from it, and none of that c
 with the language a repo is written in.
 
 **One step per machine.** Run `/mcp`, pick `atlassian`, finish the browser login. If you
-signed in before 0.13.0, do it once more: the server moved to Atlassian's v2 endpoint
+signed in before 0.14.0, do it once more: the server moved to Atlassian's v2 endpoint
 there, which is a new OAuth resource, so the old sign-in does not carry over. The
 server is remote and OAuth-authenticated, so every call runs as you — it grants
 nothing you could not already open in Jira yourself. Atlassian Cloud only. It appears

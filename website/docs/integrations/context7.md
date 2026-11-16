@@ -17,7 +17,7 @@ sources:
   - plugins/tsh-stack-aws/README.md
   - plugins/tsh-stack-azure/README.md
   - plugins/tsh-stack-gcp/README.md
-sources_hash: "ad213b27bddb7263bfecdb18a7e9f27ecfd78d5f767bd5117f440c8fb1bfdd4f"
+sources_hash: "a9a33c7d4eae0cd8954ed1f4e9bd33a67f10a337641f5b4deec03fcecefce4ac"
 ---
 
 # Context7

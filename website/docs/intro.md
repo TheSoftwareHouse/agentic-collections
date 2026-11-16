@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "ad350e5a7bacf4edfa83612e1f5265ac8917b4654f8f97eaa28297ace7bb3033"
+sources_hash: "78c132d27e96330f62d26cd703cc106c3ecb162e6170f49f2ff5c283cce1af89"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';
