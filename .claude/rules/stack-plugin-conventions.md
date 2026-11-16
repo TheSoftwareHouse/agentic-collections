@@ -5,8 +5,9 @@ paths:
 
 # Stack plugin conventions
 
-**Every technology stack gets its own plugin, named `tsh-stack-<stack-name>`.** PHP,
-Java, Go and further cloud providers are expected members of this family; each is created
+**Every technology stack gets its own plugin, named `tsh-stack-<stack-name>`.** Java,
+Go, further cloud providers and further database engines are expected members of this
+family; each is created
 when it has real content to ship, not before. An empty plugin in the Discover tab teaches
 teammates the catalogue is hollow — and so does a plugin holding a single reference file,
 so seed a new member with at least one complete skill.
@@ -31,6 +32,24 @@ is the design rather than a duplication to clean up. Three reasons:
 
 Framework skills live inside their runtime's plugin: `implementing-nestjs-api`
 belongs in `tsh-stack-nodejs`, not in a `tsh-stack-nestjs` of its own.
+
+## A database engine is a stack too
+
+`tsh-stack-postgresql` carries what PostgreSQL does with SQL: lock modes, the planner,
+types and constraints. It sits beside the runtime plugins, not inside one, for the
+same reason a cloud provider does: a Node, a PHP and a Python service can share one
+PostgreSQL database, and the advice does not change with the language.
+
+The split with the runtime plugins follows the layer, not the topic. How to write a
+migration **in TypeORM** stays in `tsh-stack-nodejs`; what that migration's SQL does
+to a live table is `tsh-stack-postgresql`. The two do not co-fire on turn one: a
+request about a TypeORM migration loads `migrating-postgresql-schemas` alone (measured
+0 of 6 co-fires), as a review loads `reviewing-code` alone. So that skill carries the
+one tool mechanic safety depends on (running a migration outside a transaction, per
+tool), and a MUST rule in it loads the ORM's skill on a later turn when one is
+installed (6 of 6 in a four-turn probe; as a late procedure step it was 0 of 6).
+Another engine (MySQL, MariaDB) is its own plugin with its own skill names, because
+lock behaviour, online DDL and the planner differ.
 
 ## Split trigger
 

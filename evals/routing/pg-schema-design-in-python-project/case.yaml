@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: pg-schema-design-in-python-project
+description: A storage question asked from a SQLModel project must load designing-postgresql-schemas, since the answer is a column type and a key, not a Python model.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-python"]
+runs: 1
+execution:
+  prompt: |
+    We're about to write the SQLModel classes for invoices in our FastAPI service on Postgres. Before that:
+    should amounts be numeric or integer cents, and should invoice ids be uuid or bigint if we expose them
+    in URLs? Tell me what the columns should be.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    arm: with-only
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
