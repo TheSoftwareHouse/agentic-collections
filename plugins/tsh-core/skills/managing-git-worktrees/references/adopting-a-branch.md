@@ -57,11 +57,11 @@ There are two kinds of input.
   the pull request's repositories there. It either stops — a fork, another repository,
   an unconfirmed one — or returns a branch name and the means behind each value.
 
-For both kinds, take the name the same way. A resolved name is another person's text and
-gets no shortcut.
+A resolved name is another person's text and gets no shortcut in items 2–4.
 
-1. Strip a single leading `refs/heads/` or a single leading `origin/`. Rewrite nothing
-   else.
+1. From a name the user typed, strip a single leading `refs/heads/` or a single leading
+   `origin/`, and rewrite nothing else. Take a resolved name exactly as given: it is
+   already a branch name, and `origin/<x>` is a valid one.
 2. Keep the result in the shell variable `branch` and pass it only as a separate quoted
    argument.
 3. Validate it with `git -C "$canonical_root" check-ref-format --branch "$branch"` and
