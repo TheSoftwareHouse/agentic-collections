@@ -31,6 +31,8 @@ alone reaches nobody.
   - the branch is checked out in any worktree, including one whose directory was
     deleted but is still registered;
   - the pull request comes from a fork, even when origin has a branch of the same name;
+  - the pull request belongs to a repository other than origin's. A bare number is read
+    against origin's own repository, not an `upstream` remote's;
   - the local branch has diverged from origin, or its upstream is anything but
     `origin/<branch>` or unset, or it differs from origin in a shallow clone;
   - the branch does not exist locally but upstream settings for it are left in the
