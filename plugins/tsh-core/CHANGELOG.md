@@ -14,6 +14,40 @@ describes.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.14.0] - 2026-11-16
+
+### Changed
+
+- **The bundled `atlassian` server moved to Atlassian's v2 endpoint, and you sign in
+  to it again once.** It pointed at `https://mcp.atlassian.com/v1/mcp/authv2`, which
+  Atlassian has deprecated: on 2027-03-01 that address starts serving v2 tools anyway,
+  so staying on it only postpones the change. It now points at
+  `https://mcp.atlassian.com/v2/mcp`. v2 is a separate OAuth resource, so your old
+  sign-in does not carry over. **Action:** after `/plugin update` and a restart, run
+  `/mcp`, pick `atlassian` and finish the browser login.
+- **Tool names change.** v2 exposes a few primary tools (`getJiraIssue`,
+  `editJiraIssue`, `createConfluenceContent` …) plus `discover`, which finds an
+  operation from a description of the goal, and three runners — `executeRead`,
+  `executeWrite` and `executeDestructive` — which carry out the operation named in
+  their `name` argument.
+- **Update `tsh-product-management` to 0.6.0 in the same sitting.** Its Jira guard
+  before that version does not know the v2 tools, so in a business-analysis session
+  it holds v2 reads for confirmation.
+- **The plugin description names Bitbucket Cloud.** It said the bundled Atlassian
+  server was for Jira and Confluence; it now says Jira, Confluence and Bitbucket
+  Cloud, which the same sign-in reaches when the Bitbucket workspace is linked to
+  your Atlassian organisation.
+
+### Fixed
+
+- **The README no longer says Bitbucket and Jira Service Management need API
+  tokens.** It said both were reachable only under API-token authentication, which is
+  why no server was bundled for them. Bitbucket Cloud works over the bundled OAuth
+  sign-in as long as the Bitbucket workspace is linked to your Atlassian organisation,
+  with no extra server and no token. In Jira Service Management, searching requests
+  works over the same sign-in; what you can open still depends on your permissions on
+  each service desk.
+
 ## [0.13.0] - 2026-11-16
 
 ### Changed

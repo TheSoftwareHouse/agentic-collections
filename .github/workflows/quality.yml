@@ -89,6 +89,18 @@ jobs:
         working-directory: website
         run: npm run build
 
+  jira-write-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      # The tsh-product-management PreToolUse guard; the tests spawn it locally and need no network.
+      - name: Test the Jira write guard
+        run: node --test tests/jira-write-guard/guard-jira-write.test.mjs
+
   project-context-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10

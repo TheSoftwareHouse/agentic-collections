@@ -10,7 +10,7 @@ sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/references/ui-verification-gate.md
   - plugins/tsh-product-engineering/skills/reviewing-ui/SKILL.md
   - plugins/tsh-stack-aws/README.md
-sources_hash: "13005b423d02f53a885c615c25a51f2c0c2abeae3ea5ca92aec6439afc3986f3"
+sources_hash: "15a337f839b01125934b589e1b5a502b60f61600d6bbbe2d278f2b99c3b6d089"
 ---
 
 # Troubleshooting
