@@ -114,18 +114,18 @@ Require all four:
   line not of the two forms in (a) — whose destination is
   `refs/remotes/origin/${branch}` or a pattern ending in `*` whose part before the `*` is
   a prefix of it. That is ambiguous ownership of the tracking ref.
-- **(d) No case twin.** No line of
+- **(d) No case twin.** Compare each line of
   `git -C "$canonical_root" for-each-ref --format='%(refname)' refs/heads/ refs/remotes/origin/`
-  equals `refs/heads/${branch}` or `refs/remotes/origin/${branch}` when case is ignored
-  but differs from it byte for byte. On a case-insensitive filesystem the two share one
-  ref file, and adopt would read or move the other branch.
+  with `refs/heads/${branch}` and `refs/remotes/origin/${branch}`, component by component
+  while they match ignoring case: one that differs byte for byte fails (d), a directory
+  too (`refs/heads/feat/other` stops `Feat/X`). A case-insensitive filesystem stores both
+  in one file or directory: adopt would read or move another branch, or break `HEAD`.
 
 Any failure stops before the fetch: show the lines that failed and say which of (a)–(d)
-it is. For (a), tell the user they may run `git remote set-branches --add origin <branch>`
-themselves; it writes the second form with a `+`, and this skill never edits remote
-configuration. Narrower positive patterns such as
-`refs/heads/feat/*:refs/remotes/origin/feat/*` are unsupported by design and stop under
-(a).
+it is; for (d), name the part that differs only in case. For (a), tell the user they may
+run `git remote set-branches --add origin <branch>` themselves; it writes the second form
+with a `+`, and this skill never edits remote configuration. Narrower positive patterns
+such as `refs/heads/feat/*:refs/remotes/origin/feat/*` stop under (a) by design.
 
 Without (a)–(c), `--set-upstream-to` fails after the branch exists: "is not a branch" in
 a single-branch clone or with a negative refspec, ambiguous when another remote maps into
