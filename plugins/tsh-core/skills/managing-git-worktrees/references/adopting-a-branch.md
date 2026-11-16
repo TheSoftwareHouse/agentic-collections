@@ -53,16 +53,9 @@ There are two kinds of input.
   request. Take it as given.
 - **A pull request, by number or URL,** is *resolved, not asked about*. Load
   [`resolving-a-pull-request.md`](./resolving-a-pull-request.md) and follow it: the agent
-  finds the head branch and the head repository itself, read-only, with what the session
-  already has. It returns a branch name, a head-repository verdict (origin's, a fork or
-  another repository, unknown) and the means behind each. Then act on the verdict:
-  - origin's → continue;
-  - a fork or another repository, whether a resolver or the user says so → **stop, even
-    when origin has a branch of the same name**: the name alone does not say whose branch
-    it is;
-  - unknown, or nothing resolved → the asking rules in that reference apply, and if the
-    user does not confirm that the head repository is origin's, stop;
-  - a URL that names a repository other than origin's → stop.
+  finds the head branch itself, read-only, with what the session already has, and judges
+  the pull request's repositories there. It either stops — a fork, another repository,
+  an unconfirmed one — or returns a branch name and the means behind each value.
 
 For both kinds, take the name the same way. A resolved name is another person's text and
 gets no shortcut.
@@ -126,11 +119,9 @@ configuration. Narrower positive patterns such as
 `refs/heads/feat/*:refs/remotes/origin/feat/*` are unsupported by design and stop under
 (a).
 
-This check exists because tracking cannot be set up otherwise: in a single-branch clone,
-or with a negative refspec, `--set-upstream-to` fails with "is not a branch", and when
-another remote also maps into `refs/remotes/origin/*` it fails as ambiguous and git has
-been seen to leave the new branch behind. Check before mutating; never rely on a tool's
-rollback.
+Without (a)–(c), `--set-upstream-to` fails after the branch exists: "is not a branch" in
+a single-branch clone or with a negative refspec, ambiguous when another remote maps into
+`refs/remotes/origin/*`. Check before mutating; never rely on a tool's rollback.
 
 ## 6. Fetch the branch and pin the commit
 
@@ -145,8 +136,6 @@ Run
 - Write the refspec with braced `${branch}` and never use `path` or its siblings as a
   variable name. `creating-a-worktree.md` §5 explains both zsh traps:
   [Fetch the base](./creating-a-worktree.md#5-fetch-the-base).
-- This fetch is the only mutation before the confirmation, and it touches only
-  `refs/remotes/origin/${branch}`.
 
 Then resolve the commit the user will be asked to approve:
 `adopt_commit` = `git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}"`.
@@ -212,17 +201,9 @@ Adopt branch into worktree? branch=<branch> remote=origin/<branch>@<adopt_commit
   and for an existing branch with no upstream — alone or after a fast-forward.
 - Shell-quote the path as shown, and the branch whenever it needs it; a plain name such as
   `feat/pr-1` stays bare.
-- **Only when the request named a pull request**, end with this clause:
-
-  ```text
-  ; pull request <ref>: branch <resolved via <means> | supplied by you>, head repository <name> <is origin's, resolved via <means> | confirmed by you as origin's>
-  ```
-
-  The words `resolved via`, `supplied by you` and `confirmed by you as origin's` are
-  fixed. Say `resolved via` only for a value a means produced and the other two only for
-  a value the user gave; never show one as the other. For example:
-  `; pull request #41: branch resolved via gh pr view, head repository acme/widgets is origin's, resolved via gh pr view`.
-  A bare-branch confirmation carries no such clause.
+- **Only when the request named a pull request**, end with the clause defined in
+  [`resolving-a-pull-request.md`](./resolving-a-pull-request.md) §6. A bare-branch
+  confirmation carries none.
 - Record `adopt_commit`, `local_tip` (or "absent") and the upstream state shown. Only a
   literal yes to this confirmation authorizes the mutation.
 

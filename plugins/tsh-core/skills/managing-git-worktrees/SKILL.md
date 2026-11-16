@@ -83,7 +83,7 @@ This skill does not:
 | --- | --- | --- |
 | [Creating a worktree](./references/creating-a-worktree.md) | The request is to create, add, or set up a new worktree, whether or not a base branch was named | Root resolution, branch and path confirmation, base-branch resolution and fetching, conflict checks, `--no-track` creation, verification, and the separate publish step |
 | [Adopting a branch](./references/adopting-a-branch.md) | The request is to work on, check out or adopt a branch that already exists on `origin`, including a pull request's branch | Root and path reuse, branch-name validation, the on-origin and refspec-coverage checks, the pinned-commit fetch, the local-branch matrix, the one confirmation, recheck, creation, verification, and the controlled-failure rule |
-| [Resolving a pull request](./references/resolving-a-pull-request.md) | The adopt request names a pull request by number or URL instead of a branch | Finding the head branch and head repository read-only with means already in the session, the verdicts (origin's, fork, unknown), and the fallback to asking |
+| [Resolving a pull request](./references/resolving-a-pull-request.md) | The adopt request names a pull request by number or URL instead of a branch | Finding the head branch and head repository read-only with means already in the session, the verdicts (origin's, fork, unknown), the fallback to asking, and the confirmation's pull-request clause |
 | [Removing a worktree](./references/removing-a-worktree.md) | The request is to remove, delete, or clean up an existing worktree | Target resolution, refused targets, cleanliness checks, confirmation, safe removal, verification, and the separate branch-deletion question |
 
 ## Procedure

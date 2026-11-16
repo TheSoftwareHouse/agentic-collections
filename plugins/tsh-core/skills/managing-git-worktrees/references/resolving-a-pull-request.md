@@ -80,14 +80,16 @@ as section 4 apply to the answer: a fork stops, and so does a user who cannot co
 
 Return the branch name to step 2 of `adopting-a-branch.md`, which validates it exactly as
 it would a typed name — a resolved name gets no shortcut. Return the verdict and the means
-too: step 8 of that reference shows each in the confirmation's pull-request clause.
+too: step 8 of that reference ends its confirmation with this clause.
 
-- Branch: `resolved via <means>`, or `supplied by you` when the user gave it.
-- Head repository: `<name> is origin's, resolved via <means>`, or
-  `confirmed by you as origin's` when the user vouched for it.
+```text
+; pull request <ref>: branch <resolved via <means> | supplied by you>, head repository <name> <is origin's, resolved via <means> | confirmed by you as origin's>
+```
 
-Name the means plainly, for example `resolved via gh pr view` or
-`resolved via the project's instructions`.
+The words `resolved via`, `supplied by you` and `confirmed by you as origin's` are fixed.
+Say `resolved via` only for a value a means produced and the other two only for a value
+the user gave; never show one as the other. Name the means plainly, for example:
+`; pull request #41: branch resolved via gh pr view, head repository acme/widgets is origin's, resolved via gh pr view`.
 
 Never present a resolved value as if the user had typed it. A wrong or poisoned answer
 cannot reach a mutation unseen: adopt still requires exactly this branch on origin, and
