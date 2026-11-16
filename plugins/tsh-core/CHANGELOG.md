@@ -23,8 +23,9 @@ alone reaches nobody.
   `origin/<branch>`. It never pushes. Until now the skill refused such a branch, so an
   agent asked to work on a pull request fell back to raw `git worktree add` and skipped
   the checks. Adopt fetches only that branch, without tags or submodules, pins the
-  commit, shows one confirmation that names `origin/<branch>@<commit>`, the path, the upstream and what happens to any
-  local branch of the same name, rechecks after your yes, and verifies the result.
+  commit, shows one confirmation that names `origin/<branch>@<commit>`, the path, the
+  upstream and what happens to any local branch of the same name, rechecks after your
+  yes, and verifies the result.
   A local branch behind origin is fast-forwarded to the confirmed commit and nothing
   else; one ahead keeps its unpushed commits, which the confirmation lists.
 - **Adopt stops before creating anything** when:
