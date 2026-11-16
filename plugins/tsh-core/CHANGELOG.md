@@ -56,6 +56,16 @@ alone reaches nobody.
   together are 1,038 of the 1,536 the listing allows. The extra text routes
   "check out an existing remote branch" and pull-request requests to this skill.
 
+## [0.11.1] - 2026-11-13
+
+### Fixed
+
+- **`writing-technical-documents` now loads for short edits.** Asked to shorten a
+  single pasted paragraph, Claude loaded the skill in 2 of 6 measured runs and
+  otherwise rewrote the text without the standard, although the description claimed
+  any request to tighten prose. The description now says to load it before
+  rewriting, even for one paragraph. The same request measures 6 of 6.
+
 ## [0.11.0] - 2026-10-30
 
 ### Added
