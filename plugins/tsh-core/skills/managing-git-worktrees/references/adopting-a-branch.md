@@ -7,7 +7,7 @@ pushes**. A branch that does not exist yet is a create request, and create refus
 that does. Work through the steps in order: the fetch, the pinned commit, the refusals
 before the confirmation and the recheck after it are what make adopt safe.
 
-Two invariants run through every step.
+Three invariants run through every step.
 
 - **Exact refs.** Read the local branch, the tracking ref and the upstream by full ref
   (`refs/heads/${branch}`, `refs/remotes/origin/${branch}`) or by commit ID, never by
@@ -19,6 +19,9 @@ Two invariants run through every step.
   History moves only to that commit, never to whatever `refs/remotes/origin/${branch}`
   says later — another worktree's fetch can move that shared ref while the user reads the
   question.
+- **No empty values.** Each Bash call is a fresh shell: set every value a command uses in
+  that call, and prefix the command with `[ -n "$<name>" ] &&` for each, reads included.
+  `git -C ""` runs in the current directory, and an empty end of a range reads as `HEAD`.
 
 What adopt never does:
 
@@ -230,20 +233,19 @@ never proceed on the old one.
 
 ## 10. Create the worktree
 
-Pass branch, path and commit as separate quoted arguments. Use the form step 7 selected.
-Its first command is a guard joined with `&&` to the first mutation in the same shell
-command, so a moved or vanished ref stops step 10 before anything is created even when
-step 9 was skipped or ran too late. The guard fails closed: every Bash call is a fresh
-shell, so set the recorded values in that same command, and it stops when one is empty.
+Pass branch, path and commit as separate quoted arguments. Run the form step 7 selected
+as one shell command — the guard, `worktree add` and every follow-up joined with `&&` —
+so a moved or vanished ref stops step 10 before anything is created even when step 9 was
+skipped or ran too late, and no follow-up can run alone in another directory.
 
 - **Absent branch.**
   ```sh
   [ -n "$canonical_root" ] && [ -n "$branch" ] && [ -n "$worktree_path" ] && [ -n "$adopt_commit" ] \
     && [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
     && { git -C "$canonical_root" show-ref --verify --quiet "refs/heads/${branch}"; [ $? -eq 1 ]; } \
-    && git -C "$canonical_root" worktree add --no-track -b "$branch" "$worktree_path" "$adopt_commit"
+    && git -C "$canonical_root" worktree add --no-track -b "$branch" "$worktree_path" "$adopt_commit" \
+    && git -C "$worktree_path" branch --set-upstream-to="refs/remotes/origin/${branch}"
   ```
-  then `git -C "$worktree_path" branch --set-upstream-to="refs/remotes/origin/${branch}"`.
   `--track` is not an option: it needs a ref as its start point and rejects a commit ID,
   and the start point must be the pinned commit.
 - **Existing branch.**
@@ -251,25 +253,24 @@ shell, so set the recorded values in that same command, and it stops when one is
   [ -n "$canonical_root" ] && [ -n "$branch" ] && [ -n "$worktree_path" ] && [ -n "$adopt_commit" ] && [ -n "$local_tip" ] \
     && [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
     && [ "$(git -C "$canonical_root" rev-parse --verify "refs/heads/${branch}^{commit}")" = "$local_tip" ] \
-    && git -C "$canonical_root" worktree add "$worktree_path" "$branch"
+    && git -C "$canonical_root" worktree add "$worktree_path" "$branch" \
+    && [ "$(git -C "$worktree_path" rev-parse HEAD)" = "$local_tip" ]
   ```
-  The attach uses the short name; see Exact refs. Immediately check that
-  `git -C "$worktree_path" rev-parse HEAD` equals the recorded `local_tip`, else stop
-  under step 11's controlled-failure rule. Then, for *behind*,
-  `git -C "$worktree_path" merge --ff-only "$adopt_commit"`, and for *no upstream* the
-  same `--set-upstream-to` as above. Nothing else.
+  The attach uses the short name; see Exact refs. The last test compares the new `HEAD`
+  with `local_tip`. Append `&& git -C "$worktree_path" merge --ff-only "$adopt_commit"`
+  for *behind*, then the absent form's last line for *no upstream*. Nothing else.
 
 A non-zero exit does not say which command failed: run
 `git -C "$canonical_root" worktree list --porcelain`. If it lists `$worktree_path`,
-`worktree add` failed after creating it (a `post-checkout` hook can do that): step 11's
-controlled failure. If not, no worktree was created. In the absent-branch form, read
-`refs/heads/${branch}` with `show-ref --verify` and its two upstream keys. `-b` creates
-the branch before the directory, so a branch at `adopt_commit` with neither key set was
-left by the failure: report it so, with no upstream; a rerun of adopt shows it as
-`existing, equal`. Adopt never deletes it. A branch in any other state differs from the
-record. If `worktree add` says the branch is already used by a worktree or checked out at
-a path, stop as Occupied and name that path. Otherwise report the output and, if a ref
-differs from the record, return to step 7 as step 9 says.
+`worktree add` failed after creating it (a `post-checkout` hook can do that) or a
+follow-up did: step 11's controlled failure. If not, no worktree was created. In the
+absent-branch form, read `refs/heads/${branch}` with `show-ref --verify` and its two
+upstream keys: `-b` creates the branch before the directory, so a branch at
+`adopt_commit` with neither key set was left by the failure. Report it so, with no
+upstream; a rerun shows it as `existing, equal`, and adopt never deletes it. Any other
+state differs from the record. If `worktree add` says the branch is already used by a
+worktree or checked out at a path, stop as Occupied and name that path. Otherwise report
+the output and, if a ref differs from the record, return to step 7 as step 9 says.
 
 ## 11. Verify the result
 
