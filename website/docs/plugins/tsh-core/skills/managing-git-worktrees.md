@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Creates a Git worktree for a new branch from a freshly fetched base branch on origin, adopts a branch that already exists on origin, such as a pull request's head, into its own worktree without pushing, lists registered worktrees read-only, and removes one precisely identified worktree.
 sources:
   - plugins/tsh-core/skills/managing-git-worktrees/
-sources_hash: "6fcd8daf8a7f57f4762eca83a47c9fdcfa4ee4ba84da2542cb344c1d92bc11ff"
+sources_hash: "5ee6f103f15bcd230e9341d64d5e36df75c4411f046e77699107ad8707afea7f"
 ---
 
 # Managing Git Worktrees
@@ -35,7 +35,7 @@ Handles the Git worktree lifecycle inside the current repository: create, adopt,
 
 1. **Identify the request type:** create, adopt, list or remove. A new branch is create; a branch that already exists on `origin` is adopt. Anything else is an unsupported request: the skill summarises the supported operations and proposes bounded extensions only if the user wants them developed.
 2. **Create.** Resolve the active and canonical roots, confirm the branch name, propose or accept a sibling path derived from the canonical root and the new branch slug, resolve and fetch the base, check conflicts, confirm, create, verify, return the `cd` command, then confirm separately and publish with `git push --set-upstream origin <branch>`.
-3. **Adopt.** Resolve the roots, then take and validate the branch name; a pull request's number or URL is resolved to its head branch first. Choose the sibling path, check that `origin` has exactly `refs/heads/<branch>`, and check that the fetch refspecs can track it. Fetch the branch with `--refmap= --no-tags` and pin `adopt_commit`, classify the local branch, take the one literal confirmation, recheck the state after the yes, create the worktree, and verify it. Return the `cd` command and say that nothing was pushed.
+3. **Adopt.** Resolve the roots, then take and validate the branch name; a pull request's number or URL is resolved to its head branch first. Choose the sibling path, check that `origin` has exactly `refs/heads/<branch>`, and check that the fetch refspecs can track it. Fetch the branch with `--refmap= --no-tags --no-recurse-submodules` and pin `adopt_commit`, classify the local branch, take the one literal confirmation, recheck the state after the yes, create the worktree, and verify it. Return the `cd` command and say that nothing was pushed.
 4. **List.** Run the porcelain list from the repository root and report it. If the command fails, stop and report the failure instead of attempting recovery.
 5. **Remove.** Read the refusal list before running any command; removal is destructive.
 
@@ -47,7 +47,7 @@ Handles the Git worktree lifecycle inside the current repository: create, adopt,
 | Never fall back to a local branch, `HEAD` or the current feature branch when a fetch fails | Stop instead of substituting a different base |
 | Create refuses a branch that already exists on `origin`; its rejection names adopt and the user chooses | Create never switches to adopt on its own |
 | Adopt only a branch for which `git ls-remote --exit-code --heads` returns exactly `refs/heads/<branch>` | No exact line, or exit status `2`, stops as "no such branch on origin"; anything else is fatal. A pull request's head repository must be origin's |
-| Fetch with `--refmap= --no-tags` and an explicit braced refspec, pin `adopt_commit`, and read every ref by its full name or commit ID | Configured fetch mappings cannot move other local branches before the confirmation, and a tag named like the branch cannot redirect a read |
+| Fetch with `--refmap= --no-tags --no-recurse-submodules` and an explicit braced refspec, pin `adopt_commit`, and read every ref by its full name or commit ID | Configured fetch mappings cannot move other local branches before the confirmation, the fetch cannot move a submodule's refs, and a tag named like the branch cannot redirect a read |
 | Resolve a pull request's number or URL by reading it with means already in the session, never by installing, configuring or signing in to anything | A fork stops, an unknown head repository is asked, and an unresolvable pull request means asking for the branch. Resolved values are shown as resolved, never as user-supplied |
 | Never adopt a branch checked out in any worktree, a fork's branch, a diverged local branch, one whose upstream is anything but `origin/<branch>` or unset, one that differs from origin in a shallow clone, a branch absent locally but with upstream settings left in the config, a branch whose name matches a local branch or `origin` tracking ref only when case is ignored, or into a clone whose fetch refspecs cannot track it unambiguously | Never reset, rebase, merge anything but `"$adopt_commit"` with `--ff-only`, retarget or complete an upstream, or switch another checkout to make it fit |
 | Take one literal confirmation for adopt and recheck after the yes | It names `origin/<branch>@<adopt_commit>`, the path, the upstream and what happens to any local branch; for a pull request it also says whether the branch and head repository were resolved (by what) or supplied by the user. If anything moved, the skill confirms again. Adopt never pushes |

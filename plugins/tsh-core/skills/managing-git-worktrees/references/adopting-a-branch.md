@@ -132,13 +132,15 @@ a single-branch clone or with a negative refspec, ambiguous when another remote 
 ## 6. Fetch the branch and pin the commit
 
 Run
-`git -C "$canonical_root" fetch --refmap= --no-tags origin -- "+refs/heads/${branch}:refs/remotes/origin/${branch}"`.
+`git -C "$canonical_root" fetch --refmap= --no-tags --no-recurse-submodules origin -- "+refs/heads/${branch}:refs/remotes/origin/${branch}"`.
 
 - `--refmap=` is required. Without it git also applies the fetch mappings from
   configuration, and a mapping such as `+refs/heads/<branch>:refs/heads/<other>` moves
   the unrelated local branch `<other>` before the user has confirmed anything.
 - `--no-tags` is required too. Without it git follows tags and creates `refs/tags/<tag>`
   for those on the fetched history, so the fetch would touch more than the tracking ref.
+- `--no-recurse-submodules` is required as well. When the fetched commits move a
+  submodule pointer, git otherwise fetches inside that submodule and moves its refs.
 - Write the refspec with braced `${branch}` and never use `path` or its siblings as a
   variable name. `creating-a-worktree.md` §5 explains both zsh traps:
   [Fetch the base](./creating-a-worktree.md#5-fetch-the-base).
