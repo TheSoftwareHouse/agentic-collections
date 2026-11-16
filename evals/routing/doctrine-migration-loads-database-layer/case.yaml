@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: doctrine-migration-loads-database-layer
+description: A Doctrine migration that adds NOT NULL to a large live PostgreSQL table must load migrating-postgresql-schemas, not the PHP architecture skill.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-php"]
+runs: 1
+execution:
+  prompt: |
+    Our Symfony app's next Doctrine migration makes shipments.carrier_id NOT NULL. The table is on Postgres,
+    has around 60 million rows and is written to constantly. How do we ship that without locking it up?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+  - name: architecting-php-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?architecting-php-code"'
+    min: 0
+    max: 0

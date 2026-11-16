@@ -15,9 +15,11 @@ const pluginWord = (n: number): string => `${n} ${n === 1 ? 'plugin' : 'plugins'
 const disciplines = plugins.filter((p) => p.family === 'discipline');
 const stacks = plugins.filter((p) => p.family === 'stack');
 const core = plugins.filter((p) => p.family === 'core');
-// The marketplace files cloud providers under "platform" and runtime targets under "engineering".
+// The marketplace files cloud providers under "platform", database engines under "database"
+// and runtime targets under "engineering".
 const cloudStacks = stacks.filter((p) => p.category === 'platform');
-const runtimeStacks = stacks.filter((p) => p.category !== 'platform');
+const databaseStacks = stacks.filter((p) => p.category === 'database');
+const runtimeStacks = stacks.filter((p) => p.category !== 'platform' && p.category !== 'database');
 
 const FAMILIES = [
   {
@@ -28,7 +30,11 @@ const FAMILIES = [
   {
     label: `Stacks · ${pluginWord(stacks.length)}`,
     skills: skillCount(stacks),
-    names: `Runtime: ${runtimeStacks.map(shortName).join(', ')} · Cloud: ${cloudStacks.map(shortName).join(', ')}`,
+    names: [
+      `Runtime: ${runtimeStacks.map(shortName).join(', ')}`,
+      `Cloud: ${cloudStacks.map(shortName).join(', ')}`,
+      ...(databaseStacks.length ? [`Database: ${databaseStacks.map(shortName).join(', ')}`] : []),
+    ].join(' · '),
   },
   {
     label: 'Core · tsh-core',

@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: mysql-migration-not-postgresql
+description: A migration question about a MySQL table must fire none of the PostgreSQL skills, whose lock modes and recipes do not apply to another engine.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-postgresql"]
+runs: 1
+execution:
+  prompt: |
+    We're on MySQL 8 with InnoDB. I need to add an index on orders.customer_id; the table has about
+    80 million rows and is busy all day. Will ALTER TABLE lock it, and should we use gh-ost?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-postgresql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    min: 0
+    max: 0
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0
