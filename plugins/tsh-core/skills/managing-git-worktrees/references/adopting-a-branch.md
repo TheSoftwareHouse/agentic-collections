@@ -100,7 +100,7 @@ and read the refname column of every line it prints.
 Read every fetch refspec with
 `git -C "$canonical_root" config --get-regexp '^remote\..*\.fetch$'`. Exit `1` with no
 output means none are configured, which fails (a); any other non-zero exit is fatal.
-Require all three:
+Require all four:
 
 - **(a) Coverage.** An origin line (`remote.origin.fetch`), leading `+` optional, equal to
   `refs/heads/*:refs/remotes/origin/*` or to
@@ -111,7 +111,6 @@ Require all three:
   line not of the two forms in (a) — whose destination is
   `refs/remotes/origin/${branch}` or a pattern ending in `*` whose part before the `*` is
   a prefix of it. That is ambiguous ownership of the tracking ref.
-
 - **(d) No case twin.** No line of
   `git -C "$canonical_root" for-each-ref --format='%(refname)' refs/heads/ refs/remotes/origin/`
   equals `refs/heads/${branch}` or `refs/remotes/origin/${branch}` when case is ignored
