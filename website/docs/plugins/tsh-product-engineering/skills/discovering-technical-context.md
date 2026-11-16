@@ -5,7 +5,7 @@ sidebar_position: 4
 description: Establishes which conventions a change must follow before it is written, in priority order from the plan's persisted context to project instructions, codebase patterns and external documentation.
 sources:
   - plugins/tsh-product-engineering/skills/discovering-technical-context/
-sources_hash: "1a86fe063b5277462022ff2d72519a0567660ba3d29c33d92931efc8005f5e19"
+sources_hash: "d34776298d5d5fd4a6b5c59ad4753d6a7d00b846a4b219938dbc1c092be088b5"
 ---
 
 # Discovering Technical Context
@@ -23,7 +23,7 @@ Use it before implementing a feature or fix in code you have not worked in recen
 | Area | Coverage |
 | :-- | :-- |
 | **Persisted context first** | If the plan's Technical Context is populated, it is used as-is and only what it does not cover is re-discovered |
-| **Project instructions** | The root `CLAUDE.md` and nested ones near the touched files, path-scoped rules under `.claude/rules/`, decision records, and `CONTRIBUTING.md` or equivalent. The primary source for coding standards, architecture and layering, stack versions, testing strategy and naming |
+| **Project instructions** | The root `CLAUDE.md` and nested ones near the touched files, path-scoped rules under `.claude/rules/`, decision records, and `CONTRIBUTING.md` or equivalent. The primary source for coding standards, architecture and layering, stack versions, testing strategy and naming. A project's own verification or security-invariant skill, named in `CLAUDE.md`'s `tsh:project-checks` block or in the skill listing, is read too, as the source for verification commands, their boundaries and the project's security rules |
 | **Existing codebase patterns** | When instructions are silent, the nearest similar implementation is replicated: architecture, style and idiom, error handling and validation, testing, persistence, API surface and configuration |
 | **Exact dependency versions** | The project's manifest is checked for exact versions before any external documentation is consulted |
 | **External documentation** | Only when neither instructions nor codebase answer, for example in a greenfield project. Official docs for the pinned versions are read, and the decision is documented so it becomes the project's pattern |

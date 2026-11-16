@@ -7,7 +7,8 @@ bar. It is deliberately not an exhaustive standard.
 Three things set its scope:
 
 - **It is a floor, not a ceiling.** A project's own security rules — in its `CLAUDE.md`,
-  its `.claude/rules/`, its decision records, or a client ruleset the task supplies —
+  its `.claude/rules/`, its decision records, its security-invariant skill, or a client
+  ruleset the task supplies —
   **outrank this list** and are applied first, exactly as project review checklists
   outrank the review skill. This baseline fills what they leave unstated; it never
   overrides them.

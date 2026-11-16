@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: claude-context-not-project-checks
+description: Setting up a repository's Claude Code instructions from nothing must route to managing-claude-context, not to capturing-project-checks, which records only the project's verification and security-rule procedures.
+tags: [routing]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-core"]
+runs: 1
+execution:
+  prompt: |
+    We just started using Claude Code on this repository and there is no CLAUDE.md yet.
+    It keeps re-deriving our folder layout, our naming conventions and where database
+    migrations live. Set up the project's instructions so those conventions load in
+    every session.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: claude-context-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?managing-claude-context"'
+    arm: with-only
+  - name: project-checks-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?capturing-project-checks"'
+    min: 0
+    max: 0
