@@ -230,12 +230,14 @@ the moved commit; never proceed on the old one.
 Pass branch, path and commit as separate quoted arguments. Use the form step 7 selected.
 Its first command is a guard joined with `&&` to the first mutation in the same shell
 command, so a moved or vanished ref stops step 10 before anything is created even when
-step 9 was skipped or ran too late.
+step 9 was skipped or ran too late. The guard fails closed: every Bash call is a fresh
+shell, so set the recorded values in that same command, and it stops when one is empty.
 
 - **Absent branch.**
   ```sh
-  [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
-    && ! git -C "$canonical_root" show-ref --verify --quiet "refs/heads/${branch}" \
+  [ -n "$canonical_root" ] && [ -n "$branch" ] && [ -n "$worktree_path" ] && [ -n "$adopt_commit" ] \
+    && [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
+    && { git -C "$canonical_root" show-ref --verify --quiet "refs/heads/${branch}"; [ $? -eq 1 ]; } \
     && git -C "$canonical_root" worktree add --no-track -b "$branch" "$worktree_path" "$adopt_commit"
   ```
   then `git -C "$worktree_path" branch --set-upstream-to="refs/remotes/origin/${branch}"`.
@@ -243,7 +245,8 @@ step 9 was skipped or ran too late.
   and the start point must be the pinned commit.
 - **Existing branch.**
   ```sh
-  [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
+  [ -n "$canonical_root" ] && [ -n "$branch" ] && [ -n "$worktree_path" ] && [ -n "$adopt_commit" ] && [ -n "$local_tip" ] \
+    && [ "$(git -C "$canonical_root" rev-parse --verify "refs/remotes/origin/${branch}^{commit}")" = "$adopt_commit" ] \
     && [ "$(git -C "$canonical_root" rev-parse --verify "refs/heads/${branch}^{commit}")" = "$local_tip" ] \
     && git -C "$canonical_root" worktree add "$worktree_path" "$branch"
   ```
