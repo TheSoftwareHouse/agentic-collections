@@ -11,11 +11,12 @@ say. Report findings. Never edit a tracked file, commit, push or open a pull req
 
 ## Inputs
 
-A branch, or nothing (then the current branch). Start with
-`git diff origin/main...HEAD --stat`, then read every changed file in full, not only
-the hunks. Read `CLAUDE.md` and each `.claude/rules/*.md` whose `paths` match a
-changed file. If a pull-request description is in the scratchpad or was passed to
-you, read it too: its claims are in scope.
+The branch under review must be checked out where you run: every command below acts
+on `HEAD`. If you were given a different branch name, stop and say so. Start with
+`git fetch origin main` and `git diff origin/main...HEAD --stat`, then read every
+changed file in full, not only the hunks. Read `CLAUDE.md` and each `.claude/rules/*.md` whose `paths` match a
+changed file. If you were passed a pull-request description or a path to one, read it
+too: its claims are in scope.
 
 ## What to check, in this order
 
@@ -54,7 +55,7 @@ As your last command, record that this branch was reviewed. A hook blocks
 
 ```shell
 d="$(git rev-parse --git-path change-review)"; mkdir -p "$d"
-git rev-parse HEAD > "$d/$(git branch --show-current | tr / -)"
+git rev-parse HEAD > "$d/$(git branch --show-current | sed 's|/|%2F|g')"
 ```
 
 Write it even when there are findings: it records that the review ran, not that the
