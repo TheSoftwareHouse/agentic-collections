@@ -46,6 +46,7 @@ migrations against a shared or production environment.
 | MUST | Backfill large tables in bounded batches outside the schema migration, never one `UPDATE` over the whole table. |
 | MUST | Ship the code that stops reading a column before the migration that drops it. |
 | MUST | When the migration is written with an ORM or framework that has its own skill available in this session (a NestJS, Symfony or Python stack skill, for example), load that skill too, before writing the migration file. This skill owns what the SQL does to the database; that one owns how the tool writes and runs it. Name none that is absent. |
+| MUST | When the migration is one part of a whole change under review (a pull request or a diff that also changes application code), load the general code-review skill too when one is available in this session (`reviewing-code`, for example). This skill judges the migration; that one judges the rest of the change and merge readiness. Name none that is absent. |
 | NEVER | Run a migration against production, staging or any shared database yourself. Hand over the SQL and the order of steps. |
 | NEVER | Let a deploy retry a failed non-transactional migration automatically. The tool's state (and any invalid index) needs resolving first. |
 | NEVER | Call a migration safe on a table whose size and traffic you do not know. Ask, or state the assumption in the review. |

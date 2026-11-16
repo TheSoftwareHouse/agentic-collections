@@ -5,7 +5,7 @@ sidebar_position: 6
 description: TSH's evidence-based pre-merge review of a delivered change set, comparing it with the plan, running the project's checks and applying anti-pattern, security and scalability checks.
 sources:
   - plugins/tsh-product-engineering/skills/reviewing-code/
-sources_hash: "d85ac229a79e15f9faa9b2760f6343fd6469bb86fd9ae929125e5484a3917c19"
+sources_hash: "8b53db892d1a4524f384170ce311c405f809c047750c6e32da4d847889e1badb"
 ---
 
 # Reviewing Code
@@ -27,7 +27,7 @@ Use it when a delivered change set (feature, fix or refactor) needs review befor
 | **Test coverage by layer** | Every critical path needs coverage from the right layer. Missing integration coverage is a substantive finding when correctness depends on a real database, transactions, SQL semantics, migrations, queues or external services |
 | **High-risk anti-patterns** | N+1 access patterns, in-memory data processing that should be pushed down to the database or upstream service, and missing integration tests for behavior that depends on a real database or external boundary |
 | **Security baseline** | A universal, framework-agnostic checklist applied on every review (see below) |
-| **Stack-specific checks** | When the change targets a framework whose stack skill is available in the session, that skill is loaded and its review checklist applied alongside. Whichever are present are loaded; none that is absent is named |
+| **Stack-specific checks** | When the change targets a framework whose stack skill is available in the session, that skill is loaded and its review checklist applied alongside. The database engine counts as a stack: a change with a schema migration or a new query shape also loads that engine's skill (such as `tsh-stack-postgresql`'s) when one is available. Whichever are present are loaded; none that is absent is named |
 | **Finding contract** | Every finding has a severity, evidence (file and line), the consequence and the minimum correction. No redesigns |
 | **Honest reporting** | No cosmetic or wording-only findings, no invented issues to pad a clean review, and no severity escalation because an issue repeats |
 | **Leftover files** | A module the change moved or renamed must leave nothing behind. A file at the old path that only re-exports the new one is a finding, unless it is the public API of a package other code consumes and is marked deprecated, or the plan stages it as transitional |

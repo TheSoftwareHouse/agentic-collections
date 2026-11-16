@@ -12,6 +12,18 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.1] - 2026-11-16
+
+### Fixed
+
+- **A review of a pull request with a migration now loads the database skill.**
+  `reviewing-code` and `code-reviewer` loaded stack skills for frameworks but did not
+  count the database engine as one, so a whole-PR review with a PostgreSQL migration
+  reached `tsh-stack-postgresql` in only 3 of 6 measured runs, and in the others either
+  the review or the migration check was missing. The rule now names the engine: a
+  change with a schema migration or a new query shape also loads that engine's skill.
+  With the matching rule in `tsh-stack-postgresql` 0.1.1, both load in 6 of 6.
+
 ## [0.12.0] - 2026-11-16
 
 ### Added

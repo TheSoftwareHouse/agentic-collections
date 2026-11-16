@@ -58,7 +58,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "8440d030d1550acac177da6f36d94096efad944b7cd2148155c2765b8c089702"
+sources_hash: "f4851da1b46e27f2abc0a009e478c75595a26b12b1253ca363ec38d8b31f3d83"
 ---
 
 # Use cases
@@ -139,7 +139,7 @@ During feature implementation, every Figma-backed UI task goes through this gate
 
 ### Code review before merge
 
-[`reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) reads the plan and requirements before the diff. It executes the project's tests, linters and build itself, and never accepts "tests pass" from an implementation report. Every review runs a universal security baseline of framework-agnostic OWASP classes on top of the project's own rules, and checks for high-risk anti-patterns such as N+1 access and in-memory pagination. When a stack skill for the change's framework is installed, the review loads it and applies its checklist too. Every finding carries a severity, the file and line, the consequence and the minimum correction. The [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer) agent runs the same review read-only.
+[`reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) reads the plan and requirements before the diff. It executes the project's tests, linters and build itself, and never accepts "tests pass" from an implementation report. Every review runs a universal security baseline of framework-agnostic OWASP classes on top of the project's own rules, and checks for high-risk anti-patterns such as N+1 access and in-memory pagination. When a stack skill for the change's framework is installed, the review loads it and applies its checklist too; a change with a schema migration also loads the database engine's skill. Every finding carries a severity, the file and line, the consequence and the minimum correction. The [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer) agent runs the same review read-only.
 
 **Start:** ask "is this ready to merge?", or run `/tsh-product-engineering:reviewing-code`
 

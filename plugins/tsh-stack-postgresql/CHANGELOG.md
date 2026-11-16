@@ -10,6 +10,17 @@ under `[Unreleased]` would be false the moment it was pushed. Every entry below 
 a released version, and its version bump landed in the same commit as the change it
 describes.
 
+## [0.1.1] - 2026-11-16
+
+### Fixed
+
+- **`migrating-postgresql-schemas` loads the code review for a whole pull request.**
+  Asked to review a pull request that includes a migration, Claude sometimes loaded
+  only this skill and judged the migration without the rest of the change. A new rule
+  loads the general code-review skill too (`reviewing-code`, when installed) when the
+  migration is one part of a change under review. With the matching rule in
+  `tsh-product-engineering` 0.12.1, both load in 6 of 6 measured runs, up from 3 of 6.
+
 ## [0.1.0] - 2026-11-13
 
 Initial release: the database layer under every ORM, for PostgreSQL 14 to 18.
