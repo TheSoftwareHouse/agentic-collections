@@ -21,7 +21,8 @@ the rules *should* be.
 - An existing project skill that already covers verification or security is
   **revised in place** under its own name, never replaced by a new one. When its
   `SKILL.md` only points at another file, edit the file that holds the content.
-  Repair changes facts, not shape: another tool may read that file.
+  Repair changes facts, not shape: another tool may read that file. In local mode a
+  tracked skill is not edited at all; see the last item below.
 - What CI runs is the source of truth for the full gate. A local command that runs
   less than CI is recorded as a subset, never as the gate.
 - `CLAUDE.md` hard rules, `Accepted` decision records, `SECURITY.md` and written
@@ -37,27 +38,40 @@ the rules *should* be.
   and a draft for the project's `<slug>-shared` plugin goes in the report for a
   person to add. Read
   [`security-invariants-skill.md`](./references/security-invariants-skill.md) §6.
-- **A repository the team may not commit to** (the block is in `CLAUDE.local.md`
-  and the plugin entry in `.claude/settings.local.json`: a client's repository) gets no tracked file from this skill. Ask whether the files
-  may be committed here. On "keep local", write the skills, put the pointer block in
-  `CLAUDE.local.md` beside the `tsh:project-context` block, which stays byte for
-  byte, and list every path written in `.git/info/exclude`. With no answer, write
-  nothing and put both drafts in the report.
+- **A repository the team may not commit to** (local mode: the block is in
+  `CLAUDE.local.md` and the plugin entry in `.claude/settings.local.json`, a client's
+  repository) gets no tracked file and no change to one. Wiring already asked whether
+  the team may commit here, and local mode is the recorded "no"; do not ask again.
+  - Resolve the exclude file with `git rev-parse --git-path info/exclude` before
+    writing anything. Never touch `.gitignore`.
+  - Check every write target with `git ls-files --error-unmatch <path>`, including
+    the file a pointer skill redirects to. A tracked target is left alone; its
+    revision goes in the report as a draft.
+  - Write only new, untracked files: the skills, and the pointer block in
+    `CLAUDE.local.md` beside the `tsh:project-context` block, which stays byte for
+    byte. List each path in the exclude file before writing it, then confirm with
+    `git check-ignore` that each is ignored. Delete a file that is not, and report it
+    as a draft.
+  - In a linked worktree the `.local` files live only in the main checkout, so this
+    worktree's sessions would not see the pointer. Write nothing there; put both
+    drafts in the report and name the main checkout as the place to run this skill.
 
 ## Non-negotiable Rules
 
 | Severity | Rule |
 | --- | --- |
-| MUST | Read `CLAUDE.md`, `CLAUDE.local.md`, `.claude/settings.json` and `.claude/settings.local.json` from disk before anything else. The fence markers are HTML comments, which are stripped from the copy already in context, so only the file shows them. A `tsh:project-context` block, or an enabled `<slug>-shared@<slug>-context` plugin, marks an attached repository; found only in the `.local` files, it marks one the team may not commit to. |
+| MUST | Read `CLAUDE.md`, `CLAUDE.local.md`, `.claude/settings.json` and `.claude/settings.local.json` from disk before anything else. The fence markers are HTML comments, which are stripped from the copy already in context, so only the file shows them. A `tsh:project-context` block, or an enabled `<slug>-shared@<slug>-context` plugin, marks an attached repository; found only in the `.local` files, it marks one the team may not commit to. In a linked worktree (`.git` is a file), read the four files in the main checkout too, the first entry of `git worktree list`: the `.local` files exist only there. |
 | MUST | Inventory before writing: `.claude/skills/`, an existing `tsh:project-checks` block, CI workflows, task runners, test configuration, `docs/decisions/`, `SECURITY.md`. Report it before changing anything. |
 | MUST | Read a command before running it: the script or job it expands to, the environment it resolves (`.env`, exported variables, CI secrets) and the traps `CLAUDE.md` or the README name. A pipeline job that deploys, publishes or applies is never part of the gate and is never run. |
-| MUST | Run every check command before writing it down, unless it is destructive, costs money, needs a service or credential that is not available, or reaches a real external system or a shared environment. Such a command is written with what it needs and marked not run in the report. |
+| MUST | Run every check command before writing it down, unless it writes (next rows), is destructive, costs money, needs a service or credential that is not available, or reaches a real external system or a shared environment. Such a command is written with what it needs and marked not run in the report. |
 | NEVER | Run a check against production, a real third-party service or a shared environment, or start a long-running server, to prove a command works. A database or emulator counts as local only when the project's own tooling starts it. |
+| NEVER | Run a command that writes to tracked files or to a database that may hold someone's data: a fixer (`--fix`, `--write`, a format script, a snapshot update such as `jest -u`), a regenerate step, an install that can rewrite the lockfile, a migration, a seed or a suite that resets tables. Run its read-only variant (`--check`, `--dry-run`, a frozen-lockfile install) or record it as not run. Run `git status --porcelain` before the first command and after the last, and report every difference without reverting it. |
+| NEVER | Copy a secret or a connection-string value into a generated file or the report. Name the variable and what it resolves to ("`DATABASE_URL` resolves to a non-local host"). |
 | NEVER | Invent a check, a boundary or an invariant. Each one traces to a file, or to a confirmation the team gave during capture; anything inferred only from code is proposed to the user and written only on a yes. |
 | NEVER | Copy the universal security baseline or generic OWASP advice into the invariants skill. It holds only what is specific to this project; the baseline already runs in every review. |
 | NEVER | Commit, stage or push. Write the files and leave them for the team to review. In a project knowledge base, write nothing and run no git: a change there belongs to that knowledge base's own process and its owners. |
 | MUST | Keep each generated skill under ~100 lines, model-invocable, with a description that names the project and what the skill covers. |
-| MUST | Write the `CLAUDE.md` pointer only inside the `tsh:project-checks` block, paths in backticks, never an `@` import, and rewrite that block whole on every run. |
+| MUST | Write the pointer only inside the `tsh:project-checks` block (Step 4 names the file), paths in backticks, never an `@` import, and rewrite that block whole on every run, carrying its record line forward. |
 | MUST | End with a report: created, repaired, left alone; commands run and not run; invariants confirmed, declined and still open; in an attached repository, the decision records read or not read and the shared-plugin draft. Present the result as a proposal. |
 
 ## Reference Loading
@@ -97,26 +111,38 @@ ask in one batch which hold project-wide, mark those, and put the shared-plugin 
 in the report. When no source yields an invariant and the user confirms none, write
 no skill and say so — an empty invariants skill is noise.
 
-**Step 4 — `CLAUDE.md` block.** Add or rewrite this block near the end of root
-`CLAUDE.md`, after the orientation content, naming the skills by their actual names
-and paths and dropping the line for a skill that does not exist. When there is no
-`CLAUDE.md`, create one holding only this block and tell the user that
-`/tsh-core:managing-claude-context` writes the rest; the block alone is not a
-`CLAUDE.md`.
+**Step 4 — The pointer block.** The target file depends on the mode: root
+`CLAUDE.md` in a repository the team commits to, `CLAUDE.local.md` in local mode,
+where `CLAUDE.md` is never created or edited. Add or rewrite this block near the end
+of the target, after the orientation content, naming the skills by their actual
+names and paths and dropping the line for a skill that does not exist. When a
+committed repository has no `CLAUDE.md`, create one holding only this block and tell
+the user that `/tsh-core:managing-claude-context` writes the rest; the block alone is
+not a `CLAUDE.md`.
 
 ```markdown
 <!-- tsh:project-checks START — only /tsh-product-engineering:capturing-project-checks edits this block. -->
 Verifying a change: the `verifying-changes` skill (`.claude/skills/verifying-changes/SKILL.md`); its checks and boundaries apply to every change, with or without a plan. Security invariants: the `reviewing-security-invariants` skill (`.claude/skills/reviewing-security-invariants/SKILL.md`); they outrank generic security checklists. When CI, task runners or security rules change, re-run `/tsh-product-engineering:capturing-project-checks`; without that plugin, update the two skills by hand in the same change.
+<!-- tsh:project-checks record: captured at <commit>; declined: <candidate, date>; not project-wide: <invariant, date> -->
 <!-- tsh:project-checks END -->
 ```
 
-**Step 5 — Verify and report.** Confirm each file is where the block says, then
-re-read each generated skill against the rules above. Skills load at session start,
-so ask the user to confirm with `/context` in a fresh session. Report in the shape
-the last rule names. A second run on an unchanged repository must find nothing to
-change and ask nothing again: a command already recorded and unchanged at its source
-is not re-run, an invariant whose source is a team confirmation is kept as it stands,
-and declined candidates and project-wide marks are read back from the skill.
+The record line is this skill's memory between runs. It holds the commit the
+capture ran at and every **negative** answer the team gave, which leave no other
+trace: a declined code-only candidate and an invariant confirmed as not project-wide.
+Positive answers live in the skills themselves.
+
+**Step 5 — Verify and report.** Confirm each file is where the block says, in the
+same target file Step 4 chose, then re-read each generated skill against the rules
+above. Skills load at session start, so ask the user to confirm with `/context` in a
+fresh session. Report in the shape the last rule names.
+
+A second run on an unchanged repository must find nothing to change and ask nothing
+again. Read the block and the generated skills **from disk**, since HTML comments are
+stripped from the copy in context. A command whose sources show no change in
+`git diff <captured commit> -- <its sources>` is not re-run; an invariant whose
+source is a team confirmation is kept as it stands; a candidate or a project-wide
+question already answered, either way, is not asked again.
 
 ## Related Skills
 

@@ -59,7 +59,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "a86fa64bbff099986438145c3410483dda549a0c165b4ddaf27f92aea1bf0f45"
+sources_hash: "0035c0d4bce976ce3b567eff22be9381356a44213a9abed5d8354f23f0de7d88"
 ---
 
 # Use cases
@@ -158,7 +158,7 @@ A review reads one change; [`auditing-application-security`](/docs/plugins/tsh-p
 
 ### Verify every change the way the project does
 
-Without a plan, a review or a fix has to work out the project's checks from scratch, and the project's security rules reach a review only when the right person reviews it. [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks) writes two project skills into `.claude/skills/`: one with the checks each kind of change needs, the full gate as CI runs it and the boundaries a check must respect, and one with the project's own security invariants, each citing its source. A short block in `CLAUDE.md` names both, and the plugin's review, planning, debugging and audit skills read them from then on. Every command is read, then run, before it is written down, and never against production, a paid service or a shared environment; a rule seen only in code is written only after the team confirms it; nothing is committed.
+Without a plan, a review or a fix has to work out the project's checks from scratch, and the project's security rules reach a review only when the right person reviews it. [`capturing-project-checks`](/docs/plugins/tsh-product-engineering/skills/capturing-project-checks) writes two project skills into `.claude/skills/`: one with the checks each kind of change needs, the full gate as CI runs it and the boundaries a check must respect, and one with the project's own security invariants, each citing its source. A short block in `CLAUDE.md` names both, and the plugin's review, planning, debugging and audit skills read them from then on. Every command is read, then run, before it is written down, and never against production, a paid service or a shared environment, or in a form that writes to tracked files or a database holding data; a rule seen only in code is written only after the team confirms it; nothing is committed.
 
 **Start:** ask to "write down how changes in this repo get verified", or run `/tsh-product-engineering:capturing-project-checks`
 

@@ -12,7 +12,7 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
-## [0.12.0] - 2026-11-13
+## [0.12.0] - 2026-11-16
 
 ### Added
 
@@ -29,14 +29,15 @@ alone reaches nobody.
   only in code is written only after the team confirms it). A short
   `tsh:project-checks` block in `CLAUDE.md` names both and says when to re-run. It
   reads every command before running it and runs it before writing it down, never
-  against production, a paid service or a shared environment, revises existing project
+  against production, a paid service or a shared environment, and never in a form that
+  writes to tracked files or a database holding data, revises existing project
   skills in place, and commits nothing. In a repository attached to a project knowledge
   base (`tsh-product-management`'s `<slug>-context`), it reads the decision records
   there and writes nothing in the knowledge base: every invariant stays in the
   repository's skill, the ones the team confirms as project-wide are marked, and a
   draft for the project's own `<slug>-shared` plugin goes in the report with the
   steps for a person to add it. In a client's repository (attached in local mode) it
-  writes no tracked file. `/tsh-core:init` now invokes it as its fourth step where this
+  writes no tracked file and changes none, including in a linked worktree. `/tsh-core:init` now invokes it as its fourth step where this
   plugin is installed.
 
 ### Changed

@@ -46,9 +46,9 @@ propose it, with where you saw it:
 Ask in one batch, not one question at a time. Write a candidate only on a yes, with
 the source "confirmed with the team during capture, <date>". That source is final: a
 later run keeps the invariant as it stands and never re-proposes or removes it for
-lacking a file. A declined candidate goes in the report and in one HTML comment at
-the end of the generated skill (`<!-- declined during capture: … -->`), so a later
-run does not ask again.
+lacking a file. A declined candidate goes in the report and in the record line of the
+`tsh:project-checks` block (SKILL.md, Step 4), which exists even when no invariants
+skill is written, so a later run does not ask again.
 
 ## 4. Open decisions
 
@@ -90,8 +90,10 @@ needed by a single repository stays in that repository's `.claude/`; ties go to 
 code repository.
 
 - Ask, in one batch, which invariants hold for more than one repository of the
-  project. Mark each confirmed one `(project-wide)` after its name; the mark is how a
-  later run knows the answer. With no answer, mark none.
+  project. Mark each confirmed one `(project-wide)` after its name, and add each one
+  the team says is not project-wide to the block's record line; together they are
+  how a later run knows the answer. With no answer, record nothing, so the question
+  is asked again.
 - Put a draft of `<slug>-security-invariants` in the report, from the template below
   with the project as its subject and only the marked invariants. Cite each source by
   repository name and rule, or by record number and title: the plugin installs
@@ -104,8 +106,10 @@ code repository.
   `scripts/check_plugin.py`, at its root, checks all three in the pipeline. The
   person, or the knowledge base's owners, make that change.
 - Once `<slug>-security-invariants` appears in a session's skill listing, a later run
-  may replace the marked invariants in the repository's skill with one line naming
-  it. Never before.
+  loads it and compares it with the marked invariants. Only an invariant the
+  installed shared skill states may be replaced in the repository's skill by one line
+  naming it; every other stays, even when marked. The name alone proves nothing: the
+  installed version may predate the latest draft.
 
 ## 7. Template
 
@@ -115,7 +119,7 @@ under ~100 lines.
 ```markdown
 ---
 name: reviewing-security-invariants
-description: "The security invariants specific to <project> — <three to five boundary names> — that every review, audit and change touching them must preserve. Use when changing <boundaries or paths>, or when a security review or audit runs on this repository; not for generic security checklists, which reviews already apply."
+description: "Lists the security invariants specific to <project> — <three to five boundary names> — that every change touching them must preserve. Use when changing <boundaries or paths>. A security review or audit belongs to the team's review and audit skills, which read this one alongside the generic baseline."
 ---
 
 # Security invariants of <project>

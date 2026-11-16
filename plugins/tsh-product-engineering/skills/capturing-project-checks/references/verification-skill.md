@@ -47,7 +47,7 @@ Typical rows:
 | Request schemas, validation, middleware | Adjacent handler and validation tests as well |
 | Database schema or migrations | The migration run against the database the project's own tooling starts locally (a compose service, an emulator), never one taken from `.env` alone, and the integration suites that read the changed tables |
 | Infrastructure, IAM, configuration, dependencies, build | The full gate |
-| Generated code (OpenAPI clients, ORM types) | Regenerate, inspect the diff, run the consumers' tests — never hand-edit the output |
+| Generated code (OpenAPI clients, ORM types) | Regenerate, inspect the diff, run the consumers' tests — never hand-edit the output. During capture, record this row without running the regeneration |
 | Documentation only | Links, commands named in the text, formatting where tooling covers it |
 
 Readiness for a pull request, or a request to verify everything, always means the full
@@ -80,11 +80,22 @@ string comes from `.env` may point at a shared database on a developer's clone; 
 "test" script may call a paid sandbox. Such a command is written with what it needs
 and marked not run, never executed to see what happens. An external system here is
 one of the project's own: its providers, clouds, sandboxes and shared environments. A
-read of a public package registry — an install, a dependency audit — is not, and runs
-like any other check.
+read of a public package registry, such as a dependency audit, is not, and runs like
+any other check.
 
-Then run each remaining command, cheapest first. A command that fails on a clean
-checkout is a finding for the report, not a line for the skill. Do not start services
+A command that writes is not run during capture either, however local it is: a fixer
+or format script, a snapshot update, a regenerate step, a migration, a seed or a
+suite that resets tables. Run its read-only variant when the project has one
+(`--check`, `--dry-run`, `git diff --exit-code` after a generator writing to a
+temporary directory); otherwise record it and mark it not run. Install dependencies
+only when they are missing, and only with the lockfile frozen (`npm ci`,
+`pnpm install --frozen-lockfile`, `composer install`, `uv sync --locked`).
+
+Then run each remaining command, cheapest first. A required check that fails today,
+such as a dependency audit with a real advisory or a lint with an existing
+violation, stays in the skill like any other: leaving it out would make a shorter
+list read as the full gate. Its failure goes in the report as the baseline status,
+so the team knows the gate is red before any change. Do not start services
 to make a command pass; write what it needs and mark it not run. Run a slow gate once,
 and give its rough duration so later sessions can plan for it.
 
@@ -95,7 +106,7 @@ Fill every `<…>`, delete rows that do not apply, and keep the result under ~10
 ```markdown
 ---
 name: verifying-changes
-description: "Selects and runs the checks a change to <project> needs — the closest tests, typecheck and lint for a small change, the full gate (`<command>`) for pull-request readiness or <infrastructure, dependency, configuration> changes — within the project's boundaries. Use after implementing or fixing something, when a check fails, or when asked whether a change is ready; not for reviewing design or plan conformance."
+description: "Selects and runs the checks a change to <project> needs — the closest tests, typecheck and lint for a small change, the full gate (`<command>`) before a pull request or for <infrastructure, dependency, configuration> changes — within the project's boundaries. Use to choose and run checks after implementing or fixing something. A failing check whose cause is unknown, a merge review and a security review belong to the team's debugging and review skills, which read this one."
 ---
 
 # Verifying a change in <project>
