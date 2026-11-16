@@ -112,7 +112,13 @@ Require all three:
   `refs/remotes/origin/${branch}` or a pattern ending in `*` whose part before the `*` is
   a prefix of it. That is ambiguous ownership of the tracking ref.
 
-Any failure stops before the fetch: show the lines that failed and say which of (a)–(c)
+- **(d) No case twin.** No line of
+  `git -C "$canonical_root" for-each-ref --format='%(refname)' refs/heads/ refs/remotes/origin/`
+  equals `refs/heads/${branch}` or `refs/remotes/origin/${branch}` when case is ignored
+  but differs from it byte for byte. On a case-insensitive filesystem the two share one
+  ref file, and adopt would read or move the other branch.
+
+Any failure stops before the fetch: show the lines that failed and say which of (a)–(d)
 it is. For (a), tell the user they may run `git remote set-branches --add origin <branch>`
 themselves; it writes the second form with a `+`, and this skill never edits remote
 configuration. Narrower positive patterns such as

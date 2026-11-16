@@ -35,6 +35,8 @@ alone reaches nobody.
     `origin/<branch>` or unset, or it differs from origin in a shallow clone;
   - the branch does not exist locally but upstream settings for it are left in the
     config, which adopt would otherwise overwrite;
+  - a local branch or `origin` tracking ref has the branch's name in a different letter
+    case, which a case-insensitive filesystem stores as the same branch;
   - the clone's fetch refspecs cannot track the branch unambiguously — a single-branch
     clone, a negative refspec, or a second remote mapping into `origin`'s namespace.
 - **A pull request given by number or URL is resolved to its head branch and head
