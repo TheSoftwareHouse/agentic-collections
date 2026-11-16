@@ -222,6 +222,10 @@ their output means, and what CI runs — keep commands there rather than copying
 
 The website's install, build and docs-check commands live in `.claude/rules/website.md`.
 
+Before opening a pull request, run the `change-reviewer` agent on the branch and fix
+or answer its findings. It reviews with a fresh context, so it catches what the author
+reads past; a hook blocks `gh pr create` until it has run on the branch.
+
 ## Where the rest lives
 
 Authoring rationale is in `.claude/rules/`, one file per concern, loaded only when you
