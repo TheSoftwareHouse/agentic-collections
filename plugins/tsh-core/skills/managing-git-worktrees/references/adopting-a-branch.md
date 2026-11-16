@@ -224,9 +224,10 @@ mutation or in parallel with one, which could only report what the mutation alre
 Re-read the worktree list, the candidate path, `refs/heads/${branch}`, its two upstream
 keys and `refs/remotes/origin/${branch}`. If any differs from what the confirmation
 showed — another worktree took the branch, the local tip moved, a background fetch moved
-the tracking ref — stop and report the change. Return to step 7, first re-resolving
-`adopt_commit` with step 6's `rev-parse` (no new fetch) so the fresh confirmation shows
-the moved commit; never proceed on the old one.
+the tracking ref — stop and report the change. If the candidate path changed, return to
+step 3 for a path. Otherwise return to step 7, first re-resolving `adopt_commit` with
+step 6's `rev-parse` (no new fetch) so the fresh confirmation shows the moved commit;
+never proceed on the old one.
 
 ## 10. Create the worktree
 
