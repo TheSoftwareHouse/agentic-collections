@@ -10,6 +10,20 @@ under `[Unreleased]` would be false the moment it was pushed. Every entry below 
 a released version, and its version bump landed in the same commit as the change it
 describes.
 
+## [0.1.1] - 2026-11-16
+
+### Fixed
+
+- **`migrating-postgresql-schemas` loads the code review for a whole pull request.**
+  Asked to review a pull request that includes a migration, Claude sometimes loaded
+  only this skill and judged the migration without the rest of the change. A new rule
+  loads the general code-review skill too (`reviewing-code`, when installed) when the
+  whole change or its merge readiness is under review, not only the migration. With
+  the matching rule in `tsh-product-engineering` 0.12.1, a four-turn probe on Sonnet
+  loaded both in 6 of 6 runs, up from 3 of 6, and a question about the migration
+  alone did not load `reviewing-code` (6 of 6). Six runs is a small sample; both
+  probes are manual checks in the repository's `evals/README.md`.
+
 ## [0.1.0] - 2026-11-13
 
 Initial release: the database layer under every ORM, for PostgreSQL 14 to 18.

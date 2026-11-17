@@ -5,14 +5,14 @@ sidebar_position: 1
 description: Writes and reviews PostgreSQL schema migrations that run against a live database without stopping traffic.
 sources:
   - plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas/
-sources_hash: "e7ecd6793df479c6c4db81e71dac507740db4ebd55aa532bd1746a95bc534d46"
+sources_hash: "df9f5ec205d878579828186aee01132b7479048f06b4c4878337927ec78e6060"
 ---
 
 # Migrating PostgreSQL Schemas
 
 **Plugin:** [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)  
 **Invoke:** `/tsh-stack-postgresql:migrating-postgresql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) hands it every change to a table that already holds data, and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hands it the index a slow query needs. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
+**Used by:** [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) hands it every change to a table that already holds data, and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hands it the index a slow query needs. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent load the database engine's skill that covers a change under review, which for a schema migration is this one, and this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
 
 A migration that is correct SQL can still take production down. What decides it is the lock each statement takes, how long it holds it, and what is queued behind it. The skill makes those three things explicit before a migration ships, for PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and stops; below version 14 it stops and says the version is unsupported.
 
@@ -49,6 +49,7 @@ Use it when a migration adds, changes or drops a column, index or constraint on 
 | MUST | Rename or retype a column used by running code through expand-and-contract, and ship the code that stops reading a column before the migration that drops it |
 | MUST | Backfill large tables in bounded batches outside the schema migration |
 | MUST | When the migration is written with an ORM or framework that has its own skill available in the session, load that skill too, before writing the migration file |
+| MUST | When asked to review a whole change or its merge readiness, not only the migration, load the general code-review skill too when one is available |
 | NEVER | Run a migration against production, staging or any shared database, or call a migration safe on a table whose size and traffic are unknown |
 | NEVER | Let a deploy retry a failed non-transactional migration automatically |
 

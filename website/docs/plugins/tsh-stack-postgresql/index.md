@@ -6,7 +6,7 @@ description: TSH practices for PostgreSQL 14 to 18, beneath whatever ORM a proje
 sources:
   - plugins/tsh-stack-postgresql/.claude-plugin/plugin.json
   - plugins/tsh-stack-postgresql/README.md
-sources_hash: "69c6d9631c4e8d1fc11b3dfaf91c4c25a8919f7b82df98bc757107f221ec9997"
+sources_hash: "5ad8ba1914ff73e3303e209bfdfb70e7c17d2ecaaaf573813b22e8b748ec5e11"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';

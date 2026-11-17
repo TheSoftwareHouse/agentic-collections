@@ -12,7 +12,7 @@ sources_hash: "4aff9323cabd9f7b0b113ccdc059e1c8e9b448e712f2689121506476cc0399ac"
 
 **Plugin:** [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)  
 **Invoke:** `/tsh-stack-postgresql:designing-postgresql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
+**Used by:** no agent loads it. [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads the database engine's skill for a schema migration or a new query shape, which are the other two skills of this plugin, not this one.
 
 The schema is the one place a rule holds for every writer: every service, script, migration and console session. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and stops; below version 14 it stops and says the version is unsupported.
 
