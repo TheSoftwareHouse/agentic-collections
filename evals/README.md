@@ -515,7 +515,8 @@ on the users list") should still reach the database engine's skill: through
 one turn, so they are manual checks. Run them before changing either rule.
 
 Save each as `evals/routing/<name>/case.yaml` and **delete both directories when
-done**, because `check-eval-cases.py` rejects their `max_turns: 4`:
+done**, because `check-eval-cases.py` rejects them (the `probe` tag, `max_turns: 4`,
+no must-not-fire grader):
 
 ```yaml
 schema_version: "1.1"
@@ -549,9 +550,10 @@ graders:
     arm: with-only
 ```
 
-`_probe-plain-feature` is the same file without the words "Write an implementation
-plan for this:" (the prompt starts with "Add a") and without the
-`creating-implementation-plans` grader. Then:
+`_probe-plain-feature` is the same file with `name: _probe-plain-feature`, its own
+description, the prompt without the words "Write an implementation plan for this:"
+(it starts with "Add a"), and an `orchestrating-feature-implementation` grader in
+place of the `creating-implementation-plans` one. Then:
 
 ```shell
 for c in _probe-plain-plan _probe-plain-feature; do
@@ -562,18 +564,21 @@ done
 rm -rf evals/routing/_probe-plain-plan evals/routing/_probe-plain-feature
 ```
 
-Measured on 2026-11-17, about USD 0.10–0.16 per run:
+Measured on 2026-11-17, six runs each, about USD 0.08–0.16 per run. "Before" is
+`tsh-product-engineering` 0.12.1 with `tsh-stack-postgresql` 0.1.1; "after" is 0.12.2
+with 0.1.2:
 
-| Probe | Before the rules (`tsh-product-engineering` 0.12.1) | After (0.12.2) |
+| Probe | Before | After |
 | :-- | :-- | :-- |
-| `_probe-plain-plan` | plan 6/6, design 0/6, migration 0/6 | plan 6/6, design 5/6, migration 6/6 |
-| `_probe-plain-feature` | design 0/6, migration 2/6 | design 0/6, migration 2/6 |
+| `_probe-plain-plan` | plan 6/6, design 0/6, migration 0/6 | plan 6/6, design 6/6, migration 6/6 |
+| `_probe-plain-feature` | design 0/6, migration 2/6 | orchestration 0/6, design 0/6, migration 1/6 |
 
-The plan path works. The implementation path does not yet: on "add X",
-`orchestrating-feature-implementation` itself rarely loads (2 of 6 runs in kept
-traces); the model goes to the stack skill (`implementing-nestjs-api`), so the
-orchestrator's rule never runs. Not covered: the `software-engineer` delegation, and
-any session with a real repository, where the engine is visible in the code.
+The plan path works. The implementation path does not: on "add X",
+`orchestrating-feature-implementation` itself did not load (0 of 6), so its rule
+never runs. Limits: six runs is a small sample; the prompt names the engine; the
+probes allow only the `Skill` tool and have no repository; 0.1.2 also changed the
+PostgreSQL triggers, so the gain is not isolated to the plan rule; the
+`software-engineer` delegation is not covered.
 
 ## Behavioural suites: what a skill does after it fires
 

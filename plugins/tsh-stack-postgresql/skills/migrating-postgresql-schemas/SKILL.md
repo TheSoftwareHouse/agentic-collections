@@ -20,7 +20,7 @@ say the project is on an unsupported version; continue only when asked, and then
 only with recipes whose mark the version satisfies.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply and stop: lock modes and online DDL differ by engine. When a skill for that engine is available in this session, load it instead; name none that is absent.
+another engine, say this skill does not apply: lock modes and online DDL differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 

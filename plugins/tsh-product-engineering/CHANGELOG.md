@@ -16,20 +16,28 @@ alone reaches nobody.
 
 ### Fixed
 
-- **A plan for a feature that needs a schema change now loads the database skill.**
+- **A plan for a feature that needs a schema change now loads the database skills.**
   A feature can need a new column without saying so ("show last seen on the users
   list"). `creating-implementation-plans` now decides whether the work changes the
-  schema before writing tasks and, when a skill for the project's database engine is
-  installed, loads it and names it in the Technical Context. In a four-turn probe on
-  Sonnet, a plan for such a feature loaded the PostgreSQL design skill in 5 of 6 runs
-  and the migration skill in 6 of 6, up from 0 of 6 each.
-- **`orchestrating-feature-implementation` and `software-engineer` carry the same
-  rule:** the orchestrator loads the engine's skill before delegating a task with a
-  migration and tells the implementer to load it; the implementer loads every skill
-  the plan or delegation names. This does not yet help a plain "add X" request: in the
-  same probe the orchestrator itself rarely loaded (the model went to the stack
-  skill), and the result stayed at 0 of 6 for design and 2 of 6 for migration. Both
-  probes are manual checks in `evals/README.md`.
+  schema before writing tasks and, when skills for the project's database engine are
+  installed, loads the ones that cover it (design, migration) and names them in the
+  Technical Context for the tasks that change the schema. In a four-turn probe on
+  Sonnet, a plan for such a feature loaded the PostgreSQL design and migration skills
+  in 6 of 6 runs each, up from 0 of 6. Six runs is a small sample; the prompt named
+  the engine and the probe had no repository.
+
+### Changed
+
+- **A change that touches the schema is no longer trivial** for
+  `orchestrating-feature-implementation`: it needs a plan, like any change with a
+  design decision.
+- **`orchestrating-feature-implementation` names the engine's skills in the
+  delegation** of a task with a migration, and `software-engineer` loads the skills
+  the Technical Context or its delegation names for the work its tasks do. This does
+  not yet help a plain "add X" request: in the same probe the orchestrator did not
+  load at all (0 of 6; the model went to the stack skill), and the migration skill
+  loaded in 1 of 6 runs, against 2 of 6 before. The delegation path itself was not
+  measured. Both probes are manual checks in `evals/README.md`.
 
 ## [0.12.1] - 2026-11-16
 

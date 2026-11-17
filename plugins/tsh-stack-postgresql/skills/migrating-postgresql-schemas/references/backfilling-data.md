@@ -73,12 +73,20 @@ The same rules hold for deleting old rows: walk the primary key in batches, comm
 between them, pause on replica lag.
 
 ```sql
+-- one batch; repeat until it deletes 0 rows
 DELETE FROM events
-WHERE id IN (SELECT id FROM events WHERE created_at < :cutoff ORDER BY id LIMIT 5000);
+WHERE id IN (
+  SELECT id FROM events
+  WHERE id > :last_id AND created_at < :cutoff
+  ORDER BY id
+  LIMIT 5000
+)
+RETURNING id;   -- the highest id is the next :last_id
 ```
 
-Vacuum makes the freed space reusable but does not shrink the file; only a rewrite
-does, and `VACUUM FULL` takes `ACCESS EXCLUSIVE` for its whole run. For data removed
+`ON DELETE CASCADE` and delete triggers make a batch larger than its row count. Vacuum
+makes the freed space reusable but does not shrink the file, except for empty pages
+at its end; only a rewrite does, and `VACUUM FULL` takes `ACCESS EXCLUSIVE` for its whole run. For data removed
 by age, partitioning by time and dropping whole partitions is cheaper, a design
 decision for `designing-postgresql-schemas`.
 

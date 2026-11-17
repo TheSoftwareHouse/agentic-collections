@@ -5,7 +5,7 @@ sidebar_position: 3
 description: Implements delegated implementation-plan tasks exactly as specified and verifies each with the plan's own Definition of Done commands.
 sources:
   - plugins/tsh-product-engineering/agents/software-engineer.md
-sources_hash: "19f08ae52cc14023058f553a844b958861dee69ae25c357be95911fa9f0ee998"
+sources_hash: "d6622e887697d3164c2a72ee143b94589c12a9536b9efd8566d915b90a09b071"
 ---
 
 # Software Engineer
@@ -24,7 +24,7 @@ The delegation must name the plan file path and the task IDs it owns. If either 
 
 ## Responsibilities
 
-1. **Read the plan:** the Goal and its Do-NOT-touch list, its tasks in full, and the Technical Context section, which it uses as-is and extends only where it is silent. It loads every skill the Technical Context or the delegation names, such as the database engine's skill for a task with a migration.
+1. **Read the plan:** the Goal and its Do-NOT-touch list, its tasks in full, and the Technical Context section, which it uses as-is and extends only where it is silent. It loads each skill the Technical Context or the delegation names for the kind of work its tasks do, such as the database engine's skills when a task changes the schema.
 2. **Implement each task as written,** touching the files its `**Files:**` field names. If the task has a Stop Rule and its condition occurs, or an expected seam is not there, it stops and reports instead of improvising.
 3. **Fix reported failures with `debugging-code`.** When the task is a fix for a reported failure, such as a review or verification finding, a failing test or an error with a stack trace, it reproduces, secures the failing test, names the root cause and then changes code. Its reach assessment stays inside the delegated scope: a fix that needs to go wider is a deviation to report. Because it cannot ask the user anything, any step that needs an unavailable symptom, the user's agreement or a plan, and any failure it cannot reproduce, is also a deviation to report. It never ships a mitigation or workaround to turn the Definition of Done green.
 4. **Verify with the task's Definition of Done,** running its commands verbatim and looping on fix-and-rerun until they pass or it is genuinely blocked. Commands run exactly as scoped, never widened to directory- or project-wide suites.

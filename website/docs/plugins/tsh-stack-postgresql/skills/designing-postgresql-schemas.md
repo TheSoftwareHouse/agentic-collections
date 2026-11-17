@@ -5,16 +5,16 @@ sidebar_position: 3
 description: Designs and reviews PostgreSQL tables at the database level, whatever ORM maps them, with types, keys and constraints that keep bad data out.
 sources:
   - plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas/
-sources_hash: "147d237a72bebc6af3d6671c7e748c9b43e6a5e149b49c66c9da0ee14667f5b4"
+sources_hash: "35f9929bfc40def404299c9ed15a0d4ac631c05cc84bffeeb174dd74b3d9f255"
 ---
 
 # Designing PostgreSQL Schemas
 
 **Plugin:** [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)  
 **Invoke:** `/tsh-stack-postgresql:designing-postgresql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads the database engine's skill for a schema migration or a new query shape, which are the other two skills of this plugin, not this one.
+**Used by:** in `tsh-product-engineering`, `creating-implementation-plans` loads it when a plan adds tables or columns and names it for the implementers of those tasks, and `orchestrating-feature-implementation` names it in their delegations. [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads the database engine's skill for a schema migration or a new query shape, which are the other two skills of this plugin, not this one.
 
-The schema is the one place a rule holds for every writer: every service, script, migration and console session. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and loads that engine's skill when one is installed, or stops; below version 14 it stops and says the version is unsupported.
+The schema is the one place a rule holds for every writer: every service, script, migration and console session. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply, and loads that engine's skill when one is installed or stops otherwise; below version 14 it stops and says the version is unsupported.
 
 Use it when creating tables for a new feature, reviewing an entity or schema change, or deciding how to store a kind of data. A convention the project already follows outranks the skill's defaults. When the schema is generated from an ORM's entities, the ORM's own skill owns how to express a choice in that ORM; this skill owns what the resulting table should be. A table that already holds data changes through [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas).
 
