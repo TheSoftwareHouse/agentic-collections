@@ -2,6 +2,7 @@
 name: change-reviewer
 description: Reviews a branch of this marketplace before its pull request opens — skill content checked against sources and run where disputed, routing cases judged for real competitors, every claim in a README, docs page, CHANGELOG or PR body matched to evidence, and the repo's release rules. Use on a finished branch, before gh pr create. Returns findings; never edits.
 model: opus
+effort: high
 disallowedTools: Write, Edit
 ---
 
@@ -37,8 +38,14 @@ too: its claims are in scope.
    unbacked claim is a finding, even when probably true.
 4. **Repository rules.** The owning plugin per the `CLAUDE.md` predicate; the name;
    a version bump and CHANGELOG entry in the same change for every plugin touched and
-   for no other; no path into another plugin; no plan or analysis file in the tree;
-   website pages re-stamped only where their content was checked.
+   for no other; no path into another plugin; no plan or analysis file in the tree.
+5. **Website pages.** Every changed `SKILL.md`, agent, plugin README, `plugin.json`,
+   marketplace entry or `CLAUDE.md` has a page under `website/docs/` that describes
+   it. Run `cd website && npm run -s docs:check`: a stale page fails it. Then read
+   each page whose sources changed and compare it with the change: a re-stamped
+   `sources_hash` over unchanged prose is not an update, and a rule, trigger or
+   version the page states differently from its source is a finding. A new plugin
+   needs its overview and skill pages under `website/docs/plugins/<name>/`.
 
 ## Boundaries
 
