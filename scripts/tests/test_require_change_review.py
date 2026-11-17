@@ -51,6 +51,24 @@ class RequireChangeReviewTest(unittest.TestCase):
         sh(self.repo, "git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "fix")
         self.assertEqual(self.run_hook("gh pr create").returncode, 0)
 
+    def commit_file(self, path):
+        f = self.repo / path
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("x\n", encoding="utf-8")
+        sh(self.repo, "git", "add", path)
+        sh(self.repo, "git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", path)
+
+    def test_docs_only_branch_needs_no_review(self):
+        sh(self.repo, "git", "update-ref", "refs/remotes/origin/main", "main")
+        self.commit_file("website/docs/intro.md")
+        self.assertEqual(self.run_hook("gh pr create --fill").returncode, 0)
+
+    def test_plugin_change_needs_review(self):
+        sh(self.repo, "git", "update-ref", "refs/remotes/origin/main", "main")
+        self.commit_file("website/docs/intro.md")
+        self.commit_file("plugins/tsh-core/README.md")
+        self.assertEqual(self.run_hook("gh pr create --fill").returncode, 2)
+
     def test_blocks_chained_pr_create(self):
         self.assertEqual(self.run_hook("git push -u origin feat/x && gh pr create --fill").returncode, 2)
 

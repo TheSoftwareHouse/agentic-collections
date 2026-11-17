@@ -8,6 +8,10 @@ ran on this branch, not that it passed, and survives later commits, so fixing th
 findings needs no second review. Exit code 2 blocks the tool call and shows
 stderr to Claude.
 
+Only a branch whose commits since `origin/main` touch `plugins/`, `evals/` or
+`.claude/` needs the review; documentation-only changes pass. When the merge base
+with `origin/main` cannot be found, the review is required.
+
 It is a reminder, not a lock: a command hidden in `bash -c`, backticks or a
 script is not seen, and `--head <other branch>` is checked against the current
 branch.
@@ -22,6 +26,7 @@ import sys
 OPERATORS = set(";&|()\n")
 ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 REPO_FLAGS = {"-R", "--repo"}
+REVIEWED_PATHS = ("plugins/", "evals/", ".claude/")
 
 
 def segments(command):
@@ -63,6 +68,14 @@ def git(cwd, *args):
     return out.stdout.strip() if out.returncode == 0 else ""
 
 
+def needs_review(cwd):
+    base = git(cwd, "merge-base", "HEAD", "origin/main")
+    if not base:
+        return True
+    changed = git(cwd, "diff", "--name-only", base, "HEAD").splitlines()
+    return any(path.startswith(REVIEWED_PATHS) for path in changed)
+
+
 def main():
     try:
         event = json.load(sys.stdin)
@@ -79,7 +92,7 @@ def main():
     if not branch or not marker_dir:
         return 0
     marker = os.path.join(marker_dir, branch.replace("/", "%2F"))
-    if os.path.isfile(marker):
+    if os.path.isfile(marker) or not needs_review(cwd):
         return 0
     print(
         f"No change review recorded for branch '{branch}'. Run the change-reviewer "
