@@ -1,0 +1,40 @@
+schema_version: "1.1"
+name: mysql-slow-query-with-both-engines
+description: With both database plugins installed, a slow MySQL query with its plan pasted must route to optimizing-mysql-queries and fire none of the PostgreSQL skills.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
+runs: 1
+execution:
+  prompt: |
+    This MySQL 8.4 query behind our reports page takes 6 seconds:
+
+    SELECT customer_id, SUM(total) FROM orders WHERE DATE(created_at) = '2026-11-01' GROUP BY customer_id;
+
+    EXPLAIN shows type ALL, rows 41000000, Extra: Using where; Using temporary. There's an index on created_at.
+    Why isn't it used?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-mysql-queries"'
+    arm: with-only
+  - name: optimizing-postgresql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    min: 0
+    max: 0
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0

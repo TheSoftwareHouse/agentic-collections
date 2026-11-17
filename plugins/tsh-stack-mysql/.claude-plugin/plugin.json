@@ -1,0 +1,14 @@
+{
+  "name": "tsh-stack-mysql",
+  "displayName": "TSH Stack: MySQL",
+  "description": "TSH practices for MySQL 8.0, 8.4 and 9.7 with InnoDB, Aurora MySQL included, whatever ORM sits on top: schema migrations that run against live traffic without blocking it or stalling replicas, finding and fixing slow queries from performance_schema and EXPLAIN ANALYZE, and table design with types, collations and constraints that keep bad data out.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Software House",
+    "url": "https://tsh.io"
+  },
+  "homepage": "https://github.com/TheSoftwareHouse/agentic-collections/tree/main/plugins/tsh-stack-mysql",
+  "repository": "https://github.com/TheSoftwareHouse/agentic-collections",
+  "license": "MIT",
+  "keywords": ["tsh", "stack", "mysql", "innodb", "aurora", "database", "migrations", "online-ddl", "gh-ost", "sql", "indexes", "explain"]
+}

@@ -11,7 +11,7 @@ sources:
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-platform-engineering/README.md
-sources_hash: "21b5b7993f8adfd524d016b9c505ec0677b2d66e6eea064e0b4005924e8e5c08"
+sources_hash: "12d9d1f0d217947caff71972ad86148f226e3a83879d397d401db1a6f6e842a9"
 ---
 
 import { PluginList } from '@site/src/components/PluginComponents';

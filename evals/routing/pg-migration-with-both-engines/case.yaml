@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: pg-migration-with-both-engines
+description: With both database plugins installed, a migration question about a PostgreSQL table must route to migrating-postgresql-schemas and fire none of the MySQL skills.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-mysql"]
+runs: 1
+execution:
+  prompt: |
+    Our Postgres 16 orders table has about 80 million rows and takes writes all day. I need to add an
+    index on customer_id in the next release. Will CREATE INDEX block inserts, and how should the migration look?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+  - name: migrating-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-mysql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-mysql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-mysql-queries"'
+    min: 0
+    max: 0
+  - name: designing-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-mysql-schemas"'
+    min: 0
+    max: 0
