@@ -7,14 +7,14 @@ sources:
   - plugins/tsh-core/.claude-plugin/plugin.json
   - plugins/tsh-core/README.md
   - plugins/tsh-core/.mcp.json
-sources_hash: "f1ae70269548b48021fb6e04ec7e1da74ff1b281b4f38d32afbc32db48035b23"
+sources_hash: "eb0ed2e36fd61b83e3544ba4ed3c617db5eeac32ba27000a666af903a211448d"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
 
 # TSH Core
 
-`tsh-core` holds what is neither a discipline's practice nor a stack's convention: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, and a one-command project setup that wires them together. It also bundles three MCP servers: Atlassian for Jira and Confluence, Figma for design context, and Context7 for library documentation.
+`tsh-core` holds what is neither a discipline's practice nor a stack's convention: Git worktree lifecycle, the house standard for writing technical documents, authoring Claude Code extensions, the project-context files Claude Code loads, the decision-record format and lifecycle, and a one-command project setup that wires them together. It also bundles three MCP servers: Atlassian for Jira, Confluence and Bitbucket Cloud, Figma for design context, and Context7 for library documentation.
 
 It is the only plugin in the marketplace defined by a negation (neither a discipline nor a stack), so it is deliberately small and has the highest admission bar in the repository.
 
@@ -43,13 +43,13 @@ The plugin ships an `.mcp.json` with three remote HTTP servers. They appear in `
 
 | Server | Endpoint | Sign-in | What it gives Claude |
 | :-- | :-- | :-- | :-- |
-| `atlassian` | `https://mcp.atlassian.com/v1/mcp/authv2` | Run `/mcp`, pick `atlassian`, finish the browser login (OAuth) | Read and update Jira work items and Confluence pages directly. Atlassian Cloud only |
+| `atlassian` | `https://mcp.atlassian.com/v2/mcp` | Run `/mcp`, pick `atlassian`, finish the browser login (OAuth) | Read and update Jira work items, Confluence pages and Bitbucket Cloud directly. Atlassian Cloud only |
 | `figma` | `https://mcp.figma.com/mcp` | Run `/mcp`, pick `figma`, finish the browser login (OAuth) | Read a design directly: layout, variables, components and a rendered export |
 | `context7` | `https://mcp.context7.com/mcp` | None | Current, version-specific library and framework documentation, read-only |
 
 - **Per-user access.** Atlassian and Figma are OAuth-authenticated, so every call runs as you and grants nothing you could not already open yourself. Without the Figma login the server shows as needing authentication, and agents that need a design report what is missing rather than guessing at one.
 - **Context7 rate limit.** Without an API key it works under Context7's anonymous rate limit; a teammate who hits it can add their own key in a user-scope `context7` entry, which outranks the bundled one.
-- **Bitbucket and the Figma desktop server are not bundled.** The same Atlassian server exposes Bitbucket Cloud only under API-token authentication, and the Figma desktop server is a separate local endpoint that needs the desktop app. The plugin README shows how to add each yourself.
+- **The Figma desktop server is not bundled.** It is a separate local endpoint that needs the desktop app. The plugin README shows how to add it yourself. Bitbucket Cloud needs no extra server: it works over the Atlassian sign-in when the Bitbucket workspace is linked to your Atlassian organization.
 - **Do not pin tool names.** A teammate's own user-scope entry wins on precedence and changes the tool namespace, so tool names are discovered at runtime and never written into an agent's `tools:`, a skill's `allowed-tools:` or a hook matcher.
 
 For sign-in steps and server details see [Connecting tools](/docs/getting-started/connecting-tools), [Atlassian](/docs/integrations/atlassian), [Figma](/docs/integrations/figma) and [Context7](/docs/integrations/context7).
