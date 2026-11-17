@@ -25,7 +25,7 @@ sources:
   - plugins/tsh-core/skills/init/SKILL.md
   - plugins/tsh-core/skills/managing-decision-records/SKILL.md
   - plugins/tsh-product-management/skills/navigating-project-context/SKILL.md
-sources_hash: "a0b5c02099abce863fec2772d33104db58a79e6062e21609a89115b947f5f0a4"
+sources_hash: "c878346f512d09658fd855dce3e1b60e0a341d4a0b4a2ecd822e2f1fd4060ff9"
 ---
 
 # For CTOs

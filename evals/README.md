@@ -506,6 +506,75 @@ before the rules named the database engine). Other skills, such as the NestJS on
 may load and are not graded. Not covered: a change with a new query but no migration,
 a plain "review this migration" with no opt-out, and the `code-reviewer` subagent.
 
+## A manual check that is not a routing case: the database skill in feature work
+
+A request for a feature that needs a new column without saying so ("show last seen
+on the users list") should still reach the database engine's skill: through
+`creating-implementation-plans` when a plan is asked for, through
+`orchestrating-feature-implementation` when implementation is. Both need more than
+one turn, so they are manual checks. Run them before changing either rule.
+
+Save each as `evals/routing/<name>/case.yaml` and **delete both directories when
+done**, because `check-eval-cases.py` rejects their `max_turns: 4`:
+
+```yaml
+schema_version: "1.1"
+name: _probe-plain-plan
+description: Manual probe (not committed) — a plan for a feature that implies a new column must load the PostgreSQL design and migration skills within four turns.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Write an implementation plan for this: add a "last seen" timestamp to user profiles in our NestJS API (Postgres 16)
+    and show it on the admin users list, sortable. Update it at most once a minute per user. The users table has about
+    12 million rows.
+  max_turns: 4
+  allowed_tools: [Skill]
+graders:
+  - name: creating-implementation-plans-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    arm: with-only
+  - name: designing-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    arm: with-only
+  - name: migrating-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+```
+
+`_probe-plain-feature` is the same file without the words "Write an implementation
+plan for this:" (the prompt starts with "Add a") and without the
+`creating-implementation-plans` grader. Then:
+
+```shell
+for c in _probe-plain-plan _probe-plain-feature; do
+  claude plugin eval . --eval-dir evals --case "$c" \
+    --runs 6 --trust-plugin --no-publish --ablation none \
+    --model claude-sonnet-5-5 --max-cost-usd 2
+done
+rm -rf evals/routing/_probe-plain-plan evals/routing/_probe-plain-feature
+```
+
+Measured on 2026-11-17, about USD 0.10–0.16 per run:
+
+| Probe | Before the rules (`tsh-product-engineering` 0.12.1) | After (0.12.2) |
+| :-- | :-- | :-- |
+| `_probe-plain-plan` | plan 6/6, design 0/6, migration 0/6 | plan 6/6, design 5/6, migration 6/6 |
+| `_probe-plain-feature` | design 0/6, migration 2/6 | design 0/6, migration 2/6 |
+
+The plan path works. The implementation path does not yet: on "add X",
+`orchestrating-feature-implementation` itself rarely loads (2 of 6 runs in kept
+traces); the model goes to the stack skill (`implementing-nestjs-api`), so the
+orchestrator's rule never runs. Not covered: the `software-engineer` delegation, and
+any session with a real repository, where the engine is visible in the code.
+
 ## Behavioural suites: what a skill does after it fires
 
 A routing case proves the right skill loads. A behavioural case proves what it then

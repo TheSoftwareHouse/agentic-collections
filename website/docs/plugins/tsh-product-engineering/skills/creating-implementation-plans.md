@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Writes TSH's implementation plan as a committed file with phased tasks that each name their files and a verifiable Definition of Done, plus a verification document for the final phase.
 sources:
   - plugins/tsh-product-engineering/skills/creating-implementation-plans/
-sources_hash: "0ce3b6a21895e91b7be8ea33842db326917ab9fe460125f497b4c6154b1156cb"
+sources_hash: "3c7a7e03b61e7ebed1bf6b2a5ca8b9c31257505ff31bd99b34b18d700a492c5d"
 ---
 
 # Creating Implementation Plans
@@ -65,7 +65,7 @@ Credential values never appear in the document, the plan or a report.
 1. **Confirm the inputs:** goal, constraints and acceptance expectations. Ambiguity is resolved with the user before drafting.
 2. **Establish technical context** by following `discovering-technical-context`.
 3. **Pick the building blocks** from the reference, and tell the user in one line which were dropped and why.
-4. **Analyze the current implementation:** what exists to reuse, what must change and what is new, with file paths.
+4. **Analyze the current implementation:** what exists to reuse, what must change and what is new, with file paths. This includes deciding whether the work changes the database schema, which a feature can need without saying so; when it does and a skill for the project's database engine is installed (for example from [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)), the skill loads it and names it in the Technical Context so implementers load it too.
 5. **Break the work into phases and tasks** with files, a scoped Definition of Done and optionally a Stop Rule and Clues.
 6. **Mark parallel groups** explicitly, for example `Parallel group A: Tasks 2.1–2.3`.
 7. **Persist the Technical Context** into the plan.

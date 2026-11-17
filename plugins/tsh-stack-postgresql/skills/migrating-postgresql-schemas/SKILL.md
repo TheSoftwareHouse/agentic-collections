@@ -1,7 +1,7 @@
 ---
 name: migrating-postgresql-schemas
 description: "Writes and reviews PostgreSQL schema migrations that run against a live database without stopping traffic: the lock each DDL statement takes and what it blocks, lock_timeout so a migration waits instead of queueing everyone behind it, expand-and-contract for renames and type changes, NOT VALID constraints validated separately, indexes built CONCURRENTLY outside a transaction, and batched backfills. Use when a migration adds, changes or drops a column, index or constraint on a table that already holds production data, or when reviewing a migration an ORM generated."
-when_to_use: "Trigger on: adding a column, index, foreign key, unique or NOT NULL constraint to an existing table, renaming a column or table, changing a column type, dropping a column, backfilling or rewriting rows in a large table, a migration that hung, timed out or caused an outage, reviewing a TypeORM, Prisma, Doctrine, Alembic, Django, Knex, Laravel, Rails or Flyway migration that targets PostgreSQL, or planning a schema change that must ship with zero downtime. How to shape the schema in the first place is designing-postgresql-schemas; a slow query is optimizing-postgresql-queries."
+when_to_use: "Trigger on: adding a column, index, foreign key, unique or NOT NULL constraint to an existing PostgreSQL table, renaming a column or table, changing a column type, dropping a column, backfilling or rewriting rows in a large table, a PostgreSQL migration that hung, timed out or caused an outage, reviewing a TypeORM, Prisma, Doctrine, Alembic, Django, Knex, Laravel, Rails or Flyway migration that targets PostgreSQL, or planning a schema change that must ship with zero downtime. How to shape the schema in the first place is designing-postgresql-schemas; a slow query is optimizing-postgresql-queries."
 ---
 
 # Migrating PostgreSQL Schemas
@@ -20,7 +20,7 @@ say the project is on an unsupported version; continue only when asked, and then
 only with recipes whose mark the version satisfies.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply and stop: lock modes and online DDL differ by engine.
+another engine, say this skill does not apply and stop: lock modes and online DDL differ by engine. When a skill for that engine is available in this session, load it instead; name none that is absent.
 
 ## Applicability and Precedence
 

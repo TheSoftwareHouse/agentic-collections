@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "d15dec6f879c7a2153a83cd0ec484b6ac3d2defc051f3354126a4ee7952c65b9"
+sources_hash: "4fb9c21d704330329f613c52eb945f699186e01bfc8df0883316d5617a350343"
 ---
 
 # Orchestrating Feature Implementation
@@ -53,7 +53,7 @@ Use it for any feature request or multi-file change, before the first file is ed
 2. **Confirm the go-ahead.** For a plan created or changed in this session, the user is asked to read it through the AskUserQuestion tool, not as a prose question at the end of a turn.
 3. **Create todos.** One per plan task, including the final verification phase's tasks, with parallel groups noted.
 4. **Collect pinned inputs up front.** For UI work or browser and API verification scenarios: the exact full dev server URL, confirmed by the user and never inferred, and every design URL.
-5. **Execute.** Walk the plan in order; launch parallel groups in one message.
+5. **Execute.** Walk the plan in order; launch parallel groups in one message. Before delegating a task that adds or changes tables, columns, indexes, constraints or a migration, load the database engine's skill when one is installed, and tell the implementer to load it before writing the migration.
 6. **Record and gate.** Read each report, confirm the Definition of Done commands ran, tick the plan's boxes, update the todo, and run the phase's `Verification:` line when its last task completes.
 7. **Run the UI verification gate** after each Figma-backed UI task, following the gate reference.
 8. **Execute the final verification phase.** Launch `code-reviewer` and `feature-verifier` concurrently. The reviewer's delegation states verbatim that functional and E2E verification runs in the parallel verifier. A legacy plan without this phase gets a single full-scope `code-reviewer` instead.

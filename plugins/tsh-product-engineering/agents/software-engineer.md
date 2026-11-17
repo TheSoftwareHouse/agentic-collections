@@ -21,7 +21,9 @@ improvise a scope.
 
 1. Read the plan: the Goal and its Do-NOT-touch list, your tasks in full, and the
    **Technical Context** section. Use the persisted context as-is; re-discover only
-   what it does not cover.
+   what it does not cover. Load every skill the Technical Context or your delegation names
+   (the database engine's skill for a task with a migration, for example) when it is
+   available, before writing code.
 2. Implement each task as written: the files its `**Files:**` field names, the
    behavior its description states. If the task has a Stop Rule and its condition
    occurs — or an expected seam simply is not there — stop and report instead of

@@ -12,6 +12,25 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.2] - 2026-11-17
+
+### Fixed
+
+- **A plan for a feature that needs a schema change now loads the database skill.**
+  A feature can need a new column without saying so ("show last seen on the users
+  list"). `creating-implementation-plans` now decides whether the work changes the
+  schema before writing tasks and, when a skill for the project's database engine is
+  installed, loads it and names it in the Technical Context. In a four-turn probe on
+  Sonnet, a plan for such a feature loaded the PostgreSQL design skill in 5 of 6 runs
+  and the migration skill in 6 of 6, up from 0 of 6 each.
+- **`orchestrating-feature-implementation` and `software-engineer` carry the same
+  rule:** the orchestrator loads the engine's skill before delegating a task with a
+  migration and tells the implementer to load it; the implementer loads every skill
+  the plan or delegation names. This does not yet help a plain "add X" request: in the
+  same probe the orchestrator itself rarely loaded (the model went to the stack
+  skill), and the result stayed at 0 of 6 for design and 2 of 6 for migration. Both
+  probes are manual checks in `evals/README.md`.
+
 ## [0.12.1] - 2026-11-16
 
 ### Fixed
