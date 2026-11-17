@@ -1,13 +1,13 @@
 schema_version: "1.1"
 name: mysql-migration-with-both-engines
-description: With both database plugins installed, a migration question about a MySQL table must route to migrating-mysql-schemas and fire none of the PostgreSQL skills, whose lock modes and recipes do not apply.
+description: With both database plugins installed, a plainly worded migration question about a MySQL table, with no MySQL jargon, must route to migrating-mysql-schemas and fire none of the PostgreSQL skills.
 tags: [routing, cross-plugin]
 plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
 runs: 1
 execution:
   prompt: |
-    We're on MySQL 8 with InnoDB. I need to add an index on orders.customer_id; the table has about
-    80 million rows and is busy all day. Will ALTER TABLE lock it, and should we use gh-ost?
+    Our Laravel app runs on MySQL. The next release makes users.phone required, so the column has to become
+    NOT NULL. The users table has about 30 million rows and people sign up all day. How do we ship that safely?
   max_turns: 1
   allowed_tools: [Skill]
 graders:

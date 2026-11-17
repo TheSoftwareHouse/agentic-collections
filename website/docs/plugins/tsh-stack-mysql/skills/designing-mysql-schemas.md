@@ -5,7 +5,7 @@ sidebar_position: 3
 description: Designs and reviews MySQL tables at the database level, whatever ORM maps them, with types, collations, keys and constraints that keep bad data out.
 sources:
   - plugins/tsh-stack-mysql/skills/designing-mysql-schemas/
-sources_hash: "daca585e4c7134b5c2d6210ae4a6d72da32cc1c14b708e935de6d18becc9b5b7"
+sources_hash: "729b503d6410824b26de20c5a3d1df1f16824b4aac416c652386cd1a04c2c59a"
 ---
 
 # Designing MySQL Schemas
@@ -14,7 +14,7 @@ sources_hash: "daca585e4c7134b5c2d6210ae4a6d72da32cc1c14b708e935de6d18becc9b5b7"
 **Invoke:** `/tsh-stack-mysql:designing-mysql-schemas`, and Claude also loads it when the work matches its description  
 **Used by:** no agent loads it. [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
 
-The schema is the one place a rule holds for every writer: every service, script, migration and console session. On MySQL two settings decide whether its rules hold at all: strict `sql_mode` and the collation. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
+The schema is the one place a rule holds for every writer: every service, script, migration and console session. On MySQL two settings decide whether its rules hold at all: strict `sql_mode` and the collation. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 
 Use it when creating tables for a new feature, reviewing an entity or schema change, or deciding how to store a kind of data. A convention the project already follows outranks the skill's defaults. When the schema is generated from an ORM's entities, the ORM's own skill owns how to express a choice in that ORM; this skill owns what the resulting table should be. A table that already holds data changes through [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas).
 
@@ -47,6 +47,7 @@ Use it when creating tables for a new feature, reviewing an entity or schema cha
 | MUST | Store money as `DECIMAL` with an explicit scale, or as an integer count of the smallest unit, with the currency beside it |
 | MUST | Declare a foreign key for every reference, choose its `ON DELETE` deliberately, and match both columns' types exactly |
 | MUST | Enforce invariants with constraints, not only in application validation |
+| MUST | When asked to review a whole change or its merge readiness, not only the schema, load the general code-review skill too when one is available |
 | NEVER | Store several values in one delimited column, or a reference without a foreign key |
 | NEVER | Use `JSON` for attributes that are queried, joined, constrained or present on every row |
 | NEVER | Introduce a second naming, key, timestamp or collation convention into a schema that already has one |

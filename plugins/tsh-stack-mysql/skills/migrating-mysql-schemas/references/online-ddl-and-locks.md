@@ -31,7 +31,7 @@ fails with `ERROR 1221`.
 
 | Operation | Request | Rebuilds | Notes |
 | :-- | :-- | :-- | :-- |
-| Add a column (nullable, or `NOT NULL` with a `DEFAULT`) | `INSTANT` | No | Any position on `8.0.29+`; only last before that. Not instant on tables with a `FULLTEXT` index or `ROW_FORMAT=COMPRESSED` (see below) |
+| Add a column (nullable, or `NOT NULL` with a `DEFAULT`) | `INSTANT` | No | Any position on `8.0.29+`; only last before that. Not instant on tables with a `FULLTEXT` index or `ROW_FORMAT=COMPRESSED` (for `FULLTEXT`, see below) |
 | Drop a column | `INSTANT` on `8.0.29+` | No | Before 8.0.29: `INPLACE`, rebuilds |
 | Rename a column | `INSTANT` on `8.0.28+` | No | `INPLACE` when another table's foreign key references it. Breaks running code: see the recipes |
 | Set or drop a column default | `INSTANT` | No | |

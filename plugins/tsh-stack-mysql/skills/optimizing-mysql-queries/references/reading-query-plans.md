@@ -89,7 +89,7 @@ InnoDB estimates from sampled index pages and **index dives**:
 - **Columns without an index have no statistics** beyond defaults. A filter on one
   is guessed (often 10% or 33%, the `filtered` column shows the guess). A
   **histogram** fixes that without the write cost of an index:
-  `ANALYZE TABLE od UPDATE HISTOGRAM ON status WITH 32 BUCKETS;`. The optimizer uses
+  `ANALYZE TABLE od UPDATE HISTOGRAM ON total WITH 32 BUCKETS;` (`total` has no index). The optimizer uses
   histograms for columns it cannot dive into; it does not use them for a column whose
   index it can dive into.
 - **Long `IN` lists.** Up to `eq_range_index_dive_limit` values (200) the optimizer

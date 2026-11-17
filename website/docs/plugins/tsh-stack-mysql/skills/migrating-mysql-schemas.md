@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Writes and reviews MySQL schema migrations that run against a live InnoDB table without blocking writes or stalling replicas.
 sources:
   - plugins/tsh-stack-mysql/skills/migrating-mysql-schemas/
-sources_hash: "a92dd50ca5648de9f7ad63c354b406ce70911572a6b3b51bf50e41b3e79268a1"
+sources_hash: "827faf130f20809b033bc8779e9b15a308502d6e71261a23d42f4b897c40c187"
 ---
 
 # Migrating MySQL Schemas
@@ -14,7 +14,7 @@ sources_hash: "a92dd50ca5648de9f7ad63c354b406ce70911572a6b3b51bf50e41b3e79268a1"
 **Invoke:** `/tsh-stack-mysql:migrating-mysql-schemas`, and Claude also loads it when the work matches its description  
 **Used by:** no agent loads it. [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) hands it every change to a table that already holds data, and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hands it the index a slow query needs. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin; this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
 
-A migration that is correct SQL can still take production down. On MySQL three things decide it: the metadata lock every `ALTER TABLE` waits for, whether the statement copies the table while blocking writes, and how long binlog replicas take to replay it. The skill makes those three explicit before a migration ships, for MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
+A migration that is correct SQL can still take production down. On MySQL three things decide it: the metadata lock every `ALTER TABLE` waits for, whether the statement copies the table while blocking writes, and how long binlog replicas take to replay it. The skill makes those three explicit before a migration ships, for MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 
 Use it when a migration adds, changes or drops a column, index or constraint on a table that already holds production data, when a migration hung on a metadata lock or left replicas lagging, or when reviewing a migration an ORM generated. The ORM's own skill owns the tool's mechanics; this skill owns what the SQL does to a live database. It never runs a migration or an online schema change tool against a production, staging or shared database: it hands over the SQL, the commands and the order of steps.
 

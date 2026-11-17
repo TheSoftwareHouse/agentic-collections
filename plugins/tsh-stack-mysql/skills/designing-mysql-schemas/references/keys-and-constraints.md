@@ -41,7 +41,7 @@ CREATE TABLE order_lines (
 | Action | Use when |
 | :-- | :-- |
 | `RESTRICT` / `NO ACTION` (the same in MySQL, checked at once) | The child must not outlive the parent, and deleting a parent that still has children is a mistake. The default |
-| `CASCADE` | The child is part of the parent (order lines of an order). Deletes the whole tree in one transaction: on a large tree, a long one |
+| `CASCADE` | The child is part of the parent (order lines of an order). Deletes the whole tree in one transaction: on a large tree, a long one. Never on a record with legal or financial weight (invoices, payments, audit entries) |
 | `SET NULL` | The link is optional and the child stands alone. The column must be nullable |
 - **Cascades are invisible to triggers**, and on 8.0 and 8.4 to the binary log: the
   child rows a cascade deletes are not logged as row events, so change data capture
@@ -50,8 +50,9 @@ CREATE TABLE order_lines (
   explicitly in the application.
 - **No deferrable constraints.** Each row is checked as it is written, so rows that
   reference each other in a cycle need one nullable link filled in afterwards.
-- `foreign_key_checks = 0` disables checking for the session: for restoring dumps,
-  never in application code.
+- `foreign_key_checks = 0` disables checking for the session: for restoring dumps
+  and for the online foreign key recipe in `migrating-mysql-schemas`, never in
+  application code.
 
 ## CHECK constraints
 
@@ -63,7 +64,8 @@ CONSTRAINT orders_period_ck  CHECK (ends_at IS NULL OR ends_at > starts_at),
 CONSTRAINT payments_target_ck CHECK ((order_id IS NULL) + (invoice_id IS NULL) = 1)
 ```
 
-Limits:
+A `CHECK` passes when its expression is `NULL`: `CHECK (total >= 0)` accepts a
+`NULL` total, so pair it with `NOT NULL` where absence is not allowed. Limits:
 
 - one row only: no subqueries, no other tables, no non-deterministic functions such
   as `NOW()`, no `AUTO_INCREMENT` column;

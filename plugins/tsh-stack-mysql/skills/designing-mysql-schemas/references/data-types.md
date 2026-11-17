@@ -82,7 +82,9 @@ the session time zone makes the stored value depend on connection settings.
 - A literal with an offset (`'2026-01-01 10:00:00+02:00'`, `8.0.19+`) is converted to
   the session time zone on insert.
 - Wall-clock values with no zone, such as a store's opening hour, are `TIME`, or a
-  `DATETIME` documented as local.
+  `DATETIME` documented as local. A future local event (an appointment at 9:00 in
+  Warsaw) is the local `DATETIME` plus a column with the IANA zone name: the UTC
+  instant changes if the zone's rules do.
 - Audit defaults: `DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)`, and for
   `updated_at` add `ON UPDATE CURRENT_TIMESTAMP(3)`.
 

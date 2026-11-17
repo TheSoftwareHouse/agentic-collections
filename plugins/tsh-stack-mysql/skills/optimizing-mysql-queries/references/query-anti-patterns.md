@@ -82,7 +82,13 @@ in a generated column.
 InnoDB keeps no stored row count: `SELECT COUNT(*) FROM t` reads an entire index,
 every time. For a total shown in a UI, use an approximate count
 (`information_schema.TABLES.TABLE_ROWS` is an estimate, cached), a counter
-maintained by the application, or show "more than 1,000" with `LIMIT 1001`.
+maintained by the application, or show "more than 1,000" with `LIMIT 1001`. Whether
+an approximate number is acceptable is a product decision: ask.
+
+## NOT IN with a subquery that can return NULL
+
+`WHERE id NOT IN (SELECT customer_id FROM orders)` returns no rows at all as soon as
+the subquery yields one `NULL`. Use `NOT EXISTS`, which also plans as an anti-join.
 
 ## ORDER BY RAND()
 

@@ -120,7 +120,7 @@ An `INT` primary key that is running out (2,147,483,647 signed) is the case that
 cannot wait: the table rejects inserts when it is exhausted. Check how close it is:
 
 ```sql
-SELECT MAX(id) / 2147483647 AS used FROM orders;  -- reads one end of the primary key
+SELECT MAX(id) / 2147483647 AS used FROM orders;  -- 4294967295 for INT UNSIGNED
 ```
 
 (`information_schema.TABLES.AUTO_INCREMENT` is cached for up to a day by default, so
@@ -132,11 +132,17 @@ widened first (`ERROR 3780`), and gh-ost refuses tables with foreign keys. The o
 
 1. Drop the foreign keys that reference the key (in place, `LOCK=NONE`).
 2. Widen each referencing column, then the key itself: copy operations, each a tool
-   run or a window on a large table. Until step 3, nothing enforces the references;
-   keep the window short and the application's writes careful.
+   run or a window on a large table.
 3. Re-add the foreign keys with the foreign key recipe above, orphan check included.
 
-Plan it while there is headroom.
+**Between steps 1 and 3 the database enforces nothing**, and that window lasts as
+long as all the copies together: hours or days on large tables. Inserts can
+reference missing parents, and `ON DELETE CASCADE` and `SET NULL` stop happening, so
+deleting a parent leaves its children behind. Before step 1, deploy code that does
+what the foreign keys did (delete or null the children itself, or refuse to delete
+parents), keep it until step 3, and treat a non-empty orphan check in step 3 as
+data to repair, not to skip. Say this in the hand-over; it is the risk of the
+change. Plan it while there is headroom.
 
 ## Drop a column
 

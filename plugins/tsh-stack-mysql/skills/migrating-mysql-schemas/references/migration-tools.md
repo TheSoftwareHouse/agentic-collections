@@ -51,7 +51,10 @@ The pool may hand each statement a different connection in some tools; `SET SESS
 only helps if the `ALTER` runs on the same one. Where that cannot be guaranteed, put
 both in one call where the driver allows several statements, or set
 `lock_wait_timeout` on the migration connection in the tool's configuration and say
-so in the review.
+so in the review. The same goes for `foreign_key_checks = 0` in the foreign key
+recipe, with one more risk: if the `ALTER` fails, the line that turns checks back on
+never runs, and a pooled connection stays without foreign key checks. Run that
+migration on a connection that is closed afterwards.
 
 ## Changes made outside the tool
 

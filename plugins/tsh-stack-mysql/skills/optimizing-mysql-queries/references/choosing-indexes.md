@@ -85,8 +85,8 @@ FROM sys.schema_redundant_indexes WHERE table_schema = DATABASE();
   server: a replica that serves reports may use what the primary does not. Check the
   uptime and every server that takes reads.
 - An index whose columns are a left prefix of another's, `(a)` beside `(a, b)`, is
-  usually redundant. Not when it is unique, or when it backs a foreign key that
-  nothing else covers.
+  usually redundant. Not when it is unique: it then enforces a rule the longer
+  index does not.
 - Remove one in steps: make it invisible, watch a release, then drop it, each through
   `migrating-mysql-schemas`.
 

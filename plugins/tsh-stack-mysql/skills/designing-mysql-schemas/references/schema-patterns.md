@@ -23,7 +23,15 @@ queries.
 keeps the live table small and every query simple. Prefer it when deleted rows are
 kept for audit or legal reasons rather than undeletion.
 
-Choose soft delete when users can undo a deletion; archive otherwise.
+Choose by why rows are kept:
+
+| Need | Design |
+| :-- | :-- |
+| Undo for a short time, or the row is still referenced | `deleted_at`, uniqueness on live rows through the generated column, `deleted_at` in the hot indexes |
+| Keep a record for audit or law, never shown again | Move the row to an archive table and delete it from the live one |
+| Personal data that must actually be erased | Delete it, or anonymise it in place; a soft-deleted row is not erased |
+
+Apply the choice consistently per table and say which tables use it.
 
 ## Multi-tenancy
 
@@ -94,7 +102,7 @@ CREATE TABLE order_status_history (
   order_id   BIGINT NOT NULL,
   status     VARCHAR(32) NOT NULL,
   changed_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  changed_by BIGINT NULL,
+  changed_by BIGINT NULL,  -- with a foreign key to users where the schema has one
   CONSTRAINT order_status_history_order_fk FOREIGN KEY (order_id) REFERENCES orders (id),
   INDEX order_status_history_order_idx (order_id, changed_at)
 );
@@ -135,4 +143,13 @@ Its one strong use is **retention of a large, append-only table**: dropping a mo
 is `ALTER TABLE events DROP PARTITION p2026_01`, quick, instead of a long batched
 `DELETE`. It still takes the metadata lock, so schedule the monthly partition
 maintenance like any migration. Below hundreds of millions of rows, or without a
-retention need, an index on the time column is enough.
+retention need, an index on the time column is enough. Partitioning a table that
+already holds data copies it: decide before it grows.
+
+## Flexible attributes
+
+Attributes that differ per row or per tenant go in a `JSON` column, with the paths
+that are queried extracted into indexed generated columns
+([data-types.md](./data-types.md#json)). Avoid an entity-attribute-value table
+(`entity_id, name, value`): every value is a string, nothing can be constrained, and
+reading one entity takes a join per attribute.

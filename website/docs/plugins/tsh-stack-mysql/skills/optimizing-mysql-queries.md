@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Finds and fixes slow MySQL queries from evidence, from performance_schema digests and EXPLAIN ANALYZE to the index or query change that fixes them.
 sources:
   - plugins/tsh-stack-mysql/skills/optimizing-mysql-queries/
-sources_hash: "dabbc9a40a7378a8f6ead9fd0b942419b59b2cebd69b21d6fe411ff7a4eb035a"
+sources_hash: "d25353cbbff96566b68106668c062dfff14eb557f615fa2ca418201fba78c03e"
 ---
 
 # Optimizing MySQL Queries
@@ -14,7 +14,7 @@ sources_hash: "dabbc9a40a7378a8f6ead9fd0b942419b59b2cebd69b21d6fe411ff7a4eb035a"
 **Invoke:** `/tsh-stack-mysql:optimizing-mysql-queries`, and Claude also loads it when the work matches its description  
 **Used by:** no agent loads it. [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) point slow-query work at it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
 
-A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
+A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 
 Use it when an endpoint or job is slow because of a MySQL query, when a plan needs explaining, or when someone proposes adding an index. The ORM's own skill owns how to express the fix in that ORM; this skill owns what the database does with the SQL. It changes no server configuration and writes nothing to a shared or production database, and it runs `EXPLAIN ANALYZE`, which executes the query, on production only for a `SELECT` and only with the agreement of the person responsible.
 
@@ -45,6 +45,7 @@ Use it when an endpoint or job is slow because of a MySQL query, when a plan nee
 | MUST | Measure again after the change and report before and after numbers |
 | MUST | Justify every new index with the query it serves and the plan that uses it, and account for its cost on writes and memory |
 | MUST | Treat `FORCE INDEX` and optimizer hints as a last resort, with a comment naming the plan they prevent |
+| MUST | When asked to review a whole change or its merge readiness, not only the query, load the general code-review skill too when one is available |
 | NEVER | Run a write against a shared database to measure it |
 | NEVER | Create or drop an index on a production table outside a migration |
 

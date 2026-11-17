@@ -1,17 +1,14 @@
 schema_version: "1.1"
 name: mysql-slow-query-with-both-engines
-description: With both database plugins installed, a slow MySQL query with its plan pasted must route to optimizing-mysql-queries and fire none of the PostgreSQL skills.
+description: With both database plugins installed, a plainly worded slow-report question on MySQL, with no plan output or MySQL jargon, must route to optimizing-mysql-queries and fire none of the PostgreSQL skills.
 tags: [routing, cross-plugin]
 plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
 runs: 1
 execution:
   prompt: |
-    This MySQL 8.4 query behind our reports page takes 6 seconds:
-
-    SELECT customer_id, SUM(total) FROM orders WHERE DATE(created_at) = '2026-11-01' GROUP BY customer_id;
-
-    EXPLAIN shows type ALL, rows 41000000, Extra: Using where; Using temporary. There's an index on created_at.
-    Why isn't it used?
+    The customers report in our back office takes 6 seconds to load and it's getting worse every month.
+    The database is MySQL. It sums order totals per customer for one day out of roughly 40 million orders.
+    How do I find out what's wrong and fix it?
   max_turns: 1
   allowed_tools: [Skill]
 graders:

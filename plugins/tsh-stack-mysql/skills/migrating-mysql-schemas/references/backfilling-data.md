@@ -41,7 +41,7 @@ WHERE id > :last_id AND id <= :batch_end
   growing `OFFSET` gets slower with every batch.
 - **Size batches by time, not rows.** Aim for well under a second per batch; start
   around 1,000 to 5,000 rows and adjust from the measured duration.
-- **Pause between batches when replicas lag.** Check `Seconds_Behind_Source` in
+- **Pause between batches when replicas lag.** Check `Seconds_Behind_Source` (`Seconds_Behind_Master` before 8.0.22) in
   `SHOW REPLICA STATUS` (8.0.22+; `SHOW SLAVE STATUS` before) on each binlog replica,
   or the replica-lag metric of the managed service, and wait while it is above a
   threshold of a second or two.

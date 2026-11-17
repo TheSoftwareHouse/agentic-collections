@@ -25,7 +25,8 @@ when asked.
 
 **MySQL only.** If the database is MariaDB, PostgreSQL, SQL Server or another engine,
 say this skill does not apply and stop: online DDL, its algorithms and their limits
-differ by engine, and MariaDB's have diverged from MySQL's. On PlanetScale or Vitess,
+differ by engine, and MariaDB's have diverged from MySQL's. When a skill for that
+engine is available in this session, load it instead; name none that is absent. On PlanetScale or Vitess,
 the platform's own schema-change workflow replaces the migration recipes here.
 
 ## Applicability and Precedence
@@ -47,7 +48,7 @@ against a shared or production environment.
 | MUST | Name, for every statement, the algorithm it uses (`INSTANT`, `INPLACE`, `COPY`), whether it rebuilds the table and whether it permits concurrent writes, from [online-ddl-and-locks.md](./references/online-ddl-and-locks.md), before calling a migration safe. |
 | MUST | State `ALGORITHM` and `LOCK` on every `ALTER TABLE` against a populated table (`ALGORITHM=INSTANT` alone, since `INSTANT` rejects any `LOCK` but `DEFAULT`; or `ALGORITHM=INPLACE, LOCK=NONE`). Without them MySQL silently falls back to a table copy that blocks writes; with them it refuses. |
 | MUST | Run `SET SESSION lock_wait_timeout` to a few seconds before any DDL on a table with traffic. The default is a year; every `ALTER`, even an instant one, waits for an exclusive metadata lock on the table (and, for a foreign key, on the referenced table too), at the start and again at the end, and every query on the table queues behind it while it waits. |
-| MUST | Treat an operation that needs `ALGORITHM=COPY` (a column type change, adding a `CHECK` constraint or a stored generated column, a character set conversion) on a large table with traffic as work for an online schema change tool or an agreed maintenance window, never a plain migration. |
+| MUST | Treat an operation that needs `ALGORITHM=COPY` (a column type change, adding a `CHECK` constraint or a stored generated column, a character set conversion) on a large table with traffic as work for an online schema change tool or an agreed maintenance window (there, with `ALGORITHM=COPY` written out), never a plain migration. |
 | MUST | Account for replica lag before running a long in-place build: a binlog replica starts the same `ALTER` only after the source commits it, and lags for its whole duration. Throttle with an online schema change tool when lag matters. |
 | MUST | Put one DDL statement in each migration. MySQL commits implicitly after every DDL statement, so no tool can roll back a half-applied migration. |
 | MUST | Check for orphan rows before adding a foreign key in place with `foreign_key_checks=0`, and set it for that session only: in that mode MySQL does not validate existing rows. |

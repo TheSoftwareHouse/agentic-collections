@@ -24,7 +24,9 @@ CI. Below 8.0, stop and say the version is unsupported; continue only when asked
 
 **MySQL only.** If the database is MariaDB, PostgreSQL, SQL Server or another engine,
 say this skill does not apply and stop: types, collations, constraints and their
-defaults differ by engine, and MariaDB's have diverged from MySQL's.
+defaults differ by engine, and MariaDB's have diverged from MySQL's. When a skill
+for that engine is available in this session, load it instead; name none that is
+absent.
 
 ## Applicability and Precedence
 
@@ -50,6 +52,7 @@ This skill does not ship the change. A table that already holds data changes thr
 | MUST | Store money as `DECIMAL` with an explicit scale, or as a `BIGINT` count of the smallest unit, with the currency stored beside it. Never `FLOAT` or `DOUBLE`. |
 | MUST | Declare a foreign key for every reference to another table's row, choose its `ON DELETE` deliberately, and give both columns identical types and signedness. |
 | MUST | Enforce invariants that must hold for every row with constraints (`CHECK`, `UNIQUE`, foreign keys), not only in application validation. |
+| MUST | When asked to review a whole change or its merge readiness (a pull request or a diff that also changes application code), not only the schema, load the general code-review skill too when one is available in this session (`reviewing-code`, for example). This skill covers the schema; that one covers the rest of the change. Name none that is absent. |
 | NEVER | Store several values in one delimited text column, or a reference in a column with no foreign key because "it could point at several tables". |
 | NEVER | Reach for `JSON` for attributes that are queried, joined, constrained or present on every row. Those are columns. |
 | NEVER | Introduce a second naming, key, timestamp or collation convention into a schema that already has one. |

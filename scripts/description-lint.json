@@ -22,7 +22,7 @@
     {
       "a": "tsh-stack-mysql:optimizing-mysql-queries",
       "b": "tsh-stack-postgresql:optimizing-postgresql-queries",
-      "reason": "Same job on two engines, deliberately duplicated; mysql-slow-query-with-both-engines proves they route apart."
+      "reason": "Same job on two engines, deliberately duplicated; mysql-slow-query-with-both-engines and pg-slow-query-with-both-engines prove they route apart."
     },
     {
       "a": "tsh-stack-mysql:designing-mysql-schemas",

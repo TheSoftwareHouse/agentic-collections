@@ -22,6 +22,8 @@ version is unsupported; continue only when asked.
 **MySQL only.** If the database is MariaDB, PostgreSQL, SQL Server or another engine,
 say this skill does not apply and stop: plan output, index types, statistics and
 instrumentation differ by engine, and MariaDB's optimizer has diverged from MySQL's.
+When a skill for that engine is available in this session, load it instead; name
+none that is absent.
 
 ## Applicability and Precedence
 
@@ -33,6 +35,8 @@ indexing or performance convention in the project outranks this skill.
 This skill does not change server configuration or run anything that writes to a
 shared or production database. `EXPLAIN ANALYZE` executes the query: on production,
 run it only for a `SELECT`, and only when the person responsible agrees.
+`ANALYZE TABLE` and `UPDATE HISTOGRAM` write statistics: on a shared or production
+server, hand them over like an index, do not run them.
 
 ## Non-negotiable Rules
 
@@ -42,6 +46,7 @@ run it only for a `SELECT`, and only when the person responsible agrees.
 | MUST | Read the plan with `EXPLAIN ANALYZE` (or `EXPLAIN FORMAT=TREE` where it cannot run) on realistic data before proposing a fix. A plan on an empty development database proves nothing. |
 | MUST | Compare estimated and actual rows at every step, and rows examined with rows returned. An estimate off by 10x or more, or a query that examines 1,000 rows per row it returns, is the first thing to explain. |
 | MUST | Measure again after the change and report before and after numbers. |
+| MUST | When asked to review a whole change or its merge readiness (a pull request or a diff that also changes application code), not only the query, load the general code-review skill too when one is available in this session (`reviewing-code`, for example). This skill covers the query; that one covers the rest of the change. Name none that is absent. |
 | MUST | Justify every new index with the query it serves and the plan that uses it, and account for its cost on writes and memory. |
 | MUST | Treat `FORCE INDEX`, `USE INDEX` and optimizer hints as a last resort: only after statistics and the query shape are fixed, with a comment naming the plan they prevent. They outlive the data distribution they were written for. |
 | NEVER | Run a write (`INSERT`, `UPDATE`, `DELETE`) to measure it against a shared database. Use a copy, or plain `EXPLAIN`, which does not execute. |
