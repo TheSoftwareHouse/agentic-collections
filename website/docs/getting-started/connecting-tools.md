@@ -9,7 +9,7 @@ sources:
   - plugins/tsh-core/.mcp.json
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-management/README.md
-sources_hash: "b57a17134eef7f08afdfead3014c461122805c90664340be7ff6daf8072ec7ed"
+sources_hash: "25ca11b09e42e018a60477c73149218013d6102c3a27a6038508236cca1df0d0"
 ---
 
 # Connecting tools
@@ -19,7 +19,7 @@ once per machine; the third needs nothing.
 
 | Server | Gives Claude | Sign-in |
 | :-- | :-- | :-- |
-| [Atlassian](/docs/integrations/atlassian) | Jira work items and Confluence pages, read and updated directly | Browser login via `/mcp` |
+| [Atlassian](/docs/integrations/atlassian) | Jira work items, Confluence pages and Bitbucket Cloud, read and updated directly | Browser login via `/mcp` |
 | [Figma](/docs/integrations/figma) | Designs: layout, variables, components and a rendered export | Browser login via `/mcp` |
 | [Context7](/docs/integrations/context7) | Current, version-specific library documentation | None |
 
@@ -46,16 +46,18 @@ project from the same panel.
 Nothing else breaks. The server simply shows as needing authentication.
 
 - **Figma:** agents that need a design report what is missing rather than guessing at one. The UI verification gate in `tsh-product-engineering` reports `VERIFICATION NOT RUN` instead of judging a design it cannot read.
-- **Atlassian:** Jira and Confluence access is unavailable. For example, `e2e-engineer` reads acceptance criteria from a Jira issue key through this server, and without it you supply the criteria directly.
+- **Atlassian:** Jira, Confluence and Bitbucket Cloud access is unavailable. For example, `e2e-engineer` reads acceptance criteria from a Jira issue key through this server, and without it you supply the criteria directly.
 
 ## What is deliberately left out
 
-Two connections are not bundled, because each would fail for most people. Both are
+One connection is not bundled, because it would fail for most people. It is
 documented, with an opt-in command, in the
 [`tsh-core` README](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md).
 
-- **Bitbucket.** The Atlassian server exposes Bitbucket Cloud only under API-token authentication, never OAuth. That needs an Atlassian org admin to enable it first, the Bitbucket workspace linked to the organisation, and a scoped token per person. See [The Atlassian connector](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md#the-atlassian-connector).
 - **Figma's desktop server.** It is a separate local endpoint, served by the desktop app with Dev Mode enabled. It shows as a failed connection for anyone not running the desktop app, and it needs a Dev or Full seat on a paid plan, where the remote server needs neither. See [The Figma connector](https://github.com/TheSoftwareHouse/agentic-collections/blob/main/plugins/tsh-core/README.md#the-figma-connector).
+
+Bitbucket Cloud needs nothing extra: it comes with the Atlassian sign-in when the
+Bitbucket workspace is linked to your Atlassian organization.
 
 ## Other servers and tools
 
