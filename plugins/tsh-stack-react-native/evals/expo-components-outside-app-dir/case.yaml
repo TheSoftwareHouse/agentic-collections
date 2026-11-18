@@ -1,0 +1,60 @@
+schema_version: "1.1"
+name: expo-components-outside-app-dir
+description: Asked for a Settings screen and a reusable SettingsRow in an Expo Router app, implementing-react-native fires and reads references/expo.md, the route file src/app/settings.tsx has a default export, SettingsRow is created outside src/app/, and no package is added with npm install or yarn add.
+tags: [behaviour]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    Add a Settings screen in src/app/settings.tsx with a reusable SettingsRow component:
+    each row shows a label and a value, and can be pressed. Link to the screen from the home screen.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: implementing-react-native-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-react-native"'
+  - name: expo-reference-read
+    type: regex
+    target: trace
+    pattern: '(?:file_path|command)\\?"\s*:\s*\\?"[^"]*references/expo\.md'
+  - name: route-file-has-a-default-export
+    type: regex
+    target: { source: file, path: src/app/settings.tsx }
+    pattern: '(?:^|\n)\s*export\s+default\b'
+  - name: settings-row-file-created
+    type: file_exists
+    path: "src/**/SettingsRow*"
+  - name: settings-row-not-in-app-dir
+    type: file_exists
+    path: "src/app/**/SettingsRow*"
+    exists: false
+  - name: nothing-installed
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*\b(?:npm|pnpm|yarn|bun)\s+(?:i|install|add|ci)\b'
+    min: 0
+    max: 0
+  - name: unchanged-package-json
+    type: regex
+    target: { source: file, path: package.json }
+    pattern: '^\{\n  "name": "field-app",\n  "private": true,\n  "main": "expo-router\/entry",\n  "scripts": \{ "start": "expo start", "typecheck": "tsc --noEmit", "lint": "eslint src" \},\n  "dependencies": \{\n    "expo": "~58\.0\.0",\n    "expo-router": "~58\.0\.0",\n    "react": "19\.3\.1",\n    "react-native": "0\.88\.0",\n    "react-native-safe-area-context": "5\.6\.0",\n    "react-native-screens": "4\.16\.0"\n  \},\n  "devDependencies": \{\n    "typescript": "6\.0\.3"\n  \}\n\}\n$'
+  - name: unchanged-app-json
+    type: regex
+    target: { source: file, path: app.json }
+    pattern: '^\{\n  "expo": \{ "name": "field-app", "slug": "field-app", "scheme": "fieldapp", "plugins": \["expo-router"\] \}\n\}\n$'
+  - name: unchanged-tsconfig-json
+    type: regex
+    target: { source: file, path: tsconfig.json }
+    pattern: '^\{\n  "extends": "expo\/tsconfig\.base",\n  "include": \["src", "\.expo\/types\/\*\*\/\*\.ts", "expo-env\.d\.ts"\]\n\}\n$'
+  - name: unchanged-src-theme-tokens-ts
+    type: regex
+    target: { source: file, path: src/theme/tokens.ts }
+    pattern: '^export const colors = \{ background: ''#ffffff'', text: ''#111111'', muted: ''#6b7280'', border: ''#e5e7eb'' \};\nexport const spacing = \{ sm: 8, md: 16, lg: 24 \};\n$'
+  - name: unchanged-src-components-heading-tsx
+    type: regex
+    target: { source: file, path: src/components/Heading.tsx }
+    pattern: '^import \{ Text \} from ''react-native'';\nimport \{ colors \} from ''\.\.\/theme\/tokens'';\n\nexport function Heading\(\{ title \}: \{ title: string \}\) \{\n  return <Text style=\{\{ color: colors\.text, fontSize: 24, fontWeight: ''600'' \}\}>\{title\}<\/Text>;\n\}\n$'

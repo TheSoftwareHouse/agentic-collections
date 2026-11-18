@@ -1,0 +1,93 @@
+schema_version: "1.1"
+name: rn-list-screen-follows-device-rules
+description: Asked for a paginated Users screen in a bare React Native app, implementing-react-native fires and the screen renders the list through FlatList or FlashList keyed by item id, without a ScrollView over map, a default export or a React namespace import, handles the safe area and the loading, error and empty states, and installs nothing.
+tags: [behaviour]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    Add a paginated Users screen in src/screens/UsersScreen.tsx. It lists users from
+    GET /users (use the client in src/api/client.ts), loads the next page as the person scrolls,
+    and should look right on both iPhone and Android phones.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: implementing-react-native-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-react-native"'
+  - name: uses-a-virtualized-list
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '<(?:FlatList|FlashList)\b'
+  - name: key-comes-from-the-item-id
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '(?:keyExtractor|\bkey)\b[\s\S]{0,80}?\bid\b'
+  - name: loads-the-next-page-on-scroll
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '\bonEndReached\b'
+  - name: no-scrollview-over-map
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '<ScrollView\b[\s\S]*?\.map\('
+    match: not_contains
+  - name: no-default-export
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '(?:^|\n)\s*export\s+default\b'
+    match: not_contains
+  - name: no-react-namespace
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: 'import\s+React\b|import\s+\*\s+as\s+React\b|\bReact\.\w'
+    match: not_contains
+  - name: handles-the-safe-area
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: 'import\s*\{[^}]*\bSafeAreaView\b[^}]*\}\s*from\s*[''"]react-native-safe-area-context[''"][\s\S]*<SafeAreaView\b|import\s*\{[^}]*\buseSafeAreaInsets\b[^}]*\}\s*from\s*[''"]react-native-safe-area-context[''"][\s\S]*\buseSafeAreaInsets\s*\('
+  - name: has-a-loading-state
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: 'ActivityIndicator|\bisLoading\b|\bloading\b'
+    flags: i
+  - name: has-an-error-state
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '(?:\b\w*error\b(?:\s*!==?\s*(?:null|undefined))?|[''"]error[''"])\s*(?:&&|\?)\s*\(?\s*<|\bif\s*\([^()]*\b\w*error\b[^()]*\)\s*\{?\s*return\s*\(?\s*<|\bcase\s+[''"]error[''"]\s*:\s*return\s*\(?\s*<|(?:^|[^\w$.])<\w*Error\w*\b'
+    flags: i
+  - name: error-state-offers-a-retry
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '(?:retry|try again|(?<!p)refetch|(?<!p)reload)'
+    flags: i
+  - name: has-an-empty-state
+    type: regex
+    target: { source: file, path: src/screens/UsersScreen.tsx }
+    pattern: '\bListEmptyComponent\s*=|(?:\.length\s*===?\s*0|!\s*[\w.?]*\.length\b|\b\w*empty\b)\s*(?:&&|\?)\s*\(?\s*<|\bif\s*\([^()]*(?:\.length\s*===?\s*0|!\s*[\w.?]*\.length\b|\b\w*empty\b)[^()]*\)\s*\{?\s*return\s*\(?\s*<|(?:^|[^\w$.])<\w*Empty\w*\b'
+    flags: i
+  - name: nothing-installed
+    type: tool_used
+    tool: Bash
+    input_match: '"command"\s*:\s*"(?:[^"\\]|\\.)*\b(?:npm|pnpm|yarn|bun)\s+(?:i|install|add|ci)\b'
+    min: 0
+    max: 0
+  - name: unchanged-package-json
+    type: regex
+    target: { source: file, path: package.json }
+    pattern: '^\{\n  "name": "field-app",\n  "private": true,\n  "scripts": \{ "typecheck": "tsc --noEmit", "lint": "eslint src" \},\n  "dependencies": \{\n    "react": "19\.3\.1",\n    "react-native": "0\.88\.0",\n    "react-native-safe-area-context": "5\.6\.0"\n  \},\n  "devDependencies": \{\n    "@react-native\/typescript-config": "0\.88\.0",\n    "typescript": "6\.0\.3"\n  \}\n\}\n$'
+  - name: unchanged-tsconfig-json
+    type: regex
+    target: { source: file, path: tsconfig.json }
+    pattern: '^\{\n  "extends": "@react-native\/typescript-config",\n  "include": \["src"\]\n\}\n$'
+  - name: unchanged-src-theme-tokens-ts
+    type: regex
+    target: { source: file, path: src/theme/tokens.ts }
+    pattern: '^export const colors = \{ background: ''#ffffff'', text: ''#111111'', muted: ''#6b7280'', danger: ''#b91c1c'' \};\nexport const spacing = \{ sm: 8, md: 16, lg: 24 \};\n$'
+  - name: unchanged-src-api-client-ts
+    type: regex
+    target: { source: file, path: src/api/client.ts }
+    pattern: '^export async function getJson<T>\(path: string\): Promise<T> \{\n  const response = await fetch\(`https:\/\/api\.example\.com\$\{path\}`\);\n  if \(!response\.ok\) throw new Error\(`Request failed: \$\{response\.status\}`\);\n  return \(await response\.json\(\)\) as T;\n\}\n$'

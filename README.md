@@ -73,6 +73,7 @@ Copy just the lines you need:
 
 # Stacks — pick what the project is built on
 /plugin install tsh-stack-frontend@tsh-agentic-collections
+/plugin install tsh-stack-react-native@tsh-agentic-collections
 /plugin install tsh-stack-nodejs@tsh-agentic-collections
 /plugin install tsh-stack-serverless@tsh-agentic-collections
 /plugin install tsh-stack-python@tsh-agentic-collections
@@ -305,6 +306,7 @@ Install what the project is built on, at **Project** scope.
 | Plugin | Covers | Install |
 | :-- | :-- | :-- |
 | [`tsh-stack-frontend`](plugins/tsh-stack-frontend) | TypeScript for the browser: version policy, the `tsconfig` baseline for a bundler-resolved app, the React + Vite split-config layout, and getting a real type-check into CI | `/plugin install tsh-stack-frontend@tsh-agentic-collections` |
+| [`tsh-stack-react-native`](plugins/tsh-stack-react-native) | React Native apps on iOS and Android: the frontend standard plus the rules a device adds — text inside `Text`, virtualized lists, safe areas and keyboard, touch targets, platform-specific code, secrets in Keychain or Keystore, VoiceOver and TalkBack accessibility | `/plugin install tsh-stack-react-native@tsh-agentic-collections` |
 | [`tsh-stack-nodejs`](plugins/tsh-stack-nodejs) | TypeScript for Node: version policy, the `tsconfig` baseline for a Node runtime, decorator metadata and class fields; NestJS 11 REST APIs | `/plugin install tsh-stack-nodejs@tsh-agentic-collections` |
 | [`tsh-stack-serverless`](plugins/tsh-stack-serverless) | AWS Lambda on OSLS: which libraries we use and which we avoid, how a serverless project is structured, least-privilege IAM, reserved concurrency, secrets at runtime, Step Functions task rules, and checks that execute the packaged artifact | `/plugin install tsh-stack-serverless@tsh-agentic-collections` |
 | [`tsh-stack-python`](plugins/tsh-stack-python) | Modern Python 3.12+: implementation and review practices, and Pydantic v2 / dataclass / SQLModel / SQLAlchemy 2.0 data modelling | `/plugin install tsh-stack-python@tsh-agentic-collections` |

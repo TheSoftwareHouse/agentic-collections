@@ -42,6 +42,7 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | Plugin | Owns |
 | :-- | :-- |
 | `tsh-stack-frontend` | Browser-targeted code — TypeScript configuration for bundler-resolved apps, currently React and Vite |
+| `tsh-stack-react-native` | React Native apps on iOS and Android — implementation conventions shared with the web frontend plus device rules and screen-reader accessibility; Expo, NativeWind and React Navigation when the project uses them |
 | `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
 | `tsh-stack-python` | Modern Python — implementation and review practices, and data modelling |
 | `tsh-stack-php` | PHP 7.4–8.5 — version-aware design, patterns, refactoring and PSR-12; Symfony 5.4–8.x implementation and review; a PHP code reviewer agent |

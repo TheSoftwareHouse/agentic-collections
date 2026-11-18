@@ -98,6 +98,19 @@
       "keywords": ["tsh", "stack", "frontend", "typescript", "react", "vite", "browser", "components", "design-tokens", "accessibility", "wcag"]
     },
     {
+      "name": "tsh-stack-react-native",
+      "source": "./plugins/tsh-stack-react-native",
+      "displayName": "TSH Stack: React Native",
+      "description": "TSH conventions for React Native 0.88 code on iOS and Android: the same standard as frontend code — Figma first, design tokens, three UI states, named exports, module boundaries — plus the rules a device adds: text inside Text, virtualized lists, safe areas and keyboard, touch targets, platform-specific code, and secrets in Keychain or Keystore. Also screen-reader accessibility on iOS and Android: VoiceOver and TalkBack roles and labels, focus and announcements, large text, and reduced motion.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "react-native", "mobile", "ios", "android", "typescript", "components", "design-tokens", "expo", "accessibility", "voiceover", "talkback"]
+    },
+    {
       "name": "tsh-stack-nodejs",
       "source": "./plugins/tsh-stack-nodejs",
       "displayName": "TSH Stack: Node.js",

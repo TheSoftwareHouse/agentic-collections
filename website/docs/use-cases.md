@@ -51,6 +51,8 @@ sources:
   - plugins/tsh-core/skills/writing-technical-documents/SKILL.md
   - plugins/tsh-core/skills/authoring-claude-extensions/SKILL.md
   - plugins/tsh-stack-frontend/skills/implementing-frontend/SKILL.md
+  - plugins/tsh-stack-react-native/skills/implementing-react-native/SKILL.md
+  - plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility/SKILL.md
   - plugins/tsh-stack-nodejs/skills/implementing-nestjs-api/SKILL.md
   - plugins/tsh-stack-php/agents/php-code-reviewer.md
   - plugins/tsh-stack-serverless/skills/configuring-serverless-service/SKILL.md
@@ -58,7 +60,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "c197b273cbd3a6218b29311ee3f8f5865f8e310335ebc3f3926028e0b9551d3c"
+sources_hash: "4626f29280735ea6414fe14919213562626998ef7916a5f3bf1caec092095d1b"
 ---
 
 # Use cases
@@ -228,6 +230,7 @@ From then on, [`navigating-project-context`](/docs/plugins/tsh-product-managemen
 Stack plugins add what changes with the language, framework or cloud, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
 
 - **Frontend:** [`implementing-frontend`](/docs/plugins/tsh-stack-frontend/skills/implementing-frontend) covers any change to frontend application code, React today, with or without a design, and requires a Figma read before markup when a design exists.
+- **React Native:** [`implementing-react-native`](/docs/plugins/tsh-stack-react-native/skills/implementing-react-native) covers any change to React Native application code on iOS and Android, with or without a design, and adds the rules a device needs: text inside `Text`, virtualized lists, safe areas and keyboard, touch targets, platform-specific code and secrets in Keychain or Keystore. [`ensuring-react-native-accessibility`](/docs/plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility) adds VoiceOver and TalkBack roles and labels, focus and announcements, large text and reduced motion while building screens.
 - **Node.js:** [`implementing-nestjs-api`](/docs/plugins/tsh-stack-nodejs/skills/implementing-nestjs-api) guides implementation and review of NestJS 11 REST APIs with `@nestjs/cqrs` and TypeORM 0.3.
 - **PHP:** [`@tsh-stack-php:php-code-reviewer`](/docs/plugins/tsh-stack-php/agents/php-code-reviewer) reviews PHP and Symfony changes against the project's own PHP and Symfony versions, runs the project's linters and static analysis, and returns a structured findings report.
 - **Serverless:** [`configuring-serverless-service`](/docs/plugins/tsh-stack-serverless/skills/configuring-serverless-service) defines an AWS Lambda service on OSLS with least-privilege IAM without wildcard resources, per-function reserved concurrency, secrets resolved at runtime, and assertions over the packaged CloudFormation template.

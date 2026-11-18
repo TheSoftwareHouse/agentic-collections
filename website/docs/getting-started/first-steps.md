@@ -10,7 +10,7 @@ sources:
   - plugins/tsh-product-engineering/README.md
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-testing/README.md
-sources_hash: "f86b7cb7e3b96e40f0b73473023c13cc0de019ef7c469d4017ae5b9b163050dc"
+sources_hash: "836ab07e47ddb88ed52c2ee5261aa5a652627d3057a8e8f992bbe7b6f07d6d43"
 ---
 
 # First steps

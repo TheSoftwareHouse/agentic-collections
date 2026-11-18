@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: a11y-build-web-not-react-native
+description: A web accessible-component build request with the React Native plugin installed must route to ensuring-accessibility, not ensuring-react-native-accessibility.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-react-native", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Build a new accessible combobox component for our React app: keyboard navigation, correct ARIA, and screen-reader announcements for the selected option.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: web-ensure-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-accessibility"'
+    arm: with-only
+  - name: rn-a11y-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-react-native-accessibility"'
+    min: 0
+    max: 0
