@@ -127,15 +127,7 @@ Docs: [Security](https://reactnative.dev/docs/security),
 | PREFER | Type the keys in `react-native-config.d.ts` (`declare module 'react-native-config'` with an `export interface NativeConfig { … }`), so a misspelt key fails the type check. |
 | MUST | Treat MMKV without an `encryptionKey` as plain text on disk, protected only by the OS sandbox (per the MMKV README). |
 | MUST | If MMKV must hold sensitive data, generate the encryption key on the device at first launch and keep it in Keychain/Keystore. **This is TSH's derivation from the two sources above; the MMKV docs do not say where the key should come from.** |
+| MUST | On iOS, store the refresh token with a `*_THIS_DEVICE_ONLY` accessibility (`WHEN_UNLOCKED_THIS_DEVICE_ONLY`, in `react-native-keychain`'s `ACCESSIBLE` or `expo-secure-store`'s `keychainAccessible`), so it is not migrated to a new device from a backup ([react-native-keychain](https://oblador.github.io/react-native-keychain/api/enumerations/ACCESSIBLE.html)). On Android, exclude secure storage from Auto Backup (Expo: see `expo.md`). |
+| PREFER | Keep the access token in memory only and persist just the refresh token in secure storage. **TSH derivation: a short-lived token needs no persistence, and what is never written cannot leak from storage.** |
+| MUST | On sign-out, clear the session on the device even when the network call fails: delete the tokens, clear the server cache (`queryClient.clear()` with TanStack Query clears queries and mutations — [QueryClient](https://tanstack.com/query/latest/docs/reference/QueryClient)), reset local stores, and remove user data from MMKV or AsyncStorage. |
 
-```ts
-// TSH derivation: key generated on device, held in the keychain, never in .env
-// Called once during app start-up, before anything reads the storage.
-export async function createSecureStorage() {
-  const key = (await readKeyFromKeychain()) ?? (await createAndStoreKeyInKeychain());
-  return createMMKV({ id: 'secure', encryptionKey: key });
-}
-```
-
-`readKeyFromKeychain` and `createAndStoreKeyInKeychain` are the project's wrappers around its
-keychain library; no key value appears in source.

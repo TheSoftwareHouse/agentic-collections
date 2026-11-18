@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: rn-sign-out-session
+description: A sign-out request in a React Native app must route to implementing-react-native, which owns where tokens live and what sign-out clears, not implementing-frontend.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-react-native", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    In our Expo app, implement sign-out from the Settings screen: call POST /auth/logout and send the user back to the login screen.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: rn-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-react-native"'
+    arm: with-only
+  - name: frontend-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    min: 0
+    max: 0

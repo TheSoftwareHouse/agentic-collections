@@ -6,14 +6,15 @@ description: TSH conventions for any change to React Native application code, fr
 sources:
   - plugins/tsh-stack-react-native/skills/implementing-react-native/SKILL.md
   - plugins/tsh-stack-react-native/skills/implementing-react-native/references/
-sources_hash: "a74250ec78568fb6bb5565e0bdb0c103cfc0898cdef0c30a37965eff73cbd72a"
+  - plugins/tsh-stack-react-native/agents/react-native-code-reviewer.md
+sources_hash: "35c3572f59940e0fcd39ea9ff39b100dc028083ae6dd7fb0251dca3dbc3902a4"
 ---
 
 # Implementing React Native
 
 **Plugin:** [`tsh-stack-react-native`](/docs/plugins/tsh-stack-react-native/)  
 **Invoke:** `/tsh-stack-react-native:implementing-react-native` (Claude also loads it when the work matches its description)  
-**Used by:** [`ensuring-react-native-accessibility`](/docs/plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility) points to it for component composition and touch-target code
+**Used by:** [`ensuring-react-native-accessibility`](/docs/plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility) points to it for component composition and touch-target code; the [`react-native-code-reviewer`](/docs/plugins/tsh-stack-react-native/agents/react-native-code-reviewer) preloads it for reviews
 
 TSH conventions for React Native application code: how components are composed, where state and modules live, what the device demands on top of that, and, when the task has a design, the Figma-to-code workflow that comes before any markup. It covers **every** change to React Native application code, with or without a design: a new screen from Figma, a custom hook, a store or API client, a refactor that moves modules, or a data or logic change that renders nothing new. Each rule scopes itself: the Figma gate applies only when the task has a design reference, the token and UI-state rules to code that renders, the device rules to code that touches a screen, a list, storage or a platform API, and the import, export, typing and module rules to all of it.
 
@@ -33,7 +34,7 @@ The project's existing component patterns, design system and styling approach ou
 | **Text** | Every string inside a `<Text>` component, enforced by the `react-native/no-raw-text` lint rule where the project lints with it, and proposed otherwise |
 | **Lists** | Any list that can grow long goes through `FlatList` (or `FlashList` where the project uses it) with a stable key; never `ScrollView` plus `map` for unbounded data |
 | **Screen edges** | Safe area and on-screen keyboard respected on every screen; touch targets of at least 44 pt on iOS and 48 dp on Android |
-| **Secrets** | Tokens and secrets never in `AsyncStorage`, plain MMKV, source or the JS bundle; the platform Keychain and Keystore through a secure-storage library |
+| **Secrets** | Tokens and secrets never in `AsyncStorage`, plain MMKV, source or the JS bundle; the platform Keychain and Keystore through a secure-storage library. The checklist adds a session cleared on sign-out and development-only code unreachable in a release build |
 | **Platforms** | Platform-dependent code behind `Platform.select` or `.ios.tsx` / `.android.tsx` files, verified on both platforms or the unverified platform named |
 
 ## Version baseline
@@ -45,6 +46,7 @@ The rules target **React Native 0.88 with React 19**, and the skill reads the pr
 | React Native is pinned | Follows that version; every rule holds for releases that use the New Architecture by default |
 | No `package.json` yet (greenfield) | Asks whether the app is Expo (the React Native docs recommend a framework) or bare before scaffolding, then installs the latest stable release, with the `react` version that release pins |
 | Installed major is newer than 0.88 | Checks what changed in the current React Native documentation, through `context7` or reactnative.dev, before applying the skill; the documentation wins where they disagree |
+| Writing a library call or a config file | Takes the exact syntax for the installed version from current documentation through `context7`; the references state rules, not setup code |
 | Project predates the New Architecture default | Says so before writing code; some library guidance and the lists reference assume it |
 
 ## How it works
@@ -58,7 +60,7 @@ Steps 1 and 2 apply when the task has a design reference. Without one, such as a
 5. **Organize modules**: barrels only at public boundaries, no importer left on an old path.
 6. **Verify**: run the project's type check and linter. For a change that renders or is platform-dependent, also run it on an iOS simulator and an Android emulator, or name the platform that could not be run. For a design-backed task, if the calling workflow provides a verification loop, defer to it; otherwise compare the rendered screen against the design and walk through each interaction state.
 
-The skill ends with a fifteen-item component checklist, which doubles as the React Native review checklist for the diff.
+The skill ends with a seventeen-item component checklist, which doubles as the React Native review checklist for the diff.
 
 ## References
 

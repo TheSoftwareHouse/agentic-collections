@@ -97,29 +97,10 @@ From [accessibilityinfo](https://reactnative.dev/docs/accessibilityinfo):
 | `announceForAccessibilityWithOptions(text, { queue, priority })` | iOS options | `queue: true` waits behind current speech; `priority` is `'low'`, `'default'` or `'high'`. |
 | `getRecommendedTimeoutMillis(ms)` | Android | The user's "Time to take action" setting — use it for toasts and auto-dismissed UI. |
 
-```tsx
-import { useEffect, useRef } from 'react';
-import { AccessibilityInfo, Text, View } from 'react-native';
-
-export function FormErrorSummary({ message }: { message: string }) {
-  const ref = useRef<View>(null);
-
-  useEffect(() => {
-    if (ref.current) AccessibilityInfo.sendAccessibilityEvent(ref.current, 'focus');
-  }, [message]);
-
-  return (
-    <View ref={ref} accessible role="alert">
-      <Text>{message}</Text>
-    </View>
-  );
-}
-```
-
 The React Native docs give no timing guidance for `sendAccessibilityEvent`: a focus event sent
 in the same commit that mounts the view can be dropped, and `role="alert"` together with a focus
-move can be announced twice. Check this pattern with VoiceOver and TalkBack on a device before
-copying it; if focus does not land, send the event after the next frame.
+move can be announced twice. Check every focus move with VoiceOver and TalkBack on a device;
+if focus does not land, send the event after the next frame.
 
 ## 6. System preferences
 

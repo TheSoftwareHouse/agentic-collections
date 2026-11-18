@@ -6,7 +6,7 @@ description: TSH conventions for React Native 0.88 with React 19 on iOS and Andr
 sources:
   - plugins/tsh-stack-react-native/.claude-plugin/plugin.json
   - plugins/tsh-stack-react-native/README.md
-sources_hash: "1767a9cdc4434197dff4e1e08eb91606cef57fb5b03219722450e5150e1109be"
+sources_hash: "74d1c08ff9866ae917280e6667028ed0a54db1344545d030d81cf9545c900e9e"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
@@ -23,11 +23,13 @@ TSH conventions for React Native 0.88 with React 19, on iOS and Android: the sam
 
 <PluginComponents plugin="tsh-stack-react-native" />
 
-The plugin ships two skills. Both are model-invocable: Claude loads them when the work matches their descriptions.
+The plugin ships two skills and one agent. Both skills are model-invocable: Claude loads them when the work matches their descriptions. The agent preloads both.
 
 `implementing-react-native` covers any change to React Native application code: Figma-first work, design tokens, the three UI states, named exports and `react` imports, and module boundaries. The device rules on top are text inside `<Text>`, virtualized lists with stable keys, safe areas and keyboard, touch targets (44 pt on iOS, 48 dp on Android), platform-specific code checked on both platforms, and tokens and secrets only in Keychain or Keystore. See [`implementing-react-native`](/docs/plugins/tsh-stack-react-native/skills/implementing-react-native).
 
 [`ensuring-react-native-accessibility`](/docs/plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility) covers accessibility while building screens: `role`, label and state props that VoiceOver and TalkBack announce, moving screen-reader focus and announcing changes, text that follows the system font size, reduced motion, and a walk with the screen reader on a device.
+
+[`@tsh-stack-react-native:react-native-code-reviewer`](/docs/plugins/tsh-stack-react-native/agents/react-native-code-reviewer) is a read-only review of a React Native or Expo change against the installed versions and both skills, plus the project's type check, linter and tests. It returns a findings report that names what only a device run would settle.
 
 ## References
 

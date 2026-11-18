@@ -27,27 +27,6 @@ Source: [troubleshooting](https://reactnavigation.org/docs/troubleshooting/).
 | MUST | Group related screens into nested navigators (tabs inside a stack) rather than one flat list of every screen. |
 | PREFER | The navigator's `createXScreen` helper (for example `createNativeStackScreen`) when a screen's `options` or `listeners` need inferred param types. |
 
-```tsx
-import { createStaticNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import { HomeScreen } from './screens/HomeScreen';
-import { ProfileScreen } from './screens/ProfileScreen';
-
-const RootStack = createNativeStackNavigator({
-  screens: {
-    Home: HomeScreen,
-    Profile: ProfileScreen,
-  },
-});
-
-const Navigation = createStaticNavigation(RootStack);
-
-export function App() {
-  return <Navigation />;
-}
-```
-
 Sources: [static vs dynamic](https://reactnavigation.org/docs/static-vs-dynamic/),
 [static configuration](https://reactnavigation.org/docs/static-configuration/).
 
@@ -60,24 +39,6 @@ Sources: [static vs dynamic](https://reactnavigation.org/docs/static-vs-dynamic/
 | MUST | Dynamic API: define one `RootStackParamList` type per navigator and type screens with the navigator's `NativeStackScreenProps<RootStackParamList, 'Name'>` (or the matching `StackScreenProps`, `BottomTabScreenProps`). Keep these types in a separate `types.ts`. |
 | NEVER | Type params as `any` or cast `route.params`. A screen without params is `undefined`; an optional-params screen is `{ ... } | undefined`. |
 | MUST | Pass serializable values only in params (ids, strings, numbers). Fetch the object on the destination screen from the shared data layer. |
-
-```tsx
-import type { StaticScreenProps } from '@react-navigation/native';
-
-type ProfileScreenProps = StaticScreenProps<{ userId: string }>;
-
-export function ProfileScreen({ route }: ProfileScreenProps) {
-  // route.params.userId is a string
-}
-```
-
-```ts
-type RootStackType = typeof RootStack;
-
-declare module '@react-navigation/native' {
-  interface RootNavigator extends RootStackType {}
-}
-```
 
 Sources: [TypeScript](https://reactnavigation.org/docs/typescript/),
 [static vs dynamic](https://reactnavigation.org/docs/static-vs-dynamic/).
@@ -92,17 +53,6 @@ Sources: [TypeScript](https://reactnavigation.org/docs/typescript/),
 | MUST | A dynamic navigator nested inside a static one needs a `screens` map on the parent screen's `linking`, because the nested navigator cannot generate paths. |
 | MUST | Treat deep link params as untrusted input and validate them in the screen, as for any external request. Never act on a link (delete, pay, sign out) without the user's confirmation. |
 
-```tsx
-const linking = {
-  enabled: 'auto' as const,
-  prefixes: ['https://example.com', 'example://'],
-};
-
-export function App() {
-  return <Navigation linking={linking} />;
-}
-```
-
 Sources: [static configuration](https://reactnavigation.org/docs/static-configuration/),
 [combining static with dynamic](https://reactnavigation.org/docs/combine-static-with-dynamic/).
 
@@ -115,6 +65,8 @@ Sources: [static configuration](https://reactnavigation.org/docs/static-configur
 | PREFER | `useNavigation()` in a deeply nested component over threading the `navigation` prop down. |
 | MUST | Header colors, tab bar styling and transition options come from design tokens, not literals. |
 | MUST | Respect the safe area under custom headers and tab bars (core rule on safe area and keyboard). |
+| MUST | Guard a screen with unsaved changes with `usePreventRemove`: it blocks every action that removes the screen, from the header, a custom button or a stack swipe (the swipe is cancelled), not one specific button. Do not rely on disabling the gesture or overriding one button ([preventing going back](https://reactnavigation.org/docs/preventing-going-back/)). |
+| MUST | Persist a draft that must survive, rather than relying on the prompt: leaving the app — the app switcher, the system closing it, any exit on iOS — cannot be prevented ([preventing going back](https://reactnavigation.org/docs/preventing-going-back/)). |
 
 ## Checklist for a navigation change
 

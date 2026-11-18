@@ -6,14 +6,15 @@ description: Accessibility patterns applied while building React Native screens 
 sources:
   - plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility/SKILL.md
   - plugins/tsh-stack-react-native/skills/ensuring-react-native-accessibility/references/
-sources_hash: "18bedfc13b32950995a7a2c808782360da0165a253f4b1d72e7b93a2787ca289"
+  - plugins/tsh-stack-react-native/agents/react-native-code-reviewer.md
+sources_hash: "12c54c0cf33efc97e18277d0e598380e1086dcf1dc19795a58aca346c48fe409"
 ---
 
 # Ensuring React Native Accessibility
 
 **Plugin:** [`tsh-stack-react-native`](/docs/plugins/tsh-stack-react-native/)  
 **Invoke:** `/tsh-stack-react-native:ensuring-react-native-accessibility` (Claude also loads it when the work matches its description)  
-**Used by:** [`implementing-react-native`](/docs/plugins/tsh-stack-react-native/skills/implementing-react-native) lists it as a related skill
+**Used by:** [`implementing-react-native`](/docs/plugins/tsh-stack-react-native/skills/implementing-react-native) lists it as a related skill; the [`react-native-code-reviewer`](/docs/plugins/tsh-stack-react-native/agents/react-native-code-reviewer) preloads it for reviews
 
 Accessibility patterns for React Native screens on iOS and Android: the roles, labels and state that VoiceOver and TalkBack announce, focus and announcements, text that follows the system font size, contrast and motion. They are applied while building, not audited afterwards. The project's component library and its accessible primitives come first; the skill says to check which `role`, label and state props they already set instead of re-implementing them, and to follow the React Native documentation for the version the project pins.
 

@@ -15,6 +15,7 @@ Docs: [Optimizing FlatList](https://reactnative.dev/docs/optimizing-flatlist-con
 | PREFER | `ScrollView` only for short, fixed content such as a settings screen. |
 | MUST | Cover the three UI states on a list: loading, error, and empty through `ListEmptyComponent`. |
 | MUST | Check `package.json` before using FlashList. v2 requires the New Architecture; do not add it to a project that has not enabled it. |
+| MUST | Drive `RefreshControl`'s `refreshing` from the pull the user started — local state around the `refetch()` promise — never from a query's `isFetching` or `isRefetching`. Those are true for every background fetch, so the spinner flashes on entry to a cached screen and after unrelated invalidations. TanStack Query's React Native example tracks a user-initiated refresh separately ([example](https://github.com/tanstack/query/blob/main/examples/react/react-native/src/screens/MoviesListScreen.tsx)). |
 
 ## Keys and layout
 

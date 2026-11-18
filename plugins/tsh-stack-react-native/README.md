@@ -20,13 +20,14 @@ If you added the marketplace before this plugin existed, refresh it first with
 
 ## What's in it
 
-| Skill | Invoke | Covers |
+| Component | Invoke | Covers |
 | :-- | :-- | :-- |
 | `implementing-react-native` | `/tsh-stack-react-native:implementing-react-native` | Any change to React Native app code: Figma-first work, design tokens, the three UI states, named exports and `react` imports, module boundaries. Device rules: text inside `<Text>`, virtualized lists with stable keys, safe areas and keyboard, touch targets (44 pt iOS, 48 dp Android), platform-specific code checked on both platforms, tokens and secrets only in Keychain or Keystore |
 | `ensuring-react-native-accessibility` | `/tsh-stack-react-native:ensuring-react-native-accessibility` | Accessibility while building React Native screens: `role`, label and state props that VoiceOver and TalkBack announce, moving screen-reader focus and announcing changes, text that follows the system font size, reduced motion, and a walk with the screen reader on a device |
+| `react-native-code-reviewer` agent | `@tsh-stack-react-native:react-native-code-reviewer` | Read-only review of a React Native or Expo change against the installed versions and both skills — security and release hygiene, device rules, framework rules, lists and performance, accessibility, the component checklist — plus the project's type check, linter and tests, returned as a findings report that names what only a device run would settle |
 
 Both skills are model-invocable — Claude loads them when the work matches their
-descriptions.
+descriptions. The reviewer agent preloads both.
 
 ### References
 

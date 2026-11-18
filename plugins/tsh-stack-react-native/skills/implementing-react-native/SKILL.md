@@ -1,7 +1,7 @@
 ---
 name: implementing-react-native
 description: "React Native rules for iOS and Android apps, Expo or bare: screens built from View, Text and Pressable, every string inside Text, virtualized lists with stable keys, safe area and keyboard handling, Keychain and Keystore for secrets, Platform.select and .ios/.android files, and a design read before layout when a mockup exists. Use when writing or refactoring app code that runs on a phone, simulator or emulator."
-when_to_use: "Trigger on: building or changing a React Native or Expo screen, Pressable touch targets, FlatList or FlashList screens, notch and keyboard overlap, StyleSheet work, Platform.select or .ios and .android files, storing a token on the device, running on a simulator or emulator, mobile data wiring or refactors, or starting or upgrading a React Native app."
+when_to_use: "Trigger on: building or changing a React Native or Expo screen, Pressable touch targets, FlatList or FlashList screens, notch and keyboard overlap, StyleSheet work, Platform.select or .ios and .android files, storing a token on the device, sign-in, sign-out or refresh-token handling, a development-only mock or fallback that must not ship, a pull-to-refresh list, an unsaved-changes prompt on leaving a screen, running on a simulator or emulator, mobile data wiring or refactors, or starting or upgrading a React Native app."
 ---
 
 # Implementing React Native
@@ -40,6 +40,9 @@ The rules target **React Native 0.88 with React 19**. Read the project's
   React Native documentation — through `context7`, which `tsh-core` bundles, or
   reactnative.dev — before applying this skill; where they disagree, the
   documentation wins.
+- **Writing a library call or a config file** → the references state rules, not
+  setup code; take the exact syntax for the installed version from its current
+  documentation through `context7` rather than from memory.
 - **The project predates the New Architecture default** → say so before writing
   code; some library guidance and the lists reference assume it.
 
@@ -118,7 +121,8 @@ the diff against it and the Non-negotiable Rules above.
 - [ ] Lists — virtualized, stable keys
 - [ ] Safe area and keyboard — handled; touch targets 44 pt / 48 dp
 - [ ] Platforms — platform code isolated, checked on iOS and Android
-- [ ] Secrets — tokens only in Keychain/Keystore
+- [ ] Secrets — tokens only in Keychain/Keystore; sign-out clears the session
+- [ ] Release build — development-only code and fallbacks unreachable
 ```
 
 ## Reference Loading
@@ -127,12 +131,12 @@ the diff against it and the Non-negotiable Rules above.
 | --- | --- | --- |
 | [Component guidelines](./references/component-guidelines.md) | Deciding where state lives, adding a barrel file, moving or splitting modules, or reviewing for anti-patterns | The state decision framework, barrel-file details, the anti-pattern table |
 | [React Native patterns](./references/react-native-patterns.md) | Before writing or reviewing React Native code | How React implements the composition, state, error-handling, and performance patterns above, plus the lint rules that enforce imports, exports and raw text |
-| [Platform and device](./references/platform-and-device.md) | Laying out a screen, handling forms or the keyboard, storing data on the device, or code that differs per platform | Text and styles, flexbox defaults, Pressable, safe area, keyboard, platform files, AppState, deep links, secure storage, environment variables |
-| [Lists and performance](./references/lists-and-performance.md) | Writing a list, or investigating jank or slow screens | FlatList and FlashList, keys, release-build measurement, JS thread versus UI thread |
+| [Platform and device](./references/platform-and-device.md) | Laying out a screen, handling forms or the keyboard, storing data on the device, or code that differs per platform | Text and styles, flexbox defaults, Pressable, safe area, keyboard, platform files, AppState, deep links, secure storage, session and sign-out, environment variables |
+| [Lists and performance](./references/lists-and-performance.md) | Writing a list, or investigating jank or slow screens | FlatList and FlashList, keys, pull-to-refresh state, release-build measurement, JS thread versus UI thread |
 | [TypeScript for React Native](./references/typescript-for-react-native.md) | Editing `tsconfig`, adding path aliases, typing navigation, or upgrading TypeScript | The preset-owned config, `tsc` as a separate gate, aliases, version policy |
-| [Expo](./references/expo.md) | `package.json` depends on `expo` | Expo-specific setup, config, routing and build conventions |
+| [Expo](./references/expo.md) | `package.json` depends on `expo` | Expo-specific setup, config, routing, unsaved-changes guard, monorepo native modules, release-build guards and build conventions |
 | [NativeWind](./references/nativewind.md) | `package.json` depends on `nativewind` | Tokens through Tailwind classes, setup and its limits |
-| [React Navigation](./references/react-navigation.md) | `package.json` depends on `@react-navigation/native` | Navigator structure, typed routes, screen options, deep links |
+| [React Navigation](./references/react-navigation.md) | `package.json` depends on `@react-navigation/native` | Navigator structure, typed routes, screen options, deep links, unsaved-changes guard |
 
 ## Related Skills
 

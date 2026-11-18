@@ -32,19 +32,6 @@ This is rule 3 of the core skill (every visual value comes from a token) applied
 
 Source: [themes](https://www.nativewind.dev/docs/guides/themes).
 
-```js
-// tailwind.config.js
-const colors = require('./colors');
-
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  presets: [require('nativewind/preset')],
-  theme: { extend: { colors } },
-  plugins: [],
-};
-```
-
 ## Writing styles with `className`
 
 | Severity | Rule |
@@ -57,40 +44,6 @@ module.exports = {
 | NEVER | Concatenate two class strings that may set the same property (`'p-2 ' + className`). Both classes reach the style engine and the winner is not the one you intend. |
 | MUST | Platform and state variants use the Tailwind prefixes (`ios:`, `android:`, `dark:`, `active:`), not `Platform.OS` branches around class strings. |
 | MUST | Touch targets stay 44 pt (iOS) / 48 dp (Android) through a theme token (`minHeight: { touch: '48px' }`, `minWidth: { touch: '48px' }` in `theme.extend`, used as `min-h-touch min-w-touch`) or `hitSlop`. NativeWind's native rem is smaller than the web's 16 px (its own tests render `p-4` as about 14.3), so spacing-scale classes are not their web size: `min-h-12` comes out near 43, below both targets. |
-
-```ts
-// src/utils/tw-merge.ts — created once; lists the theme keys tailwind-merge cannot know
-import { extendTailwindMerge } from 'tailwind-merge';
-
-export const twMerge = extendTailwindMerge({
-  extend: {
-    classGroups: { 'min-h': [{ 'min-h': ['touch'] }], 'min-w': [{ 'min-w': ['touch'] }] },
-  },
-});
-```
-
-```tsx
-import { Pressable, Text } from 'react-native';
-import { twMerge } from '../utils/tw-merge';
-
-type ButtonProps = {
-  label: string;
-  onPress: () => void;
-  className?: string;
-};
-
-export function Button({ label, onPress, className }: ButtonProps) {
-  return (
-    <Pressable
-      role="button"
-      onPress={onPress}
-      className={twMerge('min-h-touch min-w-touch items-center justify-center rounded-md bg-primary px-4 active:bg-primary-pressed', className)}
-    >
-      <Text className="text-on-primary">{label}</Text>
-    </Pressable>
-  );
-}
-```
 
 Sources: [tailwind-merge](https://github.com/dcastil/tailwind-merge) for the merge behaviour and the
 Tailwind version each major supports; [`extendTailwindMerge` in v2.6.0](https://github.com/dcastil/tailwind-merge/blob/v2.6.0/docs/configuration.md).
@@ -119,13 +72,6 @@ First check whether it already takes a `style` prop and whether wrapping it is s
 
 Sources: [cssInterop](https://www.nativewind.dev/docs/api/css-interop),
 [remapProps](https://www.nativewind.dev/docs/api/remap-props).
-
-```ts
-import { cssInterop } from 'nativewind';
-import { LinearGradient } from 'expo-linear-gradient';
-
-cssInterop(LinearGradient, { className: 'style' });
-```
 
 ## Checklist for a NativeWind change
 

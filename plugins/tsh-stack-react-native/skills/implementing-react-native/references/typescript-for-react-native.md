@@ -72,26 +72,6 @@ fails at bundle or run time.
 | Bare React Native | `compilerOptions.paths` in `tsconfig.json`, relative to the project root and without `baseUrl` ([TypeScript 6.0](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html) deprecates it, 7.0 removes it), mirrored in `babel.config.js` with `babel-plugin-module-resolver` (`root`, `extensions`, `alias`) | [TypeScript](https://reactnative.dev/docs/typescript) |
 | Expo | `paths` in `tsconfig.json` only (`"@/*": ["./src/*"]`); Expo CLI resolves them automatically | [Expo TypeScript](https://docs.expo.dev/guides/typescript/) |
 
-```json
-{
-  "extends": "@react-native/typescript-config",
-  "compilerOptions": {
-    "paths": { "@components/*": ["./src/components/*"] }
-  }
-}
-```
-
-```js
-// babel.config.js — the resolver half of the same alias
-plugins: [
-  ['module-resolver', {
-    root: ['./src'],
-    extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
-    alias: { '@components': './src/components' },
-  }],
-],
-```
-
 | Severity | Rule |
 | --- | --- |
 | MUST | Mirror every `paths` alias in `babel.config.js` in a bare project (or generate both from one source), and list the platform extensions in the resolver. |
