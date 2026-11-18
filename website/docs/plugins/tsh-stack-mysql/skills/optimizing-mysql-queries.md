@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Finds and fixes slow MySQL queries from evidence, from performance_schema digests and EXPLAIN ANALYZE to the index or query change that fixes them.
 sources:
   - plugins/tsh-stack-mysql/skills/optimizing-mysql-queries/
-sources_hash: "d25353cbbff96566b68106668c062dfff14eb557f615fa2ca418201fba78c03e"
+sources_hash: "b50784a961b77a4acd708efb1f9ebb288db76482cb84deffe3030f5ca1029574"
 ---
 
 # Optimizing MySQL Queries

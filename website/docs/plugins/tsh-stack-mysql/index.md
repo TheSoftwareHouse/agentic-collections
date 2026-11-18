@@ -6,7 +6,7 @@ description: TSH practices for MySQL 8.0, 8.4 and 9.7 with InnoDB, beneath whate
 sources:
   - plugins/tsh-stack-mysql/.claude-plugin/plugin.json
   - plugins/tsh-stack-mysql/README.md
-sources_hash: "33339a37a5c19a6956d349c06b959df6c6d488b05687843a60548b56e366326b"
+sources_hash: "f8d82ec93cf97b7a4273b3256f20de0ce1d970106185a13e7012e3bb0c052655"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';

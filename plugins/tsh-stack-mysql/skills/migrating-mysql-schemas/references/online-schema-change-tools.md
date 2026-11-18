@@ -41,10 +41,11 @@ pt-online-schema-change otherwise. If the project already uses one, use that one
 - **A rehearsal first**, then the real run with `--execute`, with the rehearsal's
   output in the review: `--dry-run` for pt-online-schema-change; gh-ost does nothing
   until it is given `--execute`, so a run without it is the rehearsal.
-- **Constraint names change.** Both build their copy with `CREATE TABLE ... LIKE`,
-  which gives named `CHECK` constraints generated names (`..._chk_1`), and
-  pt-online-schema-change also renames foreign keys (below). Rename them back
-  afterwards if migrations refer to them by name.
+- **Constraint names change.** gh-ost builds its copy with `CREATE TABLE ... LIKE`,
+  which gives named `CHECK` constraints generated names (`..._chk_1`).
+  pt-online-schema-change rewrites the table definition instead and toggles a leading
+  underscore on every constraint name, `CHECK` and foreign keys alike (below). Rename
+  them back afterwards if migrations refer to them by name.
 - **Recording the change in the migration tool**, which never ran it. See
   [migration-tools.md](./migration-tools.md#changes-made-outside-the-tool).
 
@@ -82,9 +83,9 @@ pt-online-schema-change \
 
 - The triggers add work to every write on the table for the whole run; size the run
   for the busiest hour it will overlap.
-- **Foreign keys change name.** On the new table each foreign key's name gains or
-  loses a leading underscore. Migrations or code that refer to a constraint by name
-  must expect that.
+- **Constraint names change.** On the new table each constraint's name, foreign keys
+  and `CHECK` alike, gains or loses a leading underscore. Migrations or code that refer
+  to a constraint by name must expect that.
 - `--alter-foreign-keys-method` decides how child tables that reference the altered
   table are repointed at the new one: `rebuild_constraints` alters each child table
   (a copy, if a child is large), `drop_swap` briefly leaves the table missing and

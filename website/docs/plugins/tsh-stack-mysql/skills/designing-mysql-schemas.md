@@ -5,7 +5,7 @@ sidebar_position: 3
 description: Designs and reviews MySQL tables at the database level, whatever ORM maps them, with types, collations, keys and constraints that keep bad data out.
 sources:
   - plugins/tsh-stack-mysql/skills/designing-mysql-schemas/
-sources_hash: "729b503d6410824b26de20c5a3d1df1f16824b4aac416c652386cd1a04c2c59a"
+sources_hash: "0f40a5012bb6f7e469a986f45149d74ae7e80304d1c93c4e2dc7dbff3b386812"
 ---
 
 # Designing MySQL Schemas

@@ -43,13 +43,14 @@ fails with `ERROR 1221`.
 | Widen a `VARCHAR` within the same length-prefix size | `INPLACE, LOCK=NONE` | No | Up to 255 bytes uses a 1-byte prefix, beyond that 2. In `utf8mb4` (4 bytes a character) `VARCHAR(63)` is 252 bytes and `VARCHAR(64)` is 256, so crossing that line is copy. Shrinking is copy |
 | Make a column `NOT NULL` | `INPLACE, LOCK=NONE` | **Yes** | Fails on the first `NULL` it finds (strict mode). Backfill first |
 | Make a column nullable | `INPLACE, LOCK=NONE` | **Yes** | |
-| Change a column's type (`INT` to `BIGINT`, `VARCHAR` to `TEXT`, any charset change) | **`COPY` only** | Yes | See the recipes and the online schema change tools |
+| Change a column's type (`INT` to `BIGINT`, `VARCHAR` to `TEXT`) | **`COPY` only** | Yes | See the recipes and the online schema change tools |
+| Change a column's character set or collation | `INPLACE, LOCK=NONE` when the column is not indexed, the source is not `latin1` and the column stays within its length-prefix size; otherwise **`COPY`** | No, when in place | The copy cases are refused in place with `ERROR 1846`, so stating the clauses sorts them. `utf8mb3` to `utf8mb4` grows each character from 3 to 4 bytes: `VARCHAR(80)` goes from 240 to 320 bytes and crosses the 255-byte line. `INSTANT` is refused |
 | Add a foreign key | **`COPY`**, unless `foreign_key_checks=0` in the session: then `INPLACE, LOCK=NONE` | No | With checks off, existing rows are **not** validated. Check for orphans first. Takes the metadata lock on the **referenced table too** |
 | Drop a foreign key | `INPLACE, LOCK=NONE` | No | Also locks the referenced table's metadata briefly |
 | Add a `CHECK` constraint | **`COPY` only** | Yes | `ALTER CHECK ... NOT ENFORCED` and `DROP CHECK` are `INSTANT`; turning one back to `ENFORCED` is copy again |
 | Add or replace the primary key | `INPLACE, LOCK=NONE` | **Yes** | Dropping it without adding another is copy |
 | `OPTIMIZE TABLE`, `ALTER TABLE ... FORCE` | `INPLACE` | **Yes** | Resets the instant row-version counter |
-| Convert the table's character set | No concurrent writes | Yes | Treat as copy |
+| Convert the table's character set (`CONVERT TO CHARACTER SET`) | `INPLACE, LOCK=NONE` when every text column meets the conditions in the row above; otherwise **`COPY`** | Yes on 8.0; no on 8.4 and 9.7 | Checked converting from `utf8mb3` |
 | Rename a table | `INSTANT` | No | |
 
 **Instant has a budget.** Each instant add or drop creates a row version, counted in

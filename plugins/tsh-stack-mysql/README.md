@@ -1,9 +1,9 @@
 # TSH Stack: MySQL
 
-TSH practices for MySQL 8.0, 8.4 and 9.7 with InnoDB, Aurora MySQL included, at the
-level of the database itself rather than any ORM: schema migrations that run against
-live traffic without blocking it or stalling replicas, slow queries found and fixed
-from evidence, and table design that keeps bad data out.
+TSH practices for MySQL 8.0, 8.4 and 9.7 with InnoDB, Aurora MySQL 3 and Aurora
+MySQL 8.4 included, at the level of the database itself rather than any ORM: schema
+migrations that run against live traffic without blocking it or stalling replicas,
+slow queries found and fixed from evidence, and table design that keeps bad data out.
 
 This is a **stack** plugin, not a discipline plugin. Install it into the projects
 that use MySQL, at `project` scope, so it travels with the repo — the repo already

@@ -164,9 +164,9 @@ ALTER TABLE orders ALTER INDEX orders_status_idx INVISIBLE, ALGORITHM=INPLACE, L
 ALTER TABLE orders DROP INDEX orders_status_idx, ALGORITHM=INPLACE, LOCK=NONE;
 ```
 
-Making it visible again is instant to apply; rebuilding a dropped index is not. An
-invisible index is still maintained on every write, and a unique one still enforces
-uniqueness.
+Making it visible again is a metadata-only change, quick once it has the metadata
+lock; rebuilding a dropped index is not. An invisible index is still maintained on
+every write, and a unique one still enforces uniqueness.
 
 ## Add or change a primary key
 

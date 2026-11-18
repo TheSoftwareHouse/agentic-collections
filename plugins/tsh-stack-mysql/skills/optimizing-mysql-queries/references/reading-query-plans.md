@@ -92,9 +92,9 @@ InnoDB estimates from sampled index pages and **index dives**:
   `ANALYZE TABLE od UPDATE HISTOGRAM ON total WITH 32 BUCKETS;` (`total` has no index). The optimizer uses
   histograms for columns it cannot dive into; it does not use them for a column whose
   index it can dive into.
-- **Long `IN` lists.** Up to `eq_range_index_dive_limit` values (200) the optimizer
-  dives into the index for each one; beyond that it uses averages, and a skewed
-  column is misestimated.
+- **Long `IN` lists.** Below `eq_range_index_dive_limit` values (200) the optimizer
+  dives into the index for each one; at the limit and beyond it uses averages, and a
+  skewed column is misestimated.
 - **Correlated columns.** Estimates multiply selectivities as if columns were
   independent (`country = 'PL' AND city = 'Kraków'`), so they come out too low.
 

@@ -46,7 +46,7 @@ Install what the project is built on, at **Project** scope. The repo already kno
 
 <PluginList family="stack" />
 
-A stack here is a **runtime target** or a **cloud provider**, not a language. A repository has exactly one cloud provider but may have more than one runtime target. The frontend, Node and serverless plugins all carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle need different compiler configuration. Every stack gets its own plugin, named `tsh-stack-<stack-name>`, once it has real content to ship.
+A stack here is a **runtime target**, a **cloud provider** or a **database engine**, not a language. A repository has exactly one cloud provider but may have more than one runtime target and more than one database. The frontend, Node and serverless plugins all carry TypeScript guidance, because a browser app, a Node service and a Lambda bundle need different compiler configuration. Every stack gets its own plugin, named `tsh-stack-<stack-name>`, once it has real content to ship.
 
 ## Scopes
 

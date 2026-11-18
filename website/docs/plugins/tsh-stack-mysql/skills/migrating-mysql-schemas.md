@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Writes and reviews MySQL schema migrations that run against a live InnoDB table without blocking writes or stalling replicas.
 sources:
   - plugins/tsh-stack-mysql/skills/migrating-mysql-schemas/
-sources_hash: "827faf130f20809b033bc8779e9b15a308502d6e71261a23d42f4b897c40c187"
+sources_hash: "9ca67cc00167208cef95d2070c03e039e9c57c10c51e5372c9fbb265826d03a8"
 ---
 
 # Migrating MySQL Schemas

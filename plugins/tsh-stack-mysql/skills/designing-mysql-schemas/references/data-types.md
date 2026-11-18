@@ -47,8 +47,8 @@ connection or ORM can set its own. A table created years ago may be
 `utf8mb4_general_ci` or `utf8mb4_unicode_ci` (which ignore trailing spaces) beside
 new `0900` tables. **Columns that are joined or compared must have the same
 character set and collation**, or the comparison fails with "Illegal mix of
-collations" or stops using the index. Changing a populated column's collation copies
-the table, so decide now.
+collations" or stops using the index. Changing the collation of an indexed column
+copies the table, so decide now.
 
 ## Numbers and money
 
@@ -91,8 +91,10 @@ the session time zone makes the stored value depend on connection settings.
 ## Primary keys
 
 - **`BIGINT AUTO_INCREMENT`** is the default. Values are unique, not dense: rollbacks
-  and failed inserts leave gaps, and since 8.0 concurrent inserts are not numbered in
-  commit order. The counter survives restarts from 8.0.
+  and failed inserts leave gaps, and a value is assigned when the insert runs, not when
+  it commits, so a later commit can carry a lower `id`. Since 8.0 the default
+  `innodb_autoinc_lock_mode=2` also interleaves the values of concurrent multi-row
+  inserts. The counter survives restarts from 8.0.
 - **UUIDs** fit when IDs are generated outside the database or must not be
   guessable. The table is clustered by its primary key, and every secondary index
   carries it, so:
