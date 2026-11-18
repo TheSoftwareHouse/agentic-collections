@@ -7,5 +7,18 @@
       },
       "autoUpdate": true
     }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/require-change-review.py\"; [ -f \"$f\" ] || exit 0; python3 \"$f\""
+          }
+        ]
+      }
+    ]
   }
 }
