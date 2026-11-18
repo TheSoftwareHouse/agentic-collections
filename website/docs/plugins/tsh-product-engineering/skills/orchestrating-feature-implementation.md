@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "8cad9870506cb9e4470e98641350fdf6d76da6bb367544eb6b88fd6474210d0b"
+sources_hash: "476e50b143031cbae5a029a348081e546111d0ae5d905d2422f4ab27ab8f536c"
 ---
 
 # Orchestrating Feature Implementation

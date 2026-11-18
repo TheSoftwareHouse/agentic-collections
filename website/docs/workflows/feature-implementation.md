@@ -13,12 +13,12 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
-sources_hash: "70b6a6724896d344f7c3604d5317e9ae3f235f088ac9a419118e9a000e8488a5"
+sources_hash: "e603a94dcc218959f52d6e3da406c3e56a0d69e16ee62653339036c2a495e795"
 ---
 
 # Feature implementation
 
-**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:orchestrating-feature-implementation`, or describe the work ("implement this", "do this ticket") and [`orchestrating-feature-implementation`](/docs/plugins/tsh-product-engineering/skills/orchestrating-feature-implementation) loads on its own.
+**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:orchestrating-feature-implementation`, or describe the work ("add X to Y", "implement this", "do this ticket") and [`orchestrating-feature-implementation`](/docs/plugins/tsh-product-engineering/skills/orchestrating-feature-implementation) loads on its own.
 
 The main conversation is the orchestrator: it owns the plan, the todo list, the delegation and the gates. Implementation runs in subagents, so their file reads, tool output and MCP traffic stay out of the main context. The plan file is the contract — every delegate works from it, because subagents never see the conversation.
 

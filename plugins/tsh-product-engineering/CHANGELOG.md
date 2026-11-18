@@ -25,6 +25,15 @@ alone reaches nobody.
   Sonnet, a plan for such a feature loaded the PostgreSQL design and migration skills
   in 6 of 6 runs each, up from 0 of 6. Six runs is a small sample; the prompt named
   the engine and the probe had no repository.
+- **A plain "add X" request now reaches feature orchestration**, and through it the
+  plan and the database skills. `orchestrating-feature-implementation` triggers on
+  "add X to Y" or "show X on Y": a new field, column, endpoint or screen, even when it
+  sounds small. In a NestJS and PostgreSQL repository, "Add a 'last seen' timestamp to
+  user profiles and show it on the admin users list, sortable" loaded no skill in 6 of
+  6 runs before, and the code and migration were written at once. After, the
+  orchestrator, the plan and the migration skill loaded in 6 of 6 and the design skill
+  in 5 of 6, and every run stopped at a plan whose Technical Context names both
+  database skills. A one-file change still went straight to a single edit, 4 of 4.
 
 ### Changed
 
@@ -33,11 +42,9 @@ alone reaches nobody.
   design decision.
 - **`orchestrating-feature-implementation` names the engine's skills in the
   delegation** of a task with a migration, and `software-engineer` loads the skills
-  the Technical Context or its delegation names for the work its tasks do. This does
-  not yet help a plain "add X" request: in the same probe the orchestrator did not
-  load at all (0 of 6; the model went to the stack skill), and the migration skill
-  loaded in 1 of 6 runs, against 2 of 6 before. The delegation path itself was not
-  measured. Both probes are manual checks in `evals/README.md`.
+  the Technical Context or its delegation names for the work its tasks do. The
+  delegation path itself was not measured. The probes are manual checks in
+  `evals/README.md`.
 
 ## [0.12.1] - 2026-11-16
 

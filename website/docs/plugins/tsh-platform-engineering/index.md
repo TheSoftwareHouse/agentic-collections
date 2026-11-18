@@ -12,7 +12,7 @@ sources:
   - plugins/tsh-product-engineering/skills/debugging-code/SKILL.md
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/SKILL.md
   - plugins/tsh-stack-serverless/README.md
-sources_hash: "5a924eb911e9f8934312d7b562cf3cc9f7629693a185e5dcf5b070951db9c31f"
+sources_hash: "90438cb5745fcb557c144b72bf6467997b38f99277212fe5c9c50003e43963f3"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
