@@ -1,7 +1,10 @@
 schema_version: "1.1"
 name: frontend-feature-orchestrated
 description: A multi-file feature in a React app must route to orchestrating-feature-implementation, although implementing-frontend now claims any code in a browser app. implementing-frontend may load alongside it; it must not displace it.
-tags: [routing, cross-plugin]
+# Quarantined 2026-11-17: orchestrating-feature-implementation fires in 1 of 6 runs on claude-sonnet-5-5;
+# the failing runs call no Skill on turn one. Restore routing once its turn-one routing is fixed
+# in tsh-product-engineering and this case measures 6 of 6.
+tags: [known-failure, cross-plugin]
 plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-frontend"]
 runs: 1
 execution:

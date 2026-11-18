@@ -581,4 +581,6 @@ control that asserts the plugin's skills stay out, and give the skill a must-fir
 case around a request it does own. `claude-hook-neither-on-settings` and
 `claude-extension-not-context` are the worked pair.
 
-**No cases are quarantined right now.**
+| Case | Observed | Fix lives in |
+| :-- | :-- | :-- |
+| `frontend-feature-orchestrated` | `orchestrating-feature-implementation` fires in 1 of 6 runs (2026-11-17); the failing runs call no Skill on turn one | `tsh-product-engineering`: turn-one routing of `orchestrating-feature-implementation` |
