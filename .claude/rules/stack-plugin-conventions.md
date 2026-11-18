@@ -48,8 +48,11 @@ request about a TypeORM migration loads `migrating-postgresql-schemas` alone (me
 one tool mechanic safety depends on (running a migration outside a transaction, per
 tool), and a MUST rule in it loads the ORM's skill on a later turn when one is
 installed (6 of 6 in a four-turn probe; as a late procedure step it was 0 of 6).
-Another engine (MySQL, MariaDB) is its own plugin with its own skill names, because
-lock behaviour, online DDL and the planner differ.
+Another engine is its own plugin with its own skill names, because lock behaviour,
+online DDL and the planner differ: `tsh-stack-mysql` mirrors the three PostgreSQL
+skills (`migrating-mysql-schemas`, `optimizing-mysql-queries`,
+`designing-mysql-schemas`) with MySQL's own content, and each family stops on the
+other's engine. MariaDB is neither; it would be a plugin of its own.
 
 ## Split trigger
 

@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Add the TSH marketplace to Claude Code, install the plugins you want at the right scope, activate them and sign in to Jira and Figma.
 sources:
   - README.md
-sources_hash: "e03c149d5a99acdba5d7ea761c6b5640b2146a33c20bf93918fa64b4037b041a"
+sources_hash: "4a2413b033ad9a42465cdac9e07789d23bd00485fceb43cc685daf0986565aa2"
 ---
 
 import Install from './_install.generated.md';
