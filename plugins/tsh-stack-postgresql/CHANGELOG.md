@@ -14,10 +14,10 @@ describes.
 
 ### Added
 
-- Deleting in bulk, in `backfilling-data.md`; never `updated_at` as the optimistic
-  locking version; the connection pool as a non-database bottleneck; collation among
-  the conventions not to duplicate. All came from comparing this plugin with the
-  MySQL one.
+- Deleting in bulk, in `backfilling-data.md`, which now also loads when rows must be
+  deleted; never `updated_at` as the optimistic locking version; the connection pool
+  as a non-database bottleneck; collation among the conventions not to duplicate. All
+  came from comparing this plugin with the MySQL one.
 
 ### Changed
 

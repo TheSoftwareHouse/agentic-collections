@@ -57,7 +57,7 @@ migrations against a shared or production environment.
 | --- | --- | --- |
 | [Lock levels](./references/lock-levels.md) | Any migration on a table with data, every time | Which lock each DDL takes, what it blocks, rewrites, the lock queue, `lock_timeout` and retries |
 | [Zero-downtime recipes](./references/zero-downtime-recipes.md) | Adding a constraint or index, renaming, retyping or dropping a column | Step-by-step expand-and-contract recipes, version differences |
-| [Backfilling data](./references/backfilling-data.md) | Rows must be updated or copied as part of the change | Batching, ordering, vacuum, replication lag, resumability |
+| [Backfilling data](./references/backfilling-data.md) | Rows must be updated, copied or deleted as part of the change | Batching, ordering, bulk deletes, vacuum, replication lag, resumability |
 | [Migration tools](./references/migration-tools.md) | The migration is written with an ORM or migration runner | Turning off the per-migration transaction, what generators emit, review points per tool |
 
 Read [lock-levels.md](./references/lock-levels.md) before judging any migration, and

@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Writes and reviews PostgreSQL schema migrations that run against a live database without stopping traffic.
 sources:
   - plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas/
-sources_hash: "2d3bbfcfe358f18ee89c00de5cb1216597a6030934eb534c1f6f180fb85b4410"
+sources_hash: "3b806a291e9cb395157edd8fdae42d559edf898101ffddcf63c9026a6ed49d52"
 ---
 
 # Migrating PostgreSQL Schemas
@@ -59,7 +59,7 @@ Use it when a migration adds, changes or drops a column, index or constraint on 
 | :-- | :-- |
 | Lock levels | Any migration on a table with data, every time |
 | Zero-downtime recipes | Adding a constraint or index, renaming, retyping or dropping a column |
-| Backfilling data | Rows must be updated or copied as part of the change |
+| Backfilling data | Rows must be updated, copied or deleted as part of the change |
 | Migration tools | The migration is written with an ORM or migration runner |
 
 ## Related skills
