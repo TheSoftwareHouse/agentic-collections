@@ -12,6 +12,21 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.1] - 2026-11-16
+
+### Fixed
+
+- **A review of a pull request with a migration now loads the database skill.**
+  `reviewing-code` and `code-reviewer` loaded stack skills for frameworks but did not
+  count the database engine as one. The rule now names it: a change with a schema
+  migration or a new query shape also loads the engine's skill that covers it. In a four-turn probe
+  on Sonnet, a review of a pull request with a PostgreSQL migration loaded both
+  `reviewing-code` and `migrating-postgresql-schemas` in 3 of 6 runs before and 6 of 6
+  after, with the matching rule in `tsh-stack-postgresql` 0.1.1; asked only about the
+  migration, it did not load `reviewing-code` (6 of 6). Six runs is a small sample, and
+  neither the query-shape case nor the `code-reviewer` path was measured. Both probes are manual checks in
+  `evals/README.md`.
+
 ## [0.12.0] - 2026-11-16
 
 ### Added

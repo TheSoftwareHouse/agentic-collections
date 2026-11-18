@@ -6,7 +6,7 @@ description: Spec-driven feature implementation with committed plan files, deleg
 sources:
   - plugins/tsh-product-engineering/.claude-plugin/plugin.json
   - plugins/tsh-product-engineering/README.md
-sources_hash: "0bb89eebbc7068a1829a46bfd0b41545bd407d844b1385d0d2be1206b3a8e29a"
+sources_hash: "e7742023c622f8f807a598067fa9b8e45d779f734d430a6e54b5ad6e98c809cc"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
