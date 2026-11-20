@@ -506,6 +506,415 @@ before the rules named the database engine). Other skills, such as the NestJS on
 may load and are not graded. Not covered: a change with a new query but no migration,
 a plain "review this migration" with no opt-out, and the `code-reviewer` subagent.
 
+## A manual check that is not a routing case: the database skill in feature work
+
+A request for a feature that needs a new column without saying so ("show last seen
+on the users list") should still reach the database engine's skill: through
+`creating-implementation-plans` when a plan is asked for, through
+`orchestrating-feature-implementation` when implementation is. Both need more than
+one turn, so they are manual checks. Run them before changing either rule.
+
+Save each as `evals/routing/<name>/case.yaml` and **delete both directories when
+done**, because `check-eval-cases.py` rejects them (the `probe` tag, `max_turns: 4`,
+no must-not-fire grader):
+
+```yaml
+schema_version: "1.1"
+name: _probe-plain-plan
+description: Manual probe (not committed) — a plan for a feature that implies a new column must load the PostgreSQL design and migration skills within four turns.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Write an implementation plan for this: add a "last seen" timestamp to user profiles in our NestJS API (Postgres 16)
+    and show it on the admin users list, sortable. Update it at most once a minute per user. The users table has about
+    12 million rows.
+  max_turns: 4
+  allowed_tools: [Skill]
+graders:
+  - name: creating-implementation-plans-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    arm: with-only
+  - name: designing-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    arm: with-only
+  - name: migrating-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+```
+
+`_probe-plain-feature` is the same file with `name: _probe-plain-feature`, its own
+description, the prompt without the words "Write an implementation plan for this:"
+(it starts with "Add a"), and an `orchestrating-feature-implementation` grader in
+place of the `creating-implementation-plans` one. Then:
+
+```shell
+for c in _probe-plain-plan _probe-plain-feature; do
+  claude plugin eval . --eval-dir evals --case "$c" \
+    --runs 6 --trust-plugin --no-publish --ablation none \
+    --model claude-sonnet-5-5 --max-cost-usd 2
+done
+rm -rf evals/routing/_probe-plain-plan evals/routing/_probe-plain-feature
+```
+
+Measured on 2026-11-17, six runs each, about USD 0.08–0.16 per run. "Before" is
+`tsh-product-engineering` 0.12.1 with `tsh-stack-postgresql` 0.1.1; "after" is 0.12.2
+with 0.1.2:
+
+| Probe | Before | After |
+| :-- | :-- | :-- |
+| `_probe-plain-plan` | plan 6/6, design 0/6, migration 0/6 | plan 6/6, design 6/6, migration 6/6 |
+| `_probe-plain-feature` | design 0/6, migration 2/6 | orchestration 0/6, design 0/6, migration 1/6 |
+
+The plan path works. The `_probe-plain-feature` row measured less than it seems:
+`allowed_tools: [Skill]` does not stop the model calling Glob and Read, and with no
+repository it explored, found an empty directory and stopped. The implementation path
+is measured on a repository instead, below. Limits of the plan probe: six runs; the
+prompt names the engine; 0.1.2 also changed the PostgreSQL triggers, so the gain is
+not isolated to the plan rule.
+
+### "Add X" in a repository
+
+The fixture is a NestJS 11 and TypeORM 0.3 service on PostgreSQL 16 with a `users`
+table, one migration and an admin users list. The prompt names neither the engine nor
+the table size:
+
+> Add a "last seen" timestamp to user profiles and show it on the admin users list,
+> sortable. Update it at most once a minute per user.
+
+Save the two files below in `evals/routing/_probe-add-field-repo/`, run it, and
+**delete the directory when done**. `--scaffold` runs `fixture.sh` as you, so run it
+only on files you wrote.
+
+```shell
+claude plugin eval . --eval-dir evals --case _probe-add-field-repo --runs 6 -j 3 \
+  --scaffold --allow-tools Write Edit --trust-plugin --no-publish --ablation none \
+  --model claude-sonnet-5-5 --max-cost-usd 4
+rm -rf evals/routing/_probe-add-field-repo
+```
+
+<details>
+<summary><code>case.yaml</code> and <code>fixture.sh</code></summary>
+
+```yaml
+schema_version: "1.1"
+name: _probe-add-field-repo
+description: Manual probe (not committed) — an "add X" request in a NestJS repository whose feature needs a new column must reach orchestration, the plan and the PostgreSQL skills.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    Add a "last seen" timestamp to user profiles and show it on the admin users list, sortable.
+    Update it at most once a minute per user.
+  max_turns: 14
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, TodoWrite]
+graders:
+  - name: orchestrating-feature-implementation-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    arm: with-only
+  - name: creating-implementation-plans-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    arm: with-only
+  - name: designing-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    arm: with-only
+  - name: migrating-postgresql-schemas-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+```
+
+```bash
+#!/usr/bin/env bash
+# A small NestJS 11 + TypeORM 0.3 service on PostgreSQL 16 with a users table and an
+# admin users list. Probe fixture, not committed.
+set -euo pipefail
+mkdir -p src/users src/admin src/auth src/database/migrations
+cat > package.json <<'JSON'
+{
+  "name": "accounts-api",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "test": "jest",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.6",
+    "@nestjs/core": "11.1.6",
+    "@nestjs/platform-express": "11.1.6",
+    "@nestjs/typeorm": "11.0.0",
+    "pg": "8.16.3",
+    "typeorm": "0.3.27"
+  },
+  "devDependencies": { "@nestjs/cli": "11.0.10", "jest": "30.1.3", "typescript": "5.9.2" }
+}
+JSON
+cat > CLAUDE.md <<'MD'
+# accounts-api
+
+NestJS 11 service with TypeORM 0.3 on PostgreSQL 16 (production runs on RDS).
+Migrations live in `src/database/migrations` and are generated with
+`npm run migration:generate`, then reviewed by hand. They run on deploy, while the
+service takes traffic. Checks: `npm run lint`, `npm test`, `npm run build`.
+MD
+cat > docker-compose.yml <<'YML'
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: dev, POSTGRES_DB: accounts }
+    ports: ["5432:5432"]
+YML
+cat > src/database/data-source.ts <<'TS'
+import { DataSource } from 'typeorm';
+import { User } from '../users/user.entity';
+
+export default new DataSource({
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  entities: [User],
+  migrations: ['src/database/migrations/*.ts'],
+});
+TS
+cat > src/database/migrations/1717000000000-CreateUsers.ts <<'TS'
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class CreateUsers1717000000000 implements MigrationInterface {
+  async up(q: QueryRunner): Promise<void> {
+    await q.query(`CREATE TABLE "users" (
+      "id" bigserial PRIMARY KEY,
+      "email" varchar(320) NOT NULL UNIQUE,
+      "display_name" varchar(120) NOT NULL,
+      "created_at" timestamptz NOT NULL DEFAULT now()
+    )`);
+  }
+  async down(q: QueryRunner): Promise<void> {
+    await q.query(`DROP TABLE "users"`);
+  }
+}
+TS
+cat > src/users/user.entity.ts <<'TS'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('increment', { type: 'bigint' })
+  id!: string;
+
+  @Column({ type: 'varchar', length: 320, unique: true })
+  email!: string;
+
+  @Column({ name: 'display_name', type: 'varchar', length: 120 })
+  displayName!: string;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  createdAt!: Date;
+}
+TS
+cat > src/users/users.module.ts <<'TS'
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
+
+@Module({ imports: [TypeOrmModule.forFeature([User])], exports: [TypeOrmModule] })
+export class UsersModule {}
+TS
+cat > src/auth/current-user.guard.ts <<'TS'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+
+// Sets request.user = { id } from the session. Every authenticated route uses it.
+@Injectable()
+export class CurrentUserGuard implements CanActivate {
+  canActivate(ctx: ExecutionContext): boolean {
+    const req = ctx.switchToHttp().getRequest();
+    if (!req.session?.userId) throw new UnauthorizedException();
+    req.user = { id: String(req.session.userId) };
+    return true;
+  }
+}
+TS
+cat > src/admin/admin-users.controller.ts <<'TS'
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CurrentUserGuard } from '../auth/current-user.guard';
+import { User } from '../users/user.entity';
+
+const SORTABLE = { createdAt: 'createdAt', email: 'email' } as const;
+
+@Controller('admin/users')
+@UseGuards(CurrentUserGuard)
+export class AdminUsersController {
+  constructor(@InjectRepository(User) private readonly users: Repository<User>) {}
+
+  @Get()
+  list(
+    @Query('sort') sort: keyof typeof SORTABLE = 'createdAt',
+    @Query('page') page = 1,
+  ) {
+    return this.users.find({
+      order: { [SORTABLE[sort] ?? 'createdAt']: 'DESC', id: 'DESC' },
+      skip: (Number(page) - 1) * 50,
+      take: 50,
+    });
+  }
+}
+TS
+cat > src/app.module.ts <<'TS'
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminUsersController } from './admin/admin-users.controller';
+import { UsersModule } from './users/users.module';
+
+@Module({
+  imports: [TypeOrmModule.forRoot({ type: 'postgres', url: process.env.DATABASE_URL, autoLoadEntities: true }), UsersModule],
+  controllers: [AdminUsersController],
+})
+export class AppModule {}
+TS
+git add -A >/dev/null 2>&1 && git -c user.name=t -c user.email=t@t commit -qm "initial" >/dev/null 2>&1 || true
+```
+
+</details>
+
+Measured on 2026-11-18, six runs each on `claude-sonnet-5-5`, about USD 0.2–0.35 per
+run, with `tsh-product-engineering` 0.12.2 and `tsh-stack-postgresql` 0.1.2. "Before"
+is `orchestrating-feature-implementation` without the "add X to Y" trigger, "after"
+with it:
+
+| Prompt | Before | After |
+| :-- | :-- | :-- |
+| As above | No skill in 6 of 6; the migration and the code were written at once | Orchestration, plan and migration 6/6, design 5/6. All 6 wrote a plan in `specifications/` whose Technical Context names both PostgreSQL skills, and changed no source file |
+| With "in our NestJS API (Postgres 16)" and "The users table has about 12 million rows" | Migration 4/6, orchestration 1/6, design 1/6; no skill in 2 | Orchestration, plan and migration 6/6, design 5/6 |
+| A one-file change: "Let admins also sort the admin users list by display name." | Not measured | No skill and one edit to the controller, 4 of 4 runs |
+
+The routing case `add-field-orchestrated` guards the trigger in CI: one turn and no
+repository, 3 of 6 before and 6 of 6 after. It is the weaker test. In a repository
+the model reads code before it considers skills, and there the same request loaded
+the orchestrator in 0 of 6 runs before.
+
+Limits: six runs, one fixture, one stack. The session stops at the plan, because
+nobody approves it, so delegation is measured separately, below.
+
+### Delegation: does the implementer load the skills the plan names?
+
+The same fixture, with an approved plan already in `specifications/` whose Technical
+Context names both PostgreSQL skills, as `creating-implementation-plans` writes it.
+Replace the fixture's last line (the `git commit`) with the block below, add `Agent`
+to `allowed_tools`, and use one of two prompts:
+
+- **Through the orchestrator:** "The plan in
+  specifications/user-last-seen/user-last-seen.plan.md is approved. Execute it."
+- **Straight to the agent:** "Use the software-engineer agent to implement task 1.1
+  of the approved plan in specifications/user-last-seen/user-last-seen.plan.md."
+
+The probe has no Bash, so the implementer cannot run `npm run build` and reports
+the task blocked; the orchestrator then stops before phase 2. What is measured is
+the first task, the migration. The graders cannot see the subagent's calls, so read
+them from the trace with `--keep-temp`: they are the events with a
+`parent_tool_use_id`.
+
+<details>
+<summary>The plan block</summary>
+
+```bash
+mkdir -p specifications/user-last-seen
+cat > specifications/user-last-seen/user-last-seen.plan.md <<'MD'
+# User last seen
+
+## Goal
+
+Admins see when each user was last active and can sort the admin users list by it.
+
+**Success Measure:** `GET /admin/users?sort=lastSeenAt` returns users ordered by last activity, newest first, users never seen last.
+
+**Do NOT touch:** authentication, the session format, any other table.
+
+## Technical Context
+
+- **Stack:** NestJS 11, TypeORM 0.3, PostgreSQL 16 on RDS. Migrations in `src/database/migrations`, written by hand or generated with `npm run migration:generate`, run on deploy while the service takes traffic.
+- **Data:** `users` has about 12 million rows and takes writes all day.
+- **Skills to load for the tasks that change the schema:** `designing-postgresql-schemas` (the new column) and `migrating-postgresql-schemas` (the migration and index on `users`).
+- **Verification commands:** `npm run lint`, `npm test`, `npm run build`.
+
+## Phase 1: Schema
+
+- [ ] **1.1 Add `last_seen_at` to `users`, with an index for sorting**
+  - **Files:** create `src/database/migrations/<timestamp>-AddUsersLastSeenAt.ts`; modify `src/users/user.entity.ts`
+  - **Definition of Done:**
+    - [ ] The migration adds a nullable `timestamptz` column and an index for sorting by it, safe on a 12-million-row table under traffic
+    - [ ] `npm run build` passes
+
+## Phase 2: Behaviour
+
+- [ ] **2.1 Record activity at most once a minute per user**
+  - **Files:** create `src/users/last-seen.service.ts`; modify `src/auth/current-user.guard.ts`, `src/users/users.module.ts`
+  - **Definition of Done:**
+    - [ ] One `UPDATE` per user per minute at most, not one per request
+    - [ ] `npm test` passes
+- [ ] **2.2 Sort the admin list by last seen**
+  - **Files:** modify `src/admin/admin-users.controller.ts`
+  - **Definition of Done:**
+    - [ ] `sort=lastSeenAt` orders newest first, nulls last
+    - [ ] `npm run lint` passes
+
+## Phase 3: Final verification
+
+- [ ] **3.1 Code review** against this plan
+- [ ] **3.2 Functional verification** per `user-last-seen.verification.md`
+MD
+cat > specifications/user-last-seen/user-last-seen.verification.md <<'MD'
+# User last seen: verification
+
+1. Run `npm test`.
+MD
+git add -A >/dev/null 2>&1 && git -c user.name=t -c user.email=t@t commit -qm "initial" >/dev/null 2>&1 || true
+```
+
+</details>
+
+Measured on 2026-11-20 on `claude-sonnet-5-5`, about USD 0.16–0.43 per run.
+
+| Prompt | Code | Delegation names both skills | Implementer loads both before writing a migration |
+| :-- | :-- | :-- | :-- |
+| Through the orchestrator | This branch (`tsh-product-engineering` 0.12.2) | 6/6 | 6/6 |
+| Through the orchestrator | `main` (0.12.1) | 6/6 | 6/6 (one run stopped before writing it) |
+| Straight to the agent | This branch | 0/4 (the main conversation wrote the delegation) | 4/4 loaded both; 2 stopped before writing a migration |
+
+- **Once the plan names the skills, they reach the implementer**, with or without
+  the new delegation and implementer rules: `main` scored the same. On this fixture
+  the gain comes from the plan rule and from routing "add X" to the plan; the two
+  later rules are a backstop that this probe does not exercise, for a plan written
+  by hand without those names.
+- **The runs that stopped did so because of the skills.** In three runs the
+  implementer, with the migration skill loaded, refused to write the migration: an
+  index built `CONCURRENTLY` must run outside a transaction, and in TypeORM 0.3 that
+  needs `migrationsTransactionMode` in `data-source.ts`, a file outside the task's
+  scope. It reported that as a blocker instead of improvising, which is what the
+  plan's scope rules ask for.
+
 ## Behavioural suites: what a skill does after it fires
 
 A routing case proves the right skill loads. A behavioural case proves what it then

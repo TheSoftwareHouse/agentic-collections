@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Writes TSH's implementation plan as a committed file with phased tasks that each name their files and a verifiable Definition of Done, plus a verification document for the final phase.
 sources:
   - plugins/tsh-product-engineering/skills/creating-implementation-plans/
-sources_hash: "0ce3b6a21895e91b7be8ea33842db326917ab9fe460125f497b4c6154b1156cb"
+sources_hash: "7e54985d8c0bbcdaecc9c056db003d6bc695dad11c2d88cc11c8632f7eaea63d"
 ---
 
 # Creating Implementation Plans
@@ -71,6 +71,8 @@ Credential values never appear in the document, the plan or a report.
 7. **Persist the Technical Context** into the plan.
 8. **Draft the verification document**, proposing candidate checks and asking which to include.
 9. **Hand both to the user** to read and iterate until they are satisfied. The plan file is the agreement; there is nothing to sign.
+
+One rule sits outside these steps: before writing tasks, the skill decides whether the work changes the database schema, which a feature can need without saying so. When it does and skills for the project's database engine are installed (for example from [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)), it loads the ones that cover the change, design for new tables or columns and migration for a table that holds data, and names them in the Technical Context for the tasks that change the schema.
 
 ## Reference Loading
 

@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "d15dec6f879c7a2153a83cd0ec484b6ac3d2defc051f3354126a4ee7952c65b9"
+sources_hash: "476e50b143031cbae5a029a348081e546111d0ae5d905d2422f4ab27ab8f536c"
 ---
 
 # Orchestrating Feature Implementation
@@ -24,7 +24,7 @@ Use it for any feature request or multi-file change, before the first file is ed
 
 | Area | Coverage |
 | :-- | :-- |
-| **Plan first** | A plan file the user has read must exist before non-trivial implementation. No plan means the skill creates one via `creating-implementation-plans`. Only a single-file change with no design decision may proceed without one |
+| **Plan first** | A plan file the user has read must exist before non-trivial implementation. No plan means the skill creates one via `creating-implementation-plans`. Only a single-file change with no design decision and no schema change may proceed without one |
 | **Self-contained delegation** | Every delegation carries the exact plan path, the task IDs, the instruction to read the plan's Technical Context first, and any pinned inputs such as the dev server URL and design URLs |
 | **Parallel groups** | Tasks run in parallel only when the plan marks them as one group and their `**Files:**` lists are disjoint. The group's subagents launch in a single message |
 | **Report gating** | Each task report must name every Definition of Done command with a passing result. A failed, blocked or command-less report stops the flow. Nothing is re-run at the task tier |
@@ -53,7 +53,7 @@ Use it for any feature request or multi-file change, before the first file is ed
 2. **Confirm the go-ahead.** For a plan created or changed in this session, the user is asked to read it through the AskUserQuestion tool, not as a prose question at the end of a turn.
 3. **Create todos.** One per plan task, including the final verification phase's tasks, with parallel groups noted.
 4. **Collect pinned inputs up front.** For UI work or browser and API verification scenarios: the exact full dev server URL, confirmed by the user and never inferred, and every design URL.
-5. **Execute.** Walk the plan in order; launch parallel groups in one message.
+5. **Execute.** Walk the plan in order; launch parallel groups in one message. A delegation for a task that adds or changes tables, columns, indexes, constraints or a migration names the database engine's skills that cover it, when installed, and tells the implementer to load them before writing the migration.
 6. **Record and gate.** Read each report, confirm the Definition of Done commands ran, tick the plan's boxes, update the todo, and run the phase's `Verification:` line when its last task completes.
 7. **Run the UI verification gate** after each Figma-backed UI task, following the gate reference.
 8. **Execute the final verification phase.** Launch `code-reviewer` and `feature-verifier` concurrently. The reviewer's delegation states verbatim that functional and E2E verification runs in the parallel verifier. A legacy plan without this phase gets a single full-scope `code-reviewer` instead.

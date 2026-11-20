@@ -10,6 +10,26 @@ under `[Unreleased]` would be false the moment it was pushed. Every entry below 
 a released version, and its version bump landed in the same commit as the change it
 describes.
 
+## [0.1.2] - 2026-11-17
+
+### Added
+
+- Deleting in bulk, in `backfilling-data.md`, which now also loads when rows must be
+  deleted; never `updated_at` as the optimistic locking version; the connection pool
+  as a non-database bottleneck; collation among the conventions not to duplicate. All
+  came from comparing this plugin with the MySQL one.
+
+### Changed
+
+- **Handover to another engine's skill.** On MySQL, MariaDB or another engine, each
+  skill still says it does not apply, and now loads that engine's skill when one is
+  installed instead of only stopping.
+- **Triggers name the engine where they were generic**: schema design, migrations on
+  an existing table, a migration that hung, and log output. The slow-endpoint trigger
+  stays generic: naming the engine there cost one run in nine on a prompt that does
+  not name it. All seven routing cases that load this plugin pass (3 of 3 each; the
+  slow-query case 6 of 6 after that trigger was reverted).
+
 ## [0.1.1] - 2026-11-16
 
 ### Fixed

@@ -1,7 +1,7 @@
 ---
 name: optimizing-postgresql-queries
 description: "Finds and fixes slow PostgreSQL queries from evidence: pg_stat_statements to find what actually costs time, EXPLAIN (ANALYZE, BUFFERS) read node by node, estimate-versus-actual row counts and stale statistics, choosing the index that fits the query (composite column order, partial, covering, GIN, BRIN), and the query shapes that defeat an index: N+1 loops, OFFSET pagination, functions on indexed columns, OR across columns, implicit casts. Use when an endpoint or job is slow because of the database, a query plan needs explaining, or someone proposes adding an index."
-when_to_use: "Trigger on: a slow endpoint, report or background job traced to a query, a query plan or EXPLAIN output pasted for explanation, a sequential scan on a large table, deciding which index to add or whether an existing one is used, N+1 queries from an ORM, deep pagination getting slower, high database CPU or I/O, pg_stat_statements or slow-query-log output, a query that was fast and became slow, or reviewing a change that adds a query to a hot path. A migration that adds the index safely is migrating-postgresql-schemas; table and column design is designing-postgresql-schemas."
+when_to_use: "Trigger on: a slow endpoint, report or background job traced to a query, a query plan or EXPLAIN output pasted for explanation, a sequential scan on a large table, deciding which index to add or whether an existing one is used, N+1 queries from an ORM, deep pagination getting slower, high database CPU or I/O, pg_stat_statements, auto_explain or PostgreSQL log output, a query that was fast and became slow, or reviewing a change that adds a query to a hot path. A migration that adds the index safely is migrating-postgresql-schemas; table and column design is designing-postgresql-schemas."
 ---
 
 # Optimizing PostgreSQL Queries
@@ -19,7 +19,7 @@ about a plan. Below 14, stop and say the project is on an unsupported version;
 continue only when asked.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply and stop: plan output, index types and statistics views differ by engine.
+another engine, say this skill does not apply: plan output, index types and statistics views differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 
@@ -80,4 +80,4 @@ any plan.
 
 Report the query, how often it runs, the plan node that dominates and why, the
 change, and the time before and after. When the database is not the bottleneck
-(the time is in the application or the network), say so and stop.
+(the time is in the application, the network or the connection pool), say so and stop.

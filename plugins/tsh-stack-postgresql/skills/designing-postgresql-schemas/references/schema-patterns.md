@@ -106,7 +106,9 @@ WHERE id = $2 AND version = $3;   -- 0 rows updated: someone else saved first
 ```
 
 The application treats 0 updated rows as a conflict and tells the user. Most ORMs
-support this column natively.
+support this column natively. Always increment the version in the same `UPDATE`, and
+do not use `updated_at` as the version: two saves within its precision look the
+same.
 
 ## Status history
 

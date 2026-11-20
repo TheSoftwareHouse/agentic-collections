@@ -12,6 +12,42 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.2] - 2026-11-17
+
+### Fixed
+
+- **A plan for a feature that needs a schema change now loads the database skills.**
+  A feature can need a new column without saying so ("show last seen on the users
+  list"). `creating-implementation-plans` now decides whether the work changes the
+  schema before writing tasks and, when skills for the project's database engine are
+  installed, loads the ones that cover it (design, migration) and names them in the
+  Technical Context for the tasks that change the schema. In a four-turn probe on
+  Sonnet, a plan for such a feature loaded the PostgreSQL design and migration skills
+  in 6 of 6 runs each, up from 0 of 6. Six runs is a small sample; the prompt named
+  the engine and the probe had no repository.
+- **A plain "add X" request now reaches feature orchestration**, and through it the
+  plan and the database skills. `orchestrating-feature-implementation` triggers on
+  "add X to Y" or "show X on Y": a new field, column, endpoint or screen, even when it
+  sounds small. In a NestJS and PostgreSQL repository, "Add a 'last seen' timestamp to
+  user profiles and show it on the admin users list, sortable" loaded no skill in 6 of
+  6 runs before, and the code and migration were written at once. After, the
+  orchestrator, the plan and the migration skill loaded in 6 of 6 and the design skill
+  in 5 of 6, and every run stopped at a plan whose Technical Context names both
+  database skills. A one-file change still went straight to a single edit, 4 of 4.
+
+### Changed
+
+- **A change that touches the schema is no longer trivial** for
+  `orchestrating-feature-implementation`: it needs a plan, like any change with a
+  design decision.
+- **`orchestrating-feature-implementation` names the engine's skills in the
+  delegation** of a task with a migration, and `software-engineer` loads the skills
+  the Technical Context or its delegation names for the work its tasks do. With an
+  approved plan that names the skills, the implementer loaded both before writing the
+  migration in 6 of 6 runs, but so did 0.12.1: the plan's Technical Context is what
+  carries them, and these two rules are a backstop for a plan that does not. The
+  probes are manual checks in `evals/README.md`.
+
 ## [0.12.1] - 2026-11-16
 
 ### Fixed

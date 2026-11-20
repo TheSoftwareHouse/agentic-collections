@@ -67,6 +67,29 @@ has to catch up on old rows.
 - Verify before the next step relies on it: `SELECT count(*) FROM t WHERE c IS NULL`
   must be 0 before `NOT NULL` is added.
 
+## Deleting in bulk
+
+The same rules hold for deleting old rows: walk the primary key in batches, commit
+between them, pause on replica lag.
+
+```sql
+-- one batch; repeat until it deletes 0 rows
+DELETE FROM events
+WHERE id IN (
+  SELECT id FROM events
+  WHERE id > :last_id AND created_at < :cutoff
+  ORDER BY id
+  LIMIT 5000
+)
+RETURNING id;   -- the highest id is the next :last_id
+```
+
+`ON DELETE CASCADE` and delete triggers make a batch larger than its row count. Vacuum
+makes the freed space reusable but does not shrink the file, except for empty pages
+at its end; only a rewrite does, and `VACUUM FULL` takes `ACCESS EXCLUSIVE` for its whole run. For data removed
+by age, partitioning by time and dropping whole partitions is cheaper, a design
+decision for `designing-postgresql-schemas`.
+
 ## Copying into a new table
 
 When a change is easier as a new table (a re-partitioning, a split), the same rules

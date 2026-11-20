@@ -91,7 +91,9 @@ Typical content, kept to what the tasks actually need:
   the touched area (naming, layering, error handling, validation).
 - **Testing patterns** — test framework, file naming, mocking strategy, and the
   verbatim commands for unit, integration, e2e, lint, and build.
-- **Database patterns** — ORM, migration tool, entity conventions, when relevant.
+- **Database patterns** — ORM, migration tool, entity conventions, when relevant;
+  and, when the plan changes the schema, the database engine's skills an implementer
+  loads for those tasks, when installed.
 - **Established root cause** — when the plan takes over a bug from `debugging-code`:
   the causal chain trigger → `file:line` → symptom with the evidence for each link,
   and the measured reach. Implementers fix that cause; they do not re-investigate it.

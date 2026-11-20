@@ -1,7 +1,7 @@
 ---
 name: designing-postgresql-schemas
 description: "Designs and reviews PostgreSQL tables at the database level, whatever ORM maps them: column types (timestamptz, numeric or integer minor units for money, text over varchar(n), identity or UUIDv7 keys, jsonb), keys and constraints that keep bad data out (NOT NULL, CHECK, foreign keys and their ON DELETE, unique and exclusion constraints), and the recurring patterns: soft delete, multi-tenancy with row-level security, audit columns, optimistic locking, status history, partitioning. Use when creating tables for a new feature, reviewing an entity or schema change, or deciding how to store a kind of data."
-when_to_use: "Trigger on: designing tables for a feature, choosing a column type or primary key, storing money, time, status values or flexible attributes, deciding between an enum, a CHECK constraint and a lookup table, adding foreign keys and choosing ON DELETE, soft delete versus archiving, multi-tenant data isolation, row-level security, deciding whether to partition a table, polymorphic relations, or reviewing an entity, model or SQL schema for data-integrity gaps. Shipping the change to a live table is migrating-postgresql-schemas; a slow query is optimizing-postgresql-queries."
+when_to_use: "Trigger on: designing PostgreSQL tables for a feature, choosing a column type or primary key, storing money, time, status values or flexible attributes, deciding between an enum, a CHECK constraint and a lookup table, adding foreign keys and choosing ON DELETE, soft delete versus archiving, multi-tenant data isolation, row-level security, deciding whether to partition a table, polymorphic relations, or reviewing an entity, model or PostgreSQL schema for data-integrity gaps. Shipping the change to a live table is migrating-postgresql-schemas; a slow query is optimizing-postgresql-queries."
 ---
 
 # Designing PostgreSQL Schemas
@@ -19,7 +19,7 @@ it, including local and CI. Below 14, stop and say the project is on an unsuppor
 version; continue only when asked.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply and stop: types, constraints and their defaults differ by engine.
+another engine, say this skill does not apply: types, constraints and their defaults differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 
@@ -45,7 +45,7 @@ This skill does not ship the change. A table that already holds data changes thr
 | MUST | Use `GENERATED ... AS IDENTITY` for integer keys, not `serial`. |
 | NEVER | Store several values in one delimited text column, or a reference in a column with no foreign key because "it could point at several tables". |
 | NEVER | Reach for `jsonb` for attributes that are queried, joined, constrained or present on every row. Those are columns. |
-| NEVER | Introduce a second naming, key or timestamp convention into a schema that already has one. |
+| NEVER | Introduce a second naming, key, timestamp or collation convention into a schema that already has one. |
 
 ## Reference Loading
 

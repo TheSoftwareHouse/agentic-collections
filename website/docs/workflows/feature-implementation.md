@@ -13,12 +13,12 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
-sources_hash: "c1f133bed399b1576559dbe3243745a12db7f7631a091894dfc7454e79f3c221"
+sources_hash: "e603a94dcc218959f52d6e3da406c3e56a0d69e16ee62653339036c2a495e795"
 ---
 
 # Feature implementation
 
-**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:orchestrating-feature-implementation`, or describe the work ("implement this", "do this ticket") and [`orchestrating-feature-implementation`](/docs/plugins/tsh-product-engineering/skills/orchestrating-feature-implementation) loads on its own.
+**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:orchestrating-feature-implementation`, or describe the work ("add X to Y", "implement this", "do this ticket") and [`orchestrating-feature-implementation`](/docs/plugins/tsh-product-engineering/skills/orchestrating-feature-implementation) loads on its own.
 
 The main conversation is the orchestrator: it owns the plan, the todo list, the delegation and the gates. Implementation runs in subagents, so their file reads, tool output and MCP traffic stay out of the main context. The plan file is the contract — every delegate works from it, because subagents never see the conversation.
 
@@ -61,12 +61,12 @@ Authoring E2E suites, infrastructure and CI, and discovery or analysis work are 
 
 ### 1. Plan
 
-A non-trivial change needs a plan file the user has read. With no plan, the orchestrator writes one through [`creating-implementation-plans`](/docs/plugins/tsh-product-engineering/skills/creating-implementation-plans); only a single-file change with no design decision may go ahead without one.
+A non-trivial change needs a plan file the user has read. With no plan, the orchestrator writes one through [`creating-implementation-plans`](/docs/plugins/tsh-product-engineering/skills/creating-implementation-plans); only a single-file change with no design decision and no schema change may go ahead without one.
 
 The plan is saved at `specifications/<task-id>/<task-name>.plan.md`, where `<task-id>` is the ticket ID or a short kebab-case task name. Its sections are chosen from a set of building blocks to match the task's risk — a config tweak gets a goal and two tasks, a schema migration gets the full treatment. What a plan carries:
 
 - **A Goal**, with a Success Measure and a Do NOT touch / do NOT add list — the one block every plan needs.
-- **Technical Context**, whenever any task will be delegated or the plan will outlive the session — which covers every plan whose tasks this workflow delegates. It holds stack and versions, conventions and the verbatim verification commands, found by [`discovering-technical-context`](/docs/plugins/tsh-product-engineering/skills/discovering-technical-context) (plan context, then project instructions, then codebase patterns, then external documentation) and persisted so implementers never rediscover them.
+- **Technical Context**, whenever any task will be delegated or the plan will outlive the session — which covers every plan whose tasks this workflow delegates. It holds stack and versions, conventions and the verbatim verification commands, found by [`discovering-technical-context`](/docs/plugins/tsh-product-engineering/skills/discovering-technical-context) (plan context, then project instructions, then codebase patterns, then external documentation) and persisted so implementers never rediscover them. When the work changes the database schema, which a feature can need without saying so, the planner loads the database engine's skills that cover it (design for new tables or columns, migration for a change to a table that holds data) and names them in the Technical Context for the tasks that change the schema, if they are installed.
 - **Phases and tasks**, always — though a small change may be a single phase, or tasks only. Each task names every file it touches in a `**Files:**` field, labelled `create`, `modify` or `reuse`, and has a Definition of Done with at least one objectively verifiable check, scoped to the task's own files. Tasks and Definition of Done items are `- [ ]` checkboxes.
 - **Parallel groups**, when two or more tasks are genuinely independent, marked explicitly — only tasks that do not consume each other's output and whose `**Files:**` lists are disjoint.
 - **A final verification phase** for every non-trivial plan: a code-review task and a functional-verification task, run in parallel.
@@ -83,9 +83,9 @@ The orchestrator then creates one todo per plan task, final verification tasks i
 
 ### 3. Delegate the tasks
 
-The orchestrator walks the plan in order. A parallel group's subagents are launched in a single message; everything else runs one task at a time. Each delegation is self-contained: the plan path, the task IDs, the instruction to read the plan's Technical Context first, the expected report shape, and the pinned inputs.
+The orchestrator walks the plan in order. A parallel group's subagents are launched in a single message; everything else runs one task at a time. Each delegation is self-contained: the plan path, the task IDs, the instruction to read the plan's Technical Context first, the expected report shape, and the pinned inputs. A task that adds or changes tables, columns, indexes, constraints or a migration also names the database engine's skills that cover it, when they are installed, and tells the implementer to load them before writing the migration.
 
-- [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) implements the task as written, runs its Definition of Done commands verbatim — never widened to directory- or project-wide suites — and ticks the plan's checkboxes for its own scope only. A fix for a reported failure follows [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code). It never discards pre-existing uncommitted changes and never runs `git bisect`; it reports the last good and first bad commit for the main conversation instead.
+- [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) loads the skills the Technical Context or its delegation names for the kind of work its tasks do, implements the task as written, runs its Definition of Done commands verbatim — never widened to directory- or project-wide suites — and ticks the plan's checkboxes for its own scope only. A fix for a reported failure follows [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code). It never discards pre-existing uncommitted changes and never runs `git bisect`; it reports the last good and first bad commit for the main conversation instead.
 - [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) fetches the design through the Figma MCP before writing markup, implements it, and runs the Definition of Done commands. When the delegation says the UI verification gate runs after the task, it leaves all rendered-result checking to the gate.
 
 Both stop and report a missing input instead of guessing it. `software-engineer` also stops and reports, instead of improvising, when a task's Stop Rule fires or an expected seam is not there.

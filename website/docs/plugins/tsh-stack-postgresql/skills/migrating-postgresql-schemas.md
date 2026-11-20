@@ -5,16 +5,16 @@ sidebar_position: 1
 description: Writes and reviews PostgreSQL schema migrations that run against a live database without stopping traffic.
 sources:
   - plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas/
-sources_hash: "df9f5ec205d878579828186aee01132b7479048f06b4c4878337927ec78e6060"
+sources_hash: "3b806a291e9cb395157edd8fdae42d559edf898101ffddcf63c9026a6ed49d52"
 ---
 
 # Migrating PostgreSQL Schemas
 
 **Plugin:** [`tsh-stack-postgresql`](/docs/plugins/tsh-stack-postgresql/)  
 **Invoke:** `/tsh-stack-postgresql:migrating-postgresql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) hands it every change to a table that already holds data, and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hands it the index a slow query needs. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent load the database engine's skill that covers a change under review, which for a schema migration is this one, and this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
+**Used by:** [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) hands it every change to a table that already holds data, and [`optimizing-postgresql-queries`](/docs/plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries) hands it the index a slow query needs. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent load the database engine's skill that covers a change under review, which for a schema migration is this one; `creating-implementation-plans` loads it when a plan changes a table that holds data and names it for the implementers of those tasks; and this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
 
-A migration that is correct SQL can still take production down. What decides it is the lock each statement takes, how long it holds it, and what is queued behind it. The skill makes those three things explicit before a migration ships, for PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and stops; below version 14 it stops and says the version is unsupported.
+A migration that is correct SQL can still take production down. What decides it is the lock each statement takes, how long it holds it, and what is queued behind it. The skill makes those three things explicit before a migration ships, for PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply, and loads that engine's skill when one is installed or stops otherwise; below version 14 it stops and says the version is unsupported.
 
 Use it when a migration adds, changes or drops a column, index or constraint on a table that already holds production data, when a migration hung or caused an outage, or when reviewing a migration an ORM generated. The ORM's own skill owns the tool's mechanics; this skill owns what the generated SQL does to a live database. It never runs a migration against a production, staging or shared database: it hands over the SQL and the order of steps.
 
@@ -59,7 +59,7 @@ Use it when a migration adds, changes or drops a column, index or constraint on 
 | :-- | :-- |
 | Lock levels | Any migration on a table with data, every time |
 | Zero-downtime recipes | Adding a constraint or index, renaming, retyping or dropping a column |
-| Backfilling data | Rows must be updated or copied as part of the change |
+| Backfilling data | Rows must be updated, copied or deleted as part of the change |
 | Migration tools | The migration is written with an ORM or migration runner |
 
 ## Related skills

@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Finds and fixes slow PostgreSQL queries from evidence, from pg_stat_statements and EXPLAIN plans to the index or query change that fixes them.
 sources:
   - plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries/
-sources_hash: "47f69a8766f1908eb4addc2c500426db94472b807774d855e055466e36463134"
+sources_hash: "c230dfc8b3cf188b7a45e48c9de6c5c24db032037230256c5818eafc97a09eac"
 ---
 
 # Optimizing PostgreSQL Queries
@@ -14,7 +14,7 @@ sources_hash: "47f69a8766f1908eb4addc2c500426db94472b807774d855e055466e36463134"
 **Invoke:** `/tsh-stack-postgresql:optimizing-postgresql-queries`, and Claude also loads it when the work matches its description  
 **Used by:** [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`designing-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas) point slow-query work at it. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent are told to load the database engine's skill that covers a change under review, which for a new query shape is this one; that path has not been measured.
 
-A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply and stops; below version 14 it stops and says the version is unsupported.
+A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on PostgreSQL 14 to 18. On another engine such as MySQL, MariaDB or SQL Server, it says it does not apply, and loads that engine's skill when one is installed or stops otherwise; below version 14 it stops and says the version is unsupported.
 
 Use it when an endpoint or job is slow because of the database, when a query plan needs explaining, or when someone proposes adding an index. The ORM's own skill owns how to express the fix in that ORM; this skill owns what the database does with the SQL. It changes no server configuration and writes nothing to a shared or production database, and it runs `EXPLAIN ANALYZE` on production only for a `SELECT` and only with the agreement of the person responsible.
 

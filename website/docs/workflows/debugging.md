@@ -8,7 +8,7 @@ sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/SKILL.md
   - plugins/tsh-product-engineering/skills/creating-implementation-plans/references/plan-building-blocks.md
   - plugins/tsh-product-engineering/agents/software-engineer.md
-sources_hash: "a5cd4ea276514b0c5216e8b4a887b99553c2eb1a527c6528a0f0de790f5bcea3"
+sources_hash: "e4cb4bd664475416cd08ed1929953f005f7f98f9535c9bc85f547313b04a27a9"
 ---
 
 # Debugging
