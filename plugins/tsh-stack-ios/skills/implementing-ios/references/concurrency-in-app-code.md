@@ -49,18 +49,38 @@ in Swift 6 anyway, so the migration is free.
   refresher that must not run twice:
 
   ```swift
-  actor TokenStore {
-      private var refreshTask: Task<Token, Error>?
+  nonisolated struct Token: Sendable {
+      let value: String
+      let expiresAt: Date
+      var isExpired: Bool { expiresAt <= .now }
+  }
 
-      func validToken(refresh: @Sendable () async throws -> Token) async throws -> Token {
+  actor TokenStore {
+      private var token: Token?
+      private var refreshTask: Task<Token, Error>?
+      private let refresh: @Sendable () async throws -> Token
+
+      init(refresh: @escaping @Sendable () async throws -> Token) {
+          self.refresh = refresh
+      }
+
+      /// The stored token, refreshed once when it has expired; concurrent callers
+      /// join the refresh already in flight instead of starting another.
+      func current() async throws -> Token {
+          if let token, !token.isExpired { return token }
           if let refreshTask { return try await refreshTask.value }
           let task = Task { try await refresh() }
           refreshTask = task
           defer { refreshTask = nil }
-          return try await task.value
+          let fresh = try await task.value
+          token = fresh
+          return fresh
       }
   }
   ```
+
+  `Token` is `nonisolated` because under main-actor default isolation its
+  `isExpired` would otherwise be main-actor isolated and unusable from the actor.
 
   Remember actor **reentrancy**: state can change across every `await` inside an actor
   method. Re-check assumptions after each suspension.
@@ -76,7 +96,7 @@ in Swift 6 anyway, so the migration is free.
 | A user action (button) | `Task { await model.save() }` in the action |
 | Several independent calls at once | `async let`, or `withThrowingTaskGroup` for a dynamic count |
 | Work that must outlive the screen (upload, sync) | A service owns the `Task` and its cancellation; not the view |
-| Debounced search | `.task(id: query) { try? await Task.sleep(for: .milliseconds(300)); … }` |
+| Debounced search | `.task(id: query) { do { try await Task.sleep(for: .milliseconds(300)) } catch { return }; … }` — never `try?` on the sleep: it swallows the cancellation and the stale search still runs |
 
 - **Unstructured `Task { }` is a last resort**; it is not cancelled with anything.
   When a type stores one, it cancels it in the right place.

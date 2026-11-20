@@ -81,7 +81,7 @@ extension EnvironmentValues {
 
 - **One composition root** builds the live services once (`AppDependencies.live()`)
   and hands them down. Previews and tests build their own.
-- **Initializer injection** for a screen model: `OrdersModel(orders:)`. The screen
+- **Initializer injection** for a screen model: `OrdersModel(service:)`. The screen
   reads the service from the environment and passes it in.
 - **`@Environment`** for what many screens need: an `@Observable` session with
   `.environment(session)`, or a service through an `@Entry` key. The default value of

@@ -48,7 +48,7 @@ and offer this recommendation:
 
 Set the target once — `IPHONEOS_DEPLOYMENT_TARGET` in `Shared.xcconfig` — and
 mirror it in every local package's `platforms:` list. A package declaring a lower
-version than the app is harmless; a higher one fails to link.
+version than the app is harmless; a higher one fails to build.
 
 The **SDK** you build with is separate: always the one the pinned Xcode ships.
 Building with the iOS 27 SDK and deploying to iOS 26 is normal; guard newer APIs
@@ -105,11 +105,10 @@ Verified 2026-11-19:
   https://developer.apple.com/documentation/xcode-release-notes/xcode-27-release-notes
 - Xcode 27.2 release notes:
   https://developer.apple.com/documentation/xcode-release-notes/xcode-27_2-release-notes
-- Xcode 27 release summary (requirements, deployment targets, removals):
-  https://blakecrosley.com/blog/xcode-27-release
 - xcodes (reads `.xcode-version`): https://github.com/XcodesOrg/xcodes
 - Xcode release notes: https://developer.apple.com/documentation/xcode-release-notes/
-- Xcode system requirements and compatibility: https://developer.apple.com/support/xcode/
+- Xcode system requirements, deployment targets and compatibility:
+  https://developer.apple.com/support/xcode/
 - App Store Connect SDK minimum requirements:
   https://developer.apple.com/news/upcoming-requirements/
 - Swift 6.4 release: https://www.swift.org/blog/swift-6.4-released/

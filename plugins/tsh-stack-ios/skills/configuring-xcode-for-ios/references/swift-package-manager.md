@@ -12,8 +12,9 @@ copied into the repository.
 CocoaPods trunk becomes **permanently read-only on 2 December 2026**: no new pods
 and no new versions of existing pods can be published after that. Existing
 `Podfile`s keep resolving, but every dependency is frozen at its last published
-version — security fixes included. Several vendors (Firebase among them) have
-already stopped publishing new versions to CocoaPods.
+version — security fixes included. Several vendors have already stopped publishing
+new versions to CocoaPods; Firebase documents CocoaPods as a deprecated installation
+method.
 
 ## 2. Adding a remote dependency
 
@@ -91,6 +92,7 @@ change. When asked to migrate:
 Verified 2026-11-19:
 
 - CocoaPods trunk read-only plan: https://blog.cocoapods.org/CocoaPods-Specs-Repo/
+- Firebase CocoaPods deprecation: https://firebase.google.com/docs/ios/cocoapods-deprecation
 - Swift Package Manager documentation: https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/
 - Adding package dependencies to your app:
   https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app

@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Sets up and maintains the build side of an iOS app, from the Xcode project and Swift 6 concurrency settings to Swift Package Manager and xcodebuild in CI.
 sources:
   - plugins/tsh-stack-ios/skills/configuring-xcode-for-ios/
-sources_hash: "61f0e6287195c8ea3aa76c2ff0e687dde3f03241bf2c39f7bc5b33f8000d6de3"
+sources_hash: "eb6591944680a89206e7c79fa67b0eb2fd6e17353d4a165f019567652e37bbf6"
 ---
 
 # Configuring Xcode for iOS

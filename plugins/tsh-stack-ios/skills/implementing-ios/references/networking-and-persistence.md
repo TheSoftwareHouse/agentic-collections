@@ -30,7 +30,8 @@ nonisolated struct APIClient: Sendable {
         request.httpMethod = endpoint.method
         request.httpBody = endpoint.body
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(try await tokens.current())", forHTTPHeaderField: "Authorization")
+        let token = try await tokens.current()
+        request.setValue("Bearer \(token.value)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
@@ -144,8 +145,11 @@ final class Draft {
   `SecItemUpdate`, `SecItemDelete`) once in a small `KeychainStore` service; nothing
   else calls `SecItem*`.
 - Use `kSecClassGenericPassword` with a service and account per item, and
-  `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` unless the item must reach
-  background work before first unlock or sync through iCloud.
+  `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`: readable by background work
+  after the first unlock since boot, and kept on this device — it neither syncs
+  through iCloud Keychain nor moves to a new device in a backup. Drop
+  `ThisDeviceOnly` only when the user should keep the item on a new device. No
+  non-deprecated class makes an item readable before the first unlock.
 - Delete the user's items on sign-out. Keychain items survive app deletion; decide
   deliberately whether a reinstall should see them.
 

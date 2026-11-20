@@ -52,6 +52,7 @@ A committed `.swiftformat` at the repository root:
 
 ```text
 --swift-version 6.4
+--language-mode 6
 --min-version 0.64.7
 --exclude BuildTools,DerivedData,**/.build
 ```
@@ -59,6 +60,9 @@ A committed `.swiftformat` at the repository root:
 - `--swift-version` enables the rules that depend on the Swift version; without it
   SwiftFormat silently skips them. Set it to the Swift of the pinned Xcode (6.4 for
   Xcode 27.2) and update it with every Xcode upgrade.
+- `--language-mode 6` matches the Swift 6 language mode. Without it SwiftFormat
+  assumes Swift 5 mode, whatever `--swift-version` says. A project still in Swift 5
+  mode sets `5`.
 - `--min-version` fails a run on an older SwiftFormat, so a developer with a stale
   copy cannot reformat the codebase backwards. Bump it with the package version.
 - Keep the default rules. Each deviation (`--disable <rule>`, an option change) is a

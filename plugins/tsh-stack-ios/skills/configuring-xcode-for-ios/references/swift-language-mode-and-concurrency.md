@@ -10,7 +10,7 @@ which actor code runs on by default. Writing concurrent code itself — actors,
 | --- | --- | --- | --- |
 | Swift Language Version | `SWIFT_VERSION` | `6.0` (Swift 6 mode) | Complete data-race checking; violations are errors |
 | Default Actor Isolation | `SWIFT_DEFAULT_ACTOR_ISOLATION` | `MainActor` | Unannotated code in the module is `@MainActor` |
-| Approachable Concurrency | `SWIFT_APPROACHABLE_CONCURRENCY` | `YES` | Turns on two upcoming features, below |
+| Approachable Concurrency | `SWIFT_APPROACHABLE_CONCURRENCY` | `YES` | Turns on upcoming features, below: two in Swift 6 mode, five in Swift 5 mode |
 
 Put them in `Shared.xcconfig` so every configuration agrees:
 
@@ -40,7 +40,13 @@ visible in review, where it belongs.
 | `NonisolatedNonsendingByDefault` | SE-0461 | A `nonisolated async` function runs on the **caller's** actor instead of hopping to the global executor; `@concurrent` restores the old behaviour |
 | `InferIsolatedConformances` | SE-0470 | A protocol conformance on a main-actor type is inferred as main-actor-isolated |
 
-Both are off by default until a future language mode. `NonisolatedNonsendingByDefault`
+In **Swift 5 mode** the same setting also turns on three features that Swift 6 mode
+already includes: `DisableOutwardActorInference`, `GlobalActorIsolatedTypesUsability`
+and `InferSendableFromCaptures` (Xcode's `Swift.xcspec`). That matters during a
+migration: a Swift 5-mode module with the setting on is already partly on Swift 6
+semantics.
+
+The two features in the table are off by default until a future language mode. `NonisolatedNonsendingByDefault`
 **changes runtime behaviour**, not only diagnostics: async code that used to leave
 the main actor implicitly now stays on it. That is why it is a default for new code
 and a deliberate, tested step for existing code.

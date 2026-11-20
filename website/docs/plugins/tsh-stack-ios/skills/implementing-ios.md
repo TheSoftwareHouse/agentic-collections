@@ -5,7 +5,7 @@ sidebar_position: 1
 description: Conventions for any change to native iOS app code in Swift, SwiftUI-first, from where state lives to networking, persistence and UIKit interop.
 sources:
   - plugins/tsh-stack-ios/skills/implementing-ios/
-sources_hash: "1609ce16a40e7ba7665ba67bc52d3a05e9821cd84e38aeb6f8f9236fcc8eabee"
+sources_hash: "2fdf67e014afe7f80cd88fe1700e0c69fc2e4a3f0946435d1e6614ecda75fa7f"
 ---
 
 # Implementing iOS
