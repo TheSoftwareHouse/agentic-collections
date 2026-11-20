@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: ios-review-layers
+description: A pre-merge review of a pasted SwiftUI change must route to reviewing-code and not start implementation, even with implementing-ios in the session claiming reviews of Swift changes.
+# Modelled on nestjs-review-layers. The stack layer (implementing-ios) is not asserted:
+# reviewing-code pulls a stack skill in on a later turn, which a max_turns: 1 routing
+# case cannot observe. A review names one dominant owner at turn one.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-ios"]
+runs: 1
+execution:
+  prompt: |
+    Review this change to our iPhone app before we merge it. This is the whole diff:
+
+    ```swift
+    struct OrdersScreen: View {
+        @StateObject private var model = OrdersViewModel()
+
+        var body: some View {
+            List(model.orders) { order in
+                Text(order.title)
+            }
+            .onAppear {
+                Task { await model.load() }
+            }
+        }
+    }
+    ```
+
+    Is it ready to merge?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: review-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    arm: with-only
+  - name: implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0

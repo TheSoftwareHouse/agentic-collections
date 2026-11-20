@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: react-hook-not-ios
+description: A React hook request in a repository that also holds an iOS app must route to implementing-frontend, not implementing-ios.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-ios", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Our repo has ios/ (the iPhone app, SwiftUI) and web/ (React + Vite).
+    In the web app, write a useOrders hook that fetches GET /orders and returns loading, error and data, and use it on the order history page.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: frontend-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    arm: with-only
+  - name: ios-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    min: 0
+    max: 0

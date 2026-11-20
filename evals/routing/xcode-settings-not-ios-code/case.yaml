@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: xcode-settings-not-ios-code
+description: A Swift 6 language-mode and CocoaPods-to-SPM request must route to configuring-xcode-for-ios, not implementing-ios, although both talk about Swift concurrency.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-ios"]
+runs: 1
+execution:
+  prompt: |
+    Our iPhone app still builds in Swift 5 mode and pulls Alamofire and Kingfisher through a Podfile.
+    Plan the move to Swift 6 language mode with main-actor default isolation, and switch those two dependencies to Swift Package Manager.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: xcode-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-xcode-for-ios"'
+    arm: with-only
+  - name: ios-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    min: 0
+    max: 0

@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: ios-state-not-xcode-settings
+description: Moving a SwiftUI screen from ObservableObject to an @Observable model must route to implementing-ios, not configuring-xcode-for-ios.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-ios"]
+runs: 1
+execution:
+  prompt: |
+    In our iPhone app the ProfileView uses a ProfileViewModel that is an ObservableObject with @Published properties and @StateObject.
+    We now target iOS 18. Rework the screen to use the Observation framework and make sure the edit form binds to the model correctly.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: ios-code-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    arm: with-only
+  - name: xcode-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-xcode-for-ios"'
+    min: 0
+    max: 0

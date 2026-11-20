@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: ios-screen-not-frontend
+description: A SwiftUI screen request in a repository that also holds a React web app must route to implementing-ios, not implementing-frontend, whose triggers claim components, state and API clients.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-ios", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Our repo has ios/ (the iPhone app, SwiftUI) and web/ (React + Vite).
+    In the iPhone app, add an order history screen: it loads the user's past orders from GET /orders, shows them in a list with pull to refresh, and needs proper loading, error and empty states.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: ios-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    arm: with-only
+  - name: frontend-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-frontend"'
+    min: 0
+    max: 0
