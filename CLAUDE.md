@@ -45,6 +45,7 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | `tsh-stack-nodejs` | Server-side JavaScript runtimes — TypeScript configuration for Node, and the frameworks TSH builds on it, currently NestJS |
 | `tsh-stack-python` | Modern Python — implementation and review practices, and data modelling |
 | `tsh-stack-php` | PHP 7.4–8.5 — version-aware design, patterns, refactoring and PSR-12; Symfony 5.4–8.x implementation and review; a PHP code reviewer agent |
+| `tsh-stack-ios` | Native iOS apps in Swift — SwiftUI-first implementation conventions, and Xcode project, build-setting and Swift Package Manager configuration |
 | `tsh-stack-serverless` | AWS Lambda on OSLS — the library policy, project structure, service definition, handler practices, and packaged-artifact checks |
 | `tsh-stack-aws` | AWS — Terraform resource patterns, Well-Architected defaults, account cost and tagging audits |
 | `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |

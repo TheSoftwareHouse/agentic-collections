@@ -189,6 +189,19 @@
       "keywords": ["tsh", "stack", "php", "symfony", "doctrine", "psr-12", "design-patterns", "refactoring", "code-review"]
     },
     {
+      "name": "tsh-stack-ios",
+      "source": "./plugins/tsh-stack-ios",
+      "displayName": "TSH Stack: iOS",
+      "description": "Conventions for native iOS apps in Swift: SwiftUI-first implementation — views and state with Observation, screen architecture, navigation, dependency injection, Swift concurrency, networking and persistence — and Xcode project configuration: Swift 6 language mode and concurrency settings, Swift Package Manager, build configurations, SwiftFormat and xcodebuild in CI.",
+      "category": "engineering",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "ios", "swift", "swiftui", "xcode", "swift-package-manager", "swift-concurrency", "swiftdata", "mobile"]
+    },
+    {
       "name": "tsh-stack-serverless",
       "source": "./plugins/tsh-stack-serverless",
       "displayName": "TSH Stack: Serverless",

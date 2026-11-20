@@ -55,10 +55,11 @@ sources:
   - plugins/tsh-stack-php/agents/php-code-reviewer.md
   - plugins/tsh-stack-serverless/skills/configuring-serverless-service/SKILL.md
   - plugins/tsh-stack-python/skills/writing-data-models/SKILL.md
+  - plugins/tsh-stack-ios/skills/implementing-ios/SKILL.md
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "c197b273cbd3a6218b29311ee3f8f5865f8e310335ebc3f3926028e0b9551d3c"
+sources_hash: "089ac7e48b146b62d66a2f53d431922cf20c14d20046d79f0da0b52e479a0860"
 ---
 
 # Use cases
@@ -232,6 +233,7 @@ Stack plugins add what changes with the language, framework or cloud, and instal
 - **PHP:** [`@tsh-stack-php:php-code-reviewer`](/docs/plugins/tsh-stack-php/agents/php-code-reviewer) reviews PHP and Symfony changes against the project's own PHP and Symfony versions, runs the project's linters and static analysis, and returns a structured findings report.
 - **Serverless:** [`configuring-serverless-service`](/docs/plugins/tsh-stack-serverless/skills/configuring-serverless-service) defines an AWS Lambda service on OSLS with least-privilege IAM without wildcard resources, per-function reserved concurrency, secrets resolved at runtime, and assertions over the packaged CloudFormation template.
 - **Python:** [`writing-data-models`](/docs/plugins/tsh-stack-python/skills/writing-data-models) governs data modelling with Pydantic v2, dataclasses, SQLModel and SQLAlchemy 2.0.
+- **iOS:** [`implementing-ios`](/docs/plugins/tsh-stack-ios/skills/implementing-ios) covers any change to native iOS app code in Swift, SwiftUI-first: one owner per piece of state with Observation, screen models that render loading, error and empty states, navigation, Swift concurrency, networking and persistence. It asks for the deployment target rather than picking one.
 - **Cloud cost audits:** [`auditing-aws-cost`](/docs/plugins/tsh-stack-aws/skills/auditing-aws-cost), [`auditing-gcp-cost`](/docs/plugins/tsh-stack-gcp/skills/auditing-gcp-cost) and [`auditing-azure-cost`](/docs/plugins/tsh-stack-azure/skills/auditing-azure-cost) read the infrastructure code first, validate it against the live account, project or subscription with read-only calls, find drift and shadow resources, check tag or label compliance, attribute measured spend, and produce a saved report.
 
 ## Foundation: `tsh-core`
