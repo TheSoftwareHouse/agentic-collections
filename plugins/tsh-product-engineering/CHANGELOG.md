@@ -42,9 +42,11 @@ alone reaches nobody.
   design decision.
 - **`orchestrating-feature-implementation` names the engine's skills in the
   delegation** of a task with a migration, and `software-engineer` loads the skills
-  the Technical Context or its delegation names for the work its tasks do. The
-  delegation path itself was not measured. The probes are manual checks in
-  `evals/README.md`.
+  the Technical Context or its delegation names for the work its tasks do. With an
+  approved plan that names the skills, the implementer loaded both before writing the
+  migration in 6 of 6 runs, but so did 0.12.1: the plan's Technical Context is what
+  carries them, and these two rules are a backstop for a plan that does not. The
+  probes are manual checks in `evals/README.md`.
 
 ## [0.12.1] - 2026-11-16
 

@@ -816,8 +816,104 @@ the model reads code before it considers skills, and there the same request load
 the orchestrator in 0 of 6 runs before.
 
 Limits: six runs, one fixture, one stack. The session stops at the plan, because
-nobody approves it, so the delegation rule and `software-engineer` loading the named
-skills are still not measured.
+nobody approves it, so delegation is measured separately, below.
+
+### Delegation: does the implementer load the skills the plan names?
+
+The same fixture, with an approved plan already in `specifications/` whose Technical
+Context names both PostgreSQL skills, as `creating-implementation-plans` writes it.
+Replace the fixture's last line (the `git commit`) with the block below, add `Agent`
+to `allowed_tools`, and use one of two prompts:
+
+- **Through the orchestrator:** "The plan in
+  specifications/user-last-seen/user-last-seen.plan.md is approved. Execute it."
+- **Straight to the agent:** "Use the software-engineer agent to implement task 1.1
+  of the approved plan in specifications/user-last-seen/user-last-seen.plan.md."
+
+The probe has no Bash, so the implementer cannot run `npm run build` and reports
+the task blocked; the orchestrator then stops before phase 2. What is measured is
+the first task, the migration. The graders cannot see the subagent's calls, so read
+them from the trace with `--keep-temp`: they are the events with a
+`parent_tool_use_id`.
+
+<details>
+<summary>The plan block</summary>
+
+```bash
+mkdir -p specifications/user-last-seen
+cat > specifications/user-last-seen/user-last-seen.plan.md <<'MD'
+# User last seen
+
+## Goal
+
+Admins see when each user was last active and can sort the admin users list by it.
+
+**Success Measure:** `GET /admin/users?sort=lastSeenAt` returns users ordered by last activity, newest first, users never seen last.
+
+**Do NOT touch:** authentication, the session format, any other table.
+
+## Technical Context
+
+- **Stack:** NestJS 11, TypeORM 0.3, PostgreSQL 16 on RDS. Migrations in `src/database/migrations`, written by hand or generated with `npm run migration:generate`, run on deploy while the service takes traffic.
+- **Data:** `users` has about 12 million rows and takes writes all day.
+- **Skills to load for the tasks that change the schema:** `designing-postgresql-schemas` (the new column) and `migrating-postgresql-schemas` (the migration and index on `users`).
+- **Verification commands:** `npm run lint`, `npm test`, `npm run build`.
+
+## Phase 1: Schema
+
+- [ ] **1.1 Add `last_seen_at` to `users`, with an index for sorting**
+  - **Files:** create `src/database/migrations/<timestamp>-AddUsersLastSeenAt.ts`; modify `src/users/user.entity.ts`
+  - **Definition of Done:**
+    - [ ] The migration adds a nullable `timestamptz` column and an index for sorting by it, safe on a 12-million-row table under traffic
+    - [ ] `npm run build` passes
+
+## Phase 2: Behaviour
+
+- [ ] **2.1 Record activity at most once a minute per user**
+  - **Files:** create `src/users/last-seen.service.ts`; modify `src/auth/current-user.guard.ts`, `src/users/users.module.ts`
+  - **Definition of Done:**
+    - [ ] One `UPDATE` per user per minute at most, not one per request
+    - [ ] `npm test` passes
+- [ ] **2.2 Sort the admin list by last seen**
+  - **Files:** modify `src/admin/admin-users.controller.ts`
+  - **Definition of Done:**
+    - [ ] `sort=lastSeenAt` orders newest first, nulls last
+    - [ ] `npm run lint` passes
+
+## Phase 3: Final verification
+
+- [ ] **3.1 Code review** against this plan
+- [ ] **3.2 Functional verification** per `user-last-seen.verification.md`
+MD
+cat > specifications/user-last-seen/user-last-seen.verification.md <<'MD'
+# User last seen: verification
+
+1. Run `npm test`.
+MD
+git add -A >/dev/null 2>&1 && git -c user.name=t -c user.email=t@t commit -qm "initial" >/dev/null 2>&1 || true
+```
+
+</details>
+
+Measured on 2026-11-20 on `claude-sonnet-5-5`, about USD 0.16–0.43 per run.
+
+| Prompt | Code | Delegation names both skills | Implementer loads both before writing a migration |
+| :-- | :-- | :-- | :-- |
+| Through the orchestrator | This branch (`tsh-product-engineering` 0.12.2) | 6/6 | 6/6 |
+| Through the orchestrator | `main` (0.12.1) | 6/6 | 6/6 (one run stopped before writing it) |
+| Straight to the agent | This branch | 0/4 (the main conversation wrote the delegation) | 4/4 loaded both; 2 stopped before writing a migration |
+
+- **Once the plan names the skills, they reach the implementer**, with or without
+  the new delegation and implementer rules: `main` scored the same. On this fixture
+  the gain comes from the plan rule and from routing "add X" to the plan; the two
+  later rules are a backstop that this probe does not exercise, for a plan written
+  by hand without those names.
+- **The runs that stopped did so because of the skills.** In three runs the
+  implementer, with the migration skill loaded, refused to write the migration: an
+  index built `CONCURRENTLY` must run outside a transaction, and in TypeORM 0.3 that
+  needs `migrationsTransactionMode` in `data-source.ts`, a file outside the task's
+  scope. It reported that as a blocker instead of improvising, which is what the
+  plan's scope rules ask for.
 
 ## Behavioural suites: what a skill does after it fires
 
