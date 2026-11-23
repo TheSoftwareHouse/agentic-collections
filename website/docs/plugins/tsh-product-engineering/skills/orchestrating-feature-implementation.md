@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "d15dec6f879c7a2153a83cd0ec484b6ac3d2defc051f3354126a4ee7952c65b9"
+sources_hash: "977e24bdd95ecfc70fbda63d7eca85475a5b54e2628a372bf855d496d3412e9b"
 ---
 
 # Orchestrating Feature Implementation
@@ -18,7 +18,7 @@ In this workflow the main conversation is the orchestrator. It owns the plan, th
 
 Verification follows a pyramid. Each task runs only its own scoped checks and is trusted from its report, each phase closes with one integration checkpoint, and the plan's final verification phase is the single full, evidence-based pass. No check runs twice.
 
-Use it for any feature request or multi-file change, before the first file is edited, and to execute or resume a `*.plan.md`. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
+Use it for any feature request or multi-file change, loaded first, before the codebase is explored or any file is edited, and to execute or resume a `*.plan.md`. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
 
 ## Key Areas
 

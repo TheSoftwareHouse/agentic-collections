@@ -581,6 +581,4 @@ control that asserts the plugin's skills stay out, and give the skill a must-fir
 case around a request it does own. `claude-hook-neither-on-settings` and
 `claude-extension-not-context` are the worked pair.
 
-| Case | Measured | Bug | Fix belongs in |
-| :-- | :-- | :-- | :-- |
-| `ios-feature-orchestrated` | 2 of 6, 2026-11-23; 6 of 6 without `tsh-stack-ios` | A multi-file SwiftUI feature: Claude searches the project first, then often loads `implementing-ios` instead of `orchestrating-feature-implementation`; five wordings of `implementing-ios`'s description scored 0 to 2 of 6 | `tsh-stack-ios`'s `implementing-ios` description, or `orchestrating-feature-implementation`'s, so that orchestration wins a feature request over a stack skill |
+**No cases are quarantined right now.**

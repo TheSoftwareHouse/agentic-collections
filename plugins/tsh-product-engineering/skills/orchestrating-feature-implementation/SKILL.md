@@ -1,7 +1,7 @@
 ---
 name: orchestrating-feature-implementation
-description: "Implements a feature, ticket, or plan end to end from the main conversation: confirms a plan file exists, delegates each task to implementer subagents — in parallel where the plan allows — gates on their reports, then closes with the plan's final verification phase: code review and functional verification in parallel. Use for any feature request or multi-file change, before the first file is edited."
-when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code; fixing a bug whose cause is not yet known is debugging-code."
+description: "Implements a feature, ticket, or plan end to end from the main conversation: confirms a plan file exists, delegates each task to implementer subagents — in parallel where the plan allows — gates on their reports, then closes with the plan's final verification phase: code review and functional verification in parallel. Use for any feature request or multi-file change — load it first, before exploring the codebase or editing any file."
+when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing, or to explore the code first. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code; fixing a bug whose cause is not yet known is debugging-code."
 ---
 
 # Orchestrating Feature Implementation

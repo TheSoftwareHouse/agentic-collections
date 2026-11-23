@@ -3,17 +3,14 @@ name: ios-feature-orchestrated
 description: A multi-file feature in a SwiftUI app must route to orchestrating-feature-implementation, although implementing-ios claims any change to iOS app code and building a screen or feature. implementing-ios may load alongside it; it must not displace it.
 # Modelled on frontend-feature-orchestrated, without its "reuse the existing ..." line:
 # with it, 4 of 6 runs searched the empty sandbox and hit the turn cap before any Skill call.
-# Quarantined (2026-11-23): 2 of 6 on claude-sonnet-5-5 with the current
-# implementing-ios description. In failing runs Claude first searches the empty
-# sandbox for the app, then loads implementing-ios instead of
-# orchestrating-feature-implementation, or is still searching when the turn cap ends
-# the run. Without tsh-stack-ios installed the same prompt scores 6 of 6, so the
-# competition comes from implementing-ios being in the session. Four other wordings
-# of its description scored 0 to 2 of 6. A four-turn probe reached the orchestrator
-# in 3 of 6: two runs searched the empty sandbox for all four turns, and one loaded
-# implementing-ios and never moved on to the orchestrator.
-# The sibling frontend-feature-orchestrated scored 4 of 6 on the same day.
-tags: [known-failure, cross-plugin]
+# Quarantined on 2026-11-23 at 2 of 6. The failing runs searched the empty sandbox
+# before any Skill call, with or without tsh-stack-ios in the session: the
+# orchestrator's description said "before the first file is edited", which left
+# reading the code first open. Lifted after it was changed to "load it first,
+# before exploring the codebase or editing any file" in tsh-product-engineering 0.12.2.
+# Measured on claude-sonnet-5-5, Claude Code 2.1.323: before, 6 of 6 and 2 of 6 in two
+# series (6 of 12 without tsh-stack-ios); after, 24 of 24.
+tags: [routing, cross-plugin]
 plugins: ["../../../plugins/tsh-product-engineering", "../../../plugins/tsh-stack-ios"]
 runs: 1
 execution:
