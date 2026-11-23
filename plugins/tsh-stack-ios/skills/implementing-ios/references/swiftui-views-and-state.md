@@ -40,7 +40,7 @@ Rules that follow:
 @Observable
 final class OrdersModel {
     private(set) var orders: [Order] = []
-    private(set) var isLoading = false
+    private(set) var isLoading = true // nothing loaded yet; see below
     private(set) var errorMessage: String?
 
     private let service: OrdersService
@@ -69,6 +69,9 @@ final class OrdersModel {
 - Each piece of screen state is its own property — the data, `isLoading` and
   `errorMessage` — and each is `private(set)`; the view changes them only through
   methods.
+- **Start in the loading state.** The first frame renders before `.task` runs; with
+  `isLoading = false` an unloaded screen looks like a loaded empty one and flashes
+  "No orders yet".
 - **`load()` keeps the properties consistent:** it clears the error when it starts
   and resets `isLoading` in a `defer`, so no exit path leaves a spinner running or a
   stale error showing.

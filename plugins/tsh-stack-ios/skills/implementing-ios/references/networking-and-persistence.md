@@ -33,7 +33,13 @@ nonisolated struct APIClient: Sendable {
         let token = try await tokens.current()
         request.setValue("Bearer \(token.value)", forHTTPHeaderField: "Authorization")
 
-        let (data, response) = try await session.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError where error.code == .cancelled {
+            throw CancellationError() // a cancelled task, not a network failure
+        }
         guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
         guard (200..<300).contains(http.statusCode) else {
             throw APIError.status(http.statusCode, data)
@@ -55,10 +61,28 @@ come from user input.)
   knows nothing about features.
 - **DTOs are not models.** Decode into `Decodable` DTOs that mirror the API, then map
   to the app's models in the service. A backend rename then touches one file.
+  Declare DTOs `nonisolated struct … : Decodable, Sendable`: under main-actor default
+  isolation their `Decodable` conformance is otherwise main-actor isolated, and
+  `send` rejects them.
 - **One configured decoder/encoder** (`JSONDecoder.api`), with the API's key and date
-  strategies set once — never configured ad hoc per call.
+  strategies set once — never configured ad hoc per call. Declare it `nonisolated`:
+  in a target that defaults to the main actor, a plain `extension` makes `api`
+  main-actor isolated, and the `nonisolated` client above cannot read it.
+
+  ```swift
+  nonisolated extension JSONDecoder {
+      static let api: JSONDecoder = {
+          let decoder = JSONDecoder()
+          decoder.keyDecodingStrategy = .convertFromSnakeCase
+          decoder.dateDecodingStrategy = .iso8601
+          return decoder
+      }()
+  }
+  ```
 - **Errors are typed** (`enum APIError: Error`) and the service maps them to domain
-  errors. Distinguish offline (`URLError.notConnectedToInternet`), unauthorised (401
+  errors. A cancelled task makes `URLSession` throw `URLError(.cancelled)`, not
+  `CancellationError`; the client maps it, so callers handle cancellation in one
+  `catch is CancellationError`. Distinguish offline (`URLError.notConnectedToInternet`), unauthorised (401
   → refresh once, then sign out), and server errors.
 - **Retries** only for idempotent requests, with a bound and backoff — never retry a
   `POST` blindly.

@@ -1,7 +1,7 @@
 ---
 name: implementing-ios
-description: "TSH conventions for any change to native iOS app code in Swift, SwiftUI-first: views and state with Observation (@State, @Observable, @Environment), screen models, the loading, error and empty states, navigation with NavigationStack, dependency injection, Swift concurrency in app code, networking with URLSession and Codable, persistence with SwiftData and the Keychain, and UIKit interop. Use when writing, refactoring or reviewing Swift code in an iOS app — a SwiftUI view, screen, model, service, API client or feature module."
-when_to_use: "Trigger on: building a screen or feature in an iPhone or iPad app, writing or changing a SwiftUI view, deciding where state lives (@State, @Observable, @Bindable, @Environment), adding a view model, wiring navigation or deep links, calling a REST API from an iOS app, moving work off the main actor, storing data with SwiftData, UserDefaults or the Keychain, embedding a UIKit view in SwiftUI or SwiftUI in a UIKit app, starting a new iOS app, or reviewing a Swift change in an iOS project."
+description: "TSH coding conventions for native iOS app code in Swift, SwiftUI-first — a native Swift app, not the generated ios/ project of a React Native or Flutter app: views and state with Observation (@State, @Observable, @Environment), screen models, the loading, error and empty states, navigation with NavigationStack, dependency injection, Swift concurrency in app code, networking with URLSession and Codable, persistence with SwiftData and the Keychain, VoiceOver labels and Dynamic Type, and UIKit interop. Use for the code itself: writing, refactoring or reviewing a SwiftUI view, screen model, service or API client. It is a companion, not a workflow: a feature request goes to orchestrating-feature-implementation first when that is installed, and this skill is loaded while the code is written."
+when_to_use: "Trigger on: writing or changing a screen in an iPhone or iPad app, writing or changing a SwiftUI view, deciding where state lives (@State, @Observable, @Bindable, @Environment), adding a view model, wiring navigation or deep links, calling a REST API from an iOS app, moving work off the main actor, storing data with SwiftData, UserDefaults or the Keychain, embedding a UIKit view in SwiftUI or SwiftUI in a UIKit app, VoiceOver labels, Dynamic Type or other accessibility in an iOS app, starting a new iOS app, or reviewing a Swift change in an iOS project."
 ---
 
 # Implementing iOS
@@ -15,7 +15,9 @@ storage and the rest of the system.
 This skill covers **every** change to Swift code in an iOS app target or its feature
 packages: a new screen, a view, a screen model, a service, an API client, a refactor.
 It does not cover the Xcode project, build settings, Swift Package Manager or linting
-— that is [`configuring-xcode-for-ios`](../configuring-xcode-for-ios/SKILL.md).
+— that is [`configuring-xcode-for-ios`](../configuring-xcode-for-ios/SKILL.md). Nor
+does it cover the `ios/` project that React Native or Flutter generates: that code
+follows its framework's conventions, not these.
 
 **Local conventions outrank this skill.** An existing app keeps its architecture —
 TCA, VIPER, MVVM with Combine, UIKit with coordinators — and its UI framework: a
@@ -49,7 +51,8 @@ Never raise the deployment target, the Swift language mode or a dependency unask
 
 | Severity | Rule |
 | --- | --- |
-| MUST | State the deployment target, Swift language mode and UI framework before writing code. When there is no project yet, ask for the deployment target. |
+| MUST | State the deployment target, Swift language mode and UI framework before writing code. When there is no project yet, ask for the deployment target (as a subagent, report the blocker to the caller; in the main conversation, ask the user). |
+| MUST | For a screen backed by a Figma design, fetch and study the design through the Figma MCP (bundled by `tsh-core`) before writing layout. NEVER implement from assumptions: a design, token or spec that is missing or unclear is a blocker to raise, not a gap to fill. |
 | NEVER | Call an API newer than the deployment target without an `if #available` / `@available` guard and a working fallback. |
 | MUST | Keep views a function of state. Business logic, networking and persistence never live in `body` or in a view's helpers — they live in a screen model or a service. No `@Query` or `ModelContext` in a view, even for a simple list. |
 | MUST | Give each piece of state one owner: `@State` for view-private values, an `@Observable` model created and held with `@State` by the view that owns it and passed down as a plain property or `@Bindable`, app-wide services through `@Environment`. NEVER `ObservableObject`, `@Published` or `@StateObject` in new code on iOS 17+. |
@@ -61,7 +64,7 @@ Never raise the deployment target, the Swift language mode or a dependency unask
 | MUST | Keep secrets and tokens in the Keychain. NEVER in `UserDefaults`, `@AppStorage`, a plist or source code. |
 | MUST | Take every user-facing string from a String Catalog and every colour and image from the asset catalog or the design system; support Dynamic Type and give icon-only controls an accessibility label. |
 | MUST | Give every new view a `#Preview` that shows its states. NEVER `PreviewProvider` — Xcode 27 deprecates it. |
-| MUST | Build and run the tests before reporting done (the project's own script, or `xcodebuild … build test`). A change that only compiles in your head is not done. |
+| MUST | Verify before reporting done. When a calling workflow defines the task's verification commands, run exactly those; otherwise build and run the tests (the project's own script, or `xcodebuild … build test`). A change that only compiles in your head is not done. |
 
 ## Reference Loading
 
@@ -94,7 +97,8 @@ Never raise the deployment target, the Swift language mode or a dependency unask
    writing any view, and
    [`concurrency-in-app-code.md`](./references/concurrency-in-app-code.md) before
    writing async code.
-5. **Verify.** Build, run the tests (new unit tests use Swift Testing), run the
+5. **Verify.** Run the calling workflow's verification commands when it defines
+   them. Otherwise build, run the tests (new unit tests use Swift Testing), run the
    formatter's lint, and for a UI change look at the previews or run the app in the
    Simulator and walk each state. Report what you ran and what you could not.
 

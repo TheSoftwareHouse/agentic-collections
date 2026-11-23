@@ -103,7 +103,10 @@ in Swift 6 anyway, so the migration is free.
 - **`Task.detached` almost never.** It drops priority and task-locals. Use
   `@concurrent` for off-main work.
 - **Honour cancellation.** Long loops check `try Task.checkCancellation()`; catch
-  `CancellationError` separately and never present it as a failure.
+  `CancellationError` separately and never present it as a failure. `URLSession`
+  throws `URLError(.cancelled)` instead, so the API client maps it to
+  `CancellationError` ([`networking-and-persistence.md`](./networking-and-persistence.md));
+  code that calls `URLSession` directly checks `Task.isCancelled` in its `catch`.
 - **No `DispatchQueue`, `DispatchGroup`, semaphores or completion handlers in new
   code.** Wrap a callback API once with `withCheckedThrowingContinuation`, resuming
   exactly once on every path.

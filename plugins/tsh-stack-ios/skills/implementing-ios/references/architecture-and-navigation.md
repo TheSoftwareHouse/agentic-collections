@@ -146,7 +146,8 @@ struct RootView: View {
   never show UI.
 - Screen models turn errors into a user-facing message and a recovery action, and log
   the underlying error with `Logger` (`os`), never `print`.
-- `CancellationError` is not a failure: never show an alert for it.
+- `CancellationError` is not a failure: never show an alert for it. The API client
+  maps `URLSession`'s `URLError(.cancelled)` to it, so one `catch` covers both.
 
 ## 6. Testing screen models and services
 

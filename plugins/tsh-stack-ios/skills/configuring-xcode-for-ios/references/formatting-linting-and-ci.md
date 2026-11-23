@@ -100,8 +100,7 @@ xcodebuild \
   -destination 'platform=iOS Simulator,name=<device from the list above>' \
   -onlyUsePackageVersionsFromResolvedFile \
   -resultBundlePath build/TestResults.xcresult \
-  SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
-  GCC_TREAT_WARNINGS_AS_ERRORS=YES \
+  CI_STRICT=YES \
   clean build test
 ```
 
@@ -111,8 +110,24 @@ xcodebuild \
 | `-destination` | Name a simulator the runner actually has; hard-coding a device that a new runner image dropped is the most common CI break after an Xcode upgrade |
 | `-onlyUsePackageVersionsFromResolvedFile` | Fails instead of silently resolving newer versions than `Package.resolved` records |
 | `-resultBundlePath` | Keeps the `.xcresult` (test results, coverage, logs) as a build artefact |
-| `SWIFT_TREAT_WARNINGS_AS_ERRORS=YES` | Warnings fail CI. Passed on the command line, so local debug builds stay usable |
+| `CI_STRICT=YES` | Warnings fail CI, through the two `$(CI_STRICT)` settings below. Local builds leave it unset and stay usable |
 | `clean build test` | A clean build catches stale-derived-data passes |
+
+- **Turn warnings into errors through your own xcconfig, never on the command
+  line.** A build setting passed to `xcodebuild` reaches every target, including
+  remote Swift packages, which Xcode builds with `SUPPRESS_WARNINGS=YES`; the Swift
+  driver then stops with `conflicting options '-warnings-as-errors' and
+  '-suppress-warnings'`. Set the two settings in `Shared.xcconfig`, where only your
+  own targets read them, and switch them from CI:
+
+  ```text
+  // Shared.xcconfig
+  SWIFT_TREAT_WARNINGS_AS_ERRORS = $(CI_STRICT)
+  GCC_TREAT_WARNINGS_AS_ERRORS = $(CI_STRICT)
+  ```
+
+  Local packages do not read the app's xcconfig, so this does not fail on their
+  warnings; that needs a setting in each `Package.swift`.
 
 - **Warnings fail CI only.** Treating warnings as errors locally blocks every
   experiment; never treating them as errors lets them pile up until nobody reads

@@ -1,6 +1,6 @@
 ---
 name: configuring-xcode-for-ios
-description: "Sets up and maintains the build side of an iPhone or iPad project: the .xcodeproj and its targets, xcconfig build configurations and shared schemes, the deployment target, SWIFT_VERSION and the Default Actor Isolation and Approachable Concurrency build settings, Package.swift and package pinning, Info.plist and PrivacyInfo.xcprivacy, the SwiftFormat formatter, and xcodebuild on CI. Use when creating or changing an Xcode project, its build settings or its package dependencies, or upgrading Xcode."
+description: "Sets up and maintains the build side of a native iPhone or iPad project — not the generated ios/ folder of a React Native or Flutter app: the .xcodeproj and its targets, xcconfig build configurations and shared schemes, the deployment target, SWIFT_VERSION and the Default Actor Isolation and Approachable Concurrency build settings, Package.swift and package pinning, Info.plist and PrivacyInfo.xcprivacy, the SwiftFormat formatter, and xcodebuild on CI. Use when creating or changing an Xcode project, its build settings or its package dependencies, or upgrading Xcode."
 when_to_use: "Trigger on: File > New > Project in Xcode, picking the minimum iOS version, planning a Swift 5 to Swift 6 language-mode migration, adding or pinning a package, Package.resolved, migrating off CocoaPods or a Podfile, Debug/Staging/Release xcconfig files, signing and DEVELOPMENT_TEAM, a missing privacy manifest, configuring SwiftFormat or SwiftLint, xcodebuild build and test in GitHub Actions or another CI, a simulator destination that no longer exists, or moving to a new Xcode release."
 ---
 
@@ -16,7 +16,10 @@ state, navigation, networking, persistence, and concurrency *in code* — belong
 the sibling skill [`implementing-ios`](../implementing-ios/SKILL.md). What tests
 assert is out of scope too; this skill only makes sure CI runs them. Release
 pipelines (TestFlight, App Store submission, certificate management at scale) are
-not covered.
+not covered. Neither is the `ios/` project that React Native or Flutter generates:
+its Podfile and build settings are managed by that framework's tooling (React
+Native autolinks through CocoaPods), so this skill's rules on dependencies and
+settings would be wrong advice there.
 
 ## Version Baseline
 
@@ -101,8 +104,8 @@ before editing the project or an `.xcconfig`, and
 [`swift-package-manager.md`](./references/swift-package-manager.md) before adding a
 dependency or a package.
 
-**Step 5 — Check the gate.** Before tuning settings, confirm CI builds and tests on a
-pinned Xcode and fails on warnings — read
+**Step 5 — Check the gate**, when the change touches build settings or CI. Confirm CI
+builds and tests on a pinned Xcode and fails on warnings — read
 [`formatting-linting-and-ci.md`](./references/formatting-linting-and-ci.md). A
 setting nobody's build enforces is a suggestion.
 

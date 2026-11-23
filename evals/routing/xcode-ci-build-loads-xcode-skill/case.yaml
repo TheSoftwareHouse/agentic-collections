@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: xcode-ci-build-loads-xcode-skill
+description: Setting up the xcodebuild build and test step for an iOS app in GitHub Actions must load configuring-xcode-for-ios, which owns the xcodebuild command, the simulator destination and warnings as errors. implementing-ci-cd-pipelines also claims workflow files and may load alongside it; implementing-ios, the app-code sibling, must not.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-platform-engineering", "../../../plugins/tsh-stack-ios"]
+runs: 1
+execution:
+  prompt: |
+    Add a GitHub Actions job that builds and tests our iPhone app on every pull request with xcodebuild: use the committed Package.resolved only, pick a simulator the runner actually has, and fail the build on compiler warnings.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: xcode-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?configuring-xcode-for-ios"'
+    arm: with-only
+  - name: ios-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    min: 0
+    max: 0

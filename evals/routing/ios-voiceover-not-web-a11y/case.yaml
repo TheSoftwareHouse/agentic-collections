@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: ios-voiceover-not-web-a11y
+description: A VoiceOver request for a SwiftUI screen, in a repository that also holds a React web app, must route to implementing-ios, not ensuring-accessibility, whose triggers claim screen-reader support and bring ARIA and axe-core advice.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-ios", "../../../plugins/tsh-stack-frontend"]
+runs: 1
+execution:
+  prompt: |
+    Our repo has ios/ (the iPhone app, SwiftUI) and web/ (React + Vite).
+    VoiceOver users say the iPhone app's product detail screen is unusable: the favourite and share buttons are read as just "button", and the price and rating are read as four separate elements. Fix it so the screen works well with VoiceOver and at the largest Dynamic Type sizes.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: ios-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?implementing-ios"'
+    arm: with-only
+  - name: web-a11y-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?ensuring-accessibility"'
+    min: 0
+    max: 0
