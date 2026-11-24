@@ -60,6 +60,12 @@ CONSTRAINT orders_customer_fk FOREIGN KEY (tenant_id, customer_id)
 -- inserting an order for tenant 1 that points at tenant 2's customer now fails
 ```
 
+  A composite foreign key like this cannot be `ON DELETE SET NULL`: it would null
+  `tenant_id`, which is `NOT NULL`, and MySQL rejects the table (`ERROR 1830`). For
+  an optional link, make only the link column nullable (`customer_id BIGINT NULL`)
+  and keep the default `RESTRICT`: a row whose `customer_id` is `NULL` is not
+  checked, so the application clears the link before it deletes the parent.
+
 - One place in the application applies the tenant filter (a repository base class,
   an ORM global scope or filter), and tests prove that a query for one tenant cannot
   return another's rows.
@@ -74,7 +80,8 @@ updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_T
 `ON UPDATE` fires only when the row actually changes: an `UPDATE` that sets the same
 values leaves `updated_at` alone. Who made the change (`created_by`, `updated_by`)
 comes from the application. A full history of changes needs a history table, written
-by the application or by triggers; triggers do not fire for foreign key cascades.
+by the application or by triggers; triggers do not fire for foreign key cascades
+(on 9.7, only in a session with `enable_cascade_triggers = ON`).
 
 ## Optimistic locking
 

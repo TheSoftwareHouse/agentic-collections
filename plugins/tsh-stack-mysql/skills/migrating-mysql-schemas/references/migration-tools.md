@@ -71,7 +71,10 @@ it applied instead of running it:
 | Rails | Insert the version into `schema_migrations` |
 | Django | `python manage.py migrate <app> <migration> --fake` |
 | Alembic | `alembic stamp <revision>` |
-| Flyway, Liquibase, TypeORM, Knex | Verify; each has its own history table |
+| Flyway | Run `migrate` with `skipExecutingMigrations=true`, which records pending migrations without running them |
+| Liquibase | `liquibase mark-next-changeset-ran` (or `changelog-sync` for every pending one) |
+| TypeORM | `typeorm migration:run --fake`, which marks **every** pending migration applied: run it when this is the only one pending |
+| Knex | Insert the file name and batch into the `knex_migrations` table |
 
 ## What generators get wrong
 

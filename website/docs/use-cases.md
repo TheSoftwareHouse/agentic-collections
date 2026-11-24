@@ -225,13 +225,14 @@ From then on, [`navigating-project-context`](/docs/plugins/tsh-product-managemen
 
 ## Stacks
 
-Stack plugins add what changes with the language, framework or cloud, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
+Stack plugins add what changes with the language, framework, cloud or database engine, and install at project scope. They plug into the work above: for example, `reviewing-code` loads whichever stack skill matches the change's framework and applies its checklist.
 
 - **Frontend:** [`implementing-frontend`](/docs/plugins/tsh-stack-frontend/skills/implementing-frontend) covers any change to frontend application code, React today, with or without a design, and requires a Figma read before markup when a design exists.
 - **Node.js:** [`implementing-nestjs-api`](/docs/plugins/tsh-stack-nodejs/skills/implementing-nestjs-api) guides implementation and review of NestJS 11 REST APIs with `@nestjs/cqrs` and TypeORM 0.3.
 - **PHP:** [`@tsh-stack-php:php-code-reviewer`](/docs/plugins/tsh-stack-php/agents/php-code-reviewer) reviews PHP and Symfony changes against the project's own PHP and Symfony versions, runs the project's linters and static analysis, and returns a structured findings report.
 - **Serverless:** [`configuring-serverless-service`](/docs/plugins/tsh-stack-serverless/skills/configuring-serverless-service) defines an AWS Lambda service on OSLS with least-privilege IAM without wildcard resources, per-function reserved concurrency, secrets resolved at runtime, and assertions over the packaged CloudFormation template.
 - **Python:** [`writing-data-models`](/docs/plugins/tsh-stack-python/skills/writing-data-models) governs data modelling with Pydantic v2, dataclasses, SQLModel and SQLAlchemy 2.0.
+- **Databases:** [`migrating-postgresql-schemas`](/docs/plugins/tsh-stack-postgresql/skills/migrating-postgresql-schemas) and [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) make a migration on a table with production data say what it locks, blocks and replays on replicas before it ships, whichever ORM wrote it; each engine's plugin also covers slow queries and table design. `reviewing-code` loads the engine's migration or query skill when a change carries a migration or a new query shape.
 - **Cloud cost audits:** [`auditing-aws-cost`](/docs/plugins/tsh-stack-aws/skills/auditing-aws-cost), [`auditing-gcp-cost`](/docs/plugins/tsh-stack-gcp/skills/auditing-gcp-cost) and [`auditing-azure-cost`](/docs/plugins/tsh-stack-azure/skills/auditing-azure-cost) read the infrastructure code first, validate it against the live account, project or subscription with read-only calls, find drift and shadow resources, check tag or label compliance, attribute measured spend, and produce a saved report.
 
 ## Foundation: `tsh-core`

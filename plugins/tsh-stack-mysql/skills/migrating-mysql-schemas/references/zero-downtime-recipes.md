@@ -66,7 +66,10 @@ SET SESSION foreign_key_checks = 1;
 The `ALTER` takes the metadata lock on `customers` as well as `orders`, so a long
 transaction on either table blocks it, and queues the queries on both. Run the
 orphan query again after the migration: a row written between the check and the
-`ALTER` is not validated either. New writes after it are. Never set
+`ALTER` is not validated either. New writes after it are. The migration is done only
+when that second run returns nothing; if it finds rows, repair them (point them at
+an existing parent, null the column, or delete them, as the data owner decides) and
+run it again. Never set
 `foreign_key_checks` globally. gh-ost cannot migrate tables that have foreign keys,
 so a table with one is later limited to native DDL or pt-online-schema-change.
 
@@ -78,7 +81,11 @@ so a table with one is later limited to native DDL or pt-online-schema-change.
 3. Migrate: `ALTER TABLE t MODIFY c <same type> NOT NULL, ALGORITHM=INPLACE, LOCK=NONE;`
 
 The `MODIFY` must repeat the column's whole definition (type, charset, default,
-comment), or those change too. Step 3 rebuilds the table: on a large one it is a tool
+comment), or those change too. Step 3 also depends on strict mode in the migration's
+own session: check `SELECT @@SESSION.sql_mode` includes `STRICT_TRANS_TABLES` (the
+default, but a driver or migration tool can override it). Without it the in-place
+`ALTER` is refused (`ERROR 1846`), and a `COPY` stores `0` or `''` for each remaining
+`NULL` with only a warning. Step 3 rebuilds the table: on a large one it is a tool
 step for the replica lag, not for locks. A `NULL` written between steps 2 and 3 fails
 it; step 1 prevents that.
 
@@ -88,18 +95,25 @@ There is no online path: adding `CHECK` is copy on every supported version, and
 there is no equivalent of PostgreSQL's `NOT VALID`. On a large table, add it through a
 tool, which applies the `ALTER` clause to its own copy of the table (confirm with the
 tool's dry run that it accepts it), or keep the rule in the application and say so
-in the hand-over. Check that no existing
-row violates it first, or the copy fails at the end.
+in the hand-over. Check that no existing row violates it first
+(`SELECT COUNT(*) FROM t WHERE NOT (<predicate>)` must be 0): native DDL fails at the
+end of the copy, but a tool may silently drop those rows, and gh-ost does unless it
+runs with `--panic-on-warnings` (see
+[online-schema-change-tools.md](./online-schema-change-tools.md#what-both-need-from-the-migration)).
 
 ## Rename a column
 
 Running code reads the old name until the deploy finishes, so the rename itself
 (instant on 8.0.28+) breaks it. Expand and contract:
 
-1. Add the new column (instant).
-2. Deploy code that writes both columns and reads the old one.
+1. Add the new column, nullable and with no default (instant).
+2. Deploy code that writes both columns and reads the old one. Confirm every writer
+   runs it (workers, scripts, old instances) before step 3; a write to the old
+   column alone after its row was backfilled is lost at step 4.
 3. Backfill the new column from the old one in batches.
-4. Deploy code that reads the new column, still writing both.
+4. Check that the two columns agree on every row
+   ([backfilling-data.md](./backfilling-data.md)), then deploy code that reads the new
+   column, still writing both.
 5. Deploy code that stops writing the old column.
 6. Drop the old column in a later release.
 
@@ -111,20 +125,30 @@ say which was chosen and why.
 
 A type change is copy. Either run it through a tool, or expand and contract:
 
-1. Add the new column with the new type (instant).
-2. Deploy code that writes both.
+1. Add the new column with the new type, nullable and with no default (instant).
+2. Deploy code that writes both, and confirm every writer runs it.
 3. Backfill in batches.
-4. Switch reads, then writes, to the new column; drop the old one in a later release.
+4. Check that the columns agree on every row, then switch reads, then writes, to the
+   new column; drop the old one in a later release.
+
+Expand and contract does not work for an `AUTO_INCREMENT` primary key: a table has
+one `AUTO_INCREMENT` column and it must be the key, so the new column cannot take
+over generating ids. Widen a key in place, through a tool or a window, as below.
 
 An `INT` primary key that is running out (2,147,483,647 signed) is the case that
 cannot wait: the table rejects inserts when it is exhausted. Check how close it is:
 
 ```sql
-SELECT MAX(id) / 2147483647 AS used FROM orders;  -- 4294967295 for INT UNSIGNED
+SET SESSION information_schema_stats_expiry = 0;  -- the value is cached for a day otherwise
+SELECT AUTO_INCREMENT / 2147483647 AS used        -- 4294967295 for INT UNSIGNED
+FROM information_schema.TABLES
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'orders';
 ```
 
-(`information_schema.TABLES.AUTO_INCREMENT` is cached for up to a day by default, so
-it can be stale.)
+Read the counter, not `MAX(id)`: failed and rolled-back inserts,
+`INSERT ... ON DUPLICATE KEY UPDATE`, bulk inserts and an explicit `AUTO_INCREMENT=`
+consume values without leaving a row, so `MAX(id)` can look empty while the next
+insert takes the last value.
 
 When other tables reference the key, the two sides of a foreign key must have the
 same type at every moment, even with `foreign_key_checks=0`, so neither side can be
@@ -150,7 +174,9 @@ change. Plan it while there is headroom.
    entity or model first: many select every mapped column.
 2. Let that release run long enough that no old instance remains.
 3. Migrate: `ALTER TABLE t DROP COLUMN c, ALGORITHM=INSTANT;` (8.0.29+; before that,
-   `INPLACE, LOCK=NONE`, which rebuilds).
+   `INPLACE, LOCK=NONE`, which rebuilds). A column that is part of an index is
+   refused as `INSTANT` on every version and needs `INPLACE, LOCK=NONE`, a rebuild:
+   a tool step on a large table.
 
 Dropping a column is one-way: only a restore brings the data back.
 

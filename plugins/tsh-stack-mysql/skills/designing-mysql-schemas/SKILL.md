@@ -48,7 +48,7 @@ This skill does not ship the change. A table that already holds data changes thr
 | MUST | Use `utf8mb4` for text, never `utf8` or `utf8mb3`, and choose each text column's collation deliberately: the default `utf8mb4_0900_ai_ci` treats `Anna`, `anna` and `ánna` as equal, in unique keys too. |
 | MUST | Give every table an explicit primary key; prefer `BIGINT` (`UNSIGNED` if the project does) `AUTO_INCREMENT` or a time-ordered UUID stored as `BINARY(16)`. |
 | MUST | Make a column `NOT NULL` unless absence is a real, distinct state of the data. |
-| MUST | Store points in time as `DATETIME(3)` or `DATETIME(6)` in UTC, with the connection's `time_zone` set to `+00:00`. Not `TIMESTAMP`, whose range ends in January 2038. |
+| MUST | Store points in time as `DATETIME(3)` or `DATETIME(6)` in UTC, not `TIMESTAMP`, whose range ends in January 2038. `DATETIME` stores the session's wall-clock value, so set the server's default `time_zone` to `+00:00` (the parameter group on RDS and Aurora), not only the application connection's. |
 | MUST | Store money as `DECIMAL` with an explicit scale, or as a `BIGINT` count of the smallest unit, with the currency stored beside it. Never `FLOAT` or `DOUBLE`. |
 | MUST | Declare a foreign key for every reference to another table's row, choose its `ON DELETE` deliberately, and give both columns identical types and signedness. |
 | MUST | Enforce invariants that must hold for every row with constraints (`CHECK`, `UNIQUE`, foreign keys), not only in application validation. |

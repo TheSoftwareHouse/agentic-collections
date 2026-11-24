@@ -32,22 +32,24 @@ fails with `ERROR 1221`.
 | Operation | Request | Rebuilds | Notes |
 | :-- | :-- | :-- | :-- |
 | Add a column (nullable, or `NOT NULL` with a `DEFAULT`) | `INSTANT` | No | Any position on `8.0.29+`; only last before that. Not instant on tables with a `FULLTEXT` index or `ROW_FORMAT=COMPRESSED` (for `FULLTEXT`, see below) |
-| Drop a column | `INSTANT` on `8.0.29+` | No | Before 8.0.29: `INPLACE`, rebuilds |
+| Drop a column | `INSTANT` on `8.0.29+` | No | Before 8.0.29: `INPLACE`, rebuilds. A column that is part of an index is refused as `INSTANT` on every version: `INPLACE, LOCK=NONE`, rebuilds |
 | Rename a column | `INSTANT` on `8.0.28+` | No | `INPLACE` when another table's foreign key references it. Breaks running code: see the recipes |
 | Set or drop a column default | `INSTANT` | No | |
 | Append a member to the end of an `ENUM` or `SET` | `INSTANT` | No | Reordering or removing members is copy, and so is growing the storage size: an `ENUM` past 255 members, a `SET` past 8, 16, 24 or 32 |
 | Add a `VIRTUAL` generated column | `INSTANT` | No | A `STORED` one is copy |
 | Add a secondary or unique index | `INPLACE, LOCK=NONE` | No | Takes time proportional to the table; a unique index fails at the end if duplicates exist or arrive during the build |
 | Add an index on an expression | Two statements: `VIRTUAL` column `INSTANT`, then index it `INPLACE, LOCK=NONE` | No | A functional index `((lower(email)))` in one statement needs `LOCK=SHARED`, so it blocks writes |
+| Add a `FULLTEXT` index | `INPLACE, LOCK=SHARED` | **Yes**, the first one | `LOCK=NONE` is refused, so it blocks writes for the build. The first `FULLTEXT` index on a table rebuilds it to add a hidden document-id column |
+| Add a multi-valued index on a JSON array (`(CAST(... AS ... ARRAY))`) | **`COPY` only** | Yes | Refused in place |
 | Drop, rename, or make an index invisible or visible | `INPLACE, LOCK=NONE` | No | Metadata only; `INSTANT` is refused for visibility |
 | Widen a `VARCHAR` within the same length-prefix size | `INPLACE, LOCK=NONE` | No | Up to 255 bytes uses a 1-byte prefix, beyond that 2. In `utf8mb4` (4 bytes a character) `VARCHAR(63)` is 252 bytes and `VARCHAR(64)` is 256, so crossing that line is copy. Shrinking is copy |
-| Make a column `NOT NULL` | `INPLACE, LOCK=NONE` | **Yes** | Fails on the first `NULL` it finds (strict mode). Backfill first |
+| Make a column `NOT NULL` | `INPLACE, LOCK=NONE` | **Yes** | Fails on the first `NULL` it finds. Needs strict mode in the session: without it the in-place request is refused (`ERROR 1846`) and a `COPY` stores `0` or `''` for the `NULL`s. Backfill first |
 | Make a column nullable | `INPLACE, LOCK=NONE` | **Yes** | |
 | Change a column's type (`INT` to `BIGINT`, `VARCHAR` to `TEXT`) | **`COPY` only** | Yes | See the recipes and the online schema change tools |
-| Change a column's character set or collation | `INPLACE, LOCK=NONE` when the column is not indexed, the source is not `latin1` and the column stays within its length-prefix size; otherwise **`COPY`** | No, when in place | The copy cases are refused in place with `ERROR 1846`, so stating the clauses sorts them. `utf8mb3` to `utf8mb4` grows each character from 3 to 4 bytes: `VARCHAR(80)` goes from 240 to 320 bytes and crosses the 255-byte line. `INSTANT` is refused |
+| Change a column's character set or collation | `INPLACE, LOCK=NONE` for a collation-only change, or `utf8mb3` to `utf8mb4`, on an unindexed column that stays within its length-prefix size; otherwise **`COPY`** | No, when in place | The copy cases are refused in place with `ERROR 1846`, so stating the clauses sorts them. A character-set change away from `latin1`, and `utf8mb4` to `utf8mb3` even within the prefix size, are copy. `utf8mb3` to `utf8mb4` grows each character from 3 to 4 bytes: `VARCHAR(80)` goes from 240 to 320 bytes and crosses the 255-byte line. `INSTANT` is refused |
 | Add a foreign key | **`COPY`**, unless `foreign_key_checks=0` in the session: then `INPLACE, LOCK=NONE` | No | With checks off, existing rows are **not** validated. Check for orphans first. Takes the metadata lock on the **referenced table too** |
-| Drop a foreign key | `INPLACE, LOCK=NONE` | No | Also locks the referenced table's metadata briefly |
-| Add a `CHECK` constraint | **`COPY` only** | Yes | `ALTER CHECK ... NOT ENFORCED` and `DROP CHECK` are `INSTANT`; turning one back to `ENFORCED` is copy again |
+| Drop a foreign key | `INPLACE, LOCK=NONE` | No | Waits for an exclusive metadata lock on the **referenced table too**, like adding one, and queues queries on both while it waits |
+| Add a `CHECK` constraint | **`COPY` only** | Yes | Adding it as `NOT ENFORCED` is `INSTANT`, and enforces nothing. `ALTER CHECK ... NOT ENFORCED` and `DROP CHECK` are `INSTANT`; turning one to `ENFORCED` is copy |
 | Add or replace the primary key | `INPLACE, LOCK=NONE` | **Yes** | Dropping it without adding another is copy |
 | `OPTIMIZE TABLE`, `ALTER TABLE ... FORCE` | `INPLACE` | **Yes** | Resets the instant row-version counter |
 | Convert the table's character set (`CONVERT TO CHARACTER SET`) | `INPLACE, LOCK=NONE` when every text column meets the conditions in the row above; otherwise **`COPY`** | Yes on 8.0; no on 8.4 and 9.7 | Checked converting from `utf8mb3` |
@@ -133,6 +135,16 @@ and do not replay the `ALTER`; binlog replicas of an Aurora cluster still do.
 If reads go to replicas, or failover depends on them being current, estimate the run
 time first (on a copy of production-size data) and use an online schema change tool,
 which copies in throttled chunks, when the lag is not acceptable.
+
+**The replica takes the metadata lock too, without the migration's timeout.** The
+replica's applier runs the `ALTER`, an instant one included, under the same exclusive
+metadata lock, so it waits behind any long query or open transaction on that table on
+the replica. `SET SESSION lock_wait_timeout` is not written to the binary log: the
+applier waits with the replica's global value, one year by default. While it waits,
+replication stops for every table, and new reads of that table on the replica queue
+behind it. Before the migration, run the open-transaction query below on each binlog
+replica, and keep long reports and batch jobs off the replicas until the change has
+applied there.
 
 ## Finding what blocks a migration
 

@@ -21,20 +21,23 @@ SELECT LEFT(DIGEST_TEXT, 120)               AS query,
        SUM_CREATED_TMP_DISK_TABLES          AS tmp_disk_tables,
        QUERY_SAMPLE_TEXT                    AS sample
 FROM performance_schema.events_statements_summary_by_digest
-WHERE SCHEMA_NAME = DATABASE()
+WHERE SCHEMA_NAME = 'app'   -- the application's schema, named
 ORDER BY SUM_TIMER_WAIT DESC
 LIMIT 20;
 ```
 
-Timers are in picoseconds, hence the divisions. Read, in order:
+Timers are in picoseconds, hence the divisions. Name the schema rather than writing
+`DATABASE()`: in a session with no default schema it is `NULL`, the query returns no
+rows, and that reads as "no slow queries". Read, in order:
 
 - **`total_s`**: where the database spends its time. Optimise from the top.
 - **`calls` with a low `mean_ms`**: a cheap query run very often, usually an N+1
   loop in the application. The fix is in the code, not the index.
 - **`rows_examined` far above `rows_sent`**: the query reads many rows to return
   few, the clearest sign of a missing or unusable index.
-- **`no_index_used`** and **`tmp_disk_tables`**: full scans, and sorts or groupings
-  that spilled to disk.
+- **`no_index_used`** and **`tmp_disk_tables`**: full scans, and internal temporary
+  tables (for `GROUP BY`, `DISTINCT`, a `UNION`) created on disk. Sorts that spilled
+  show in `SUM_SORT_MERGE_PASSES`, not here.
 - **`sample`**: one real statement with its literals, ready for `EXPLAIN`.
 
 The `sys` schema has the same data formatted: `sys.statement_analysis`,
@@ -59,8 +62,9 @@ matter, changed by whoever owns the server:
 
 - `slow_query_log = ON` and a `long_query_time` that catches the queries in question
   (0.5 to 1 s is common for web traffic);
-- `log_slow_extra = ON` (8.0.14+) adds rows examined, sort and temporary-table
-  details to each entry.
+- `log_slow_extra = ON` (8.0.14+) adds handler reads, sort and temporary-table
+  counts, and bytes sent to each entry. Rows examined and rows sent are in every
+  entry without it.
 
 Summarise a log with `pt-query-digest slow.log`, which ranks by total time like the
 digest table does.

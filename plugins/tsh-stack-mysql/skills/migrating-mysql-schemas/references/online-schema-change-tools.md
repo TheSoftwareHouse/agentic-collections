@@ -31,6 +31,17 @@ pt-online-schema-change otherwise. If the project already uses one, use that one
 - **A primary key, or a unique key on non-null columns.** They copy by it. A table
   without one needs a key first.
 - **Disk for a second copy** of the table and its indexes.
+- **Data that already satisfies the new definition.** Both tools copy existing rows
+  with `INSERT IGNORE`, so a row the new definition rejects is not an error: a `NULL`
+  going into a `NOT NULL` column becomes `0` or `''`, a value too long for a narrowed
+  column is truncated, and a row that breaks a new `CHECK` or unique key is left out of
+  the new table. gh-ost reports none of this unless it runs with `--panic-on-warnings`
+  (v1.1.9 or later covers every statement in a batch); pt-online-schema-change stops on
+  a `NULL` or a `CHECK` violation but only warns on truncation. Before either run, the
+  pre-checks for the change must return nothing: `COUNT(*) WHERE c IS NULL` for
+  `NOT NULL`, the negated predicate for a `CHECK`, `MAX(CHAR_LENGTH(c))` against a
+  narrower length, and duplicate groups for a new unique key. A rehearsal copies no
+  rows, so a clean one proves none of this.
 - **The metadata lock at the end.** The swap is a `RENAME TABLE`, which waits for the
   metadata lock like any DDL (see [online-ddl-and-locks.md](./online-ddl-and-locks.md)).
   A long transaction at cut-over delays it; both tools time the wait out and retry.
@@ -44,8 +55,10 @@ pt-online-schema-change otherwise. If the project already uses one, use that one
 - **Constraint names change.** gh-ost builds its copy with `CREATE TABLE ... LIKE`,
   which gives named `CHECK` constraints generated names (`..._chk_1`).
   pt-online-schema-change rewrites the table definition instead and toggles a leading
-  underscore on every constraint name, `CHECK` and foreign keys alike (below). Rename
-  them back afterwards if migrations refer to them by name.
+  underscore on every constraint name, `CHECK` and foreign keys alike (below). MySQL
+  cannot rename a constraint in place: restoring a name means dropping and re-adding
+  it, which for a `CHECK` is a table copy. Read the names after the swap and write
+  later migrations against them.
 - **Recording the change in the migration tool**, which never ran it. See
   [migration-tools.md](./migration-tools.md#changes-made-outside-the-tool).
 
@@ -57,6 +70,7 @@ gh-ost \
   --alter="MODIFY amount BIGINT NOT NULL" \
   --max-lag-millis=1500 --chunk-size=1000 \
   --postpone-cut-over-flag-file=/tmp/ghost.postpone \
+  --panic-on-warnings \
   --assume-rbr --verbose            # rehearsal: nothing happens without --execute
 ```
 
@@ -76,7 +90,7 @@ gh-ost \
 pt-online-schema-change \
   --alter "ADD CONSTRAINT orders_amount_ck CHECK (amount >= 0)" \
   --max-lag 2 --chunk-time 0.5 \
-  --alter-foreign-keys-method auto \
+  --alter-foreign-keys-method rebuild_constraints \
   --set-vars lock_wait_timeout=5 \
   D=shop,t=orders --dry-run
 ```
@@ -87,10 +101,14 @@ pt-online-schema-change \
   and `CHECK` alike, gains or loses a leading underscore. Migrations or code that refer
   to a constraint by name must expect that.
 - `--alter-foreign-keys-method` decides how child tables that reference the altered
-  table are repointed at the new one: `rebuild_constraints` alters each child table
-  (a copy, if a child is large), `drop_swap` briefly leaves the table missing and
-  disables foreign key checks for the swap. `auto` picks between them; read the
-  choice it reports in the dry run.
+  table are repointed at the new one. Name `rebuild_constraints`: it re-adds each
+  child's foreign key with `foreign_key_checks=0`, which runs in place on 8.0 and
+  later; its cost is an exclusive metadata lock on each child table, so each one
+  queues behind that child's long transactions. `drop_swap` drops the original table
+  before renaming the copy in: queries fail for that moment, and a failed rename
+  leaves the table gone. Use it only with explicit agreement. Never use `auto`: a dry
+  run does not resolve it, and on `--execute` it switches to `drop_swap` when a child
+  table is large, which is exactly the busy-parent case.
 
 ## Managed platforms
 

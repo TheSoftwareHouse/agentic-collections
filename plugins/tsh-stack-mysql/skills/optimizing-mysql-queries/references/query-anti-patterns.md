@@ -41,18 +41,22 @@ comparisons and order both columns `DESC`.
 the plan shows a `Filter: (cast(created_at as date) = ...)` over a full scan.
 
 Rewrite as a range on the bare column:
-`WHERE created_at >= '2026-01-03' AND created_at < '2026-01-04'`. When the
-expression cannot be rewritten (case-insensitive matching under a case-sensitive
-collation), index the expression, as an indexed `VIRTUAL` column.
+`WHERE created_at >= '2026-01-03' AND created_at < '2026-01-04'`. `LOWER(email) = ?`
+needs no function under a case-insensitive collation (`_ci`, the default): drop
+`LOWER()`, and `email = ?` matches regardless of case and uses the index. Index the
+expression, as an indexed `VIRTUAL` column, only when it cannot be rewritten:
+case-insensitive matching on a `_bin` or `_cs` column, for example.
 
 ## Implicit type conversion
 
 A string column compared with a number is converted row by row, and the index on it
 is not used: `WHERE code = 1` on a `VARCHAR` column scans the table, while
 `WHERE code = '1'` is an index lookup. The opposite (a numeric column compared with a
-string literal) converts the literal once and is fine. Bind parameters with the
-column's type; ORMs and drivers that send every parameter as a string are a common
-source, and so is a JavaScript number used for a `VARCHAR` identifier.
+string literal) converts the literal once and is fine. Only a number bound to a
+string column loses the index, so a driver that sends every parameter as a string
+does no harm here. Bind parameters with the column's type; the usual source is a
+JavaScript or PHP number used for a `VARCHAR` identifier, or an ORM field typed as a
+number over a string column.
 
 ## Joining columns with different character sets or collations
 
@@ -68,8 +72,13 @@ and collation identical, a schema change for `designing-mysql-schemas`. Compare 
 
 `WHERE customer_id = ? OR status = ?` cannot use one index for both. MySQL sometimes
 merges two indexes (`Using union(...)` in the plan, type `index_merge`), often it
-scans. Rewrite as a `UNION` of two indexed queries (`UNION ALL` when they cannot
-overlap) when the plan shows a scan and both conditions are selective.
+scans. When the plan shows a scan and both conditions are selective, rewrite as two
+indexed queries joined by a `UNION`.
+
+`UNION` removes duplicate rows, including duplicates the `OR` query returns, so it
+gives the same result only when the select list contains a unique key such as the
+primary key. Otherwise use `UNION ALL` and exclude the first branch's rows from the
+second: `... WHERE status = ? AND NOT (customer_id <=> ?)`.
 
 ## Leading wildcards
 
@@ -97,7 +106,7 @@ in the application, or sample with a random range of the primary key.
 
 ## Large IN lists
 
-Beyond `eq_range_index_dive_limit` (200) values, the optimizer stops estimating
+At `eq_range_index_dive_limit` (200) values and above, the optimizer stops estimating
 each value from the index and uses averages; on skewed data the plan can flip to a
 scan. Batch the list, or join to a temporary table of the values.
 

@@ -5,14 +5,14 @@ sidebar_position: 2
 description: Finds and fixes slow MySQL queries from evidence, from performance_schema digests and EXPLAIN ANALYZE to the index or query change that fixes them.
 sources:
   - plugins/tsh-stack-mysql/skills/optimizing-mysql-queries/
-sources_hash: "b50784a961b77a4acd708efb1f9ebb288db76482cb84deffe3030f5ca1029574"
+sources_hash: "8b45f2cef2cab6aa7e5def96a9626063c53ab5142e57d424dce1f0598f3f8c8b"
 ---
 
 # Optimizing MySQL Queries
 
 **Plugin:** [`tsh-stack-mysql`](/docs/plugins/tsh-stack-mysql/)  
 **Invoke:** `/tsh-stack-mysql:optimizing-mysql-queries`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) point slow-query work at it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
+**Used by:** [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) point slow-query work at it. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent are told to load the database engine's skill that covers a change under review, which for a new query shape is this one; that path has not been measured.
 
 A slow query is fixed by evidence, not by adding indexes until it improves. The skill measures which queries cost the most time, reads their actual plans, changes one thing and measures again, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 

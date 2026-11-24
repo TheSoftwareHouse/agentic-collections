@@ -8,8 +8,9 @@ the default strict `sql_mode`.
 
 - **`VARCHAR(n)`** counts characters, not bytes. Give it a real limit from the domain.
   Three byte limits make the number matter in `utf8mb4` (4 bytes a character):
-  an index key holds at most 3,072 bytes (`VARCHAR(768)` fully indexed); all
-  `VARCHAR` columns of a row share 65,535 bytes; and a column whose maximum is up to
+  an index key holds at most 3,072 bytes (`VARCHAR(768)` fully indexed); a row's
+  columns together may declare at most 65,535 bytes (`TEXT` and `BLOB` count only
+  their pointer, so a wide row moves text there); and a column whose maximum is up to
   255 bytes has a 1-byte length prefix, more than that a 2-byte one, so widening
   across that line later copies the table (`VARCHAR(63)` to `VARCHAR(64)` in
   `utf8mb4`).
@@ -66,14 +67,21 @@ copies the table, so decide now.
 
 | Type | Stores | Range |
 | :-- | :-- | :-- |
-| `DATETIME(fsp)` | The value as given, no time zone | Years 1000 to 9999 |
-| `TIMESTAMP(fsp)` | UTC, converted from and to the session `time_zone` | **1970 to 2038-01-19 03:14:07 UTC** |
+| `DATETIME(fsp)` | The wall-clock value as given, no time zone | Years 1000 to 9999 |
+| `TIMESTAMP(fsp)` | The instant, as UTC, converted from and to the session `time_zone` | **1970 to 2038-01-19 03:14:07 UTC** |
 | `DATE`, `TIME` | Calendar dates, times of day | |
 
-Use **`DATETIME(3)` or `DATETIME(6)` holding UTC**, and set the connection's
-`time_zone` to `+00:00` in the driver or ORM so `NOW()` and `CURRENT_TIMESTAMP` are
-UTC too. `TIMESTAMP` rejects `2038-01-20` today, and its silent conversion through
-the session time zone makes the stored value depend on connection settings.
+Use **`DATETIME(3)` or `DATETIME(6)` holding UTC**. `TIMESTAMP` stores the instant,
+whatever the session's time zone, but its range ends in January 2038: it rejects
+`2038-01-20` today. `DATETIME` stores whatever wall-clock value the session gives
+it, and `NOW()`, `DEFAULT CURRENT_TIMESTAMP` and `ON UPDATE` follow the session
+`time_zone`. So set **the server's default `time_zone` to `+00:00`** (the parameter
+group on RDS and Aurora), not only the application's connection in the driver or
+ORM: a migration, a cron script, a BI tool or a console session connects with the
+server default, `SYSTEM` unless changed, and stores local time with no error. The
+same insert under `SET time_zone = '+05:00'` writes a `DATETIME` five hours ahead
+of one written under `'+00:00'`; a `TIMESTAMP` column stores the same instant for
+both.
 
 - Pick the fractional precision the application keeps: 3 for JavaScript `Date`, 6
   for microseconds. MySQL **rounds** extra fractional digits rather than truncating:
@@ -96,15 +104,20 @@ the session time zone makes the stored value depend on connection settings.
   `innodb_autoinc_lock_mode=2` also interleaves the values of concurrent multi-row
   inserts. The counter survives restarts from 8.0.
 - **UUIDs** fit when IDs are generated outside the database or must not be
-  guessable. The table is clustered by its primary key, and every secondary index
-  carries it, so:
+  guessable (UUIDv7 keeps 74 random bits; version 1 does not, see below). The
+  table is clustered by its primary key, and every secondary index carries it, so:
   - store them as **`BINARY(16)`**, never `CHAR(36)` (36 bytes, a 1-byte prefix, and
     a collation);
   - use a **time-ordered** UUID. Random UUIDv4 keys scatter inserts across the whole
     clustered index. MySQL has no UUIDv7 function, even on 9.7: generate it in the
     application and store it with `UUID_TO_BIN(?)`, read it with `BIN_TO_UUID(id)`.
-    MySQL's own `UUID()` is version 1; `UUID_TO_BIN(UUID(), 1)` reorders it to sort
-    by time.
+    **Never pass the swap flag** (`UUID_TO_BIN(?, 1)`) for a UUIDv7: it moves the
+    third group of the text form (the version and random bits in v7) ahead of the
+    timestamp and destroys the time order v7 already has.
+  - MySQL's own `UUID()` is version 1, built from a timestamp and the host's node
+    ID, so it is guessable: not for IDs that must not be. Where that does not
+    matter, `UUID_TO_BIN(UUID(), 1)` reorders it to sort by time, and
+    `BIN_TO_UUID(id, 1)` reads it back.
 - A common split: a `BIGINT` primary key internally, and a unique `BINARY(16)` public
   ID for URLs and APIs.
 - Every table needs an explicit primary key. Without one InnoDB uses a hidden row ID,

@@ -32,8 +32,16 @@ CREATE TABLE order_lines (
 );
 ```
 
-- **Types must match exactly**, signedness and, for strings, character set and
-  collation included; otherwise the foreign key is rejected.
+- **Types must match**: the same integer type and signedness, and for strings the
+  same character set and collation (a `VARCHAR` length may differ); otherwise the
+  foreign key is rejected.
+- **Reference a primary or unique key of the parent.** 8.0 accepts a foreign key to
+  a non-unique parent index; 8.4 and 9.7 reject it (`ERROR 6125`), so a schema built
+  on 8.0 can fail to load on an upgrade.
+- **Declare it as a table constraint** (`CONSTRAINT … FOREIGN KEY (col) REFERENCES
+  …`). An inline column reference, `customer_id BIGINT REFERENCES customers (id)`, is
+  parsed and **silently ignored** on 8.0 and 8.4: no constraint is created and an
+  orphan insert succeeds. 9.7 enforces it. Check with `SHOW CREATE TABLE`.
 - **The referencing column needs an index**; InnoDB creates one if none exists, named
   after the constraint. A composite index that starts with the column serves too.
 - **Choose `ON DELETE`** for what the domain means:
@@ -46,8 +54,10 @@ CREATE TABLE order_lines (
 - **Cascades are invisible to triggers**, and on 8.0 and 8.4 to the binary log: the
   child rows a cascade deletes are not logged as row events, so change data capture
   (Debezium, DMS) and anything else reading the binlog never sees them. On 9.7 they
-  are logged. If a consumer must see child deletions on 8.x, delete children
-  explicitly in the application.
+  are logged while `innodb_native_foreign_keys` is `OFF`, the default, and a session
+  with `enable_cascade_triggers = ON` (default `OFF`) fires triggers for them. If a
+  consumer must see child deletions on 8.x, delete children explicitly in the
+  application.
 - **No deferrable constraints.** Each row is checked as it is written, so rows that
   reference each other in a cycle need one nullable link filled in afterwards.
 - `foreign_key_checks = 0` disables checking for the session: for restoring dumps

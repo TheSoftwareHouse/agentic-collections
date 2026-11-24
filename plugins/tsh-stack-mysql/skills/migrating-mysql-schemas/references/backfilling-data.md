@@ -46,7 +46,11 @@ WHERE id > :last_id AND id <= :batch_end
   or the replica-lag metric of the managed service, and wait while it is above a
   threshold of a second or two.
 - **Make it resumable and idempotent.** The `status_code IS NULL` (or a comparison
-  with the target value) skips rows already done, so a restart repeats nothing.
+  with the target value) skips rows already done, so a restart repeats nothing. An
+  `IS NULL` guard works only on a column added as nullable with no default: added
+  with a non-null default, it matches no row and the backfill does nothing. And it
+  skips a row whose source changes after its batch, which is why every writer must
+  write both columns before the backfill starts (below).
 - **Run it outside the schema migration.** MySQL DDL commits on its own, so a backfill
   in a migration file is not even atomic with the schema change; it is the one big
   `UPDATE` again, blocking the deploy for its whole run. Use a separate script or job
@@ -57,7 +61,15 @@ WHERE id > :last_id AND id <= :batch_end
 
 New rows written during the backfill must already be correct: deploy the code that
 writes the new column before the backfill starts, so the backfill only has to catch
-up on old rows.
+up on old rows. "Deployed" means every writer: workers, scheduled jobs, scripts and
+any old application instance still running. A write that reaches only the old column
+after a row's batch leaves the new column stale, and the guard never revisits it.
+When the backfill copies one column into another, finish with a check that they
+agree before anything reads the new one:
+
+```sql
+SELECT COUNT(*) FROM orders WHERE NOT (new_col <=> old_col);  -- must be 0
+```
 
 ## Deleting in bulk
 

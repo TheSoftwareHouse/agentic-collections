@@ -5,14 +5,14 @@ sidebar_position: 3
 description: Designs and reviews MySQL tables at the database level, whatever ORM maps them, with types, collations, keys and constraints that keep bad data out.
 sources:
   - plugins/tsh-stack-mysql/skills/designing-mysql-schemas/
-sources_hash: "0f40a5012bb6f7e469a986f45149d74ae7e80304d1c93c4e2dc7dbff3b386812"
+sources_hash: "a80bbee5ef73797d70ae4fbe23fa1a1eaddaffb2cbe258e941b3da3be60bfd9a"
 ---
 
 # Designing MySQL Schemas
 
 **Plugin:** [`tsh-stack-mysql`](/docs/plugins/tsh-stack-mysql/)  
 **Invoke:** `/tsh-stack-mysql:designing-mysql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin.
+**Used by:** no agent loads it. [`migrating-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/migrating-mysql-schemas) and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hand table and column design to it. The `reviewing-code` skill in `tsh-product-engineering` loads the database engine's skill for a schema migration or a new query shape, which are the other two skills of this plugin, not this one.
 
 The schema is the one place a rule holds for every writer: every service, script, migration and console session. On MySQL two settings decide whether its rules hold at all: strict `sql_mode` and the collation. The skill designs and reviews tables so that the database enforces the invariants that must hold for every row, on MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 
@@ -43,7 +43,7 @@ Use it when creating tables for a new feature, reviewing an entity or schema cha
 | MUST | Use `utf8mb4`, and choose each text column's collation deliberately |
 | MUST | Give every table an explicit primary key |
 | MUST | Make a column `NOT NULL` unless absence is a real, distinct state |
-| MUST | Store points in time as `DATETIME` in UTC, not `TIMESTAMP` |
+| MUST | Store points in time as `DATETIME` in UTC, not `TIMESTAMP`, and set the server's default `time_zone` to `+00:00`, not only the application connection's |
 | MUST | Store money as `DECIMAL` with an explicit scale, or as an integer count of the smallest unit, with the currency beside it |
 | MUST | Declare a foreign key for every reference, choose its `ON DELETE` deliberately, and match both columns' types exactly |
 | MUST | Enforce invariants with constraints, not only in application validation |

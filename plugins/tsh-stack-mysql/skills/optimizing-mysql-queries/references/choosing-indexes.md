@@ -35,7 +35,11 @@ Order the columns:
    in the sort's order lets MySQL read the first rows in order and stop, with no
    sort: `WHERE status = ? ORDER BY created_at DESC LIMIT 20` on
    `(status, created_at)`. Mixed directions (`ORDER BY a ASC, b DESC`) need a
-   matching descending index part, supported from 8.0.
+   matching descending index part, supported from 8.0. This needs `=` on the leading
+   columns: an `IN` list does not carry over, and `WHERE a IN (1, 2) ORDER BY b
+   LIMIT 5` on `(a, b)` still sorts (`Using filesort`). Where that sort is the cost,
+   a `UNION ALL` of one `ORDER BY b LIMIT 5` query per value, sorted and limited
+   again outside, reads each in index order.
 
 Check `key_len` in the plan to see how many columns a lookup actually used.
 
@@ -53,7 +57,7 @@ most, not every query.
 | :-- | :-- | :-- |
 | B-tree | Equality, ranges, sorting, prefix `LIKE 'abc%'` | The default and almost always the answer |
 | Prefix (`col(20)`) | Long `VARCHAR` or `TEXT` columns that must be indexed | Cannot cover a query or serve `ORDER BY`; pick a length that keeps it selective |
-| Functional (`((LOWER(email)))`, `8.0.13+`) | A condition on an expression that cannot be rewritten | The query must use the exact expression. Adding one in a single statement blocks writes; ship it as an indexed `VIRTUAL` column |
+| Functional (`((LOWER(email)))`, `8.0.13+`) | A condition on an expression that cannot be rewritten. `LOWER(email)` qualifies only on a `_bin` or `_cs` column; under the default `_ci` collation drop `LOWER()` instead | The query must use the exact expression. Adding one in a single statement blocks writes; ship it as an indexed `VIRTUAL` column |
 | Multi-valued (`8.0.17+`) | Membership in a JSON array: `MEMBER OF`, `JSON_CONTAINS`, `JSON_OVERLAPS` | `INDEX ((CAST(doc->'$.tags' AS CHAR(32) ARRAY)))` |
 | `FULLTEXT` | Word search in text | `MATCH ... AGAINST`; its own relevance rules and stopwords. A table with one cannot add or drop columns instantly, and every table rebuild on it is a full copy that blocks writes |
 | Unique | Enforcing uniqueness; also an index | Multiple `NULL`s are allowed. Collation decides what counts as equal |
@@ -76,10 +80,13 @@ column, owned by `designing-mysql-schemas`.
 ## Unused and redundant indexes
 
 ```sql
-SELECT * FROM sys.schema_unused_indexes WHERE object_schema = DATABASE();
+SELECT * FROM sys.schema_unused_indexes WHERE object_schema = 'app';
 SELECT table_name, redundant_index_name, dominant_index_name
-FROM sys.schema_redundant_indexes WHERE table_schema = DATABASE();
+FROM sys.schema_redundant_indexes WHERE table_schema = 'app';
 ```
+
+Name the schema: `DATABASE()` is `NULL` in a session without a default schema, and
+an empty result then looks like a clean bill.
 
 - "Unused" means not used **since the server last started**, and only on this
   server: a replica that serves reports may use what the primary does not. Check the

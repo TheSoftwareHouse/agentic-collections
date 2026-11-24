@@ -5,14 +5,14 @@ sidebar_position: 1
 description: Writes and reviews MySQL schema migrations that run against a live InnoDB table without blocking writes or stalling replicas.
 sources:
   - plugins/tsh-stack-mysql/skills/migrating-mysql-schemas/
-sources_hash: "9ca67cc00167208cef95d2070c03e039e9c57c10c51e5372c9fbb265826d03a8"
+sources_hash: "0983429fa3be6985e1f39f71626578d3a5c6ea4230539e205912a69ec0eb3339"
 ---
 
 # Migrating MySQL Schemas
 
 **Plugin:** [`tsh-stack-mysql`](/docs/plugins/tsh-stack-mysql/)  
 **Invoke:** `/tsh-stack-mysql:migrating-mysql-schemas`, and Claude also loads it when the work matches its description  
-**Used by:** no agent loads it. [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) hands it every change to a table that already holds data, and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hands it the index a slow query needs. The `reviewing-code` skill in `tsh-product-engineering` loads whichever stack skill is available in the session for the change under review, but names no plugin; this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
+**Used by:** [`designing-mysql-schemas`](/docs/plugins/tsh-stack-mysql/skills/designing-mysql-schemas) hands it every change to a table that already holds data, and [`optimizing-mysql-queries`](/docs/plugins/tsh-stack-mysql/skills/optimizing-mysql-queries) hands it the index a slow query needs. In `tsh-product-engineering`, the `reviewing-code` skill and the `code-reviewer` agent load the database engine's skill that covers a change under review, which for a schema migration is this one, and this skill loads `reviewing-code` in turn when the whole change or its merge readiness is under review, not only the migration.
 
 A migration that is correct SQL can still take production down. On MySQL three things decide it: the metadata lock every `ALTER TABLE` waits for, whether the statement copies the table while blocking writes, and how long binlog replicas take to replay it. The skill makes those three explicit before a migration ships, for MySQL 8.0, 8.4 and 9.7, Aurora MySQL 3 and Aurora MySQL 8.4 included. On MariaDB or another engine it says it does not apply and stops; below 8.0 it stops and says the version is unsupported.
 
@@ -22,9 +22,9 @@ Use it when a migration adds, changes or drops a column, index or constraint on 
 
 | Area | Coverage |
 | :-- | :-- |
-| **Online DDL and locks** | Which algorithm (`INSTANT`, `INPLACE`, `COPY`) each common `ALTER` gets and whether it blocks writes, checked on 8.0, 8.4 and 9.7; `ALGORITHM` and `LOCK` stated so a table copy fails instead of running; the instant row-version budget; what a rebuild costs; the metadata lock queue, on the referenced table too for a foreign key, and `lock_wait_timeout` at the start and the end of a build; replica lag; queries to find blockers |
-| **Zero-downtime recipes** | Columns added and dropped instantly, indexes built online (expression indexes in two steps), foreign keys added in place with an explicit orphan check, `NOT NULL` after a backfill, `CHECK` constraints with no online path, renames and type changes through expand-and-contract, `INT` to `BIGINT` keys that other tables reference, indexes dropped after a release as invisible |
-| **Online schema change tools** | gh-ost and pt-online-schema-change compared: foreign keys, triggers, binlog needs, throttling and cut-over; RDS and Aurora notes; PlanetScale and Vitess |
+| **Online DDL and locks** | Which algorithm (`INSTANT`, `INPLACE`, `COPY`) each common `ALTER` gets and whether it blocks writes, checked on 8.0, 8.4 and 9.7; `ALGORITHM` and `LOCK` stated so a table copy fails instead of running; the instant row-version budget; what a rebuild costs; the metadata lock queue, on the referenced table too for a foreign key, and `lock_wait_timeout` at the start and the end of a build; replica lag, and the replica's applier waiting for the same lock without the migration's timeout; queries to find blockers |
+| **Zero-downtime recipes** | Columns added and dropped instantly, indexes built online (expression indexes in two steps), foreign keys added in place with an explicit orphan check, `NOT NULL` after a backfill, `CHECK` constraints with no online path, renames and type changes through expand-and-contract with every writer on the dual-write code before the backfill, `INT` to `BIGINT` keys that other tables reference, sized from the `AUTO_INCREMENT` counter rather than `MAX(id)`, indexes dropped after a release as invisible |
+| **Online schema change tools** | gh-ost and pt-online-schema-change compared: foreign keys, triggers, binlog needs, throttling and cut-over; the `INSERT IGNORE` row copy that can silently change or drop rows, and the pre-checks that rule it out; `rebuild_constraints` named, never `auto`; RDS and Aurora notes; PlanetScale and Vitess |
 | **Backfills** | Closed primary-key ranges in small transactions, gap locks and undo history, pausing on replica lag, outside the schema migration, bulk deletes |
 | **Migration tools** | MySQL's non-transactional DDL in Laravel, Doctrine, TypeORM, Prisma, Rails, Django, Alembic, Knex, Flyway and Liquibase; how each carries `ALGORITHM`, `LOCK` and `lock_wait_timeout`; how each records a change made outside it; what generators get wrong |
 
@@ -44,8 +44,8 @@ Use it when a migration adds, changes or drops a column, index or constraint on 
 | MUST | Name the algorithm, rebuild and write blocking of every statement before calling a migration safe |
 | MUST | State `ALGORITHM` and `LOCK` on every `ALTER TABLE` against a populated table, so MySQL refuses instead of silently copying the table |
 | MUST | Set `lock_wait_timeout` to a few seconds before any DDL on a table with traffic; the default is a year, and the wait happens at the start and again at the end |
-| MUST | Treat an operation that needs a table copy on a large busy table as work for an online schema change tool or an agreed maintenance window |
-| MUST | Account for replica lag before a long in-place build |
+| MUST | Treat an operation that needs a table copy on a large busy table as work for an online schema change tool or an agreed maintenance window, and show first that existing rows already satisfy the new definition |
+| MUST | Account for binlog replicas before any DDL: the lag of a long build, and the replica's own long transactions, which its applier waits behind without the migration's timeout |
 | MUST | Put one DDL statement in each migration, because MySQL commits implicitly after each one |
 | MUST | Check for orphan rows before adding a foreign key with `foreign_key_checks=0`, set for that session only |
 | MUST | Rename or retype a column used by running code through expand-and-contract, and ship the code that stops reading a column before the migration that drops it |

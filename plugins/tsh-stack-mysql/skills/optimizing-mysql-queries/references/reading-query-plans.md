@@ -11,6 +11,8 @@ formats; read the one that answers the question.
 
 Plain `EXPLAIN` uses the server's `explain_format`: the table on 8.0 and 8.4, the
 **tree on 9.7**. Name the format when asking someone to paste a plan.
+`EXPLAIN ANALYZE FORMAT=JSON` gives the actual values as JSON on 9.7, and on 8.4 with
+`explain_json_format_version = 2`; on 8.0 `EXPLAIN ANALYZE` prints only the tree.
 `EXPLAIN ANALYZE` runs the query in full and discards the rows; for a single-table
 `UPDATE` or `DELETE` it prints `<not executable by iterator executor>` and does
 nothing, so writes are read with plain `EXPLAIN`.
@@ -91,7 +93,9 @@ InnoDB estimates from sampled index pages and **index dives**:
   **histogram** fixes that without the write cost of an index:
   `ANALYZE TABLE od UPDATE HISTOGRAM ON total WITH 32 BUCKETS;` (`total` has no index). The optimizer uses
   histograms for columns it cannot dive into; it does not use them for a column whose
-  index it can dive into.
+  index it can dive into. A histogram is **not** refreshed with the index statistics:
+  rebuild it when the data shifts, or on 8.4 and 9.7 add `AUTO UPDATE` to the
+  statement so it refreshes with them (8.0 rejects `AUTO UPDATE`).
 - **Long `IN` lists.** Below `eq_range_index_dive_limit` values (200) the optimizer
   dives into the index for each one; at the limit and beyond it uses averages, and a
   skewed column is misestimated.
