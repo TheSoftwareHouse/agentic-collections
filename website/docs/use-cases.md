@@ -58,7 +58,7 @@ sources:
   - plugins/tsh-stack-aws/skills/auditing-aws-cost/SKILL.md
   - plugins/tsh-stack-gcp/skills/auditing-gcp-cost/SKILL.md
   - plugins/tsh-stack-azure/skills/auditing-azure-cost/SKILL.md
-sources_hash: "37bf73a48a9ebe1197a9866c68c0927b1f60b489b9002051a7e7119fbd49da7f"
+sources_hash: "f5bbed749b647aa5754328d0e561c27d713419541e5d1d0316e049a93c68c73e"
 ---
 
 # Use cases

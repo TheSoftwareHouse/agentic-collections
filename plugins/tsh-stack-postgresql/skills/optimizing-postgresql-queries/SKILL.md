@@ -19,7 +19,9 @@ about a plan. Below 14, stop and say the project is on an unsupported version;
 continue only when asked.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply: plan output, index types and statistics views differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
+another engine, say this skill does not apply: plan output, index types and statistics views differ by engine.
+Load that engine's skill for the same work when one is available in this session;
+otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 
@@ -79,5 +81,8 @@ any plan.
 ## Reporting
 
 Report the query, how often it runs, the plan node that dominates and why, the
-change, and the time before and after. When the database is not the bottleneck
-(the time is in the application, the network or the connection pool), say so and stop.
+change, and the time before and after. When the queries themselves are fast and the
+time is in the application, the network or waiting for a pool connection, say so and
+stop. A full pool is often a database symptom first: a lock queue or `idle in
+transaction` sessions hold its connections, so check `pg_stat_activity` before
+calling the database innocent.

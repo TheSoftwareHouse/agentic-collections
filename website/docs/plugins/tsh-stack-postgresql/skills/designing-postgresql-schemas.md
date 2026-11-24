@@ -5,7 +5,7 @@ sidebar_position: 3
 description: Designs and reviews PostgreSQL tables at the database level, whatever ORM maps them, with types, keys and constraints that keep bad data out.
 sources:
   - plugins/tsh-stack-postgresql/skills/designing-postgresql-schemas/
-sources_hash: "35f9929bfc40def404299c9ed15a0d4ac631c05cc84bffeeb174dd74b3d9f255"
+sources_hash: "6ac9687d7ae5da6eb88d15c2bd40bbda01514fc033a20594a617eced459719f2"
 ---
 
 # Designing PostgreSQL Schemas

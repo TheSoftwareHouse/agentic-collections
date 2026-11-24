@@ -1,7 +1,7 @@
 ---
 name: migrating-postgresql-schemas
 description: "Writes and reviews PostgreSQL schema migrations that run against a live database without stopping traffic: the lock each DDL statement takes and what it blocks, lock_timeout so a migration waits instead of queueing everyone behind it, expand-and-contract for renames and type changes, NOT VALID constraints validated separately, indexes built CONCURRENTLY outside a transaction, and batched backfills. Use when a migration adds, changes or drops a column, index or constraint on a table that already holds production data, or when reviewing a migration an ORM generated."
-when_to_use: "Trigger on: adding a column, index, foreign key, unique or NOT NULL constraint to an existing PostgreSQL table, renaming a column or table, changing a column type, dropping a column, backfilling or rewriting rows in a large table, a PostgreSQL migration that hung, timed out or caused an outage, reviewing a TypeORM, Prisma, Doctrine, Alembic, Django, Knex, Laravel, Rails or Flyway migration that targets PostgreSQL, or planning a schema change that must ship with zero downtime. How to shape the schema in the first place is designing-postgresql-schemas; a slow query is optimizing-postgresql-queries."
+when_to_use: "Trigger on: adding a column, index, foreign key, unique or NOT NULL constraint to an existing PostgreSQL table, renaming a column or table, changing a column type, dropping a column, backfilling, rewriting or purging rows in a large table, a PostgreSQL migration that hung, timed out or caused an outage, reviewing a TypeORM, Prisma, Doctrine, Alembic, Django, Knex, Laravel, Rails or Flyway migration that targets PostgreSQL, or planning a schema change that must ship with zero downtime. How to shape the schema in the first place is designing-postgresql-schemas; a slow query is optimizing-postgresql-queries."
 ---
 
 # Migrating PostgreSQL Schemas
@@ -20,7 +20,9 @@ say the project is on an unsupported version; continue only when asked, and then
 only with recipes whose mark the version satisfies.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply: lock modes and online DDL differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
+another engine, say this skill does not apply: lock modes and online DDL differ by engine.
+Load that engine's skill for the same work when one is available in this session;
+otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 
@@ -43,7 +45,7 @@ migrations against a shared or production environment.
 | MUST | Build indexes on populated tables with `CREATE INDEX CONCURRENTLY`, outside a transaction, one statement per migration, and check for an `INVALID` index after a failure. |
 | MUST | Add foreign keys and `CHECK` constraints to populated tables as `NOT VALID`, then `VALIDATE CONSTRAINT` in a separate step. |
 | MUST | Rename or retype a column used by running code through expand-and-contract across deploys, never in one statement. |
-| MUST | Backfill large tables in bounded batches outside the schema migration, never one `UPDATE` over the whole table. |
+| MUST | Backfill or purge large tables in bounded batches outside the schema migration, never one `UPDATE` or `DELETE` over the whole table. |
 | MUST | Ship the code that stops reading a column before the migration that drops it. |
 | MUST | When the migration is written with an ORM or framework that has its own skill available in this session (a NestJS, Symfony or Python stack skill, for example), load that skill too, before writing the migration file. This skill owns what the SQL does to the database; that one owns how the tool writes and runs it. Name none that is absent. |
 | MUST | When asked to review a whole change or its merge readiness (a pull request or a diff that also changes application code), not only the migration, load the general code-review skill too when one is available in this session (`reviewing-code`, for example). This skill judges the migration; that one judges the rest of the change and merge readiness. Name none that is absent. |

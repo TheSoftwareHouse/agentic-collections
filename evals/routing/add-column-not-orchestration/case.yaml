@@ -1,0 +1,24 @@
+schema_version: "1.1"
+name: add-column-not-orchestration
+description: An explicit "add a column" request on a large PostgreSQL table must load migrating-postgresql-schemas, not feature orchestration, although it keeps the "add X to Y" wording the orchestrator triggers on. A migration asked for on its own belongs to the database engine's skill; typeorm-migration-loads-database-layer covers the same decision for an index.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Add a nullable cancelled_reason column to the orders table in our NestJS service. orders has about 30 million
+    rows and takes writes all day.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    arm: with-only
+  - name: orchestrating-feature-implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0

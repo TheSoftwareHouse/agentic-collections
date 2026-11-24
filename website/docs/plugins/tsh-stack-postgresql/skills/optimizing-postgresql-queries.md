@@ -5,7 +5,7 @@ sidebar_position: 2
 description: Finds and fixes slow PostgreSQL queries from evidence, from pg_stat_statements and EXPLAIN plans to the index or query change that fixes them.
 sources:
   - plugins/tsh-stack-postgresql/skills/optimizing-postgresql-queries/
-sources_hash: "c230dfc8b3cf188b7a45e48c9de6c5c24db032037230256c5818eafc97a09eac"
+sources_hash: "55b82c76b5e039be4dfc8ec9f3fd0c776216280020d13f84a031c0c492ed2cf1"
 ---
 
 # Optimizing PostgreSQL Queries

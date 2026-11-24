@@ -19,12 +19,14 @@ it, including local and CI. Below 14, stop and say the project is on an unsuppor
 version; continue only when asked.
 
 **PostgreSQL only.** If the project's database is MySQL, MariaDB, SQL Server or
-another engine, say this skill does not apply: types, constraints and their defaults differ by engine. Load that engine's skill when one is available in this session; otherwise stop. Name none that is absent.
+another engine, say this skill does not apply: types, constraints and their defaults differ by engine.
+Load that engine's skill for the same work when one is available in this session;
+otherwise stop. Name none that is absent.
 
 ## Applicability and Precedence
 
 Read the existing schema and its conventions first: naming, key type, timestamp
-columns, how tenancy and deletion are already handled. **A convention the project
+columns, collation, how tenancy and deletion are already handled. **A convention the project
 already follows outranks this skill's defaults**; a second convention beside the
 first is a finding, not an improvement. When the schema is generated from an ORM's
 entities, the ORM's own skill owns how to express a choice in that ORM; this skill

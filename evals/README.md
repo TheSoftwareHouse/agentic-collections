@@ -566,7 +566,7 @@ rm -rf evals/routing/_probe-plain-plan evals/routing/_probe-plain-feature
 
 Measured on 2026-11-17, six runs each, about USD 0.08–0.16 per run. "Before" is
 `tsh-product-engineering` 0.12.1 with `tsh-stack-postgresql` 0.1.1; "after" is 0.12.2
-with 0.1.2:
+with the first draft of 0.2.0:
 
 | Probe | Before | After |
 | :-- | :-- | :-- |
@@ -577,7 +577,7 @@ The plan path works. The `_probe-plain-feature` row measured less than it seems:
 `allowed_tools: [Skill]` does not stop the model calling Glob and Read, and with no
 repository it explored, found an empty directory and stopped. The implementation path
 is measured on a repository instead, below. Limits of the plan probe: six runs; the
-prompt names the engine; 0.1.2 also changed the PostgreSQL triggers, so the gain is
+prompt names the engine; 0.2.0 also changed the PostgreSQL triggers, so the gain is
 not isolated to the plan rule.
 
 ### "Add X" in a repository
@@ -800,9 +800,9 @@ git add -A >/dev/null 2>&1 && git -c user.name=t -c user.email=t@t commit -qm "i
 </details>
 
 Measured on 2026-11-18, six runs each on `claude-sonnet-5-5`, about USD 0.2–0.35 per
-run, with `tsh-product-engineering` 0.12.2 and `tsh-stack-postgresql` 0.1.2. "Before"
-is `orchestrating-feature-implementation` without the "add X to Y" trigger, "after"
-with it:
+run, with the first drafts of `tsh-product-engineering` 0.12.2 and
+`tsh-stack-postgresql` 0.2.0. "Before" is `orchestrating-feature-implementation`
+without the "add X to Y" trigger, "after" with it:
 
 | Prompt | Before | After |
 | :-- | :-- | :-- |
@@ -814,6 +814,16 @@ The routing case `add-field-orchestrated` guards the trigger in CI: one turn and
 repository, 3 of 6 before and 6 of 6 after. It is the weaker test. In a repository
 the model reads code before it considers skills, and there the same request loaded
 the orchestrator in 0 of 6 runs before.
+
+The trigger was then bounded to changes that span layers ("a new field stored, served
+and shown"), so that a migration asked for on its own and a one-file UI change stay
+with their own skills. Re-measured on 2026-11-24 with that wording: the repository
+probe above loaded orchestration, plan, design and migration 6 of 6 each and wrote
+only the plan and verification files; `add-field-orchestrated` 6 of 6;
+`add-column-not-orchestration` (the migration skill, not the orchestrator) 6 of 6;
+`one-file-ui-neither-orchestration-nor-plan` 6 of 6. That last case has no must-fire
+grader: on a change that small the model searches for the component before it loads
+any skill, so `implementing-frontend` fired 0 of 12 on turn one.
 
 Limits: six runs, one fixture, one stack. The session stops at the plan, because
 nobody approves it, so delegation is measured separately, below.
@@ -832,9 +842,50 @@ to `allowed_tools`, and use one of two prompts:
 
 The probe has no Bash, so the implementer cannot run `npm run build` and reports
 the task blocked; the orchestrator then stops before phase 2. What is measured is
-the first task, the migration. The graders cannot see the subagent's calls, so read
-them from the trace with `--keep-temp`: they are the events with a
-`parent_tool_use_id`.
+the first task, the migration. A `tool_used` grader counts the subagent's Skill calls
+together with the main conversation's, so it cannot say who loaded a skill or whether
+that came before the migration was written. Read that from the trace with
+`--keep-temp`: the implementer's events carry a `parent_tool_use_id`.
+
+Save the fixture as `evals/routing/_probe-deleg/` with this `case.yaml`, copy it to
+`_probe-deleg-direct/` with the second prompt, run both, and **delete both
+directories when done**:
+
+```yaml
+schema_version: "1.1"
+name: _probe-deleg
+description: Manual probe (not committed) — with an approved plan that names the PostgreSQL skills, the implementer loads them before writing the migration.
+tags: [probe]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    The plan in specifications/user-last-seen/user-last-seen.plan.md is approved. Execute it.
+  max_turns: 16
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, TodoWrite, Agent]
+graders:
+  - name: orchestrator-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+  - name: delegated-to-software-engineer
+    type: tool_used
+    tool: Agent
+    input_match: 'software-engineer'
+```
+
+```shell
+claude plugin eval . --eval-dir evals --case '_probe-deleg*' --runs 6 -j 3 \
+  --scaffold --allow-tools Write Edit --keep-temp --trust-plugin --no-publish \
+  --ablation none --model claude-sonnet-5-5 --max-cost-usd 4
+rm -rf evals/routing/_probe-deleg evals/routing/_probe-deleg-direct
+```
+
+The direct prompt was measured with `--runs 4`. Its `orchestrator-fired` grader is
+expected to fail; only the trace matters there.
 
 <details>
 <summary>The plan block</summary>
@@ -910,10 +961,12 @@ Measured on 2026-11-20 on `claude-sonnet-5-5`, about USD 0.16–0.43 per run.
   by hand without those names.
 - **The runs that stopped did so because of the skills.** In three runs the
   implementer, with the migration skill loaded, refused to write the migration: an
-  index built `CONCURRENTLY` must run outside a transaction, and in TypeORM 0.3 that
-  needs `migrationsTransactionMode` in `data-source.ts`, a file outside the task's
-  scope. It reported that as a blocker instead of improvising, which is what the
-  plan's scope rules ask for.
+  index built `CONCURRENTLY` must run outside a transaction, and the plan did not
+  say how. TypeORM 0.3 offers two ways: `migrationsTransactionMode` in
+  `data-source.ts`, a file outside the task's scope, or the CLI's
+  `--transaction each`, which changes how the deploy runs migrations. The implementer
+  reported that as a blocker instead of improvising, which is what the plan's scope
+  rules ask for; a plan that pins the invocation avoids it.
 
 ## Behavioural suites: what a skill does after it fires
 

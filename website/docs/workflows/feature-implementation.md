@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
-sources_hash: "e603a94dcc218959f52d6e3da406c3e56a0d69e16ee62653339036c2a495e795"
+sources_hash: "3e508d49457255875ece3590b6eaea5dbd656efbe03b98c4249ee4719d0a4d3a"
 ---
 
 # Feature implementation
@@ -52,7 +52,7 @@ request ─▶ plan + verification document        (creating-implementation-plan
 | UI capture and design judgment, per gate iteration | Subagents | [`ui-capture-worker`](/docs/plugins/tsh-product-engineering/agents/ui-capture-worker) and [`ui-reviewer`](/docs/plugins/tsh-product-engineering/agents/ui-reviewer) — see [UI verification](./ui-verification) |
 | Code review, in the final verification phase | Subagent (`opus`, read-only) | [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer), applying [`reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) |
 | Functional verification, in the final verification phase | Subagent (`sonnet`, read-only) | [`feature-verifier`](/docs/plugins/tsh-product-engineering/agents/feature-verifier) |
-| Trivial single-file change with no design decision | Main conversation, inline | — |
+| Trivial single-file change with no design decision and no schema change | Main conversation, inline | — |
 | A bug whose cause is not yet known | Main conversation | [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code) — see [Debugging](./debugging) |
 
 Authoring E2E suites, infrastructure and CI, and discovery or analysis work are out of scope here: the orchestrator names the gap to the user instead of improvising. The `tsh-product-testing` and `tsh-platform-engineering` plugins may not be installed, and the workflow never blocks on them.
@@ -83,9 +83,9 @@ The orchestrator then creates one todo per plan task, final verification tasks i
 
 ### 3. Delegate the tasks
 
-The orchestrator walks the plan in order. A parallel group's subagents are launched in a single message; everything else runs one task at a time. Each delegation is self-contained: the plan path, the task IDs, the instruction to read the plan's Technical Context first, the expected report shape, and the pinned inputs. A task that adds or changes tables, columns, indexes, constraints or a migration also names the database engine's skills that cover it, when they are installed, and tells the implementer to load them before writing the migration.
+The orchestrator walks the plan in order. A parallel group's subagents are launched in a single message; everything else runs one task at a time. Each delegation is self-contained: the plan path, the task IDs, the instruction to read the plan's Technical Context first, the skills the Technical Context names for that task (the database engine's skills for a schema change, for example), the expected report shape, and the pinned inputs.
 
-- [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) loads the skills the Technical Context or its delegation names for the kind of work its tasks do, implements the task as written, runs its Definition of Done commands verbatim — never widened to directory- or project-wide suites — and ticks the plan's checkboxes for its own scope only. A fix for a reported failure follows [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code). It never discards pre-existing uncommitted changes and never runs `git bisect`; it reports the last good and first bad commit for the main conversation instead.
+- [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) loads the skills the Technical Context or its delegation names for its tasks — and, for a schema change neither names skills for, the database engine's skills that are installed — implements the task as written, runs its Definition of Done commands verbatim — never widened to directory- or project-wide suites — and ticks the plan's checkboxes for its own scope only. A fix for a reported failure follows [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code). It never discards pre-existing uncommitted changes and never runs `git bisect`; it reports the last good and first bad commit for the main conversation instead.
 - [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) fetches the design through the Figma MCP before writing markup, implements it, and runs the Definition of Done commands. When the delegation says the UI verification gate runs after the task, it leaves all rendered-result checking to the gate.
 
 Both stop and report a missing input instead of guessing it. `software-engineer` also stops and reports, instead of improvising, when a task's Stop Rule fires or an expected seam is not there.
