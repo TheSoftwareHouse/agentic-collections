@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "d15dec6f879c7a2153a83cd0ec484b6ac3d2defc051f3354126a4ee7952c65b9"
+sources_hash: "03b751637841c725cac6cc858a029346c69d08a79d9973e69c19a7f94d1ae59d"
 ---
 
 # Orchestrating Feature Implementation
@@ -18,7 +18,7 @@ In this workflow the main conversation is the orchestrator. It owns the plan, th
 
 Verification follows a pyramid. Each task runs only its own scoped checks and is trusted from its report, each phase closes with one integration checkpoint, and the plan's final verification phase is the single full, evidence-based pass. No check runs twice.
 
-Use it for any feature request or multi-file change, before the first file is edited, and to execute or resume a `*.plan.md`. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
+Use it for any feature request or multi-file change, loaded first, before the codebase is explored or any file is edited, and to execute or resume a `*.plan.md`. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
 
 ## Key Areas
 
@@ -30,14 +30,14 @@ Use it for any feature request or multi-file change, before the first file is ed
 | **Report gating** | Each task report must name every Definition of Done command with a passing result. A failed, blocked or command-less report stops the flow. Nothing is re-run at the task tier |
 | **Phase checkpoints** | Each phase's `Verification:` line runs exactly once, when its last task completes: an integration-scoped check plus one typecheck or build |
 | **Deviations** | A material deviation from the plan stops the flow: update the plan file, tell the user what changed and why, and let them re-read before continuing |
-| **UI verification gate** | Every Figma-backed UI task closes through a verify-fix loop of up to 5 iterations per item, using fresh capture and an independent verdict |
+| **UI verification gate** | Every Figma-backed UI task in a web app closes through a verify-fix loop of up to 5 iterations per item, using fresh capture and an independent verdict. In a native iOS app, `ui-engineer` verifies against the design in the iOS Simulator and its report is the item's verdict |
 | **Final verification phase** | `code-reviewer` and `feature-verifier` run concurrently, exactly once. Findings route back as scoped fixes, never as a second full pass |
 
 ## Task routing
 
 | Work | Routed to |
 | :-- | :-- |
-| UI task backed by a design (Figma URL or design reference in the plan) | `ui-engineer` subagent |
+| UI task backed by a design (Figma URL or design reference in the plan), in a web app or a native iOS app | `ui-engineer` subagent |
 | UI verification capture, per gate iteration | `ui-capture-worker` subagent |
 | UI verification verdict, per gate iteration | `ui-reviewer` subagent |
 | Any other implementation task: backend, logic, tests, config | `software-engineer` subagent |
@@ -52,10 +52,10 @@ Use it for any feature request or multi-file change, before the first file is ed
 1. **Establish the state.** Locate the plan (default `specifications/<task-id>/<task-name>.plan.md`) and check that it is actionable: tasks name files and Definitions of Done, no material open questions, and for a non-trivial plan a final verification phase whose verification document exists. Missing or stale means following `creating-implementation-plans`.
 2. **Confirm the go-ahead.** For a plan created or changed in this session, the user is asked to read it through the AskUserQuestion tool, not as a prose question at the end of a turn.
 3. **Create todos.** One per plan task, including the final verification phase's tasks, with parallel groups noted.
-4. **Collect pinned inputs up front.** For UI work or browser and API verification scenarios: the exact full dev server URL, confirmed by the user and never inferred, and every design URL.
+4. **Collect pinned inputs up front.** For UI work or browser and API verification scenarios: the exact full dev server URL (for a native iOS app, the Xcode scheme and Simulator device), confirmed by the user and never inferred, and every design URL.
 5. **Execute.** Walk the plan in order; launch parallel groups in one message.
 6. **Record and gate.** Read each report, confirm the Definition of Done commands ran, tick the plan's boxes, update the todo, and run the phase's `Verification:` line when its last task completes.
-7. **Run the UI verification gate** after each Figma-backed UI task, following the gate reference.
+7. **Run the UI verification gate** after each Figma-backed UI task in a web app, following the gate reference. In a native iOS app the item closes on `ui-engineer`'s Simulator comparison: every state matched is PASSED, and a remaining difference or unverified state goes to the user; unless they acknowledge it, it goes back to `ui-engineer`.
 8. **Execute the final verification phase.** Launch `code-reviewer` and `feature-verifier` concurrently. The reviewer's delegation states verbatim that functional and E2E verification runs in the parallel verifier. A legacy plan without this phase gets a single full-scope `code-reviewer` instead.
 9. **Route the findings.** Each actionable finding goes back to the implementer that owns it as a scoped follow-up, with only scoped re-checks. A fix that changes rendered UI on a Figma-backed screen reopens that item's gate.
 10. **Close.** Report what shipped, the UI Verification Summary, verification results, the review outcome, and anything recorded in the plan as deviation or follow-up.

@@ -12,6 +12,34 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.13.0] - 2026-11-24
+
+### Added
+
+- **`ui-engineer` implements and checks a Figma-backed screen in a native iOS app.**
+  It used to load only `tsh-stack-frontend`'s skills and verify in a browser, so a
+  SwiftUI screen got no iOS conventions and a check it could not pass. It now loads
+  `tsh-stack-ios`'s `implementing-ios` when that plugin is installed, builds the app
+  with `xcodebuild`, and compares iOS Simulator screenshots of each state the design
+  defines against it, through `xcrun simctl`. A state it cannot reach is reported as
+  unverified, never as matched. The delegation names the Xcode scheme and Simulator
+  device in place of a dev server URL. `orchestrating-feature-implementation` closes
+  such an item on that report: the browser-based UI verification gate stays for web
+  apps only.
+
+### Fixed
+
+- **A feature request loads `orchestrating-feature-implementation` before the
+  codebase is explored.** The description said to load it "before the first file is
+  edited", so on a feature request Claude often spent its first turn searching the
+  repository without loading any skill, and once loaded the stack skill instead of the
+  orchestrator. It now says to load it first, before exploring the codebase or editing
+  any file. Measured on Sonnet with the routing cases: `frontend-feature-orchestrated`
+  went from 3 of 6 to 12 of 12, and `ios-feature-orchestrated`, alongside
+  `tsh-stack-ios`, from 8 of 12 to 24 of 24. The cases that keep debugging, planning and
+  context discovery out of the orchestrator stayed at 6 of 6, as did a request to explain
+  multi-file code without changing it.
+
 ## [0.12.1] - 2026-11-16
 
 ### Fixed

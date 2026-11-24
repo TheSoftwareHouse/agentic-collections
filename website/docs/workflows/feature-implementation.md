@@ -13,7 +13,7 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-engineer.md
   - plugins/tsh-product-engineering/agents/code-reviewer.md
   - plugins/tsh-product-engineering/agents/feature-verifier.md
-sources_hash: "c1f133bed399b1576559dbe3243745a12db7f7631a091894dfc7454e79f3c221"
+sources_hash: "11524941fdd054d2940c9da03bcd8b4d241cf0192697809a9011f2a00f60d6d8"
 ---
 
 # Feature implementation
@@ -48,7 +48,7 @@ request ─▶ plan + verification document        (creating-implementation-plan
 | Write the plan and the verification document | Main conversation | [`creating-implementation-plans`](/docs/plugins/tsh-product-engineering/skills/creating-implementation-plans), using [`discovering-technical-context`](/docs/plugins/tsh-product-engineering/skills/discovering-technical-context) for the Technical Context |
 | Orchestrate: gate reports, tick the plan, run phase checks, route findings | Main conversation | [`orchestrating-feature-implementation`](/docs/plugins/tsh-product-engineering/skills/orchestrating-feature-implementation) |
 | Backend, logic, tests, configuration tasks | Subagent (`sonnet`) | [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) |
-| UI tasks backed by a design | Subagent (`sonnet`) | [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) |
+| UI tasks backed by a design, in a web app or a native iOS app | Subagent (`sonnet`) | [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) |
 | UI capture and design judgment, per gate iteration | Subagents | [`ui-capture-worker`](/docs/plugins/tsh-product-engineering/agents/ui-capture-worker) and [`ui-reviewer`](/docs/plugins/tsh-product-engineering/agents/ui-reviewer) — see [UI verification](./ui-verification) |
 | Code review, in the final verification phase | Subagent (`opus`, read-only) | [`code-reviewer`](/docs/plugins/tsh-product-engineering/agents/code-reviewer), applying [`reviewing-code`](/docs/plugins/tsh-product-engineering/skills/reviewing-code) |
 | Functional verification, in the final verification phase | Subagent (`sonnet`, read-only) | [`feature-verifier`](/docs/plugins/tsh-product-engineering/agents/feature-verifier) |
@@ -79,14 +79,14 @@ At planning time the skill also drafts the **verification document**, `specifica
 
 For a plan created or changed in this session, the orchestrator asks the user to read it, through the AskUserQuestion tool ("Execute the plan" / "Wait — I want changes"), never as a prose question at the end of a turn. The user's word is the gate.
 
-The orchestrator then creates one todo per plan task, final verification tasks included. If any task is UI work, or the verification document names a browser or API scenario, it collects the **pinned inputs** up front: the exact full dev server URL, confirmed by the user — never inferred from config, processes or port scans — and every design URL. A Figma-backed UI task without a design URL gets one from the user, recorded in the plan, before the first delegation.
+The orchestrator then creates one todo per plan task, final verification tasks included. If any task is UI work, or the verification document names a browser or API scenario, it collects the **pinned inputs** up front: the exact full dev server URL (for a native iOS app, the Xcode scheme and Simulator device), confirmed by the user — never inferred from config, processes or port scans — and every design URL. A Figma-backed UI task without a design URL gets one from the user, recorded in the plan, before the first delegation.
 
 ### 3. Delegate the tasks
 
 The orchestrator walks the plan in order. A parallel group's subagents are launched in a single message; everything else runs one task at a time. Each delegation is self-contained: the plan path, the task IDs, the instruction to read the plan's Technical Context first, the expected report shape, and the pinned inputs.
 
 - [`software-engineer`](/docs/plugins/tsh-product-engineering/agents/software-engineer) implements the task as written, runs its Definition of Done commands verbatim — never widened to directory- or project-wide suites — and ticks the plan's checkboxes for its own scope only. A fix for a reported failure follows [`debugging-code`](/docs/plugins/tsh-product-engineering/skills/debugging-code). It never discards pre-existing uncommitted changes and never runs `git bisect`; it reports the last good and first bad commit for the main conversation instead.
-- [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) fetches the design through the Figma MCP before writing markup, implements it, and runs the Definition of Done commands. When the delegation says the UI verification gate runs after the task, it leaves all rendered-result checking to the gate.
+- [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) fetches the design through the Figma MCP before writing markup, implements it, and runs the Definition of Done commands. When the delegation says the UI verification gate runs after the task, it leaves all rendered-result checking to the gate. In a native iOS app, where the browser gate cannot run, it compares iOS Simulator screenshots against the design itself, and that report closes the item.
 
 Both stop and report a missing input instead of guessing it. `software-engineer` also stops and reports, instead of improvising, when a task's Stop Rule fires or an expected seam is not there.
 
@@ -100,7 +100,7 @@ A material deviation from the plan stops the flow: the orchestrator updates the 
 
 ### 5. Close each UI item through the gate
 
-Every Figma-backed UI task goes through the UI verification gate before the final phase: fresh `ui-capture-worker` artifacts judged by `ui-reviewer`, iterated up to five times per item, then an escalation question to the user. The final verification phase starts only when every UI item is PASSED or ESCALATED with the user's acknowledgement. The details are on the [UI verification](./ui-verification) page.
+Every Figma-backed UI task in a web app goes through the UI verification gate before the final phase: fresh `ui-capture-worker` artifacts judged by `ui-reviewer`, iterated up to five times per item, then an escalation question to the user. The final verification phase starts only when every UI item is PASSED or ESCALATED with the user's acknowledgement. The details are on the [UI verification](./ui-verification) page. A native iOS app has no browser for the gate: its item closes on `ui-engineer`'s own iOS Simulator comparison, and a remaining difference or unverified state goes to the user.
 
 ### 6. Run the final verification phase
 

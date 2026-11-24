@@ -6,7 +6,7 @@ description: Spec-driven feature implementation with committed plan files, deleg
 sources:
   - plugins/tsh-product-engineering/.claude-plugin/plugin.json
   - plugins/tsh-product-engineering/README.md
-sources_hash: "e7742023c622f8f807a598067fa9b8e45d779f734d430a6e54b5ad6e98c809cc"
+sources_hash: "41804b871287ed7e8785df801c1cc86da22d1f0d6448b95bc3d25eceb6a9c49b"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
@@ -47,7 +47,7 @@ For the end-to-end flows see [feature implementation](/docs/workflows/feature-im
 
 - **Playwright CLI.** All browser evidence in this plugin runs on [Playwright CLI](/docs/integrations/playwright-cli): the UI verification gate's capture, `ui-engineer`'s standalone screenshot checks and `feature-verifier`'s browser walkthroughs. Before the first capture, the workflow runs `playwright-cli --version` (with an `npx` fallback) and, when neither answers, asks whether to install it for you or wait while you do it yourself. The install command is `npm install -g @playwright/cli@latest`.
 - **Figma MCP server, bundled by `tsh-core`.** Design fetching needs the [Figma MCP server](/docs/integrations/figma). This plugin deliberately does not ship a second copy. Install `tsh-core` alongside it and run `/mcp` once to authenticate; every call then runs under your own Figma account. Until that sign-in happens, agents stop and report what is missing rather than guessing at a design, and `ui-reviewer` reports `VERIFICATION NOT RUN`. This applies to the judgment side only: capture needs no design reference, and a UI task with no design at all is implemented from the plan and never enters the gate.
-- **A running app and its exact dev server URL**, for UI work. The workflow asks you to confirm the URL once and pins it for the whole loop.
+- **A running app and its exact dev server URL**, for UI work. The workflow asks you to confirm the URL once and pins it for the whole loop. A native iOS app needs a Mac with Xcode, a shared scheme and a Simulator device instead, pinned in the same way.
 
 When the page under verification needs a login, capture reuses whatever the project already has: a documented auth recipe, an existing E2E setup, existing `.env` variables that match the login form, or a seeded development account. Only when none of those exists does the flow derive `TSH_UI_LOGIN_*` variable names and ask you to add them to `.env`. Nothing is bypassed, and credentials never travel through the chat.
 
