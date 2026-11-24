@@ -12,14 +12,16 @@ sources:
   - plugins/tsh-product-engineering/agents/ui-capture-worker.md
   - plugins/tsh-product-engineering/agents/ui-reviewer.md
   - plugins/tsh-product-engineering/agents/ui-engineer.md
-sources_hash: "1836ea34987cdfc1ae8d6d37e2ec14e68d9f0da5c9ccd12f9d2f196ba54fcaf1"
+sources_hash: "05158c9c4e11f2d26f529f60eb3f51a398e455e18bc046d680fb46ec9601b5b6"
 ---
 
 # UI verification
 
-**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:reviewing-ui` for one standalone pass ("does this page match the design?"), or let [feature implementation](./feature-implementation) run it as the UI verification gate for every Figma-backed UI task.
+**Plugin:** [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/) · **Start with:** `/tsh-product-engineering:reviewing-ui` for one standalone pass ("does this page match the design?"), or let [feature implementation](./feature-implementation) run it as the UI verification gate for every Figma-backed UI task in a web app.
 
 UI verification compares the running application against its Figma design. The Figma design is the source of truth for every comparison: when in doubt, the design wins. Type checks, builds, unit tests and code review are never UI verification — "it compiles" and "code review passed" never close a UI item.
+
+The gate needs a browser, so it covers web apps only. For a native iOS app, [`ui-engineer`](/docs/plugins/tsh-product-engineering/agents/ui-engineer) compares its own iOS Simulator screenshots against the design, and the orchestrator closes the item on that report.
 
 ## At a glance
 

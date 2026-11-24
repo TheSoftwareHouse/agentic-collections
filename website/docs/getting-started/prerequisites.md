@@ -10,7 +10,7 @@ sources:
   - plugins/tsh-product-testing/README.md
   - plugins/tsh-stack-aws/README.md
   - plugins/tsh-stack-gcp/.mcp.json
-sources_hash: "cd2e0f31bc770b7f1ed0269f5ac19c328fe39e20411e24e9bfaf3474f6daaf9f"
+sources_hash: "943272bf83851da56280c3e9d7eb32a9e779eeba66c0c43dab712049b0dbc8ac"
 ---
 
 # Prerequisites
@@ -51,6 +51,7 @@ feature that uses it fails.
 | Tool | Needed for | What the source says |
 | :-- | :-- | :-- |
 | `playwright-cli` (Node.js required) | UI evidence in `tsh-product-engineering`, locator exploration in `tsh-product-testing` | Workflows check for it before first use and ask whether to install it for you. See [Playwright CLI](/docs/integrations/playwright-cli). |
+| Xcode, on a Mac | Building and checking a native iOS screen in `tsh-product-engineering`'s feature workflow | The workflow pins a shared scheme and a Simulator device instead of a dev server URL; no Playwright CLI is needed for it. |
 | `uv` | The `aws-documentation` server in `tsh-stack-aws` | Without it that one server fails to start and everything else works. See [AWS Documentation](/docs/integrations/aws-documentation). |
 | Node.js 20+ (`npx`) and the gcloud CLI, signed in | The three Google Cloud servers in `tsh-stack-gcp` | `npx` is declared in the plugin's `.mcp.json`; the servers' own READMEs add Node.js 20+ and a signed-in gcloud CLI. See [GCP](/docs/integrations/gcp). |
 

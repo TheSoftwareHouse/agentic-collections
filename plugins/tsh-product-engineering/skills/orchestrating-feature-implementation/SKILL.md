@@ -34,13 +34,13 @@ of it.
 | Severity | Rule |
 | --- | --- |
 | MUST | Have a plan file the user has read before non-trivial implementation starts. No plan → create one first via `creating-implementation-plans`, which ships in this plugin and is always available. Only a genuinely trivial change (single file, no design decision) may proceed planless. |
-| MUST | Make every delegation self-contained: exact plan path, task ID(s), the instruction to read the plan's Technical Context first, and any pinned inputs (dev server URL, design URLs). Subagents have no conversation history. |
+| MUST | Make every delegation self-contained: exact plan path, task ID(s), the instruction to read the plan's Technical Context first, and any pinned inputs (dev server URL, or Xcode scheme and Simulator device; design URLs). Subagents have no conversation history. |
 | MUST | Run tasks in parallel only when the plan marks them as one parallel group and their `**Files:**` lists are disjoint. Launch the group's subagents in a single message; run everything else in plan order. |
 | MUST | Gate on every task report: confirm it names each Definition of Done command with a passing result, and read the files-changed and deviations sections critically — they are gate inputs, not decoration. Re-run nothing at this tier; the final verification phase re-establishes evidence. A failed, blocked, or command-less report stops the flow. |
 | MUST | Run each phase's `Verification:` line exactly once, when its last task completes — an integration-scoped check of what the phase's tasks created plus one typecheck or build. Never a re-run of task Definitions of Done, never a full suite. |
 | MUST | Mirror plan tasks in the todo list and update both after each completed task. |
 | MUST | Stop on any material deviation from the plan: update the plan file, tell the user what changed and why, and let them re-read before continuing. |
-| MUST | Close every Figma-backed UI task through the UI verification gate — fresh `ui-capture-worker` artifacts judged by `ui-reviewer`, iterated up to 5 times per item. Read [`./references/ui-verification-gate.md`](./references/ui-verification-gate.md) before the first UI delegation. The final verification phase starts only when every UI item is individually PASSED or user-acknowledged ESCALATED. |
+| MUST | Close every Figma-backed UI task in a web app through the UI verification gate — fresh `ui-capture-worker` artifacts judged by `ui-reviewer`, iterated up to 5 times per item. A native iOS app has no browser for the gate: `ui-engineer` verifies it against the design in the iOS Simulator, and its report is that item's verdict. Read [`./references/ui-verification-gate.md`](./references/ui-verification-gate.md) before the first UI delegation. The final verification phase starts only when every UI item is individually PASSED or user-acknowledged ESCALATED. |
 | MUST | Close by executing the plan's final verification phase exactly once: delegate `code-reviewer` and `feature-verifier` concurrently — in a single message, or as immediately consecutive background delegations — stating verbatim in the reviewer's delegation that functional and E2E verification runs in the parallel verifier. A legacy plan without that phase gets a single full-scope `code-reviewer` delegation instead. |
 | NEVER | Re-run full suites between tasks, or add any review or verification pass after the final verification phase has passed. Findings route back as scoped fixes with scoped re-checks — never a second full pass. |
 | NEVER | Treat task-tier trust as the final word — it holds only because the final phase re-runs everything once — or a clean build as a substitute for UI verification against the design. |
@@ -49,7 +49,7 @@ of it.
 
 | Work | Route to |
 | --- | --- |
-| UI task backed by a design (Figma URL or design reference in the plan) | `ui-engineer` subagent |
+| UI task backed by a design (Figma URL or design reference in the plan), in a web app or a native iOS app | `ui-engineer` subagent |
 | UI verification capture — ACTUAL evidence from the running app, per gate iteration | `ui-capture-worker` subagent |
 | UI verification verdict — Figma comparison on captured artifacts, per gate iteration | `ui-reviewer` subagent |
 | Any other implementation task — backend, logic, tests, config | `software-engineer` subagent |
@@ -78,9 +78,10 @@ of it.
 3. **Create todos.** One per plan task, including the final verification phase's
    tasks, in plan order, parallel groups noted.
 4. **Collect pinned inputs up front.** If any task is UI work, or the verification
-   document names a browser or API scenario: the exact full dev server URL,
-   user-confirmed — never inferred from config, processes, or port scans — and every
-   design URL, before the first delegation. A Figma-backed UI task without a design
+   document names a browser or API scenario: the exact full dev server URL — for a
+   native iOS app, the Xcode scheme and Simulator device instead — user-confirmed,
+   never inferred from config, processes, or port scans, and every design URL, before
+   the first delegation. A Figma-backed UI task without a design
    URL: get it from the user and record it in the plan first. Forward these
    unchanged to every delegate that needs them, the verifier included.
 5. **Execute.** Walk the plan in order. For a parallel group, launch all its
@@ -92,13 +93,17 @@ of it.
    update the todo — and re-run nothing. When a phase's last task completes, run the
    phase's `Verification:` line once. A failed report or phase check stops the line —
    resolve it (with the user if needed) before the next delegation.
-7. **Run the UI verification gate.** After each Figma-backed UI task's report, run
-   the per-item verify-fix loop from
+7. **Run the UI verification gate.** After each Figma-backed UI task's report in a
+   web app, run the per-item verify-fix loop from
    [`./references/ui-verification-gate.md`](./references/ui-verification-gate.md):
    fresh `ui-capture-worker` capture, `ui-reviewer` verdict, fixes back to
-   `ui-engineer`, up to 5 iterations, then the structured escalation gate. Every
-   item ends PASSED or user-acknowledged ESCALATED before the next step, and the UI
-   Verification Summary is reported separately from code review.
+   `ui-engineer`, up to 5 iterations, then the structured escalation gate. In a
+   native iOS app the item closes on `ui-engineer`'s own Simulator comparison: every
+   state matched is PASSED; a remaining difference or an unverified state goes to the
+   user, and ends ESCALATED only when they acknowledge it — otherwise it goes back to
+   `ui-engineer` with the remaining differences. Every item ends PASSED or
+   user-acknowledged ESCALATED before the next step, and the UI Verification Summary
+   is reported separately from code review.
 8. **Execute the final verification phase.** When all implementation tasks are done
    and the UI gate is closed, launch both delegates concurrently (one message, or
    immediately consecutive background delegations): `code-reviewer` with the plan path, the full
@@ -110,7 +115,8 @@ of it.
    owns it (`ui-engineer` for UI, `software-engineer` otherwise) as a scoped
    follow-up task; re-run only the checks scoped to each fix — never a second full
    review or verification pass. A fix that changes rendered UI on a Figma-backed
-   screen reopens that item's UI verification gate. A finding that invalidates part
+   screen reopens that item's UI verification gate — in a native iOS app, it goes back
+   to `ui-engineer`, whose Simulator comparison closes it again. A finding that invalidates part
    of the plan is a material deviation — rule above applies.
 10. **Close.** Report to the user: what shipped, the UI Verification Summary,
     verification results, review outcome, and anything recorded in the plan as

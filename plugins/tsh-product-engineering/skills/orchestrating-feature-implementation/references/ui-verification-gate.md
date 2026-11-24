@@ -14,6 +14,11 @@ layout change as a "narrow code fix" to skip the gate. A UI task without a Figma
 reference: stop and get the URL from the user, then record it in the plan — never
 skip verification and never guess the design.
 
+The gate covers web apps, where a browser can render the screen. A native iOS app
+has no dev server and no DOM for `ui-capture-worker` to capture: `ui-engineer`
+compares its own Simulator screenshots against the design, and step 7 of the skill
+closes the item on that report. The rest of this file does not apply to it.
+
 ## Inputs pinned before the first iteration
 
 - **Playwright CLI availability**, checked once, before the first UI delegation:

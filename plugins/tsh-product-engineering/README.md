@@ -29,7 +29,7 @@ conversation, and a delegated review gate at the end.
 | `discovering-technical-context` | `/tsh-product-engineering:discovering-technical-context` | Project conventions in priority order: plan context → instructions → codebase patterns → external docs |
 | `capturing-project-checks` | `/tsh-product-engineering:capturing-project-checks` | Writes the project's own verification and security-invariant skills into `.claude/skills/` — checks per kind of change, the full gate as CI runs it, boundaries, and security rules traced to their sources — and names them in `CLAUDE.md`, so reviews, plans, fixes and audits apply the project's bar without a plan |
 | `software-engineer` (agent) | `@tsh-product-engineering:software-engineer` | Implements delegated plan tasks — code, tests, config — and verifies with the plan's commands |
-| `ui-engineer` (agent) | `@tsh-product-engineering:ui-engineer` | Implements UI from a design reference — a Figma node, or an exported reference image when Figma is not connected; a UI task with no design reference at all is implemented from the plan and stays outside the verification gate. Under the gate it implements and fixes, while capture and judgment run in the two agents below |
+| `ui-engineer` (agent) | `@tsh-product-engineering:ui-engineer` | Implements UI from a design reference — a Figma node, or an exported reference image when Figma is not connected; a UI task with no design reference at all is implemented from the plan and stays outside the verification gate. Under the gate it implements and fixes, while capture and judgment run in the two agents below. A native iOS app has no browser for the gate, so it compares its own iOS Simulator screenshots against the design |
 | `ui-capture-worker` (agent) | `@tsh-product-engineering:ui-capture-worker` | Mechanical evidence collector: Playwright-CLI screenshot, computed styles, and a11y snapshot into the iteration directory, plus the shared design reference export when a Figma URL is supplied |
 | `ui-reviewer` (agent) | `@tsh-product-engineering:ui-reviewer` | Read-only design judge: compares capture artifacts against the Figma design and returns PASS / FAIL / VERIFICATION NOT RUN with recommended fixes |
 | `code-reviewer` (agent) | `@tsh-product-engineering:code-reviewer` | Read-only reviewer: runs the checks itself and returns a structured findings report |
@@ -86,7 +86,9 @@ and ask you to add them. Nothing is ever bypassed, and credentials never travel
 through the chat.
 
 Have the target app already running and know the exact dev server URL: the
-workflow asks you to confirm it once and pins it for the whole loop.
+workflow asks you to confirm it once and pins it for the whole loop. A native iOS
+app needs none of this — no Playwright CLI and no dev server — but a Mac with Xcode,
+a shared scheme and a Simulator device, which the workflow pins in the same way.
 
 ## Not covered yet
 

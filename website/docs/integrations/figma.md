@@ -16,7 +16,7 @@ sources:
   - plugins/tsh-product-testing/agents/e2e-engineer.md
   - plugins/tsh-product-management/README.md
   - plugins/tsh-product-management/skills/orchestrating-business-analysis/references/reading-workshop-materials.md
-sources_hash: "801d76c0422bdda2c34e6044074d128adaa39f627ceedac1a05bc3dda6d7dca3"
+sources_hash: "7ae5dcdaba9e0f44214de3587fc9cc10e6d6572cd0a1efbddee2698c0aad58b9"
 ---
 
 # Figma

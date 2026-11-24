@@ -12,7 +12,20 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
-## [0.12.2] - 2026-11-23
+## [0.13.0] - 2026-11-24
+
+### Added
+
+- **`ui-engineer` implements and checks a Figma-backed screen in a native iOS app.**
+  It used to load only `tsh-stack-frontend`'s skills and verify in a browser, so a
+  SwiftUI screen got no iOS conventions and a check it could not pass. It now loads
+  `tsh-stack-ios`'s `implementing-ios` when that plugin is installed, builds the app
+  with `xcodebuild`, and compares iOS Simulator screenshots of each state the design
+  defines against it, through `xcrun simctl`. A state it cannot reach is reported as
+  unverified, never as matched. The delegation names the Xcode scheme and Simulator
+  device in place of a dev server URL. `orchestrating-feature-implementation` closes
+  such an item on that report: the browser-based UI verification gate stays for web
+  apps only.
 
 ### Fixed
 

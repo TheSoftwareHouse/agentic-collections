@@ -6,7 +6,7 @@ description: Conventions for native iOS apps in Swift, SwiftUI-first implementat
 sources:
   - plugins/tsh-stack-ios/.claude-plugin/plugin.json
   - plugins/tsh-stack-ios/README.md
-sources_hash: "4b7244b34678835b56f36f0c5b470e7df1a03c8a8341e6657ac7bb5f8d59d0d2"
+sources_hash: "2e6e88c2e2b7392527130d0cf0a11cae8f1b65212f63b1542a4f6bc4212eab44"
 ---
 
 import PluginComponents from '@site/src/components/PluginComponents';
@@ -41,7 +41,7 @@ On a newer Xcode or iOS, the skills check the current Apple documentation, throu
 
 Planning, orchestration and pre-merge review live in [`tsh-product-engineering`](/docs/plugins/tsh-product-engineering/), installed at user scope. Its workflows are framework-neutral; these skills supply the iOS conventions they review against. Each side works without the other.
 
-One gap: `orchestrating-feature-implementation` sends a UI task backed by a design (a Figma URL in the plan) to its `@tsh-product-engineering:ui-engineer` agent, which loads only `tsh-stack-frontend`'s skills and verifies in a browser with Playwright. A SwiftUI screen from Figma therefore gets neither `/tsh-stack-ios:implementing-ios` nor a check it can pass. Until that agent learns about native targets, implement such screens in the main conversation rather than through the orchestrator. Planning and review are unaffected: `reviewing-code` and its `code-reviewer` agent load the installed stack skill.
+For a screen built from a Figma design, `orchestrating-feature-implementation` hands the task to its `@tsh-product-engineering:ui-engineer` agent, which loads `/tsh-stack-ios:implementing-ios` and checks the result against the design with screenshots from the iOS Simulator, through `xcodebuild` and `xcrun simctl`. That needs `tsh-product-engineering` 0.13.0 or later and a Mac with Xcode; the browser-based UI verification gate the same plugin runs for web apps does not apply to an iOS app. The plan's final functional check, `feature-verifier`, still knows only browser and API scenarios: it has no Simulator path yet.
 
 ## MCP servers, hooks and agents
 

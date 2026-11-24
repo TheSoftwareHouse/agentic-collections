@@ -51,14 +51,14 @@ Planning, orchestration and pre-merge review live in `tsh-product-engineering`
 (installed at user scope). Its workflows are framework-neutral; these skills supply
 the iOS conventions they review against. Each side works without the other.
 
-One gap: `orchestrating-feature-implementation` sends a UI task backed by a design
-(a Figma URL in the plan) to its `ui-engineer` agent, which loads only
-`tsh-stack-frontend`'s skills and verifies in a browser with Playwright. A SwiftUI
-screen from Figma therefore gets neither `implementing-ios` nor a check it can pass.
-Until that agent learns about native targets, implement such screens in the main
-conversation rather than through the orchestrator. Planning and review are
-unaffected: `reviewing-code` and its `code-reviewer` agent load the installed stack
-skill.
+For a screen built from a Figma design, `orchestrating-feature-implementation` hands
+the task to its `ui-engineer` agent, which loads `implementing-ios` and checks the
+result against the design with screenshots from the iOS Simulator, through
+`xcodebuild` and `xcrun simctl`. That needs `tsh-product-engineering` 0.13.0 or later
+and a Mac with Xcode; the browser-based UI verification gate the same plugin runs for
+web apps does not apply to an iOS app. The plan's final functional check,
+`feature-verifier`, still knows only browser and API scenarios: it has no Simulator
+path yet.
 
 ## Not covered yet
 

@@ -7,7 +7,7 @@ description: A multi-file feature in a SwiftUI app must route to orchestrating-f
 # before any Skill call, with or without tsh-stack-ios in the session: the
 # orchestrator's description said "before the first file is edited", which left
 # reading the code first open. Lifted after it was changed to "load it first,
-# before exploring the codebase or editing any file" in tsh-product-engineering 0.12.2.
+# before exploring the codebase or editing any file" in tsh-product-engineering 0.13.0.
 # Measured on claude-sonnet-5-5, Claude Code 2.1.323: before, 6 of 6 and 2 of 6 in two
 # series (6 of 12 without tsh-stack-ios); after, 24 of 24.
 tags: [routing, cross-plugin]
