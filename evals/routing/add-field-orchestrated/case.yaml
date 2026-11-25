@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: add-field-orchestrated
+description: An "add X to Y" request that needs a new column, an API change and a UI change, phrased as a small feature without the words implement, build or ticket, must load feature orchestration on turn one, not the planning skill directly or debugging. The PostgreSQL plugin is loaded because its migration skill claims "adding a column" and is the competitor the orchestrator must beat on a feature that spans layers. Measured 3 of 6 before the "add X to Y" trigger and 6 of 6 after; in a NestJS repository, where the model reads code first, a near-identical request loaded the orchestrator 0 of 6 before (evals/README.md).
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-postgresql", "../../../plugins/tsh-stack-nodejs", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    Add a "last seen" timestamp to user profiles in our NestJS API and show it on the admin users list, sortable.
+    Update it at most once a minute per user.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    arm: with-only
+  - name: creating-implementation-plans-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    min: 0
+    max: 0
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0

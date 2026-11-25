@@ -5,7 +5,7 @@ sidebar_position: 5
 description: Implements a feature, ticket or plan end to end from the main conversation by delegating each plan task to implementer subagents and closing with parallel code review and functional verification.
 sources:
   - plugins/tsh-product-engineering/skills/orchestrating-feature-implementation/
-sources_hash: "d15dec6f879c7a2153a83cd0ec484b6ac3d2defc051f3354126a4ee7952c65b9"
+sources_hash: "2b2f0f6c07eee93734f36c5f00f7b18175caaa82666370c78de41b43dcbedb10"
 ---
 
 # Orchestrating Feature Implementation
@@ -18,14 +18,14 @@ In this workflow the main conversation is the orchestrator. It owns the plan, th
 
 Verification follows a pyramid. Each task runs only its own scoped checks and is trusted from its report, each phase closes with one integration checkpoint, and the plan's final verification phase is the single full, evidence-based pass. No check runs twice.
 
-Use it for any feature request or multi-file change, before the first file is edited, and to execute or resume a `*.plan.md`. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
+Use it for any feature request or multi-file change, before the first file is edited, and to execute or resume a `*.plan.md`. That includes an "add X to Y" or "show X on Y" request whose change spans layers, such as a new field stored, served and shown, even when it sounds small. A migration asked for on its own goes to the database engine's skill instead. Local repository rules outrank the skill: if the project defines its own delivery workflow, this one runs inside it.
 
 ## Key Areas
 
 | Area | Coverage |
 | :-- | :-- |
-| **Plan first** | A plan file the user has read must exist before non-trivial implementation. No plan means the skill creates one via `creating-implementation-plans`. Only a single-file change with no design decision may proceed without one |
-| **Self-contained delegation** | Every delegation carries the exact plan path, the task IDs, the instruction to read the plan's Technical Context first, and any pinned inputs such as the dev server URL and design URLs |
+| **Plan first** | A plan file the user has read must exist before non-trivial implementation. No plan means the skill creates one via `creating-implementation-plans`. Only a single-file change with no design decision and no schema change may proceed without one |
+| **Self-contained delegation** | Every delegation carries the exact plan path, the task IDs, the instruction to read the plan's Technical Context first, the skills the Technical Context names for that task's work (the database engine's skills for a schema change, for example), and any pinned inputs such as the dev server URL and design URLs |
 | **Parallel groups** | Tasks run in parallel only when the plan marks them as one group and their `**Files:**` lists are disjoint. The group's subagents launch in a single message |
 | **Report gating** | Each task report must name every Definition of Done command with a passing result. A failed, blocked or command-less report stops the flow. Nothing is re-run at the task tier |
 | **Phase checkpoints** | Each phase's `Verification:` line runs exactly once, when its last task completes: an integration-scoped check plus one typecheck or build |
@@ -41,7 +41,7 @@ Use it for any feature request or multi-file change, before the first file is ed
 | UI verification capture, per gate iteration | `ui-capture-worker` subagent |
 | UI verification verdict, per gate iteration | `ui-reviewer` subagent |
 | Any other implementation task: backend, logic, tests, config | `software-engineer` subagent |
-| Trivial single-file change with no design decision | Inline, in the main conversation |
+| Trivial single-file change with no design decision and no schema change | Inline, in the main conversation |
 | A bug whose cause is not yet established | `debugging-code`, in the main conversation |
 | Code review in the final verification phase | `code-reviewer` subagent |
 | Functional verification in the final verification phase | `feature-verifier` subagent |
@@ -53,7 +53,7 @@ Use it for any feature request or multi-file change, before the first file is ed
 2. **Confirm the go-ahead.** For a plan created or changed in this session, the user is asked to read it through the AskUserQuestion tool, not as a prose question at the end of a turn.
 3. **Create todos.** One per plan task, including the final verification phase's tasks, with parallel groups noted.
 4. **Collect pinned inputs up front.** For UI work or browser and API verification scenarios: the exact full dev server URL, confirmed by the user and never inferred, and every design URL.
-5. **Execute.** Walk the plan in order; launch parallel groups in one message.
+5. **Execute.** Walk the plan in order; launch parallel groups in one message. Each delegation names the skills the plan's Technical Context names for that task, such as the database engine's skills for a schema change, for the implementer to load before writing code.
 6. **Record and gate.** Read each report, confirm the Definition of Done commands ran, tick the plan's boxes, update the todo, and run the phase's `Verification:` line when its last task completes.
 7. **Run the UI verification gate** after each Figma-backed UI task, following the gate reference.
 8. **Execute the final verification phase.** Launch `code-reviewer` and `feature-verifier` concurrently. The reviewer's delegation states verbatim that functional and E2E verification runs in the parallel verifier. A legacy plan without this phase gets a single full-scope `code-reviewer` instead.

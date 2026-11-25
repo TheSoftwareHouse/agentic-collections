@@ -12,6 +12,48 @@ under `[Unreleased]` would be false the moment it was pushed.
 Teammates receive these updates by running `/plugin update` — a change to this file
 alone reaches nobody.
 
+## [0.12.2] - 2026-11-24
+
+### Fixed
+
+- **A plan for a feature that needs a schema change now loads the database skills.**
+  A feature can need a new column without saying so ("show last seen on the users
+  list"). `creating-implementation-plans` now decides whether the work changes the
+  schema before writing tasks and, when skills for the project's database engine are
+  installed, loads the ones that cover it (design, migration) and names them in the
+  Technical Context for the tasks that change the schema. In a four-turn probe on
+  Sonnet, a plan for such a feature loaded the PostgreSQL design and migration skills
+  in 6 of 6 runs each, up from 0 of 6. Six runs is a small sample, the prompt named
+  the engine, the probe had no repository, and `tsh-stack-postgresql` 0.2.0 changed
+  its triggers in the same release, so the gain is not the plan rule's alone.
+- **An "add X to Y" request whose change spans layers now reaches feature
+  orchestration**, and through it the plan and the database skills.
+  `orchestrating-feature-implementation` triggers on "add X to Y" or "show X on Y"
+  when the change spans layers (a new field stored, served and shown), even when it
+  sounds small; a migration asked for on its own stays with the database engine's
+  skill. In a NestJS and PostgreSQL repository, "Add a 'last seen' timestamp to user
+  profiles and show it on the admin users list, sortable" loaded no skill in 6 of 6
+  runs before, and the code and migration were written at once. After, the
+  orchestrator, the plan and both database skills loaded in 6 of 6, and every run
+  stopped at a plan whose Technical Context names both database skills. In the same
+  repository, a one-file change went to a single edit in 4 of 4 runs; that was not
+  measured before the change. Two new routing cases keep the trigger off an explicit
+  column migration and a one-file UI change, 6 of 6 each.
+
+### Changed
+
+- **A change that touches the schema is no longer trivial** for
+  `orchestrating-feature-implementation`: it needs a plan, like any change with a
+  design decision, and is not done inline.
+- **Delegations forward the skills the plan's Technical Context names** for the
+  task, and `software-engineer` loads them before writing code. When a task changes
+  the schema and neither the plan nor the delegation names the database engine's
+  skills, `software-engineer` loads the installed ones that cover it. With an
+  approved plan that names the skills, the implementer loaded both before writing the
+  migration in 6 of 6 runs, but so did 0.12.1: the plan's Technical Context is what
+  carries them. The implementer's own fallback, for a plan written by hand without
+  those names, was not measured. The probes are manual checks in `evals/README.md`.
+
 ## [0.12.1] - 2026-11-16
 
 ### Fixed

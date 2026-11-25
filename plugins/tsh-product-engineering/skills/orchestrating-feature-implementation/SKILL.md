@@ -1,7 +1,7 @@
 ---
 name: orchestrating-feature-implementation
 description: "Implements a feature, ticket, or plan end to end from the main conversation: confirms a plan file exists, delegates each task to implementer subagents — in parallel where the plan allows — gates on their reports, then closes with the plan's final verification phase: code review and functional verification in parallel. Use for any feature request or multi-file change, before the first file is edited."
-when_to_use: "Trigger on: 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code; fixing a bug whose cause is not yet known is debugging-code."
+when_to_use: "Trigger on: 'add X to Y' or 'show X on Y' when the change spans layers (a new field stored, served and shown, even when it sounds small), 'implement this', 'build this feature', 'do this ticket', executing or resuming a *.plan.md, work spanning more than one file or task, delegating implementation to subagents or running tasks in parallel, or a change that looks obvious enough to just start editing. Writing the plan is creating-implementation-plans; judging finished work is reviewing-code; fixing a bug whose cause is not yet known is debugging-code; a migration asked for on its own is the database engine's skill."
 ---
 
 # Orchestrating Feature Implementation
@@ -33,8 +33,8 @@ of it.
 
 | Severity | Rule |
 | --- | --- |
-| MUST | Have a plan file the user has read before non-trivial implementation starts. No plan → create one first via `creating-implementation-plans`, which ships in this plugin and is always available. Only a genuinely trivial change (single file, no design decision) may proceed planless. |
-| MUST | Make every delegation self-contained: exact plan path, task ID(s), the instruction to read the plan's Technical Context first, and any pinned inputs (dev server URL, design URLs). Subagents have no conversation history. |
+| MUST | Have a plan file the user has read before non-trivial implementation starts. No plan → create one first via `creating-implementation-plans`, which ships in this plugin and is always available. Only a genuinely trivial change (single file, no design decision, no schema change) may proceed planless. |
+| MUST | Make every delegation self-contained: exact plan path, task ID(s), the instruction to read the plan's Technical Context first, the skills it names for that task's work (the database engine's skills for a schema change, for example) to load before writing code, and any pinned inputs (dev server URL, design URLs). Subagents have no conversation history. |
 | MUST | Run tasks in parallel only when the plan marks them as one parallel group and their `**Files:**` lists are disjoint. Launch the group's subagents in a single message; run everything else in plan order. |
 | MUST | Gate on every task report: confirm it names each Definition of Done command with a passing result, and read the files-changed and deviations sections critically — they are gate inputs, not decoration. Re-run nothing at this tier; the final verification phase re-establishes evidence. A failed, blocked, or command-less report stops the flow. |
 | MUST | Run each phase's `Verification:` line exactly once, when its last task completes — an integration-scoped check of what the phase's tasks created plus one typecheck or build. Never a re-run of task Definitions of Done, never a full suite. |
@@ -53,7 +53,7 @@ of it.
 | UI verification capture — ACTUAL evidence from the running app, per gate iteration | `ui-capture-worker` subagent |
 | UI verification verdict — Figma comparison on captured artifacts, per gate iteration | `ui-reviewer` subagent |
 | Any other implementation task — backend, logic, tests, config | `software-engineer` subagent |
-| Trivial single-file change with no design decision | Inline, in this conversation |
+| Trivial single-file change with no design decision and no schema change | Inline, in this conversation |
 | A bug whose cause is not yet established | `debugging-code`, in this conversation — a fix that outgrows a minimal change comes back here as a plan carrying the established root cause |
 | Code review, in the final verification phase | `code-reviewer` subagent |
 | Functional verification of the delivered feature, in the final verification phase | `feature-verifier` subagent |
@@ -85,8 +85,9 @@ of it.
    unchanged to every delegate that needs them, the verifier included.
 5. **Execute.** Walk the plan in order. For a parallel group, launch all its
    subagents in one message; otherwise one task at a time. Each delegation states the
-   plan path, the task ID, the expected result shape (files changed, verification
-   output, deviations), and the pinned inputs.
+   plan path, the task ID, the skills the Technical Context names for that task, the
+   expected result shape (files changed, verification output, deviations), and the
+   pinned inputs.
 6. **Record and gate.** After each task: read the report, confirm the Definition of
    Done commands ran and passed as reported, check the task's boxes in the plan,
    update the todo — and re-run nothing. When a phase's last task completes, run the

@@ -1,7 +1,8 @@
 # Backfilling data
 
-Use this reference when existing rows must be updated or copied as part of a schema
-change: filling a new column, converting values, splitting or merging columns.
+Use this reference when existing rows must be updated, copied or deleted in bulk:
+filling a new column, converting values, splitting or merging columns, purging old
+rows.
 
 ## Why not one UPDATE
 
@@ -66,6 +67,50 @@ has to catch up on old rows.
   takes `ACCESS EXCLUSIVE`.
 - Verify before the next step relies on it: `SELECT count(*) FROM t WHERE c IS NULL`
   must be 0 before `NOT NULL` is added.
+
+## Deleting in bulk
+
+The same rules hold for deleting old rows: walk the primary key in batches, commit
+between them, pause on replica lag.
+
+```sql
+-- once, before the loop
+SELECT max(id) AS max_id FROM events WHERE created_at < :cutoff;
+
+-- one batch; repeat until it deletes 0 rows
+WITH batch AS (
+  SELECT id FROM events
+  WHERE id > :last_id AND id <= :max_id AND created_at < :cutoff
+  ORDER BY id
+  LIMIT 5000
+  FOR UPDATE
+)
+DELETE FROM events e
+USING batch
+WHERE e.id = batch.id
+RETURNING e.id;   -- the highest id is the next :last_id
+```
+
+- **Lock the candidates in the selection (`FOR UPDATE`).** Without it, a row that
+  another transaction changes while the batch waits for it is re-checked only
+  against `id`, and is deleted although it no longer matches the filter. With it,
+  the filter is re-checked, rows that stopped matching or were deleted by another job
+  are skipped, and the batch still fills; a batch that deletes 0 rows has no
+  candidates left.
+- **Bound the walk with `:max_id`.** Without it, the last batch, which finds nothing,
+  scans the key from `:last_id` to the end of the table, and on a retention delete
+  the kept tail is most of it. The bound saves that walk only when ids grow with
+  `created_at`; otherwise eligible rows reach the end of the table anyway.
+- **Index every column that references the table.** Each deleted row is checked
+  against the referencing table, and with no index on the referencing column each
+  check is a sequential scan of it: a batch of thousands of rows then takes seconds
+  instead of milliseconds.
+- `ON DELETE CASCADE` and delete triggers make a batch larger than its row count.
+
+Vacuum makes the freed space reusable but does not shrink the file, except for empty
+pages at its end; only a rewrite does, and `VACUUM FULL` takes `ACCESS EXCLUSIVE` for
+its whole run. For data removed by age, partitioning by time and dropping whole
+partitions is cheaper, a design decision for `designing-postgresql-schemas`.
 
 ## Copying into a new table
 

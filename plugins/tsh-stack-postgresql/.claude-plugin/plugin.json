@@ -2,7 +2,7 @@
   "name": "tsh-stack-postgresql",
   "displayName": "TSH Stack: PostgreSQL",
   "description": "TSH practices for PostgreSQL 14–18, whatever ORM sits on top: schema migrations that run against live traffic without blocking it, finding and fixing slow queries from pg_stat_statements and EXPLAIN plans, and table design with types and constraints that keep bad data out.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": {
     "name": "The Software House",
     "url": "https://tsh.io"

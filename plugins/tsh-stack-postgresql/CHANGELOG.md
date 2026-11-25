@@ -10,6 +10,35 @@ under `[Unreleased]` would be false the moment it was pushed. Every entry below 
 a released version, and its version bump landed in the same commit as the change it
 describes.
 
+## [0.2.0] - 2026-11-24
+
+### Added
+
+- **Deleting in bulk**, in `backfilling-data.md`, which now also loads when rows
+  must be deleted; `migrating-postgresql-schemas` triggers on purging rows from a
+  large table, and its batching rule covers `DELETE` as well as `UPDATE`. A batch
+  locks its candidates with `FOR UPDATE`, so a row that a concurrent update moves out
+  of the filter is not deleted, bounds the key walk with a `max(id)` taken once, and
+  needs every referencing column indexed. The race and the fix were checked on
+  PostgreSQL 16.
+- Never `updated_at` as the optimistic locking version; collation among the
+  conventions to read first and not to duplicate; a full connection pool checked as
+  a database symptom (a lock queue, `idle in transaction`) before the database is
+  called innocent. These came from comparing this plugin with the MySQL one.
+
+### Changed
+
+- **Handover to another engine's skill.** On MySQL, MariaDB or another engine, each
+  skill still says it does not apply, and now loads that engine's skill for the same
+  work when one is installed instead of only stopping.
+- **Triggers name the engine where they were generic**: schema design, migrations on
+  an existing table, a migration that hung, and log output, where "slow-query-log"
+  became "auto_explain or PostgreSQL log output". The slow-endpoint trigger stays
+  generic: naming the engine there cost one run in nine on a prompt that does not
+  name it. All seven routing cases that load this plugin passed (3 of 3 each; the
+  slow-query case 6 of 6 after that trigger was reverted), and the migration cases
+  passed again after the purge trigger was added.
+
 ## [0.1.1] - 2026-11-16
 
 ### Fixed
