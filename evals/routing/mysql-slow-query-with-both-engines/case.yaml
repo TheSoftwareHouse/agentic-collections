@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: mysql-slow-query-with-both-engines
+description: With both database plugins installed, a plainly worded slow-report question on MySQL, with no plan output or MySQL jargon, must route to optimizing-mysql-queries and fire none of the PostgreSQL skills.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
+runs: 1
+execution:
+  prompt: |
+    The customers report in our back office takes 6 seconds to load and it's getting worse every month.
+    The database is MySQL. It sums order totals per customer for one day out of roughly 40 million orders.
+    How do I find out what's wrong and fix it?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-mysql-queries"'
+    arm: with-only
+  - name: optimizing-postgresql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    min: 0
+    max: 0
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0

@@ -13,6 +13,21 @@
       "a": "tsh-product-testing:auditing-accessibility",
       "b": "tsh-stack-frontend:ensuring-accessibility",
       "reason": "Audit vs build; a11y-audit-not-build and a11y-build-not-audit prove they route apart."
+    },
+    {
+      "a": "tsh-stack-mysql:migrating-mysql-schemas",
+      "b": "tsh-stack-postgresql:migrating-postgresql-schemas",
+      "reason": "Same job on two engines, deliberately duplicated per .claude/rules/stack-plugin-conventions.md; mysql-migration-with-both-engines and pg-migration-with-both-engines prove they route apart."
+    },
+    {
+      "a": "tsh-stack-mysql:optimizing-mysql-queries",
+      "b": "tsh-stack-postgresql:optimizing-postgresql-queries",
+      "reason": "Same job on two engines, deliberately duplicated; mysql-slow-query-with-both-engines and pg-slow-query-with-both-engines prove they route apart."
+    },
+    {
+      "a": "tsh-stack-mysql:designing-mysql-schemas",
+      "b": "tsh-stack-mysql:migrating-mysql-schemas",
+      "reason": "New tables against changing populated ones; mysql-schema-design-not-planning and mysql-migration-not-schema-design prove they route apart."
     }
   ]
 }

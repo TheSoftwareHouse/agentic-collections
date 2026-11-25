@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: mysql-migration-with-both-engines
+description: With both database plugins installed, a plainly worded migration question about a MySQL table, with no MySQL jargon, must route to migrating-mysql-schemas and fire none of the PostgreSQL skills.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
+runs: 1
+execution:
+  prompt: |
+    Our Laravel app runs on MySQL. The next release makes users.phone required, so the column has to become
+    NOT NULL. The users table has about 30 million rows and people sign up all day. How do we ship that safely?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-mysql-schemas"'
+    arm: with-only
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-postgresql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    min: 0
+    max: 0
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0

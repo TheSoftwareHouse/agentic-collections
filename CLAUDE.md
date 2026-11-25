@@ -50,6 +50,7 @@ If a contribution genuinely spans two disciplines, put it in the one that owns t
 | `tsh-stack-gcp` | GCP — Terraform resource patterns, Architecture Framework defaults, project cost and labelling audits |
 | `tsh-stack-azure` | Azure — Terraform resource patterns, Well-Architected defaults, subscription cost and tagging audits |
 | `tsh-stack-postgresql` | PostgreSQL — live-table schema migrations, query plans and indexing, and table design with types and constraints, beneath whatever ORM a project uses |
+| `tsh-stack-mysql` | MySQL and Aurora MySQL — online DDL that neither blocks writes nor stalls replicas, query plans and indexing, and table design with types, collations and constraints, beneath whatever ORM a project uses |
 
 Every technology stack gets its own plugin, created when it has real content to ship,
 not before. The family has three shapes: **runtime targets for application code**,
