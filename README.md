@@ -78,6 +78,7 @@ Copy just the lines you need:
 /plugin install tsh-stack-python@tsh-agentic-collections
 /plugin install tsh-stack-php@tsh-agentic-collections
 /plugin install tsh-stack-postgresql@tsh-agentic-collections
+/plugin install tsh-stack-mysql@tsh-agentic-collections
 /plugin install tsh-stack-aws@tsh-agentic-collections
 /plugin install tsh-stack-gcp@tsh-agentic-collections
 /plugin install tsh-stack-azure@tsh-agentic-collections
@@ -310,6 +311,7 @@ Install what the project is built on, at **Project** scope.
 | [`tsh-stack-python`](plugins/tsh-stack-python) | Modern Python 3.12+: implementation and review practices, and Pydantic v2 / dataclass / SQLModel / SQLAlchemy 2.0 data modelling | `/plugin install tsh-stack-python@tsh-agentic-collections` |
 | [`tsh-stack-php`](plugins/tsh-stack-php) | PHP 7.4–8.5 and Symfony 5.4–8.x: detects the project's versions and uses only what they support, YAGNI and KISS first, patterns only when justified, refactoring, PSR-12, Symfony features and their version differences, and a PHP code reviewer agent | `/plugin install tsh-stack-php@tsh-agentic-collections` |
 | [`tsh-stack-postgresql`](plugins/tsh-stack-postgresql) | PostgreSQL 14–18 beneath any ORM: migrations that run against a live table without blocking it, slow queries found from `pg_stat_statements` and `EXPLAIN` and fixed, and table design with types and constraints that keep bad data out | `/plugin install tsh-stack-postgresql@tsh-agentic-collections` |
+| [`tsh-stack-mysql`](plugins/tsh-stack-mysql) | MySQL 8.0, 8.4 and 9.7 beneath any ORM, Aurora MySQL included: migrations whose `ALTER` neither copies a busy table nor queues every query behind its metadata lock, slow queries found from `performance_schema` and `EXPLAIN ANALYZE` and fixed, and table design with types, collations and constraints that keep bad data out | `/plugin install tsh-stack-mysql@tsh-agentic-collections` |
 | [`tsh-stack-aws`](plugins/tsh-stack-aws) | AWS: Terraform patterns for VPC, EKS, RDS and S3, Well-Architected defaults, and an evidence-based cost and tagging audit of a live account | `/plugin install tsh-stack-aws@tsh-agentic-collections` |
 | [`tsh-stack-gcp`](plugins/tsh-stack-gcp) | GCP: Terraform patterns for VPC, GKE, Cloud SQL, Cloud Storage and Cloud Run, Workload Identity and CMEK defaults, and a cost and labelling audit of a live project | `/plugin install tsh-stack-gcp@tsh-agentic-collections` |
 | [`tsh-stack-azure`](plugins/tsh-stack-azure) | Azure: Terraform patterns for VNet, AKS, Flexible Server, Blob Storage, Application Gateway and Key Vault, Managed Identity defaults, and a cost and tagging audit via Resource Graph | `/plugin install tsh-stack-azure@tsh-agentic-collections` |

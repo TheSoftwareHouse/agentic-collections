@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: mariadb-migration-not-mysql
+description: A migration question about a MariaDB table must fire none of the MySQL skills, whose online DDL algorithms and limits have diverged from MariaDB's.
+tags: [routing]
+plugins: ["../../../plugins/tsh-stack-mysql"]
+runs: 1
+execution:
+  prompt: |
+    We run MariaDB 10.11 and our orders table has about 60 million rows with writes all day. I need to
+    widen the amount column from INT to BIGINT in the next release. Will the ALTER block writes, and how should the migration look?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: migrating-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-mysql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-mysql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-mysql-queries"'
+    min: 0
+    max: 0
+  - name: designing-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-mysql-schemas"'
+    min: 0
+    max: 0

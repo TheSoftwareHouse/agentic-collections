@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: mysql-schema-design-not-planning
+description: Designing the tables for a new feature on MySQL must route to designing-mysql-schemas, not to implementation planning or feature orchestration, although it opens like a feature request, and not to migrations, since the tables do not exist yet.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    We're adding subscriptions to the billing service, which runs on MySQL. A customer can have at most one
+    active subscription per plan, a subscription has a price, a trial end, and a status that goes trial, active,
+    past due, cancelled. We need to keep when each status change happened. Sketch the tables before anyone writes code.
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-mysql-schemas"'
+    arm: with-only
+  - name: creating-implementation-plans-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?creating-implementation-plans"'
+    min: 0
+    max: 0
+  - name: orchestrating-feature-implementation-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?orchestrating-feature-implementation"'
+    min: 0
+    max: 0
+  - name: migrating-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-mysql-schemas"'
+    min: 0
+    max: 0

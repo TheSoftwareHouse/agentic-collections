@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: mysql-schema-design-with-both-engines
+description: With both database plugins installed, designing tables for a MySQL database must route to designing-mysql-schemas and fire none of the PostgreSQL skills.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-stack-postgresql"]
+runs: 1
+execution:
+  prompt: |
+    New multi-tenant invoicing module on our MySQL 8.4 database. Tenants have customers, customers get invoices
+    with line items, amounts in several currencies, and invoice numbers unique per tenant. How should the tables look?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-mysql-schemas"'
+    arm: with-only
+  - name: designing-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: migrating-postgresql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-postgresql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-postgresql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-postgresql-queries"'
+    min: 0
+    max: 0

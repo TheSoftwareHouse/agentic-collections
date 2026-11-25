@@ -124,6 +124,19 @@
       "keywords": ["tsh", "stack", "postgresql", "postgres", "database", "migrations", "sql", "indexes", "explain"]
     },
     {
+      "name": "tsh-stack-mysql",
+      "source": "./plugins/tsh-stack-mysql",
+      "displayName": "TSH Stack: MySQL",
+      "description": "TSH practices for MySQL 8.0, 8.4 and 9.7 with InnoDB, Aurora MySQL included, whatever ORM sits on top: schema migrations that run against live traffic without blocking it or stalling replicas, finding and fixing slow queries from performance_schema and EXPLAIN ANALYZE, and table design with types, collations and constraints that keep bad data out.",
+      "category": "database",
+      "license": "MIT",
+      "author": {
+        "name": "The Software House",
+        "url": "https://tsh.io"
+      },
+      "keywords": ["tsh", "stack", "mysql", "innodb", "aurora", "database", "migrations", "online-ddl", "gh-ost", "sql", "indexes", "explain"]
+    },
+    {
       "name": "tsh-stack-aws",
       "source": "./plugins/tsh-stack-aws",
       "displayName": "TSH Stack: AWS",

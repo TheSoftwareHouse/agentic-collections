@@ -1,0 +1,46 @@
+schema_version: "1.1"
+name: mysql-migration-not-schema-design
+description: Asking whether a migration will block a busy MySQL table must route to migrating-mysql-schemas, not to schema design, query tuning, debugging or the general code review, although it is a pasted change that adds a foreign key and an index.
+tags: [routing, cross-plugin]
+plugins: ["../../../plugins/tsh-stack-mysql", "../../../plugins/tsh-product-engineering"]
+runs: 1
+execution:
+  prompt: |
+    This runs on deploy against our orders table on MySQL 8.4, about 80 million rows and busy all day:
+
+    ALTER TABLE orders ADD CONSTRAINT orders_customer_fk FOREIGN KEY (customer_id) REFERENCES customers (id);
+    CREATE INDEX orders_created_at_idx ON orders (created_at);
+
+    Will this freeze checkout while it runs? If so, what should we ship instead?
+  max_turns: 1
+  allowed_tools: [Skill]
+graders:
+  - name: fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?migrating-mysql-schemas"'
+    arm: with-only
+  - name: designing-mysql-schemas-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?designing-mysql-schemas"'
+    min: 0
+    max: 0
+  - name: optimizing-mysql-queries-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?optimizing-mysql-queries"'
+    min: 0
+    max: 0
+  - name: debugging-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?debugging-code"'
+    min: 0
+    max: 0
+  - name: reviewing-code-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?reviewing-code"'
+    min: 0
+    max: 0
